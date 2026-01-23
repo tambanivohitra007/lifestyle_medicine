@@ -5,6 +5,11 @@ import Header from './Header';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    // Load collapsed state from localStorage
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
   const location = useLocation();
 
   // Close sidebar on route change (mobile)
@@ -23,14 +28,35 @@ const Layout = () => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, []);
 
+  // Save collapsed state to localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(sidebarCollapsed));
+  }, [sidebarCollapsed]);
+
+  const toggleCollapse = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar
+        isOpen={sidebarOpen}
+        isCollapsed={sidebarCollapsed}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-64">
-        <Header onMenuClick={() => setSidebarOpen(true)} />
+      <div
+        className={`flex-1 transition-all duration-300 ${
+          sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
+        }`}
+      >
+        <Header
+          onMenuClick={() => setSidebarOpen(true)}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={toggleCollapse}
+        />
         <main className="p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>

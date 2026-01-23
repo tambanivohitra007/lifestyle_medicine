@@ -1,8 +1,8 @@
-import { Bell, User, LogOut, Menu, Settings } from 'lucide-react';
+import { Bell, User, LogOut, Menu, Settings, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
-const Header = ({ onMenuClick }) => {
+const Header = ({ onMenuClick, isCollapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -23,6 +23,20 @@ const Header = ({ onMenuClick }) => {
             aria-label="Open menu"
           >
             <Menu className="w-6 h-6 text-gray-600" />
+          </button>
+
+          {/* Desktop Collapse Toggle Button */}
+          <button
+            onClick={onToggleCollapse}
+            className="hidden lg:flex p-2 -ml-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors"
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? (
+              <PanelLeft className="w-5 h-5 text-gray-600" />
+            ) : (
+              <PanelLeftClose className="w-5 h-5 text-gray-600" />
+            )}
           </button>
 
           {/* Title */}

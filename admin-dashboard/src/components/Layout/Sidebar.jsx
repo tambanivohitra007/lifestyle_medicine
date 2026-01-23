@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Heart,
   Activity,
-  FileText,
   Book,
   ChefHat,
   Bookmark,
@@ -16,7 +15,7 @@ import {
   Upload,
 } from 'lucide-react';
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/search', icon: Search, label: 'Search' },
@@ -46,19 +45,30 @@ const Sidebar = ({ isOpen, onClose }) => {
       {/* Sidebar */}
       <aside
         className={`
-          fixed left-0 top-0 z-50 h-full w-64 bg-secondary-900 text-white overflow-y-auto
-          transform transition-transform duration-300 ease-in-out
+          fixed left-0 top-0 z-50 h-full bg-secondary-900 text-white overflow-y-auto
+          transform transition-all duration-300 ease-in-out
+          ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
+          w-64
           lg:translate-x-0
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         {/* Logo & Close Button */}
-        <div className="p-4 sm:p-6 border-b border-secondary-800 flex items-center justify-between">
-          <img
-            src="/lifestyle.png"
-            alt="Family & Lifestyle Medicine"
-            className="w-full h-auto max-w-[180px]"
-          />
+        <div className={`p-4 sm:p-6 border-b border-secondary-800 flex items-center ${isCollapsed ? 'lg:justify-center lg:p-4' : 'justify-between'}`}>
+          {/* Logo - full on mobile, conditional on desktop */}
+          <div className={`${isCollapsed ? 'lg:hidden' : ''}`}>
+            <img
+              src="/lifestyle.png"
+              alt="Family & Lifestyle Medicine"
+              className="w-full h-auto max-w-[180px]"
+            />
+          </div>
+          {/* Collapsed logo icon - desktop only */}
+          {isCollapsed && (
+            <div className="hidden lg:flex items-center justify-center w-10 h-10 rounded-lg bg-primary-600">
+              <Heart className="w-6 h-6 text-white" />
+            </div>
+          )}
           {/* Close button - visible only on mobile */}
           <button
             onClick={onClose}
@@ -70,15 +80,18 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="p-3 sm:p-4">
+        <nav className={`p-3 sm:p-4 ${isCollapsed ? 'lg:p-2' : ''}`}>
           <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}
                   end={item.to === '/'}
+                  title={isCollapsed ? item.label : undefined}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 sm:px-4 py-3 rounded-lg transition-colors duration-200 touch-manipulation ${
+                      isCollapsed ? 'lg:px-0 lg:justify-center' : ''
+                    } ${
                       isActive
                         ? 'bg-primary-600 text-white'
                         : 'text-gray-300 hover:bg-secondary-800 hover:text-white active:bg-secondary-700'
@@ -86,7 +99,9 @@ const Sidebar = ({ isOpen, onClose }) => {
                   }
                 >
                   <item.icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="font-medium">{item.label}</span>
+                  <span className={`font-medium ${isCollapsed ? 'lg:hidden' : ''}`}>
+                    {item.label}
+                  </span>
                 </NavLink>
               </li>
             ))}
