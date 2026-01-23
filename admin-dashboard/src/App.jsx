@@ -6,6 +6,20 @@ import Dashboard from './pages/Dashboard';
 import Conditions from './pages/Conditions';
 import ConditionForm from './pages/ConditionForm';
 import ConditionDetail from './pages/ConditionDetail';
+import CareDomains from './pages/CareDomains';
+import CareDomainForm from './pages/CareDomainForm';
+import Interventions from './pages/Interventions';
+import InterventionForm from './pages/InterventionForm';
+import InterventionDetail from './pages/InterventionDetail';
+import Evidence from './pages/Evidence';
+import EvidenceForm from './pages/EvidenceForm';
+import References from './pages/References';
+import ReferenceForm from './pages/ReferenceForm';
+import Scriptures from './pages/Scriptures';
+import ScriptureForm from './pages/ScriptureForm';
+import Recipes from './pages/Recipes';
+import RecipeForm from './pages/RecipeForm';
+import ContentTags from './pages/ContentTags';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -21,14 +35,6 @@ const ProtectedRoute = ({ children }) => {
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
-
-// Placeholder components for other pages
-const ComingSoon = ({ title }) => (
-  <div className="card text-center py-12">
-    <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
-    <p className="text-gray-600">This page is coming soon!</p>
-  </div>
-);
 
 function App() {
   return (
@@ -48,29 +54,46 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
+
+            {/* Conditions */}
             <Route path="conditions" element={<Conditions />} />
             <Route path="conditions/new" element={<ConditionForm />} />
             <Route path="conditions/:id" element={<ConditionDetail />} />
             <Route path="conditions/:id/edit" element={<ConditionForm />} />
-            <Route
-              path="interventions"
-              element={<ComingSoon title="Interventions" />}
-            />
-            <Route
-              path="care-domains"
-              element={<ComingSoon title="Care Domains" />}
-            />
-            <Route path="evidence" element={<ComingSoon title="Evidence" />} />
-            <Route
-              path="references"
-              element={<ComingSoon title="References" />}
-            />
-            <Route
-              path="scriptures"
-              element={<ComingSoon title="Scriptures" />}
-            />
-            <Route path="recipes" element={<ComingSoon title="Recipes" />} />
-            <Route path="tags" element={<ComingSoon title="Content Tags" />} />
+
+            {/* Care Domains */}
+            <Route path="care-domains" element={<CareDomains />} />
+            <Route path="care-domains/new" element={<CareDomainForm />} />
+            <Route path="care-domains/:id/edit" element={<CareDomainForm />} />
+
+            {/* Interventions */}
+            <Route path="interventions" element={<Interventions />} />
+            <Route path="interventions/new" element={<InterventionForm />} />
+            <Route path="interventions/:id" element={<InterventionDetail />} />
+            <Route path="interventions/:id/edit" element={<InterventionForm />} />
+
+            {/* Evidence */}
+            <Route path="evidence" element={<Evidence />} />
+            <Route path="evidence/new" element={<EvidenceForm />} />
+            <Route path="evidence/:id/edit" element={<EvidenceForm />} />
+
+            {/* References */}
+            <Route path="references" element={<References />} />
+            <Route path="references/new" element={<ReferenceForm />} />
+            <Route path="references/:id/edit" element={<ReferenceForm />} />
+
+            {/* Scriptures */}
+            <Route path="scriptures" element={<Scriptures />} />
+            <Route path="scriptures/new" element={<ScriptureForm />} />
+            <Route path="scriptures/:id/edit" element={<ScriptureForm />} />
+
+            {/* Recipes */}
+            <Route path="recipes" element={<Recipes />} />
+            <Route path="recipes/new" element={<RecipeForm />} />
+            <Route path="recipes/:id/edit" element={<RecipeForm />} />
+
+            {/* Content Tags */}
+            <Route path="tags" element={<ContentTags />} />
           </Route>
 
           {/* Catch all */}
@@ -81,4 +104,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
