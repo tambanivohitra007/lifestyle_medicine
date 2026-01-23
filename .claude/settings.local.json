@@ -18,7 +18,10 @@
       "Bash(npm run build:*)",
       "Bash(composer require:*)",
       "Bash(ls:*)",
-      "Bash(composer show:*)"
+      "Bash(composer show:*)",
+      "WebFetch(domain:scripture.api.bible)",
+      "WebFetch(domain:docs.api.bible)",
+      "WebFetch(domain:api.scripture.api.bible)"
     ]
   }
 }

@@ -123,4 +123,10 @@ export const apiEndpoints = {
   // AI Suggestions
   aiSuggestScriptures: '/admin/ai/suggest-scriptures',
   aiSuggestEgwReferences: '/admin/ai/suggest-egw-references',
+
+  // Bible API
+  bibleVersions: '/bible/versions',
+  bibleSearch: '/bible/search',
+  bibleVerse: '/bible/verse',
+  biblePassage: '/bible/passage',
 };

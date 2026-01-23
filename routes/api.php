@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AiSuggestionController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BibleController;
 use App\Http\Controllers\Api\CareDomainController;
 use App\Http\Controllers\Api\ConditionController;
 use App\Http\Controllers\Api\ConditionSectionController;
@@ -34,6 +35,12 @@ Route::prefix('v1')->group(function () {
 
     // Global Search
     Route::get('/search', [SearchController::class, 'search']);
+
+    // Bible API
+    Route::get('/bible/versions', [BibleController::class, 'getBibles']);
+    Route::get('/bible/search', [BibleController::class, 'searchVerses']);
+    Route::get('/bible/verse', [BibleController::class, 'getVerse']);
+    Route::get('/bible/passage', [BibleController::class, 'getPassage']);
 
     // Care Domains
     Route::apiResource('care-domains', CareDomainController::class)->only(['index', 'show']);

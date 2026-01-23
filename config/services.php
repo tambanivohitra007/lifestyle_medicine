@@ -39,4 +39,9 @@ return [
         'api_key' => env('GEMINI_API_KEY'),
     ],
 
+    'bible_api' => [
+        'api_key' => env('BIBLE_API_KEY'),
+        'default_bible_id' => env('BIBLE_API_DEFAULT_ID', 'de4e12af7f28f599-02'), // KJV
+    ],
+
 ];
