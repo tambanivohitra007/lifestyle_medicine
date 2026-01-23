@@ -45,7 +45,7 @@ class EvidenceEntryController extends Controller
 
     public function show(EvidenceEntry $evidenceEntry): EvidenceEntryResource
     {
-        $evidenceEntry->load(['intervention', 'references']);
+        $evidenceEntry->load(['intervention', 'references', 'creator', 'updater']);
 
         return new EvidenceEntryResource($evidenceEntry);
     }

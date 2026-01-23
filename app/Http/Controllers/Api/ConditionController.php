@@ -40,7 +40,7 @@ class ConditionController extends Controller
 
     public function show(Condition $condition): ConditionResource
     {
-        $condition->load(['sections', 'interventions.careDomain']);
+        $condition->load(['sections', 'interventions.careDomain', 'creator', 'updater']);
 
         return new ConditionResource($condition);
     }

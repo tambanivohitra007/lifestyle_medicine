@@ -41,7 +41,7 @@ class InterventionController extends Controller
 
     public function show(Intervention $intervention): InterventionResource
     {
-        $intervention->load(['careDomain', 'evidenceEntries.references', 'tags', 'media']);
+        $intervention->load(['careDomain', 'evidenceEntries.references', 'tags', 'media', 'creator', 'updater']);
 
         return new InterventionResource($intervention);
     }

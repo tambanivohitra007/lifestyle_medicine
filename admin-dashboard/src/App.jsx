@@ -29,6 +29,8 @@ import ContentTags from './pages/ContentTags';
 import Profile from './pages/Profile';
 import Search from './pages/Search';
 import Import from './pages/Import';
+import Users from './pages/Users';
+import UserForm from './pages/UserForm';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -110,6 +112,11 @@ function App() {
 
             {/* Content Tags */}
             <Route path="tags" element={<ContentTags />} />
+
+            {/* Users */}
+            <Route path="users" element={<Users />} />
+            <Route path="users/new" element={<UserForm />} />
+            <Route path="users/:id/edit" element={<UserForm />} />
 
             {/* Profile */}
             <Route path="profile" element={<Profile />} />

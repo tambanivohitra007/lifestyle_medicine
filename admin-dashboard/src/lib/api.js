@@ -104,4 +104,9 @@ export const apiEndpoints = {
   // Export
   exportConditionPdf: (id) => `/export/conditions/${id}/pdf`,
   exportConditionsSummaryPdf: '/export/conditions/summary/pdf',
+
+  // User Management
+  users: '/admin/users',
+  userToggleActive: (id) => `/admin/users/${id}/toggle-active`,
+  userRestore: (id) => `/admin/users/${id}/restore`,
 };

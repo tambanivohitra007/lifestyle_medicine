@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ScriptureController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\MediaController;
+use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -106,4 +107,9 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     Route::post('import/conditions', [ImportController::class, 'importConditions']);
     Route::post('import/interventions', [ImportController::class, 'importInterventions']);
     Route::get('import/templates', [ImportController::class, 'getTemplates']);
+
+    // User Management (admin only)
+    Route::apiResource('users', UserController::class);
+    Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive']);
+    Route::post('users/{id}/restore', [UserController::class, 'restore']);
 });

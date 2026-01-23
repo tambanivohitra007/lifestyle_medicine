@@ -13,6 +13,7 @@ import {
   Settings,
   Search,
   Upload,
+  Users,
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
@@ -44,6 +45,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
     {
       title: 'System',
       items: [
+        { to: '/users', icon: Users, label: 'Users' },
         { to: '/tags', icon: Tag, label: 'Content Tags' },
         { to: '/import', icon: Upload, label: 'Import Data' },
         { to: '/profile', icon: Settings, label: 'Settings' },

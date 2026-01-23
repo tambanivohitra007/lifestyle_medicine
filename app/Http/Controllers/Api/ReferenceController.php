@@ -34,6 +34,8 @@ class ReferenceController extends Controller
 
     public function show(Reference $reference): ReferenceResource
     {
+        $reference->load(['creator', 'updater']);
+
         return new ReferenceResource($reference);
     }
 

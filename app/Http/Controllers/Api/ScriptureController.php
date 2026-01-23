@@ -40,7 +40,7 @@ class ScriptureController extends Controller
 
     public function show(Scripture $scripture): ScriptureResource
     {
-        $scripture->load(['conditions', 'interventions', 'tags']);
+        $scripture->load(['conditions', 'interventions', 'tags', 'creator', 'updater']);
 
         return new ScriptureResource($scripture);
     }

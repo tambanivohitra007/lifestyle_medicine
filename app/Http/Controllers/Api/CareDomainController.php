@@ -23,7 +23,7 @@ class CareDomainController extends Controller
 
     public function show(CareDomain $careDomain): CareDomainResource
     {
-        $careDomain->load('interventions');
+        $careDomain->load(['interventions', 'creator', 'updater']);
 
         return new CareDomainResource($careDomain);
     }

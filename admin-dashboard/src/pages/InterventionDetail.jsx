@@ -15,6 +15,7 @@ import {
 import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete } from '../lib/swal';
 import Breadcrumbs from '../components/Breadcrumbs';
+import AuditInfo from '../components/AuditInfo';
 
 const QUALITY_RATING = {
   A: { label: 'A - High', color: 'bg-green-100 text-green-700' },
@@ -200,6 +201,9 @@ const InterventionDetail = () => {
                 <p className="text-gray-600 whitespace-pre-wrap">{intervention.mechanism}</p>
               </div>
             )}
+
+            {/* Audit Info */}
+            <AuditInfo data={intervention} />
 
             {!intervention.description && !intervention.mechanism && (
               <div className="card text-center py-8">

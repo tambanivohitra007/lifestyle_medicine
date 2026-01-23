@@ -39,7 +39,7 @@ class RecipeController extends Controller
 
     public function show(Recipe $recipe): RecipeResource
     {
-        $recipe->load(['conditions', 'interventions', 'tags']);
+        $recipe->load(['conditions', 'interventions', 'tags', 'creator', 'updater']);
 
         return new RecipeResource($recipe);
     }

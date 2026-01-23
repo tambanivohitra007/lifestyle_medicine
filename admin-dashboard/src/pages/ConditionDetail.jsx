@@ -17,6 +17,7 @@ import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../lib/swal';
 import ConditionWorkflowGuide from '../components/ConditionWorkflowGuide';
 import Breadcrumbs from '../components/Breadcrumbs';
+import AuditInfo from '../components/AuditInfo';
 
 const SECTION_TYPES = {
   risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
@@ -250,6 +251,9 @@ const ConditionDetail = () => {
           <p className="text-gray-600 whitespace-pre-wrap text-sm sm:text-base">{condition.summary}</p>
         </div>
       )}
+
+      {/* Audit Info */}
+      <AuditInfo data={condition} />
 
       {/* Workflow Guide */}
       <ConditionWorkflowGuide

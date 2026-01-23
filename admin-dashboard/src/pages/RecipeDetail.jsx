@@ -11,6 +11,7 @@ import {
 import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete } from '../lib/swal';
 import Breadcrumbs from '../components/Breadcrumbs';
+import AuditInfo from '../components/AuditInfo';
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -201,6 +202,9 @@ const RecipeDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Audit Info */}
+      <AuditInfo data={recipe} />
 
       {/* No content state */}
       {!recipe.description &&
