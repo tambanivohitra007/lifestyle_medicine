@@ -15,14 +15,16 @@ import {
   Download,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import ConditionWorkflowGuide from '../components/ConditionWorkflowGuide';
 
 const SECTION_TYPES = {
-  risk_factors: { label: 'Risk Factors', color: 'bg-red-100 text-red-700' },
+  risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
   physiology: { label: 'Physiology', color: 'bg-blue-100 text-blue-700' },
   complications: { label: 'Complications', color: 'bg-orange-100 text-orange-700' },
   solutions: { label: 'Lifestyle Solutions', color: 'bg-green-100 text-green-700' },
   additional_factors: { label: 'Additional Factors', color: 'bg-purple-100 text-purple-700' },
   scripture: { label: 'Scripture / SOP', color: 'bg-indigo-100 text-indigo-700' },
+  research_ideas: { label: 'Research Ideas', color: 'bg-teal-100 text-teal-700' },
 };
 
 const EVIDENCE_STRENGTH = {
@@ -46,8 +48,10 @@ const ConditionDetail = () => {
   const [interventions, setInterventions] = useState([]);
   const [scriptures, setScriptures] = useState([]);
   const [recipes, setRecipes] = useState([]);
+  const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
+  const [workflowExpanded, setWorkflowExpanded] = useState(true);
 
   useEffect(() => {
     fetchConditionData();
@@ -56,13 +60,14 @@ const ConditionDetail = () => {
   const fetchConditionData = async () => {
     try {
       setLoading(true);
-      const [conditionRes, sectionsRes, interventionsRes, scripturesRes, recipesRes] =
+      const [conditionRes, sectionsRes, interventionsRes, scripturesRes, recipesRes, careDomainsRes] =
         await Promise.all([
           api.get(`${apiEndpoints.conditions}/${id}`),
           api.get(apiEndpoints.conditionSections(id)),
           api.get(apiEndpoints.conditionInterventions(id)),
           api.get(apiEndpoints.conditionScriptures(id)),
           api.get(apiEndpoints.conditionRecipes(id)),
+          api.get(apiEndpoints.careDomains),
         ]);
 
       setCondition(conditionRes.data.data);
@@ -70,6 +75,7 @@ const ConditionDetail = () => {
       setInterventions(interventionsRes.data.data || []);
       setScriptures(scripturesRes.data.data || []);
       setRecipes(recipesRes.data.data || []);
+      setCareDomains(careDomainsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching condition:', error);
       alert('Failed to load condition');
@@ -233,6 +239,18 @@ const ConditionDetail = () => {
           <p className="text-gray-600 whitespace-pre-wrap text-sm sm:text-base">{condition.summary}</p>
         </div>
       )}
+
+      {/* Workflow Guide */}
+      <ConditionWorkflowGuide
+        conditionId={id}
+        sections={sections}
+        interventions={interventions}
+        scriptures={scriptures}
+        recipes={recipes}
+        careDomains={careDomains}
+        isExpanded={workflowExpanded}
+        onToggle={() => setWorkflowExpanded(!workflowExpanded)}
+      />
 
       {/* Tabs */}
       <div className="border-b border-gray-200 -mx-4 sm:mx-0 px-4 sm:px-0">

@@ -17,6 +17,9 @@ class CareDomainResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'description' => $this->description,
+            'icon' => $this->icon,
+            'order_index' => $this->order_index,
             'interventions_count' => $this->whenCounted('interventions'),
             'interventions' => InterventionResource::collection($this->whenLoaded('interventions')),
             'created_at' => $this->created_at,

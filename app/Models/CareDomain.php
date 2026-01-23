@@ -14,6 +14,13 @@ class CareDomain extends Model
 
     protected $fillable = [
         'name',
+        'description',
+        'icon',
+        'order_index',
+    ];
+
+    protected $casts = [
+        'order_index' => 'integer',
     ];
 
     /**

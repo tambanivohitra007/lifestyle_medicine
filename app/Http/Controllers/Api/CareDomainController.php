@@ -13,7 +13,10 @@ class CareDomainController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        $careDomains = CareDomain::with('interventions')->paginate(20);
+        $careDomains = CareDomain::with('interventions')
+            ->orderBy('order_index')
+            ->orderBy('name')
+            ->paginate(50);
 
         return CareDomainResource::collection($careDomains);
     }
@@ -29,6 +32,9 @@ class CareDomainController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:care_domains,name',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|max:50',
+            'order_index' => 'nullable|integer|min:0',
         ]);
 
         $careDomain = CareDomain::create($validated);
@@ -40,6 +46,9 @@ class CareDomainController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:care_domains,name,' . $careDomain->id,
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|max:50',
+            'order_index' => 'nullable|integer|min:0',
         ]);
 
         $careDomain->update($validated);

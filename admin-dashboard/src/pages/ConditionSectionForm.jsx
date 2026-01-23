@@ -1,28 +1,33 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import RichTextEditor from '../components/Editor/RichTextEditor';
 
 const SECTION_TYPES = [
-  { value: 'risk_factors', label: 'Risk Factors' },
+  { value: 'risk_factors', label: 'Risk Factors / Causes' },
   { value: 'physiology', label: 'Physiology' },
   { value: 'complications', label: 'Complications' },
   { value: 'solutions', label: 'Lifestyle Solutions' },
   { value: 'additional_factors', label: 'Additional Factors' },
   { value: 'scripture', label: 'Scripture / SOP' },
+  { value: 'research_ideas', label: 'Research Ideas' },
 ];
 
 const ConditionSectionForm = () => {
   const { id: conditionId, sectionId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const isEditing = Boolean(sectionId);
+
+  // Get pre-selected type from URL query parameter
+  const preSelectedType = searchParams.get('type') || '';
 
   const [condition, setCondition] = useState(null);
   const [formData, setFormData] = useState({
     condition_id: conditionId,
-    section_type: '',
-    title: '',
+    section_type: preSelectedType,
+    title: preSelectedType ? SECTION_TYPES.find(t => t.value === preSelectedType)?.label || '' : '',
     body: '',
     order_index: 0,
   });
