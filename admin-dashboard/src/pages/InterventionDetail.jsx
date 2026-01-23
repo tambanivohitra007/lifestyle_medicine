@@ -9,6 +9,9 @@ import {
   FileText,
   Heart,
   AlertCircle,
+  Image,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 
@@ -96,10 +99,12 @@ const InterventionDetail = () => {
     );
   }
 
+  const mediaItems = intervention.media || [];
   const tabs = [
     { id: 'details', label: 'Details', icon: Stethoscope },
     { id: 'evidence', label: 'Evidence', icon: FileText, count: evidence.length },
     { id: 'conditions', label: 'Conditions', icon: Heart, count: conditions.length },
+    { id: 'media', label: 'Media', icon: Image, count: mediaItems.length },
   ];
 
   return (
@@ -319,6 +324,94 @@ const InterventionDetail = () => {
                   </Link>
                 ))}
               </div>
+            )}
+          </div>
+        )}
+
+        {/* Media Tab */}
+        {activeTab === 'media' && (
+          <div className="space-y-6">
+            {mediaItems.length === 0 ? (
+              <div className="card text-center py-8">
+                <Image className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600">No media files uploaded yet</p>
+                <Link
+                  to={`/interventions/${id}/edit`}
+                  className="text-primary-600 hover:text-primary-700 text-sm mt-2 inline-block"
+                >
+                  Upload media files
+                </Link>
+              </div>
+            ) : (
+              <>
+                {/* Images */}
+                {mediaItems.filter((m) => m.type === 'image').length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">Images</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {mediaItems
+                        .filter((m) => m.type === 'image')
+                        .map((item) => (
+                          <a
+                            key={item.id}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group relative bg-gray-100 rounded-lg overflow-hidden aspect-square"
+                          >
+                            <img
+                              src={item.url}
+                              alt={item.alt_text || item.original_filename}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <ExternalLink className="w-6 h-6 text-white" />
+                            </div>
+                            {item.caption && (
+                              <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
+                                {item.caption}
+                              </div>
+                            )}
+                          </a>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Documents */}
+                {mediaItems.filter((m) => m.type === 'document').length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">Documents</h3>
+                    <div className="space-y-2">
+                      {mediaItems
+                        .filter((m) => m.type === 'document')
+                        .map((item) => (
+                          <a
+                            key={item.id}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50/30 transition-colors"
+                          >
+                            <div className="p-2 bg-red-100 rounded-lg flex-shrink-0">
+                              <FileText className="w-5 h-5 text-red-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {item.original_filename}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {item.formatted_size}
+                                {item.caption && ` • ${item.caption}`}
+                              </p>
+                            </div>
+                            <Download className="w-5 h-5 text-gray-400" />
+                          </a>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

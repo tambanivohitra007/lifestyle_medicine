@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Image } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import MediaUploader from '../components/MediaUploader';
 
 const InterventionForm = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const InterventionForm = () => {
     description: '',
     mechanism: '',
   });
+  const [media, setMedia] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -51,6 +53,7 @@ const InterventionForm = () => {
         description: intervention.description || '',
         mechanism: intervention.mechanism || '',
       });
+      setMedia(intervention.media || []);
     } catch (error) {
       console.error('Error fetching intervention:', error);
       alert('Failed to load intervention');
@@ -235,6 +238,24 @@ const InterventionForm = () => {
               </p>
             )}
           </div>
+
+          {/* Media - Only show when editing */}
+          {isEditing && (
+            <div className="pt-6 border-t border-gray-200">
+              <label className="label flex items-center gap-2">
+                <Image className="w-4 h-4" />
+                Media Files
+              </label>
+              <p className="text-sm text-gray-500 mb-4">
+                Upload images and documents related to this intervention
+              </p>
+              <MediaUploader
+                interventionId={id}
+                media={media}
+                onMediaChange={setMedia}
+              />
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-4 pt-4 border-t border-gray-200">

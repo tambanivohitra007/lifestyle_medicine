@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasAuditFields;
+use App\Models\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Intervention extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, HasAuditFields;
+    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, HasMedia;
 
     protected $fillable = [
         'care_domain_id',

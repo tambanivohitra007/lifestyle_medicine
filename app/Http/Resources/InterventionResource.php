@@ -18,6 +18,7 @@ class InterventionResource extends JsonResource
             'mechanism' => $this->mechanism,
             'evidence_entries' => EvidenceEntryResource::collection($this->whenLoaded('evidenceEntries')),
             'tags' => ContentTagResource::collection($this->whenLoaded('tags')),
+            'media' => MediaResource::collection($this->whenLoaded('media')),
             'pivot' => $this->when($this->pivot, [
                 'strength_of_evidence' => $this->pivot?->strength_of_evidence,
                 'recommendation_level' => $this->pivot?->recommendation_level,

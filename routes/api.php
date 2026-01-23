@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\RecipeController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ScriptureController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\MediaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('interventions', InterventionController::class)->only(['index', 'show']);
     Route::get('interventions/{intervention}/evidence', [InterventionController::class, 'evidence']);
     Route::get('interventions/{intervention}/conditions', [InterventionController::class, 'conditions']);
+    Route::get('interventions/{intervention}/media', [MediaController::class, 'index']);
 
     // Evidence & References
     Route::apiResource('evidence-entries', EvidenceEntryController::class)->only(['index', 'show']);
@@ -68,6 +70,12 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
 
     // Interventions
     Route::apiResource('interventions', InterventionController::class)->except(['index', 'show']);
+
+    // Intervention Media
+    Route::post('interventions/{intervention}/media', [MediaController::class, 'store']);
+    Route::put('interventions/{intervention}/media/{medium}', [MediaController::class, 'update']);
+    Route::post('interventions/{intervention}/media/reorder', [MediaController::class, 'reorder']);
+    Route::delete('interventions/{intervention}/media/{medium}', [MediaController::class, 'destroy']);
 
     // Evidence & References
     Route::apiResource('evidence-entries', EvidenceEntryController::class)->except(['index', 'show']);

@@ -62,6 +62,10 @@ export const apiEndpoints = {
   interventionsAdmin: '/admin/interventions',
   interventionEvidence: (id) => `/interventions/${id}/evidence`,
   interventionConditions: (id) => `/interventions/${id}/conditions`,
+  interventionMedia: (id) => `/interventions/${id}/media`,
+  interventionMediaAdmin: (id) => `/admin/interventions/${id}/media`,
+  interventionMediaReorder: (id) => `/admin/interventions/${id}/media/reorder`,
+  interventionMediaItem: (interventionId, mediaId) => `/admin/interventions/${interventionId}/media/${mediaId}`,
 
   // Evidence & References
   evidenceEntries: '/evidence-entries',
