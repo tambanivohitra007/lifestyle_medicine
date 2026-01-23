@@ -39,6 +39,8 @@ export const apiEndpoints = {
   login: '/login',
   logout: '/logout',
   user: '/user',
+  updateProfile: '/profile',
+  updatePassword: '/password',
 
   // Care Domains
   careDomains: '/care-domains',

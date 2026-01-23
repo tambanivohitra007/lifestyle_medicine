@@ -26,6 +26,7 @@ import Recipes from './pages/Recipes';
 import RecipeForm from './pages/RecipeForm';
 import RecipeDetail from './pages/RecipeDetail';
 import ContentTags from './pages/ContentTags';
+import Profile from './pages/Profile';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -107,6 +108,9 @@ function App() {
 
             {/* Content Tags */}
             <Route path="tags" element={<ContentTags />} />
+
+            {/* Profile */}
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* Catch all */}

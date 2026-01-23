@@ -18,6 +18,8 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
+    Route::put('/profile', [AuthController::class, 'updateProfile'])->middleware('auth:sanctum');
+    Route::put('/password', [AuthController::class, 'updatePassword'])->middleware('auth:sanctum');
 });
 
 // Public API routes (read-only)

@@ -11,6 +11,7 @@ import {
   Tag,
   TestTube,
   Library,
+  Settings,
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -24,6 +25,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: '/scriptures', icon: Book, label: 'Scriptures' },
     { to: '/recipes', icon: ChefHat, label: 'Recipes' },
     { to: '/tags', icon: Tag, label: 'Content Tags' },
+    { to: '/profile', icon: Settings, label: 'Settings' },
   ];
 
   return (

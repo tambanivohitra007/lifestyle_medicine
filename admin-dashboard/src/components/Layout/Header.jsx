@@ -1,6 +1,6 @@
-import { Bell, User, LogOut, Menu } from 'lucide-react';
+import { Bell, User, LogOut, Menu, Settings } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
@@ -46,17 +46,29 @@ const Header = ({ onMenuClick }) => {
 
           {/* User Menu - Desktop */}
           <div className="hidden sm:flex items-center gap-3 pl-4 border-l border-gray-200">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">
-                {user?.name || 'Admin User'}
-              </p>
-              <p className="text-xs text-gray-500">
-                {user?.email || 'admin@example.com'}
-              </p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-              <User className="w-5 h-5 text-primary-600" />
-            </div>
+            <Link
+              to="/profile"
+              className="flex items-center gap-3 p-1 -m-1 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+            >
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">
+                  {user?.name || 'Admin User'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {user?.email || 'admin@example.com'}
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                <User className="w-5 h-5 text-primary-600" />
+              </div>
+            </Link>
+            <Link
+              to="/profile"
+              className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+              title="Profile Settings"
+            >
+              <Settings className="w-5 h-5 text-gray-600" />
+            </Link>
             <button
               onClick={handleLogout}
               className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
@@ -67,10 +79,15 @@ const Header = ({ onMenuClick }) => {
           </div>
 
           {/* User Menu - Mobile */}
-          <div className="flex sm:hidden items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center">
-              <User className="w-4 h-4 text-primary-600" />
-            </div>
+          <div className="flex sm:hidden items-center gap-1">
+            <Link
+              to="/profile"
+              className="p-1 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+            >
+              <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center">
+                <User className="w-4 h-4 text-primary-600" />
+              </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
