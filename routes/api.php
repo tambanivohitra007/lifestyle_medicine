@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AiSuggestionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CareDomainController;
 use App\Http\Controllers\Api\ConditionController;
@@ -125,4 +126,8 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class);
     Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive']);
     Route::post('users/{id}/restore', [UserController::class, 'restore']);
+
+    // AI Suggestions
+    Route::post('ai/suggest-scriptures', [AiSuggestionController::class, 'suggestScriptures']);
+    Route::post('ai/suggest-egw-references', [AiSuggestionController::class, 'suggestEgwReferences']);
 });

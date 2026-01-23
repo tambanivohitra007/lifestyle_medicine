@@ -119,4 +119,8 @@ export const apiEndpoints = {
   users: '/admin/users',
   userToggleActive: (id) => `/admin/users/${id}/toggle-active`,
   userRestore: (id) => `/admin/users/${id}/restore`,
+
+  // AI Suggestions
+  aiSuggestScriptures: '/admin/ai/suggest-scriptures',
+  aiSuggestEgwReferences: '/admin/ai/suggest-egw-references',
 };

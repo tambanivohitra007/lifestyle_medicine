@@ -4,6 +4,7 @@ import { Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast } from '../lib/swal';
 import Breadcrumbs from '../components/Breadcrumbs';
+import AiSuggestions from '../components/AiSuggestions';
 
 const ScriptureForm = () => {
   const { id } = useParams();
@@ -15,6 +16,7 @@ const ScriptureForm = () => {
     text: '',
     theme: '',
   });
+  const [aiTopic, setAiTopic] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
@@ -88,6 +90,15 @@ const ScriptureForm = () => {
     }
   };
 
+  const handleAiSuggestionSelect = (suggestion) => {
+    setFormData({
+      reference: suggestion.reference || '',
+      text: suggestion.text || '',
+      theme: suggestion.theme || '',
+    });
+    toast.success('Suggestion applied to form');
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -116,82 +127,109 @@ const ScriptureForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="card max-w-2xl">
-        <div className="space-y-6">
-          <div>
-            <label htmlFor="reference" className="label">
-              Reference <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="reference"
-              name="reference"
-              value={formData.reference}
-              onChange={handleChange}
-              className={`input-field ${errors.reference ? 'border-red-500' : ''}`}
-              placeholder="e.g., John 3:16, Psalm 23:1-6"
-            />
-            {errors.reference && (
-              <p className="mt-1 text-sm text-red-500">
-                {Array.isArray(errors.reference) ? errors.reference[0] : errors.reference}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="text" className="label">
-              Text <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              id="text"
-              name="text"
-              value={formData.text}
-              onChange={handleChange}
-              rows={5}
-              className={`input-field ${errors.text ? 'border-red-500' : ''}`}
-              placeholder="Enter the scripture text..."
-            />
-            {errors.text && (
-              <p className="mt-1 text-sm text-red-500">
-                {Array.isArray(errors.text) ? errors.text[0] : errors.text}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="theme" className="label">
-              Theme
-            </label>
-            <input
-              type="text"
-              id="theme"
-              name="theme"
-              value={formData.theme}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="e.g., Healing, Peace, Faith"
-            />
-          </div>
-
-          <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
-            <button
-              type="submit"
-              disabled={saving}
-              className="btn-primary flex items-center gap-2"
-            >
-              {saving ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Save className="w-5 h-5" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="card">
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="reference" className="label">
+                Reference <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="reference"
+                name="reference"
+                value={formData.reference}
+                onChange={handleChange}
+                className={`input-field ${errors.reference ? 'border-red-500' : ''}`}
+                placeholder="e.g., John 3:16, Psalm 23:1-6"
+              />
+              {errors.reference && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.reference) ? errors.reference[0] : errors.reference}
+                </p>
               )}
-              {saving ? 'Saving...' : 'Save Scripture'}
-            </button>
-            <Link to="/scriptures" className="btn-outline">
-              Cancel
-            </Link>
+            </div>
+
+            <div>
+              <label htmlFor="text" className="label">
+                Text <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                id="text"
+                name="text"
+                value={formData.text}
+                onChange={handleChange}
+                rows={5}
+                className={`input-field ${errors.text ? 'border-red-500' : ''}`}
+                placeholder="Enter the scripture text..."
+              />
+              {errors.text && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.text) ? errors.text[0] : errors.text}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="theme" className="label">
+                Theme
+              </label>
+              <input
+                type="text"
+                id="theme"
+                name="theme"
+                value={formData.theme}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., Healing, Peace, Faith"
+              />
+            </div>
+
+            <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary flex items-center gap-2"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5" />
+                )}
+                {saving ? 'Saving...' : 'Save Scripture'}
+              </button>
+              <Link to="/scriptures" className="btn-outline">
+                Cancel
+              </Link>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+
+        {/* AI Suggestions */}
+        {!isEditing && (
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="aiTopic" className="label">
+                Search Topic for AI Suggestions
+              </label>
+              <input
+                type="text"
+                id="aiTopic"
+                value={aiTopic}
+                onChange={(e) => setAiTopic(e.target.value)}
+                className="input-field"
+                placeholder="e.g., healing, anxiety, trust in God, health..."
+              />
+            </div>
+            <AiSuggestions
+              type="scripture"
+              topic={aiTopic}
+              onSelect={handleAiSuggestionSelect}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
