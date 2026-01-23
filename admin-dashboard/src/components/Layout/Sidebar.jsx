@@ -67,8 +67,9 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
       {/* Sidebar */}
       <aside
         className={`
-          fixed left-0 top-0 z-50 h-full bg-secondary-900 text-white overflow-y-auto
+          fixed left-0 top-0 z-50 h-full bg-secondary-900 text-white
           transform transition-all duration-300 ease-in-out
+          overflow-y-auto sidebar-scroll
           ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
           w-64
           lg:translate-x-0
