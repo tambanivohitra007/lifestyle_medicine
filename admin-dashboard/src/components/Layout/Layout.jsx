@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import Footer from './Footer';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -48,7 +49,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <div
-        className={`flex-1 transition-all duration-300 ${
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
           sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
         }`}
       >
@@ -57,9 +58,10 @@ const Layout = () => {
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={toggleCollapse}
         />
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className="p-4 sm:p-6 lg:p-8 flex-1">
           <Outlet />
         </main>
+        <Footer />
       </div>
     </div>
   );
