@@ -7,13 +7,20 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EvidenceEntryResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'intervention_id' => $this->intervention_id,
+            'intervention' => new InterventionResource($this->whenLoaded('intervention')),
+            'study_type' => $this->study_type,
+            'population' => $this->population,
+            'quality_rating' => $this->quality_rating,
+            'summary' => $this->summary,
+            'notes' => $this->notes,
+            'references' => ReferenceResource::collection($this->whenLoaded('references')),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

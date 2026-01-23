@@ -7,13 +7,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContentTagResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'tag' => $this->tag,
+            'interventions_count' => $this->whenCounted('interventions'),
+            'recipes_count' => $this->whenCounted('recipes'),
+            'scriptures_count' => $this->whenCounted('scriptures'),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }
