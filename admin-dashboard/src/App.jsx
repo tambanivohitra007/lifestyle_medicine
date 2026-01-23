@@ -6,6 +6,10 @@ import Dashboard from './pages/Dashboard';
 import Conditions from './pages/Conditions';
 import ConditionForm from './pages/ConditionForm';
 import ConditionDetail from './pages/ConditionDetail';
+import ConditionSectionForm from './pages/ConditionSectionForm';
+import AttachIntervention from './pages/AttachIntervention';
+import AttachScripture from './pages/AttachScripture';
+import AttachRecipe from './pages/AttachRecipe';
 import CareDomains from './pages/CareDomains';
 import CareDomainForm from './pages/CareDomainForm';
 import Interventions from './pages/Interventions';
@@ -19,6 +23,7 @@ import Scriptures from './pages/Scriptures';
 import ScriptureForm from './pages/ScriptureForm';
 import Recipes from './pages/Recipes';
 import RecipeForm from './pages/RecipeForm';
+import RecipeDetail from './pages/RecipeDetail';
 import ContentTags from './pages/ContentTags';
 
 // Protected Route Component
@@ -60,6 +65,11 @@ function App() {
             <Route path="conditions/new" element={<ConditionForm />} />
             <Route path="conditions/:id" element={<ConditionDetail />} />
             <Route path="conditions/:id/edit" element={<ConditionForm />} />
+            <Route path="conditions/:id/sections/new" element={<ConditionSectionForm />} />
+            <Route path="conditions/:id/sections/:sectionId/edit" element={<ConditionSectionForm />} />
+            <Route path="conditions/:id/interventions/attach" element={<AttachIntervention />} />
+            <Route path="conditions/:id/scriptures/attach" element={<AttachScripture />} />
+            <Route path="conditions/:id/recipes/attach" element={<AttachRecipe />} />
 
             {/* Care Domains */}
             <Route path="care-domains" element={<CareDomains />} />
@@ -90,6 +100,7 @@ function App() {
             {/* Recipes */}
             <Route path="recipes" element={<Recipes />} />
             <Route path="recipes/new" element={<RecipeForm />} />
+            <Route path="recipes/:id" element={<RecipeDetail />} />
             <Route path="recipes/:id/edit" element={<RecipeForm />} />
 
             {/* Content Tags */}

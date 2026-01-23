@@ -10,7 +10,8 @@
       "Bash(timeout:*)",
       "Bash(npm uninstall:*)",
       "Bash(ping:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\\\\admin-dashboard\\\\src\\\\pages\"\" | grep -i \"attach|section \")"
     ]
   }
 }
