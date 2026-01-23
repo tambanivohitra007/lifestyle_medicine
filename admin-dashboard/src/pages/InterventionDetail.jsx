@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft,
   Edit,
   Trash2,
   Stethoscope,
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete } from '../lib/swal';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const QUALITY_RATING = {
   A: { label: 'A - High', color: 'bg-green-100 text-green-700' },
@@ -112,26 +112,26 @@ const InterventionDetail = () => {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'Interventions', href: '/interventions' },
+          { label: intervention.name },
+        ]}
+      />
+
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/interventions"
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{intervention.name}</h1>
-            {intervention.care_domain && (
-              <div className="flex items-center gap-2 mt-2">
-                <Layers className="w-4 h-4 text-secondary-500" />
-                <span className="text-secondary-600 font-medium">
-                  {intervention.care_domain.name}
-                </span>
-              </div>
-            )}
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">{intervention.name}</h1>
+          {intervention.care_domain && (
+            <div className="flex items-center gap-2 mt-2">
+              <Layers className="w-4 h-4 text-secondary-500" />
+              <span className="text-secondary-600 font-medium">
+                {intervention.care_domain.name}
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex gap-2">
           <Link

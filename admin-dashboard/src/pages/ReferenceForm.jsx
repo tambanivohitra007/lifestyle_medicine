@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast } from '../lib/swal';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const ReferenceForm = () => {
   const { id } = useParams();
@@ -103,21 +104,22 @@ const ReferenceForm = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link
-          to="/references"
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {isEditing ? 'Edit Reference' : 'New Reference'}
-          </h1>
-          <p className="text-gray-600 mt-1">
-            {isEditing ? 'Update the reference details' : 'Add a new scientific reference'}
-          </p>
-        </div>
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'References', href: '/references' },
+          { label: isEditing ? 'Edit Reference' : 'New Reference' },
+        ]}
+      />
+
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">
+          {isEditing ? 'Edit Reference' : 'New Reference'}
+        </h1>
+        <p className="text-gray-600 mt-1">
+          {isEditing ? 'Update the reference details' : 'Add a new scientific reference'}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="card max-w-2xl">

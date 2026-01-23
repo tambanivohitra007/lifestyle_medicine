@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast } from '../lib/swal';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const ConditionForm = () => {
   const { id } = useParams();
@@ -95,24 +96,24 @@ const ConditionForm = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'Conditions', href: '/conditions' },
+          { label: isEditing ? 'Edit Condition' : 'New Condition' },
+        ]}
+      />
+
       {/* Header */}
-      <div className="flex items-start gap-3 sm:gap-4">
-        <Link
-          to="/conditions"
-          className="action-btn flex-shrink-0 mt-1"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
-        </Link>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            {isEditing ? 'Edit Condition' : 'New Condition'}
-          </h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            {isEditing
-              ? 'Update the condition details below'
-              : 'Create a new medical condition'}
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          {isEditing ? 'Edit Condition' : 'New Condition'}
+        </h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">
+          {isEditing
+            ? 'Update the condition details below'
+            : 'Create a new medical condition'}
+        </p>
       </div>
 
       {/* Form */}

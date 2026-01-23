@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
+import { Save, Loader2, Plus, X } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast } from '../lib/swal';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const RecipeForm = () => {
   const { id } = useParams();
@@ -147,21 +148,22 @@ const RecipeForm = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link
-          to="/recipes"
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {isEditing ? 'Edit Recipe' : 'New Recipe'}
-          </h1>
-          <p className="text-gray-600 mt-1">
-            {isEditing ? 'Update the recipe details' : 'Add a new healthy recipe'}
-          </p>
-        </div>
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'Recipes', href: '/recipes' },
+          { label: isEditing ? 'Edit Recipe' : 'New Recipe' },
+        ]}
+      />
+
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">
+          {isEditing ? 'Edit Recipe' : 'New Recipe'}
+        </h1>
+        <p className="text-gray-600 mt-1">
+          {isEditing ? 'Update the recipe details' : 'Add a new healthy recipe'}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="card max-w-3xl">

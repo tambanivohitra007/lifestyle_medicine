@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Search, Check, Loader2, Stethoscope, Layers } from 'lucide-react';
+import { Search, Check, Loader2, Stethoscope, Layers } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast } from '../lib/swal';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const EVIDENCE_STRENGTH = [
   { value: 'high', label: 'High' },
@@ -113,22 +114,23 @@ const AttachIntervention = () => {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'Conditions', href: '/conditions' },
+          { label: condition?.name || 'Condition', href: `/conditions/${conditionId}` },
+          { label: 'Attach Intervention' },
+        ]}
+      />
+
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link
-          to={`/conditions/${conditionId}`}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attach Intervention</h1>
-          {condition && (
-            <p className="text-gray-600 mt-1">
-              Link an intervention to: <span className="font-medium">{condition.name}</span>
-            </p>
-          )}
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Attach Intervention</h1>
+        {condition && (
+          <p className="text-gray-600 mt-1">
+            Link an intervention to: <span className="font-medium">{condition.name}</span>
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

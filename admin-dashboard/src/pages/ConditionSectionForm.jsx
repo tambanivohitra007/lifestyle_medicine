@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast } from '../lib/swal';
 import RichTextEditor from '../components/Editor/RichTextEditor';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const SECTION_TYPES = [
   { value: 'risk_factors', label: 'Risk Factors / Causes' },
@@ -129,23 +130,25 @@ const ConditionSectionForm = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="flex items-start gap-3 sm:gap-4">
-        <Link
-          to={`/conditions/${conditionId}`}
-          className="action-btn flex-shrink-0 mt-1"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
-        </Link>
-        <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            {isEditing ? 'Edit Section' : 'New Section'}
-          </h1>
-          {condition && (
-            <p className="text-gray-600 mt-1 text-sm sm:text-base truncate">
-              For condition: <span className="font-medium">{condition.name}</span>
-            </p>
-          )}
-        </div>
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'Conditions', href: '/conditions' },
+          { label: condition?.name || 'Condition', href: `/conditions/${conditionId}` },
+          { label: isEditing ? 'Edit Section' : 'New Section' },
+        ]}
+      />
+
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          {isEditing ? 'Edit Section' : 'New Section'}
+        </h1>
+        {condition && (
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">
+            For condition: <span className="font-medium">{condition.name}</span>
+          </p>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="card max-w-2xl">

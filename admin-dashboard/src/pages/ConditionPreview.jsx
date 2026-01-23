@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Printer, Edit, FileText } from 'lucide-react';
+import { Printer, Edit, FileText } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const SECTION_ORDER = [
   'risk_factors',
@@ -117,19 +118,22 @@ const ConditionPreview = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Breadcrumbs - Hidden when printing */}
+      <div className="print:hidden">
+        <Breadcrumbs
+          items={[
+            { label: 'Conditions', href: '/conditions' },
+            { label: condition.name, href: `/conditions/${id}` },
+            { label: 'Preview' },
+          ]}
+        />
+      </div>
+
       {/* Header - Hidden when printing */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
-        <div className="flex items-start gap-3 sm:gap-4">
-          <Link
-            to={`/conditions/${id}`}
-            className="action-btn flex-shrink-0 mt-1"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Document Preview</h1>
-            <p className="text-gray-600 text-sm sm:text-base">Treatment guide format</p>
-          </div>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Document Preview</h1>
+          <p className="text-gray-600 text-sm sm:text-base">Treatment guide format</p>
         </div>
         <div className="flex gap-2">
           <Link

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft,
   Edit,
   Trash2,
   Plus,
@@ -17,6 +16,7 @@ import {
 import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../lib/swal';
 import ConditionWorkflowGuide from '../components/ConditionWorkflowGuide';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const SECTION_TYPES = {
   risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
@@ -187,25 +187,25 @@ const ConditionDetail = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'Conditions', href: '/conditions' },
+          { label: condition.name },
+        ]}
+      />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div className="flex items-start gap-3 sm:gap-4">
-          <Link
-            to="/conditions"
-            className="action-btn flex-shrink-0 mt-1"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">
-              {condition.name}
-            </h1>
-            {condition.category && (
-              <span className="inline-block mt-2 px-3 py-1 bg-secondary-100 text-secondary-700 text-xs sm:text-sm font-medium rounded-full">
-                {condition.category}
-              </span>
-            )}
-          </div>
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">
+            {condition.name}
+          </h1>
+          {condition.category && (
+            <span className="inline-block mt-2 px-3 py-1 bg-secondary-100 text-secondary-700 text-xs sm:text-sm font-medium rounded-full">
+              {condition.category}
+            </span>
+          )}
         </div>
         <div className="flex flex-wrap gap-2 sm:flex-nowrap">
           <Link
