@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import RichTextEditor from '../components/Editor/RichTextEditor';
 
 const SECTION_TYPES = [
   { value: 'risk_factors', label: 'Risk Factors' },
@@ -192,21 +193,14 @@ const ConditionSectionForm = () => {
 
           {/* Body */}
           <div>
-            <label htmlFor="body" className="label">
-              Content
-            </label>
-            <textarea
-              id="body"
-              name="body"
-              value={formData.body}
-              onChange={handleChange}
-              rows={10}
-              className="input-field"
-              placeholder="Section content (HTML supported)..."
+            <label className="label">Content</label>
+            <RichTextEditor
+              content={formData.body}
+              onChange={(html) =>
+                setFormData((prev) => ({ ...prev, body: html }))
+              }
+              placeholder="Start writing the section content..."
             />
-            <p className="mt-1 text-xs text-gray-500">
-              You can use HTML tags for formatting (e.g., &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;)
-            </p>
           </div>
 
           {/* Order Index */}

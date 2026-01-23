@@ -10,6 +10,7 @@ import ConditionSectionForm from './pages/ConditionSectionForm';
 import AttachIntervention from './pages/AttachIntervention';
 import AttachScripture from './pages/AttachScripture';
 import AttachRecipe from './pages/AttachRecipe';
+import ConditionPreview from './pages/ConditionPreview';
 import CareDomains from './pages/CareDomains';
 import CareDomainForm from './pages/CareDomainForm';
 import Interventions from './pages/Interventions';
@@ -65,6 +66,7 @@ function App() {
             <Route path="conditions/new" element={<ConditionForm />} />
             <Route path="conditions/:id" element={<ConditionDetail />} />
             <Route path="conditions/:id/edit" element={<ConditionForm />} />
+            <Route path="conditions/:id/preview" element={<ConditionPreview />} />
             <Route path="conditions/:id/sections/new" element={<ConditionSectionForm />} />
             <Route path="conditions/:id/sections/:sectionId/edit" element={<ConditionSectionForm />} />
             <Route path="conditions/:id/interventions/attach" element={<AttachIntervention />} />

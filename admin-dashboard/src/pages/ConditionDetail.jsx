@@ -11,6 +11,7 @@ import {
   ChefHat,
   AlertCircle,
   ChevronRight,
+  Eye,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 
@@ -86,6 +87,18 @@ const ConditionDetail = () => {
     } catch (error) {
       console.error('Error deleting condition:', error);
       alert('Failed to delete condition');
+    }
+  };
+
+  const handleDeleteSection = async (sectionId) => {
+    if (!confirm('Are you sure you want to delete this section?')) return;
+
+    try {
+      await api.delete(`${apiEndpoints.conditionSectionsAdmin}/${sectionId}`);
+      setSections((prev) => prev.filter((s) => s.id !== sectionId));
+    } catch (error) {
+      console.error('Error deleting section:', error);
+      alert('Failed to delete section');
     }
   };
 
@@ -175,6 +188,13 @@ const ConditionDetail = () => {
           </div>
         </div>
         <div className="flex gap-2">
+          <Link
+            to={`/conditions/${id}/preview`}
+            className="btn-primary flex items-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
+            Preview Guide
+          </Link>
           <Link
             to={`/conditions/${id}/edit`}
             className="btn-outline flex items-center gap-2"
@@ -271,9 +291,17 @@ const ConditionDetail = () => {
                           <Link
                             to={`/conditions/${id}/sections/${section.id}/edit`}
                             className="p-1.5 rounded hover:bg-gray-100"
+                            title="Edit"
                           >
                             <Edit className="w-4 h-4 text-gray-600" />
                           </Link>
+                          <button
+                            onClick={() => handleDeleteSection(section.id)}
+                            className="p-1.5 rounded hover:bg-red-50"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
                         </div>
                       </div>
                       {section.body && (
