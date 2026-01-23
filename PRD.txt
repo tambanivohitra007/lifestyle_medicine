@@ -1,0 +1,528 @@
+Product Requirements Document (PRD)
+
+Lifestyle Medicine & Gospel Medical Evangelism Knowledge Platform
+
+1. Product Overview
+Product Name (Working)
+
+Lifestyle Medicine & Gospel Medical Evangelism (LM–GME) Knowledge Platform
+
+Product Type
+
+Web-based clinical knowledge and decision-support system
+
+Product Vision
+
+To build a living, evidence-based, spiritually integrated knowledge platform that equips healthcare and ministry teams to deliver whole-person care, combining lifestyle medicine, clinical research, and spiritual care in a single, structured system.
+
+Value Proposition
+
+A centralized, auditable, and continually improving reference system—similar in concept to UpToDate—focused on lifestyle-first interventions and Gospel Medical Evangelism.
+
+2. Problem Statement
+Current State
+
+Lifestyle Medicine and GME content exists primarily in static Word/PDF documents
+
+Updating evidence requires manual document revision
+
+Difficult to:
+
+Search across conditions
+
+Reuse interventions
+
+Track evidence strength
+
+Maintain consistency across teams and regions
+
+Spiritual care content is often siloed from clinical guidance
+
+Impact
+
+Fragmented knowledge
+
+Reduced confidence in guidance
+
+Limited scalability
+
+High maintenance burden
+
+3. Goals & Objectives
+Primary Goals
+
+Transform static treatment guides into structured, relational knowledge
+
+Support evidence-based lifestyle medicine
+
+Integrate Scripture and spiritual care as first-class content
+
+Enable multidisciplinary team usage
+
+Ensure auditability, accountability, and governance
+
+Non-Goals
+
+Not an EHR
+
+Not a patient record system
+
+No PHI storage
+
+No billing or scheduling
+
+4. Target Users
+Primary Users
+
+Physicians
+
+Lifestyle Medicine practitioners
+
+Culinary medicine coaches
+
+Fitness specialists
+
+Health coaches
+
+Hydrotherapists
+
+Spiritual care providers
+
+Pastors and ministry leaders
+
+Secondary Users
+
+Medical missionaries
+
+Students and trainees
+
+Researchers
+
+Editors and reviewers
+
+5. Key Use Cases
+User	Use Case
+Physician	Review lifestyle interventions with evidence strength
+Health Coach	Find actionable guidance for a condition
+Pastor	Identify scripture aligned with health themes
+Editor	Update evidence without rewriting content
+Team Lead	Ensure accountability and content consistency
+6. Functional Requirements
+6.1 Condition Management
+
+Description
+Conditions are the central organizing unit of the system.
+
+Requirements
+
+Create, read, update, and soft-delete conditions
+
+Each condition includes:
+
+UUID
+
+Name
+
+Category
+
+Summary
+
+Conditions must support structured content sections
+
+Conditions must be auditable
+
+6.2 Structured Condition Sections
+
+Supported Section Types
+
+Risk Factors
+
+Physiology
+
+Complications
+
+Lifestyle Solutions
+
+Additional Factors
+
+Scripture / SOP
+
+Requirements
+
+CRUD support for all sections
+
+Ordered display using order_index
+
+Rich-text body content
+
+Soft delete with audit trail
+
+Independent editing without affecting other sections
+
+6.3 Care Domains
+
+Description
+Care domains categorize interventions by discipline.
+
+Examples
+
+Nutrition
+
+Exercise
+
+Hydrotherapy
+
+Spiritual Care
+
+Stress Management
+
+Requirements
+
+Full CRUD support
+
+Unique domain names
+
+Used as parent category for interventions
+
+Soft-deletable with audit tracking
+
+6.4 Interventions
+
+Description
+Interventions represent actionable lifestyle strategies.
+
+Requirements
+
+CRUD support for interventions
+
+Each intervention:
+
+Belongs to one care domain
+
+Has name, description, mechanism
+
+Reusable across multiple conditions
+
+Unique per care domain
+
+Soft delete with audit trail
+
+6.5 Condition–Intervention Mapping
+
+Description
+Defines how interventions apply to specific conditions.
+
+Requirements
+
+CRUD support for mappings
+
+Assign:
+
+Strength of evidence (high, moderate, emerging, insufficient)
+
+Recommendation level (core, adjunct, optional)
+
+Clinical notes
+
+Display order
+
+Soft-deletable
+
+Auditable
+
+6.6 Evidence Management
+Evidence Entries
+
+CRUD support
+
+Linked to interventions
+
+Support study types:
+
+RCT
+
+Meta-analysis
+
+Systematic review
+
+Observational
+
+Case series
+
+Expert opinion
+
+Quality rating (A–D)
+
+Summary and notes
+
+References
+
+CRUD support
+
+Store citation text, DOI, URL, year
+
+Reusable across evidence entries
+
+Evidence–Reference Linking
+
+Many-to-many relationship
+
+Soft-deletable
+
+Audited
+
+6.7 Scripture Management
+
+Description
+Scripture supports spiritual care integration.
+
+Requirements
+
+CRUD support for scriptures
+
+Store:
+
+Reference
+
+Text
+
+Optional theme
+
+Taggable
+
+Linkable to conditions and interventions
+
+Soft delete with audit trail
+
+6.8 Recipes as Clinical Content
+
+Description
+Recipes operationalize dietary interventions.
+
+Requirements
+
+CRUD support
+
+Store title, description, dietary tags (JSON)
+
+Taggable using content tags
+
+Linkable to conditions and interventions
+
+Soft delete with audit trail
+
+6.9 Content Tagging System
+
+Description
+Unified taxonomy for cross-content discovery.
+
+Requirements
+
+CRUD support for tags
+
+Tags must be unique
+
+Applicable to:
+
+Interventions
+
+Recipes
+
+Scriptures
+
+Enable filtering and future recommendation logic
+
+7. Content Management & CRUD Operations (Updated Section)
+7.1 CRUD Scope
+
+The system shall provide full Create, Read, Update, and Delete (CRUD) capabilities for all core content entities via secure, role-based interfaces.
+
+Entities Supporting CRUD
+
+Care Domains
+
+Conditions
+
+Condition Sections
+
+Interventions
+
+Condition–Intervention mappings
+
+Evidence Entries
+
+References
+
+Scriptures
+
+Recipes
+
+Content Tags
+
+7.2 Deletion Policy
+
+All deletions must be implemented as soft deletes
+
+Deleted records must retain:
+
+Deleted timestamp
+
+Deleted-by user
+
+Authorized users must be able to restore soft-deleted records
+
+7.3 Access Control (Future Phase)
+
+Viewers: Read-only access
+
+Editors: Create and update content
+
+Administrators: Full CRUD, delete, and restore
+
+7.4 Audit & Governance
+
+Every CRUD operation must record:
+
+User ID
+
+Action type (create, update, delete, restore)
+
+Timestamp
+
+Entity affected
+
+Audit data must be immutable.
+
+8. Non-Functional Requirements
+Performance
+
+Optimized for read-heavy usage
+
+Scalable for multi-region deployment
+
+Security
+
+Role-based authorization
+
+No patient data stored
+
+Secure admin interfaces
+
+Maintainability
+
+Modular schema
+
+Reusable interventions and evidence
+
+Minimal content duplication
+
+Extensibility
+
+AI summarization-ready
+
+Localization-ready
+
+Mobile/offline capable (future)
+
+9. User Interface Requirements (High-Level)
+Navigation
+
+Conditions
+
+Interventions
+
+Recipes
+
+Scriptures
+
+Care Domains
+
+Evidence Library
+
+Condition Detail View
+
+Summary
+
+Section-based layout
+
+Interventions grouped by care domain
+
+Evidence visibility
+
+Linked recipes and scriptures
+
+10. MVP Scope
+Included
+
+Full CRUD for all core entities
+
+Structured condition content
+
+Evidence and references
+
+Recipes and scriptures
+
+Read-only public or pilot view
+
+Excluded (Post-MVP)
+
+AI-generated summaries
+
+Patient-facing tools
+
+Multi-language support
+
+Offline/mobile apps
+
+11. Success Metrics
+
+Number of conditions fully structured
+
+Evidence entries per intervention
+
+Reuse rate of interventions across conditions
+
+Editorial turnaround time
+
+Adoption across pilot teams
+
+12. Risks & Mitigations
+Risk	Mitigation
+Content inconsistency	Structured sections + audit
+Editorial overload	Reusable interventions
+Adoption friction	Read-only pilot access
+Evidence disputes	Transparent citations
+13. Roadmap (High-Level)
+Phase 1 – Knowledge Core
+
+Schema & models
+
+Admin CRUD UI
+
+Condition detail views
+
+Phase 2 – Discoverability
+
+Tags
+
+Filters
+
+Advanced search
+
+Phase 3 – Intelligence
+
+AI-assisted summaries
+
+Comparative guidance
+
+14. System Identity
+
+This platform is:
+
+A clinical knowledge base
+
+A training and teaching system
+
+A spiritually integrated decision-support tool
+
+A living, governed reference, not static documentation

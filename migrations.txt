@@ -1,0 +1,238 @@
+1️⃣ create_care_domains_table.php
+Schema::create('care_domains', function (Blueprint $table) {
+    $table->id();
+    $table->string('name')->unique();
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+});
+
+2️⃣ create_conditions_table.php
+Schema::create('conditions', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->string('name')->unique();
+    $table->string('category')->nullable();
+    $table->text('summary')->nullable();
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+});
+
+3️⃣ create_condition_sections_table.php
+Schema::create('condition_sections', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->uuid('condition_id');
+
+    $table->enum('section_type', [
+        'risk_factors',
+        'physiology',
+        'complications',
+        'solutions',
+        'additional_factors',
+        'scripture'
+    ]);
+
+    $table->string('title')->nullable();
+    $table->longText('body');
+    $table->unsignedInteger('order_index')->default(0);
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+
+    $table->foreign('condition_id')
+          ->references('id')->on('conditions')
+          ->cascadeOnDelete();
+});
+
+4️⃣ create_interventions_table.php
+Schema::create('interventions', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->foreignId('care_domain_id')->constrained()->cascadeOnDelete();
+    $table->string('name');
+    $table->text('description')->nullable();
+    $table->text('mechanism')->nullable();
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+
+    $table->unique(['care_domain_id', 'name']);
+});
+
+5️⃣ create_condition_interventions_table.php
+Schema::create('condition_interventions', function (Blueprint $table) {
+    $table->uuid('condition_id');
+    $table->uuid('intervention_id');
+
+    $table->enum('strength_of_evidence', [
+        'high', 'moderate', 'emerging', 'insufficient'
+    ])->default('emerging');
+
+    $table->enum('recommendation_level', [
+        'core', 'adjunct', 'optional'
+    ])->default('optional');
+
+    $table->text('clinical_notes')->nullable();
+    $table->unsignedInteger('order_index')->default(0);
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+
+    $table->primary(['condition_id', 'intervention_id']);
+
+    $table->foreign('condition_id')->references('id')->on('conditions')->cascadeOnDelete();
+    $table->foreign('intervention_id')->references('id')->on('interventions')->cascadeOnDelete();
+});
+
+6️⃣ create_evidence_entries_table.php
+Schema::create('evidence_entries', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->uuid('intervention_id');
+
+    $table->enum('study_type', [
+        'rct',
+        'meta_analysis',
+        'systematic_review',
+        'observational',
+        'case_series',
+        'expert_opinion'
+    ]);
+
+    $table->string('population')->nullable();
+    $table->enum('quality_rating', ['A', 'B', 'C', 'D'])->nullable();
+    $table->text('summary');
+    $table->text('notes')->nullable();
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+
+    $table->foreign('intervention_id')
+          ->references('id')->on('interventions')
+          ->cascadeOnDelete();
+});
+
+7️⃣ create_references_table.php
+Schema::create('references', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->text('citation');
+    $table->string('doi')->nullable();
+    $table->text('url')->nullable();
+    $table->year('year')->nullable();
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+});
+
+8️⃣ create_evidence_reference_table.php
+Schema::create('evidence_reference', function (Blueprint $table) {
+    $table->uuid('evidence_entry_id');
+    $table->uuid('reference_id');
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+
+    $table->primary(['evidence_entry_id', 'reference_id']);
+
+    $table->foreign('evidence_entry_id')->references('id')->on('evidence_entries')->cascadeOnDelete();
+    $table->foreign('reference_id')->references('id')->on('references')->cascadeOnDelete();
+});
+
+9️⃣ create_scriptures_table.php
+Schema::create('scriptures', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->string('reference');
+    $table->longText('text');
+    $table->string('theme')->nullable();
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+});
+
+🔟 create_recipes_table.php
+Schema::create('recipes', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->string('title');
+    $table->text('description')->nullable();
+    $table->json('dietary_tags')->nullable();
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+});
+
+1️⃣1️⃣ create_content_tags_table.php
+Schema::create('content_tags', function (Blueprint $table) {
+    $table->id();
+    $table->string('tag')->unique();
+
+    // Audit
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
+    $table->timestamps();
+    $table->softDeletes();
+});
+
+1️⃣2️⃣ Tag pivot tables (audited but minimal)
+intervention_tag
+Schema::create('intervention_tag', function (Blueprint $table) {
+    $table->uuid('intervention_id');
+    $table->foreignId('content_tag_id')->constrained()->cascadeOnDelete();
+
+    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+    $table->timestamps();
+    $table->softDeletes();
+
+    $table->primary(['intervention_id', 'content_tag_id']);
+});
+
+
+(Repeat same structure for recipe_tag, scripture_tag.)
