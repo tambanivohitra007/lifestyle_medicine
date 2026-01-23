@@ -12,8 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('references', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->text('citation');
+            $table->string('doi')->nullable();
+            $table->string('pmid')->nullable(); // PubMed ID for medical literature
+            $table->text('url')->nullable();
+            $table->unsignedSmallInteger('year')->nullable();
+
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

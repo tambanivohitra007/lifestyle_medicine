@@ -13,7 +13,19 @@ return new class extends Migration
     {
         Schema::create('condition_scripture', function (Blueprint $table) {
             $table->id();
+            $table->uuid('condition_id');
+            $table->uuid('scripture_id');
+
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('condition_id')->references('id')->on('conditions')->cascadeOnDelete();
+            $table->foreign('scripture_id')->references('id')->on('scriptures')->cascadeOnDelete();
+            $table->unique(['condition_id', 'scripture_id'], 'condition_scripture_unique');
         });
     }
 

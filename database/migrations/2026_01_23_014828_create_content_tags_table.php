@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('content_tags', function (Blueprint $table) {
             $table->id();
+            $table->string('tag')->unique();
+
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

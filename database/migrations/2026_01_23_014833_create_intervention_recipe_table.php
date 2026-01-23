@@ -13,7 +13,19 @@ return new class extends Migration
     {
         Schema::create('intervention_recipe', function (Blueprint $table) {
             $table->id();
+            $table->uuid('intervention_id');
+            $table->uuid('recipe_id');
+
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('intervention_id')->references('id')->on('interventions')->cascadeOnDelete();
+            $table->foreign('recipe_id')->references('id')->on('recipes')->cascadeOnDelete();
+            $table->unique(['intervention_id', 'recipe_id'], 'intervention_recipe_unique');
         });
     }
 

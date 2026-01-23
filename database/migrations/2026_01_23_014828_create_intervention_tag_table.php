@@ -13,7 +13,18 @@ return new class extends Migration
     {
         Schema::create('intervention_tag', function (Blueprint $table) {
             $table->id();
+            $table->uuid('intervention_id');
+            $table->foreignId('content_tag_id')->constrained()->cascadeOnDelete();
+
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('intervention_id')->references('id')->on('interventions')->cascadeOnDelete();
+            $table->unique(['intervention_id', 'content_tag_id'], 'intervention_tag_unique');
         });
     }
 

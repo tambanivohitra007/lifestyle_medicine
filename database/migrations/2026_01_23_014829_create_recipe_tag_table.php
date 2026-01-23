@@ -13,7 +13,18 @@ return new class extends Migration
     {
         Schema::create('recipe_tag', function (Blueprint $table) {
             $table->id();
+            $table->uuid('recipe_id');
+            $table->foreignId('content_tag_id')->constrained()->cascadeOnDelete();
+
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('recipe_id')->references('id')->on('recipes')->cascadeOnDelete();
+            $table->unique(['recipe_id', 'content_tag_id'], 'recipe_tag_unique');
         });
     }
 

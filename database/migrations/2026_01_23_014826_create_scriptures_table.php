@@ -12,8 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('scriptures', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->string('reference');
+            $table->longText('text');
+            $table->string('theme')->nullable();
+
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
