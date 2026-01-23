@@ -31,6 +31,9 @@ import Search from './pages/Search';
 import Import from './pages/Import';
 import Users from './pages/Users';
 import UserForm from './pages/UserForm';
+import EgwReferences from './pages/EgwReferences';
+import EgwReferenceForm from './pages/EgwReferenceForm';
+import AttachEgwReference from './pages/AttachEgwReference';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -77,6 +80,7 @@ function App() {
             <Route path="conditions/:id/interventions/attach" element={<AttachIntervention />} />
             <Route path="conditions/:id/scriptures/attach" element={<AttachScripture />} />
             <Route path="conditions/:id/recipes/attach" element={<AttachRecipe />} />
+            <Route path="conditions/:id/egw-references/attach" element={<AttachEgwReference />} />
 
             {/* Care Domains */}
             <Route path="care-domains" element={<CareDomains />} />
@@ -109,6 +113,11 @@ function App() {
             <Route path="recipes/new" element={<RecipeForm />} />
             <Route path="recipes/:id" element={<RecipeDetail />} />
             <Route path="recipes/:id/edit" element={<RecipeForm />} />
+
+            {/* EGW References */}
+            <Route path="egw-references" element={<EgwReferences />} />
+            <Route path="egw-references/new" element={<EgwReferenceForm />} />
+            <Route path="egw-references/:id/edit" element={<EgwReferenceForm />} />
 
             {/* Content Tags */}
             <Route path="tags" element={<ContentTags />} />

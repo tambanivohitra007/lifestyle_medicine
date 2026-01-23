@@ -65,4 +65,14 @@ class Condition extends Model
             ->withPivot(['created_by', 'deleted_by'])
             ->withTimestamps();
     }
+
+    /**
+     * Get the EGW references linked to this condition.
+     */
+    public function egwReferences(): BelongsToMany
+    {
+        return $this->belongsToMany(EgwReference::class, 'condition_egw_reference')
+            ->withPivot(['created_by', 'deleted_by'])
+            ->withTimestamps();
+    }
 }

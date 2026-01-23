@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ConditionResource;
 use App\Http\Resources\ConditionSectionResource;
+use App\Http\Resources\EgwReferenceResource;
 use App\Http\Resources\InterventionResource;
 use App\Http\Resources\RecipeResource;
 use App\Http\Resources\ScriptureResource;
 use App\Models\Condition;
+use App\Models\EgwReference;
 use App\Models\Intervention;
 use App\Models\Recipe;
 use App\Models\Scripture;
@@ -153,5 +155,24 @@ class ConditionController extends Controller
         $condition->recipes()->detach($recipe->id);
 
         return response()->json(['message' => 'Recipe detached successfully']);
+    }
+
+    public function egwReferences(Condition $condition): AnonymousResourceCollection
+    {
+        return EgwReferenceResource::collection($condition->egwReferences);
+    }
+
+    public function attachEgwReference(Condition $condition, EgwReference $egwReference): Response
+    {
+        $condition->egwReferences()->attach($egwReference->id);
+
+        return response()->json(['message' => 'EGW reference attached successfully']);
+    }
+
+    public function detachEgwReference(Condition $condition, EgwReference $egwReference): Response
+    {
+        $condition->egwReferences()->detach($egwReference->id);
+
+        return response()->json(['message' => 'EGW reference detached successfully']);
     }
 }

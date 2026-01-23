@@ -56,6 +56,7 @@ export const apiEndpoints = {
   conditionInterventions: (id) => `/conditions/${id}/interventions`,
   conditionScriptures: (id) => `/conditions/${id}/scriptures`,
   conditionRecipes: (id) => `/conditions/${id}/recipes`,
+  conditionEgwReferences: (id) => `/conditions/${id}/egw-references`,
 
   // Interventions
   interventions: '/interventions',
@@ -77,6 +78,13 @@ export const apiEndpoints = {
   scriptures: '/scriptures',
   scripturesAdmin: '/admin/scriptures',
 
+  // EGW References
+  egwReferences: '/egw-references',
+  egwReferencesAdmin: '/admin/egw-references',
+  egwReferencesBooks: '/egw-references-books',
+  egwReferencesTopics: '/egw-references-topics',
+  egwReferencesAbbreviations: '/egw-references-abbreviations',
+
   // Recipes
   recipes: '/recipes',
   recipesAdmin: '/admin/recipes',
@@ -95,6 +103,8 @@ export const apiEndpoints = {
     `/admin/conditions/${conditionId}/scriptures/${scriptureId}`,
   attachConditionRecipe: (conditionId, recipeId) =>
     `/admin/conditions/${conditionId}/recipes/${recipeId}`,
+  attachConditionEgwReference: (conditionId, egwReferenceId) =>
+    `/admin/conditions/${conditionId}/egw-references/${egwReferenceId}`,
 
   // Import
   importConditions: '/admin/import/conditions',

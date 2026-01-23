@@ -86,4 +86,14 @@ class Intervention extends Model
             ->withPivot(['created_by', 'deleted_by'])
             ->withTimestamps();
     }
+
+    /**
+     * Get the EGW references linked to this intervention.
+     */
+    public function egwReferences(): BelongsToMany
+    {
+        return $this->belongsToMany(EgwReference::class, 'intervention_egw_reference')
+            ->withPivot(['created_by', 'deleted_by'])
+            ->withTimestamps();
+    }
 }

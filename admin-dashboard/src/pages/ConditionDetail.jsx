@@ -7,6 +7,7 @@ import {
   FileText,
   Stethoscope,
   BookOpen,
+  BookMarked,
   ChefHat,
   AlertCircle,
   ChevronRight,
@@ -49,6 +50,7 @@ const ConditionDetail = () => {
   const [sections, setSections] = useState([]);
   const [interventions, setInterventions] = useState([]);
   const [scriptures, setScriptures] = useState([]);
+  const [egwReferences, setEgwReferences] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,12 +64,13 @@ const ConditionDetail = () => {
   const fetchConditionData = async () => {
     try {
       setLoading(true);
-      const [conditionRes, sectionsRes, interventionsRes, scripturesRes, recipesRes, careDomainsRes] =
+      const [conditionRes, sectionsRes, interventionsRes, scripturesRes, egwRes, recipesRes, careDomainsRes] =
         await Promise.all([
           api.get(`${apiEndpoints.conditions}/${id}`),
           api.get(apiEndpoints.conditionSections(id)),
           api.get(apiEndpoints.conditionInterventions(id)),
           api.get(apiEndpoints.conditionScriptures(id)),
+          api.get(apiEndpoints.conditionEgwReferences(id)),
           api.get(apiEndpoints.conditionRecipes(id)),
           api.get(apiEndpoints.careDomains),
         ]);
@@ -76,6 +79,7 @@ const ConditionDetail = () => {
       setSections(sectionsRes.data.data || []);
       setInterventions(interventionsRes.data.data || []);
       setScriptures(scripturesRes.data.data || []);
+      setEgwReferences(egwRes.data.data || []);
       setRecipes(recipesRes.data.data || []);
       setCareDomains(careDomainsRes.data.data || []);
     } catch (error) {
@@ -157,6 +161,20 @@ const ConditionDetail = () => {
     }
   };
 
+  const handleDetachEgwReference = async (egwReferenceId, citation) => {
+    const confirmed = await confirmRemove(`Remove "${citation}" from this condition?`);
+    if (!confirmed) return;
+
+    try {
+      await api.delete(apiEndpoints.attachConditionEgwReference(id, egwReferenceId));
+      setEgwReferences((prev) => prev.filter((e) => e.id !== egwReferenceId));
+      toast.success('EGW reference removed');
+    } catch (error) {
+      console.error('Error detaching EGW reference:', error);
+      toast.error('Failed to remove EGW reference');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -183,6 +201,7 @@ const ConditionDetail = () => {
     { id: 'sections', label: 'Sections', icon: FileText, count: sections.length },
     { id: 'interventions', label: 'Interventions', icon: Stethoscope, count: interventions.length },
     { id: 'scriptures', label: 'Scriptures', icon: BookOpen, count: scriptures.length },
+    { id: 'egw', label: 'EGW Writings', icon: BookMarked, count: egwReferences.length },
     { id: 'recipes', label: 'Recipes', icon: ChefHat, count: recipes.length },
   ];
 
@@ -497,6 +516,59 @@ const ConditionDetail = () => {
                       </span>
                     )}
                     <p className="text-gray-600 text-xs sm:text-sm italic">"{scripture.text}"</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* EGW References Tab */}
+        {activeTab === 'egw' && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-gray-900">Ellen G. White Writings</h2>
+              <Link
+                to={`/conditions/${id}/egw-references/attach`}
+                className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
+              >
+                <Plus className="w-4 h-4" />
+                Attach EGW Reference
+              </Link>
+            </div>
+
+            {egwReferences.length === 0 ? (
+              <div className="card text-center py-8">
+                <BookMarked className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600">No EGW references linked yet</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {egwReferences.map((egwRef) => (
+                  <div key={egwRef.id} className="card">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                          {egwRef.citation}
+                        </h3>
+                        {egwRef.topic && (
+                          <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
+                            {egwRef.topic}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleDetachEgwReference(egwRef.id, egwRef.citation)}
+                        className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
+                        title="Remove"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </button>
+                    </div>
+                    <p className="text-gray-600 text-xs sm:text-sm italic">"{egwRef.quote}"</p>
+                    {egwRef.context && (
+                      <p className="text-gray-500 text-xs mt-2">{egwRef.context}</p>
+                    )}
                   </div>
                 ))}
               </div>

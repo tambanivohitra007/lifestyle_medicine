@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CareDomainController;
 use App\Http\Controllers\Api\ConditionController;
 use App\Http\Controllers\Api\ConditionSectionController;
 use App\Http\Controllers\Api\ContentTagController;
+use App\Http\Controllers\Api\EgwReferenceController;
 use App\Http\Controllers\Api\EvidenceEntryController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\ImportController;
@@ -42,6 +43,7 @@ Route::prefix('v1')->group(function () {
     Route::get('conditions/{condition}/interventions', [ConditionController::class, 'interventions']);
     Route::get('conditions/{condition}/scriptures', [ConditionController::class, 'scriptures']);
     Route::get('conditions/{condition}/recipes', [ConditionController::class, 'recipes']);
+    Route::get('conditions/{condition}/egw-references', [ConditionController::class, 'egwReferences']);
 
     // Interventions
     Route::apiResource('interventions', InterventionController::class)->only(['index', 'show']);
@@ -56,6 +58,12 @@ Route::prefix('v1')->group(function () {
     // Scriptures & Recipes
     Route::apiResource('scriptures', ScriptureController::class)->only(['index', 'show']);
     Route::apiResource('recipes', RecipeController::class)->only(['index', 'show']);
+
+    // EGW References
+    Route::apiResource('egw-references', EgwReferenceController::class)->only(['index', 'show']);
+    Route::get('egw-references-books', [EgwReferenceController::class, 'books']);
+    Route::get('egw-references-topics', [EgwReferenceController::class, 'topics']);
+    Route::get('egw-references-abbreviations', [EgwReferenceController::class, 'abbreviations']);
 
     // Content Tags
     Route::apiResource('content-tags', ContentTagController::class)->only(['index', 'show']);
@@ -92,6 +100,9 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('scriptures', ScriptureController::class)->except(['index', 'show']);
     Route::apiResource('recipes', RecipeController::class)->except(['index', 'show']);
 
+    // EGW References
+    Route::apiResource('egw-references', EgwReferenceController::class)->except(['index', 'show']);
+
     // Content Tags
     Route::apiResource('content-tags', ContentTagController::class)->except(['index', 'show']);
 
@@ -102,6 +113,8 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     Route::delete('conditions/{condition}/scriptures/{scripture}', [ConditionController::class, 'detachScripture']);
     Route::post('conditions/{condition}/recipes/{recipe}', [ConditionController::class, 'attachRecipe']);
     Route::delete('conditions/{condition}/recipes/{recipe}', [ConditionController::class, 'detachRecipe']);
+    Route::post('conditions/{condition}/egw-references/{egwReference}', [ConditionController::class, 'attachEgwReference']);
+    Route::delete('conditions/{condition}/egw-references/{egwReference}', [ConditionController::class, 'detachEgwReference']);
 
     // Data Import
     Route::post('import/conditions', [ImportController::class, 'importConditions']);
