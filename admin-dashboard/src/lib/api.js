@@ -36,8 +36,9 @@ export default api;
 // API endpoints
 export const apiEndpoints = {
   // Auth
-  login: '/login',
-  logout: '/logout',
+  login: '/v1/login',
+  logout: '/v1/logout',
+  user: '/v1/user',
 
   // Care Domains
   careDomains: '/care-domains',

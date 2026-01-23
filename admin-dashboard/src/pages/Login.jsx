@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart, Lock, Mail } from 'lucide-react';
+import api, { apiEndpoints } from '../lib/api';
 
 const Login = () => {
   const [email, setEmail] = useState('admin@example.com');
@@ -17,18 +18,19 @@ const Login = () => {
     setError('');
 
     try {
-      // For now, simulate login
-      // In production, you'd call your Laravel Sanctum API
-      const mockToken = 'mock-token-' + Date.now();
-      const mockUser = {
-        name: 'Admin User',
-        email: email,
-      };
+      const response = await api.post(apiEndpoints.login, { email, password });
+      const { token, user } = response.data;
 
-      login(mockToken, mockUser);
+      login(token, user);
       navigate('/');
     } catch (err) {
-      setError('Invalid credentials. Please try again.');
+      if (err.response?.data?.errors?.email) {
+        setError(err.response.data.errors.email[0]);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Invalid credentials. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CareDomainController;
 use App\Http\Controllers\Api\ConditionController;
 use App\Http\Controllers\Api\ConditionSectionController;
@@ -12,9 +13,12 @@ use App\Http\Controllers\Api\ScriptureController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Authentication routes
+Route::prefix('v1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
+});
 
 // Public API routes (read-only)
 Route::prefix('v1')->group(function () {
