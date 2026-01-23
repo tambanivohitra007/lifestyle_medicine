@@ -15,6 +15,17 @@ class EvidenceEntryController extends Controller
     {
         $query = EvidenceEntry::with(['intervention', 'references']);
 
+        if ($request->has('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('summary', 'like', '%' . $request->search . '%')
+                  ->orWhere('population', 'like', '%' . $request->search . '%')
+                  ->orWhere('notes', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('intervention', function ($q) use ($request) {
+                      $q->where('name', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
         if ($request->has('intervention_id')) {
             $query->where('intervention_id', $request->intervention_id);
         }

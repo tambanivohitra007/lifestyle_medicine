@@ -22,17 +22,19 @@ const STUDY_TYPE = {
 const Evidence = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [studyTypeFilter, setStudyTypeFilter] = useState('');
   const [qualityFilter, setQualityFilter] = useState('');
 
   useEffect(() => {
     fetchEntries();
-  }, [studyTypeFilter, qualityFilter]);
+  }, [searchTerm, studyTypeFilter, qualityFilter]);
 
   const fetchEntries = async () => {
     try {
       setLoading(true);
       const params = {};
+      if (searchTerm) params.search = searchTerm;
       if (studyTypeFilter) params.study_type = studyTypeFilter;
       if (qualityFilter) params.quality_rating = qualityFilter;
 
@@ -58,16 +60,16 @@ const Evidence = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Evidence Entries</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Evidence Entries</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Manage evidence supporting interventions
           </p>
         </div>
-        <Link to="/evidence/new" className="btn-primary flex items-center gap-2">
+        <Link to="/evidence/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
           <Plus className="w-5 h-5" />
           Add Evidence
         </Link>
@@ -75,7 +77,18 @@ const Evidence = () => {
 
       {/* Filters */}
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Search */}
+          <div className="relative">
+            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search evidence..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="input-field pl-10"
+            />
+          </div>
           <select
             value={studyTypeFilter}
             onChange={(e) => setStudyTypeFilter(e.target.value)}
@@ -109,12 +122,12 @@ const Evidence = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       ) : entries.length === 0 ? (
-        <div className="card text-center py-12">
-          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <div className="card text-center py-8 sm:py-12">
+          <FileText className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No evidence entries found
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Get started by adding evidence for interventions.
           </p>
           <Link to="/evidence/new" className="btn-primary inline-flex items-center gap-2">
@@ -129,9 +142,9 @@ const Evidence = () => {
               key={entry.id}
               className="card hover:shadow-lg transition-shadow duration-200"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
                     {entry.quality_rating && (
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
@@ -150,7 +163,7 @@ const Evidence = () => {
 
                   {entry.intervention && (
                     <div className="flex items-center gap-2 mb-2">
-                      <Stethoscope className="w-4 h-4 text-green-500" />
+                      <Stethoscope className="w-4 h-4 text-green-500 flex-shrink-0" />
                       <Link
                         to={`/interventions/${entry.intervention.id}`}
                         className="text-sm font-medium text-green-600 hover:underline"
@@ -161,11 +174,11 @@ const Evidence = () => {
                   )}
 
                   {entry.summary && (
-                    <p className="text-gray-700 mb-2">{entry.summary}</p>
+                    <p className="text-gray-700 mb-2 text-sm sm:text-base">{entry.summary}</p>
                   )}
 
                   {entry.population && (
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-gray-500">
                       <span className="font-medium">Population:</span> {entry.population}
                     </p>
                   )}
@@ -177,17 +190,17 @@ const Evidence = () => {
                   )}
                 </div>
 
-                <div className="flex gap-2 ml-4">
+                <div className="flex gap-1 self-end sm:self-start">
                   <Link
                     to={`/evidence/${entry.id}/edit`}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="action-btn"
                     title="Edit"
                   >
                     <Edit className="w-4 h-4 text-gray-600" />
                   </Link>
                   <button
                     onClick={() => handleDelete(entry.id)}
-                    className="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                    className="action-btn hover:bg-red-50 active:bg-red-100"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4 text-red-600" />
