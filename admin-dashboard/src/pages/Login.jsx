@@ -40,19 +40,19 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4 sm:p-6">
       <div className="max-w-md w-full">
         {/* Logo and Title */}
-        <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-primary-100 mb-4">
-            <Heart className="w-8 sm:w-10 h-8 sm:h-10 text-primary-600" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-            Welcome Back
-          </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
-            Lifestyle Medicine Knowledge Platform
-          </p>
-        </div>
+                    <div className="text-center mb-6 sm:mb-8">
+                      <div className="inline-flex items-center justify-center w-24 sm:w-32 h-24 sm:h-32 mb-4">
+                        <img src="/lifestyle.png" alt="Logo"  />
+                      </div>
+                      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                        Welcome Back
+                      </h1>
+                      <p className="text-gray-600 text-sm sm:text-base">
+                        Lifestyle Medicine Knowledge Platform
+                      </p>
+                    </div>
 
-        {/* Login Card */}
+                {/* Login Card */}
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             {/* Email */}
