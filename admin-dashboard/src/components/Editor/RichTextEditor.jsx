@@ -31,14 +31,18 @@ const MenuButton = ({ onClick, isActive, disabled, children, title }) => (
     onClick={onClick}
     disabled={disabled}
     title={title}
-    className={`p-1.5 rounded transition-colors ${
+    className={`p-2 sm:p-1.5 rounded transition-colors touch-manipulation ${
       isActive
         ? 'bg-primary-100 text-primary-700'
-        : 'text-gray-600 hover:bg-gray-100'
+        : 'text-gray-600 hover:bg-gray-100 active:bg-gray-200'
     } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
   >
     {children}
   </button>
+);
+
+const Divider = () => (
+  <div className="w-px h-6 bg-gray-300 mx-0.5 sm:mx-1 hidden sm:block" />
 );
 
 const MenuBar = ({ editor }) => {
@@ -59,7 +63,7 @@ const MenuBar = ({ editor }) => {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1 p-2 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+    <div className="flex flex-wrap items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 border-b border-gray-200 bg-gray-50 rounded-t-lg">
       {/* History */}
       <MenuButton
         onClick={() => editor.chain().focus().undo().run()}
@@ -76,7 +80,7 @@ const MenuBar = ({ editor }) => {
         <Redo className="w-4 h-4" />
       </MenuButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+      <Divider />
 
       {/* Headings */}
       <MenuButton
@@ -101,7 +105,7 @@ const MenuBar = ({ editor }) => {
         <Heading3 className="w-4 h-4" />
       </MenuButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+      <Divider />
 
       {/* Text formatting */}
       <MenuButton
@@ -140,7 +144,7 @@ const MenuBar = ({ editor }) => {
         <Code className="w-4 h-4" />
       </MenuButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+      <Divider />
 
       {/* Lists */}
       <MenuButton
@@ -165,32 +169,34 @@ const MenuBar = ({ editor }) => {
         <Quote className="w-4 h-4" />
       </MenuButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+      <Divider />
 
-      {/* Alignment */}
-      <MenuButton
-        onClick={() => editor.chain().focus().setTextAlign('left').run()}
-        isActive={editor.isActive({ textAlign: 'left' })}
-        title="Align Left"
-      >
-        <AlignLeft className="w-4 h-4" />
-      </MenuButton>
-      <MenuButton
-        onClick={() => editor.chain().focus().setTextAlign('center').run()}
-        isActive={editor.isActive({ textAlign: 'center' })}
-        title="Align Center"
-      >
-        <AlignCenter className="w-4 h-4" />
-      </MenuButton>
-      <MenuButton
-        onClick={() => editor.chain().focus().setTextAlign('right').run()}
-        isActive={editor.isActive({ textAlign: 'right' })}
-        title="Align Right"
-      >
-        <AlignRight className="w-4 h-4" />
-      </MenuButton>
+      {/* Alignment - Hidden on very small screens */}
+      <div className="hidden xs:contents">
+        <MenuButton
+          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          isActive={editor.isActive({ textAlign: 'left' })}
+          title="Align Left"
+        >
+          <AlignLeft className="w-4 h-4" />
+        </MenuButton>
+        <MenuButton
+          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          isActive={editor.isActive({ textAlign: 'center' })}
+          title="Align Center"
+        >
+          <AlignCenter className="w-4 h-4" />
+        </MenuButton>
+        <MenuButton
+          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          isActive={editor.isActive({ textAlign: 'right' })}
+          title="Align Right"
+        >
+          <AlignRight className="w-4 h-4" />
+        </MenuButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+        <Divider />
+      </div>
 
       {/* Link */}
       <MenuButton
@@ -240,7 +246,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...' })
     editorProps: {
       attributes: {
         class:
-          'prose prose-sm max-w-none p-4 min-h-[200px] focus:outline-none',
+          'prose prose-sm max-w-none p-3 sm:p-4 min-h-[150px] sm:min-h-[200px] focus:outline-none',
       },
     },
   });

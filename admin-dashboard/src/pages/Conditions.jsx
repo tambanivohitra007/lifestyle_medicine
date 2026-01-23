@@ -44,16 +44,16 @@ const Conditions = () => {
   const categories = [...new Set(conditions.map((c) => c.category).filter(Boolean))];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Conditions</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Conditions</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Manage medical conditions and their interventions
           </p>
         </div>
-        <Link to="/conditions/new" className="btn-primary flex items-center gap-2">
+        <Link to="/conditions/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
           <Plus className="w-5 h-5" />
           Add Condition
         </Link>
@@ -61,7 +61,7 @@ const Conditions = () => {
 
       {/* Filters */}
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -96,12 +96,12 @@ const Conditions = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       ) : conditions.length === 0 ? (
-        <div className="card text-center py-12">
-          <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <div className="card text-center py-8 sm:py-12">
+          <Heart className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No conditions found
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Get started by creating your first medical condition.
           </p>
           <Link to="/conditions/new" className="btn-primary inline-flex items-center gap-2">
@@ -110,7 +110,7 @@ const Conditions = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {conditions.map((condition) => (
             <div
               key={condition.id}
@@ -118,26 +118,26 @@ const Conditions = () => {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="p-2 rounded-lg bg-primary-100">
-                  <Heart className="w-6 h-6 text-primary-600" />
+                  <Heart className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1">
                   <Link
                     to={`/conditions/${condition.id}`}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="action-btn"
                     title="View Details"
                   >
                     <Eye className="w-4 h-4 text-gray-600" />
                   </Link>
                   <Link
                     to={`/conditions/${condition.id}/edit`}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="action-btn"
                     title="Edit"
                   >
                     <Edit className="w-4 h-4 text-gray-600" />
                   </Link>
                   <button
                     onClick={() => handleDelete(condition.id)}
-                    className="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                    className="action-btn hover:bg-red-50 active:bg-red-100"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4 text-red-600" />
@@ -145,7 +145,7 @@ const Conditions = () => {
                 </div>
               </div>
 
-              <h3 className="font-semibold text-lg text-gray-900 mb-2">
+              <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
                 {condition.name}
               </h3>
 
@@ -164,7 +164,7 @@ const Conditions = () => {
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <Link
                   to={`/conditions/${condition.id}`}
-                  className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                  className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
                 >
                   View Details →
                 </Link>

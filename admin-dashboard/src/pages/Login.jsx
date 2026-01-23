@@ -37,28 +37,28 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4 sm:p-6">
       <div className="max-w-md w-full">
         {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary-100 mb-4">
-            <Heart className="w-10 h-10 text-primary-600" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-primary-100 mb-4">
+            <Heart className="w-8 sm:w-10 h-8 sm:h-10 text-primary-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             Welcome Back
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm sm:text-base">
             Lifestyle Medicine Knowledge Platform
           </p>
         </div>
 
         {/* Login Card */}
         <div className="card">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             {/* Email */}
             <div>
-              <label className="label">
-                <Mail className="w-4 h-4 inline mr-2" />
+              <label className="label flex items-center">
+                <Mail className="w-4 h-4 mr-2" />
                 Email Address
               </label>
               <input
@@ -67,14 +67,15 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="input-field"
                 placeholder="admin@example.com"
+                autoComplete="email"
                 required
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="label">
-                <Lock className="w-4 h-4 inline mr-2" />
+              <label className="label flex items-center">
+                <Lock className="w-4 h-4 mr-2" />
                 Password
               </label>
               <input
@@ -83,6 +84,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="input-field"
                 placeholder="Enter your password"
+                autoComplete="current-password"
                 required
               />
             </div>
@@ -98,7 +100,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed py-3"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -119,7 +121,7 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-500 mt-8">
+        <p className="text-center text-xs sm:text-sm text-gray-500 mt-6 sm:mt-8">
           Family & Lifestyle Medicine Lansing
         </p>
       </div>

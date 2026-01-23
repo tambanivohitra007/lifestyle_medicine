@@ -122,20 +122,20 @@ const ConditionSectionForm = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex items-start gap-3 sm:gap-4">
         <Link
           to={`/conditions/${conditionId}`}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="action-btn flex-shrink-0 mt-1"
         >
           <ArrowLeft className="w-5 h-5 text-gray-600" />
         </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             {isEditing ? 'Edit Section' : 'New Section'}
           </h1>
           {condition && (
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 mt-1 text-sm sm:text-base truncate">
               For condition: <span className="font-medium">{condition.name}</span>
             </p>
           )}
@@ -143,7 +143,7 @@ const ConditionSectionForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="card max-w-2xl">
-        <div className="space-y-6">
+        <div className="space-y-5 sm:space-y-6">
           {/* Section Type */}
           <div>
             <label htmlFor="section_type" className="label">
@@ -214,7 +214,7 @@ const ConditionSectionForm = () => {
               name="order_index"
               value={formData.order_index}
               onChange={handleChange}
-              className="input-field w-32"
+              className="input-field w-full sm:w-32"
               min="0"
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -223,11 +223,11 @@ const ConditionSectionForm = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
+          <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 sm:gap-4 pt-4 border-t border-gray-200">
             <button
               type="submit"
               disabled={saving}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               {saving ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -236,7 +236,7 @@ const ConditionSectionForm = () => {
               )}
               {saving ? 'Saving...' : 'Save Section'}
             </button>
-            <Link to={`/conditions/${conditionId}`} className="btn-outline">
+            <Link to={`/conditions/${conditionId}`} className="btn-outline text-center w-full sm:w-auto">
               Cancel
             </Link>
           </div>

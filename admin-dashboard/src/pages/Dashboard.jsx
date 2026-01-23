@@ -89,34 +89,34 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Welcome Section */}
       <div className="card bg-gradient-to-r from-primary-600 to-primary-700 text-white">
-        <h1 className="text-3xl font-bold mb-2">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
           Welcome to the Knowledge Platform
         </h1>
-        <p className="text-primary-100">
+        <p className="text-primary-100 text-sm sm:text-base">
           Manage lifestyle medicine content, evidence, and spiritual care resources
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {statCards.map((stat) => (
           <Link
             key={stat.title}
             to={stat.link}
-            className="card hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+            className="card hover:shadow-lg transition-shadow duration-200 cursor-pointer touch-manipulation"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="order-2 sm:order-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
                   {stat.title}
                 </p>
-                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</p>
               </div>
-              <div className={`p-4 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`w-8 h-8 ${stat.textColor}`} />
+              <div className={`p-3 sm:p-4 rounded-lg ${stat.bgColor} self-start sm:self-auto order-1 sm:order-2`}>
+                <stat.icon className={`w-6 sm:w-8 h-6 sm:h-8 ${stat.textColor}`} />
               </div>
             </div>
           </Link>
@@ -125,19 +125,19 @@ const Dashboard = () => {
 
       {/* Recent Conditions */}
       <div className="card">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Recent Conditions</h2>
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Recent Conditions</h2>
           <Link
             to="/conditions"
-            className="text-sm font-medium text-primary-600 hover:text-primary-700"
+            className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
           >
             View all →
           </Link>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {recentConditions.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
+            <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">
               No conditions found. Create your first condition to get started.
             </p>
           ) : (
@@ -145,25 +145,25 @@ const Dashboard = () => {
               <Link
                 key={condition.id}
                 to={`/conditions/${condition.id}`}
-                className="flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50/30 transition-all duration-200"
+                className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50/30 active:bg-primary-100/30 transition-all duration-200 touch-manipulation"
               >
-                <div className="p-2 rounded-lg bg-primary-100">
-                  <Heart className="w-5 h-5 text-primary-600" />
+                <div className="p-1.5 sm:p-2 rounded-lg bg-primary-100 flex-shrink-0">
+                  <Heart className="w-4 sm:w-5 h-4 sm:h-5 text-primary-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900">{condition.name}</h3>
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{condition.name}</h3>
                   {condition.category && (
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
                       {condition.category}
                     </p>
                   )}
                   {condition.summary && (
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 line-clamp-2 hidden sm:block">
                       {condition.summary}
                     </p>
                   )}
                 </div>
-                <TrendingUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400 flex-shrink-0 hidden sm:block" />
               </Link>
             ))
           )}
@@ -171,40 +171,40 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <Link
           to="/conditions/new"
-          className="card hover:shadow-lg transition-shadow duration-200 text-center"
+          className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
         >
-          <Heart className="w-12 h-12 text-primary-600 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-1">
+          <Heart className="w-10 sm:w-12 h-10 sm:h-12 text-primary-600 mx-auto mb-2 sm:mb-3" />
+          <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
             Add New Condition
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-xs sm:text-sm text-gray-600">
             Create a new medical condition entry
           </p>
         </Link>
 
         <Link
           to="/interventions/new"
-          className="card hover:shadow-lg transition-shadow duration-200 text-center"
+          className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
         >
-          <Activity className="w-12 h-12 text-secondary-600 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-1">
+          <Activity className="w-10 sm:w-12 h-10 sm:h-12 text-secondary-600 mx-auto mb-2 sm:mb-3" />
+          <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
             Add Intervention
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-xs sm:text-sm text-gray-600">
             Create a lifestyle intervention
           </p>
         </Link>
 
         <Link
           to="/scriptures/new"
-          className="card hover:shadow-lg transition-shadow duration-200 text-center"
+          className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
         >
-          <Book className="w-12 h-12 text-purple-600 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-1">Add Scripture</h3>
-          <p className="text-sm text-gray-600">
+          <Book className="w-10 sm:w-12 h-10 sm:h-12 text-purple-600 mx-auto mb-2 sm:mb-3" />
+          <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Add Scripture</h3>
+          <p className="text-xs sm:text-sm text-gray-600">
             Add spiritual care content
           </p>
         </Link>
