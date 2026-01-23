@@ -4,6 +4,7 @@ namespace App\Services;
 
 use GeminiAPI\Client;
 use GeminiAPI\Resources\Parts\TextPart;
+use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\Facades\Log;
 
 class GeminiService
@@ -16,7 +17,17 @@ class GeminiService
         $this->apiKey = config('services.gemini.api_key');
 
         if ($this->apiKey) {
-            $this->client = new Client($this->apiKey);
+            $httpClient = null;
+
+            // For local development on Windows, disable SSL verification
+            // Remove this in production or configure proper CA bundle
+            if (config('app.env') === 'local' && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $httpClient = new GuzzleClient([
+                    'verify' => false, // Disable SSL verification for local Windows development
+                ]);
+            }
+
+            $this->client = new Client($this->apiKey, $httpClient);
         }
     }
 
@@ -40,7 +51,8 @@ class GeminiService
         $prompt = $this->buildScripturePrompt($topic, $context);
 
         try {
-            $response = $this->client->geminiPro()->generateContent(
+            // Use gemini-2.5-flash (latest and fastest model)
+            $response = $this->client->generativeModel('gemini-2.5-flash')->generateContent(
                 new TextPart($prompt)
             );
 
@@ -64,7 +76,8 @@ class GeminiService
         $prompt = $this->buildEgwPrompt($topic, $context);
 
         try {
-            $response = $this->client->geminiPro()->generateContent(
+            // Use gemini-2.5-flash (latest and fastest model)
+            $response = $this->client->generativeModel('gemini-2.5-flash')->generateContent(
                 new TextPart($prompt)
             );
 
