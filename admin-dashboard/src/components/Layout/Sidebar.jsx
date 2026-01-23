@@ -13,6 +13,7 @@ import {
   Library,
   Settings,
   Search,
+  Upload,
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -27,6 +28,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: '/scriptures', icon: Book, label: 'Scriptures' },
     { to: '/recipes', icon: ChefHat, label: 'Recipes' },
     { to: '/tags', icon: Tag, label: 'Content Tags' },
+    { to: '/import', icon: Upload, label: 'Import Data' },
     { to: '/profile', icon: Settings, label: 'Settings' },
   ];
 

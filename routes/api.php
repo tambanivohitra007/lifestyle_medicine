@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\ConditionController;
 use App\Http\Controllers\Api\ConditionSectionController;
 use App\Http\Controllers\Api\ContentTagController;
 use App\Http\Controllers\Api\EvidenceEntryController;
+use App\Http\Controllers\Api\ExportController;
+use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\InterventionController;
 use App\Http\Controllers\Api\RecipeController;
 use App\Http\Controllers\Api\ReferenceController;
@@ -56,6 +58,10 @@ Route::prefix('v1')->group(function () {
 
     // Content Tags
     Route::apiResource('content-tags', ContentTagController::class)->only(['index', 'show']);
+
+    // PDF Exports (public)
+    Route::get('export/conditions/{condition}/pdf', [ExportController::class, 'conditionPdf']);
+    Route::get('export/conditions/summary/pdf', [ExportController::class, 'conditionsSummaryPdf']);
 });
 
 // Admin API routes (full CRUD) - protected by auth:sanctum
@@ -95,4 +101,9 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     Route::delete('conditions/{condition}/scriptures/{scripture}', [ConditionController::class, 'detachScripture']);
     Route::post('conditions/{condition}/recipes/{recipe}', [ConditionController::class, 'attachRecipe']);
     Route::delete('conditions/{condition}/recipes/{recipe}', [ConditionController::class, 'detachRecipe']);
+
+    // Data Import
+    Route::post('import/conditions', [ImportController::class, 'importConditions']);
+    Route::post('import/interventions', [ImportController::class, 'importInterventions']);
+    Route::get('import/templates', [ImportController::class, 'getTemplates']);
 });

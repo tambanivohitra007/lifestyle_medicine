@@ -12,6 +12,7 @@ import {
   AlertCircle,
   ChevronRight,
   Eye,
+  Download,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 
@@ -198,6 +199,16 @@ const ConditionDetail = () => {
             <span className="hidden sm:inline">Preview Guide</span>
             <span className="sm:hidden">Preview</span>
           </Link>
+          <a
+            href={`http://localhost:8000/api/v1/export/conditions/${id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+          >
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Export PDF</span>
+            <span className="sm:hidden">PDF</span>
+          </a>
           <Link
             to={`/conditions/${id}/edit`}
             className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"

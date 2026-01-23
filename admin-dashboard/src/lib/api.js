@@ -95,4 +95,13 @@ export const apiEndpoints = {
     `/admin/conditions/${conditionId}/scriptures/${scriptureId}`,
   attachConditionRecipe: (conditionId, recipeId) =>
     `/admin/conditions/${conditionId}/recipes/${recipeId}`,
+
+  // Import
+  importConditions: '/admin/import/conditions',
+  importInterventions: '/admin/import/interventions',
+  importTemplates: '/admin/import/templates',
+
+  // Export
+  exportConditionPdf: (id) => `/export/conditions/${id}/pdf`,
+  exportConditionsSummaryPdf: '/export/conditions/summary/pdf',
 };

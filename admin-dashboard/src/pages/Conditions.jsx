@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Heart, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, Heart, Edit, Trash2, Eye, Download } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import Pagination from '../components/Pagination';
 
@@ -65,10 +65,21 @@ const Conditions = () => {
             Manage medical conditions and their interventions
           </p>
         </div>
-        <Link to="/conditions/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-          <Plus className="w-5 h-5" />
-          Add Condition
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <a
+            href="http://localhost:8000/api/v1/export/conditions/summary/pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline flex items-center justify-center gap-2"
+          >
+            <Download className="w-5 h-5" />
+            Export Summary
+          </a>
+          <Link to="/conditions/new" className="btn-primary flex items-center justify-center gap-2">
+            <Plus className="w-5 h-5" />
+            Add Condition
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
