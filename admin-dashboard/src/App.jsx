@@ -27,6 +27,7 @@ import RecipeForm from './pages/RecipeForm';
 import RecipeDetail from './pages/RecipeDetail';
 import ContentTags from './pages/ContentTags';
 import Profile from './pages/Profile';
+import Search from './pages/Search';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -111,6 +112,9 @@ function App() {
 
             {/* Profile */}
             <Route path="profile" element={<Profile />} />
+
+            {/* Search */}
+            <Route path="search" element={<Search />} />
           </Route>
 
           {/* Catch all */}

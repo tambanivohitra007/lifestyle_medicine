@@ -2,26 +2,38 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Heart, Edit, Trash2, Eye } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import Pagination from '../components/Pagination';
 
 const Conditions = () => {
   const [conditions, setConditions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, categoryFilter]);
 
   useEffect(() => {
     fetchConditions();
-  }, [searchTerm, categoryFilter]);
+  }, [searchTerm, categoryFilter, currentPage]);
 
   const fetchConditions = async () => {
     try {
       setLoading(true);
-      const params = {};
+      const params = { page: currentPage };
       if (searchTerm) params.search = searchTerm;
       if (categoryFilter) params.category = categoryFilter;
 
       const response = await api.get(apiEndpoints.conditions, { params });
       setConditions(response.data.data);
+      setPagination({
+        total: response.data.meta?.total || response.data.data.length,
+        lastPage: response.data.meta?.last_page || 1,
+        perPage: response.data.meta?.per_page || 20,
+      });
     } catch (error) {
       console.error('Error fetching conditions:', error);
     } finally {
@@ -110,68 +122,77 @@ const Conditions = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {conditions.map((condition) => (
-            <div
-              key={condition.id}
-              className="card hover:shadow-lg transition-shadow duration-200"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2 rounded-lg bg-primary-100">
-                  <Heart className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {conditions.map((condition) => (
+              <div
+                key={condition.id}
+                className="card hover:shadow-lg transition-shadow duration-200"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="p-2 rounded-lg bg-primary-100">
+                    <Heart className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
+                  </div>
+                  <div className="flex gap-1">
+                    <Link
+                      to={`/conditions/${condition.id}`}
+                      className="action-btn"
+                      title="View Details"
+                    >
+                      <Eye className="w-4 h-4 text-gray-600" />
+                    </Link>
+                    <Link
+                      to={`/conditions/${condition.id}/edit`}
+                      className="action-btn"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(condition.id)}
+                      className="action-btn hover:bg-red-50 active:bg-red-100"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-1">
+
+                <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
+                  {condition.name}
+                </h3>
+
+                {condition.category && (
+                  <span className="inline-block px-3 py-1 bg-secondary-100 text-secondary-700 text-xs font-medium rounded-full mb-3">
+                    {condition.category}
+                  </span>
+                )}
+
+                {condition.summary && (
+                  <p className="text-sm text-gray-600 line-clamp-3">
+                    {condition.summary}
+                  </p>
+                )}
+
+                <div className="mt-4 pt-4 border-t border-gray-200">
                   <Link
                     to={`/conditions/${condition.id}`}
-                    className="action-btn"
-                    title="View Details"
+                    className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
                   >
-                    <Eye className="w-4 h-4 text-gray-600" />
+                    View Details →
                   </Link>
-                  <Link
-                    to={`/conditions/${condition.id}/edit`}
-                    className="action-btn"
-                    title="Edit"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(condition.id)}
-                    className="action-btn hover:bg-red-50 active:bg-red-100"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
                 </div>
               </div>
-
-              <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
-                {condition.name}
-              </h3>
-
-              {condition.category && (
-                <span className="inline-block px-3 py-1 bg-secondary-100 text-secondary-700 text-xs font-medium rounded-full mb-3">
-                  {condition.category}
-                </span>
-              )}
-
-              {condition.summary && (
-                <p className="text-sm text-gray-600 line-clamp-3">
-                  {condition.summary}
-                </p>
-              )}
-
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <Link
-                  to={`/conditions/${condition.id}`}
-                  className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
-                >
-                  View Details →
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={pagination.lastPage}
+            onPageChange={setCurrentPage}
+            totalItems={pagination.total}
+            itemsPerPage={pagination.perPage}
+          />
+        </>
       )}
     </div>
   );

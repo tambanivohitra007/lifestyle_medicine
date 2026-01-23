@@ -13,11 +13,13 @@ class ContentTagController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = ContentTag::query();
+        $query = ContentTag::withCount(['interventions', 'recipes', 'scriptures']);
 
         if ($request->has('search')) {
             $query->where('tag', 'like', '%' . $request->search . '%');
         }
+
+        $query->orderBy('tag');
 
         $tags = $query->paginate(50);
 
@@ -26,6 +28,7 @@ class ContentTagController extends Controller
 
     public function show(ContentTag $contentTag): ContentTagResource
     {
+        $contentTag->loadCount(['interventions', 'recipes', 'scriptures']);
         $contentTag->load(['interventions', 'recipes', 'scriptures']);
 
         return new ContentTagResource($contentTag);

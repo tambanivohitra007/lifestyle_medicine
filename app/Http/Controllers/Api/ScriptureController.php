@@ -13,10 +13,16 @@ class ScriptureController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Scripture::query();
+        $query = Scripture::with('tags');
 
         if ($request->has('theme')) {
             $query->where('theme', $request->theme);
+        }
+
+        if ($request->has('tag_id')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->where('content_tags.id', $request->tag_id);
+            });
         }
 
         if ($request->has('search')) {

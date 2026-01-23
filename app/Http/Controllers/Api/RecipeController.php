@@ -13,7 +13,7 @@ class RecipeController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Recipe::query();
+        $query = Recipe::with('tags');
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
@@ -24,6 +24,12 @@ class RecipeController extends Controller
 
         if ($request->has('dietary_tag')) {
             $query->whereJsonContains('dietary_tags', $request->dietary_tag);
+        }
+
+        if ($request->has('tag_id')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->where('content_tags.id', $request->tag_id);
+            });
         }
 
         $recipes = $query->paginate(20);

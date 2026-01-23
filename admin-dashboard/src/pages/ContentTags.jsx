@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Search, Tag, Edit, Trash2, Loader2, X, Check } from 'lucide-react';
+import { Plus, Search, Tag, Edit, Trash2, Loader2, X, Check, Activity, ChefHat, Book } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 
 const ContentTags = () => {
@@ -77,7 +77,7 @@ const ContentTags = () => {
 
   const startEditing = (tag) => {
     setEditingId(tag.id);
-    setEditValue(tag.tag);
+    setEditValue(tag.name || tag.tag);
   };
 
   const cancelEditing = () => {
@@ -86,15 +86,15 @@ const ContentTags = () => {
   };
 
   const filteredTags = tags.filter((tag) =>
-    tag.tag.toLowerCase().includes(searchTerm.toLowerCase())
+    (tag.name || tag.tag || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Content Tags</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Content Tags</h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">
           Manage tags for organizing content across the platform
         </p>
       </div>
@@ -102,7 +102,7 @@ const ContentTags = () => {
       {/* Add New Tag */}
       <div className="card">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Add New Tag</h2>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             value={newTag}
@@ -114,7 +114,7 @@ const ContentTags = () => {
           <button
             onClick={handleCreate}
             disabled={saving || !newTag.trim()}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             {saving ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -128,7 +128,7 @@ const ContentTags = () => {
 
       {/* Search */}
       <div className="card">
-        <div className="relative max-w-md">
+        <div className="relative">
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -146,12 +146,12 @@ const ContentTags = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       ) : filteredTags.length === 0 ? (
-        <div className="card text-center py-12">
-          <Tag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <div className="card text-center py-8 sm:py-12">
+          <Tag className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {searchTerm ? 'No tags found' : 'No tags yet'}
           </h3>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm sm:text-base">
             {searchTerm
               ? 'Try adjusting your search term'
               : 'Add tags to organize your content'}
@@ -163,7 +163,7 @@ const ContentTags = () => {
             {filteredTags.map((tag) => (
               <div
                 key={tag.id}
-                className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+                className="flex flex-col sm:flex-row sm:items-center justify-between py-4 first:pt-0 last:pb-0 gap-3"
               >
                 {editingId === tag.id ? (
                   <div className="flex items-center gap-2 flex-1">
@@ -178,34 +178,57 @@ const ContentTags = () => {
                     <button
                       onClick={() => handleUpdate(tag.id)}
                       disabled={saving}
-                      className="p-2 rounded-lg hover:bg-green-50 text-green-600"
+                      className="action-btn hover:bg-green-50"
                     >
-                      <Check className="w-5 h-5" />
+                      <Check className="w-5 h-5 text-green-600" />
                     </button>
                     <button
                       onClick={cancelEditing}
-                      className="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+                      className="action-btn"
                     >
-                      <X className="w-5 h-5" />
+                      <X className="w-5 h-5 text-gray-600" />
                     </button>
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-center gap-3">
-                      <Tag className="w-5 h-5 text-gray-400" />
-                      <span className="font-medium text-gray-900">{tag.tag}</span>
+                    <div className="flex items-center gap-3 flex-1">
+                      <Tag className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      <div>
+                        <span className="font-medium text-gray-900">{tag.name || tag.tag}</span>
+                        {/* Usage counts */}
+                        <div className="flex flex-wrap gap-3 mt-1">
+                          {tag.interventions_count !== undefined && (
+                            <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                              <Activity className="w-3 h-3" />
+                              {tag.interventions_count} interventions
+                            </span>
+                          )}
+                          {tag.recipes_count !== undefined && (
+                            <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                              <ChefHat className="w-3 h-3" />
+                              {tag.recipes_count} recipes
+                            </span>
+                          )}
+                          {tag.scriptures_count !== undefined && (
+                            <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                              <Book className="w-3 h-3" />
+                              {tag.scriptures_count} scriptures
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 self-end sm:self-auto">
                       <button
                         onClick={() => startEditing(tag)}
-                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="action-btn"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
                         onClick={() => handleDelete(tag.id)}
-                        className="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                        className="action-btn hover:bg-red-50 active:bg-red-100"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />

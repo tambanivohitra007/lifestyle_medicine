@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, FileText, Edit, Trash2, Stethoscope } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import Pagination from '../components/Pagination';
 
 const QUALITY_RATING = {
   A: { label: 'A - High', color: 'bg-green-100 text-green-700' },
@@ -25,21 +26,32 @@ const Evidence = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [studyTypeFilter, setStudyTypeFilter] = useState('');
   const [qualityFilter, setQualityFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, studyTypeFilter, qualityFilter]);
 
   useEffect(() => {
     fetchEntries();
-  }, [searchTerm, studyTypeFilter, qualityFilter]);
+  }, [searchTerm, studyTypeFilter, qualityFilter, currentPage]);
 
   const fetchEntries = async () => {
     try {
       setLoading(true);
-      const params = {};
+      const params = { page: currentPage };
       if (searchTerm) params.search = searchTerm;
       if (studyTypeFilter) params.study_type = studyTypeFilter;
       if (qualityFilter) params.quality_rating = qualityFilter;
 
       const response = await api.get(apiEndpoints.evidenceEntries, { params });
       setEntries(response.data.data);
+      setPagination({
+        total: response.data.meta?.total || response.data.data.length,
+        lastPage: response.data.meta?.last_page || 1,
+        perPage: response.data.meta?.per_page || 20,
+      });
     } catch (error) {
       console.error('Error fetching evidence:', error);
     } finally {
@@ -136,80 +148,89 @@ const Evidence = () => {
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {entries.map((entry) => (
-            <div
-              key={entry.id}
-              className="card hover:shadow-lg transition-shadow duration-200"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    {entry.quality_rating && (
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          QUALITY_RATING[entry.quality_rating]?.color
-                        }`}
-                      >
-                        {QUALITY_RATING[entry.quality_rating]?.label}
-                      </span>
+        <>
+          <div className="space-y-4">
+            {entries.map((entry) => (
+              <div
+                key={entry.id}
+                className="card hover:shadow-lg transition-shadow duration-200"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      {entry.quality_rating && (
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${
+                            QUALITY_RATING[entry.quality_rating]?.color
+                          }`}
+                        >
+                          {QUALITY_RATING[entry.quality_rating]?.label}
+                        </span>
+                      )}
+                      {entry.study_type && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                          {STUDY_TYPE[entry.study_type]}
+                        </span>
+                      )}
+                    </div>
+
+                    {entry.intervention && (
+                      <div className="flex items-center gap-2 mb-2">
+                        <Stethoscope className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <Link
+                          to={`/interventions/${entry.intervention.id}`}
+                          className="text-sm font-medium text-green-600 hover:underline"
+                        >
+                          {entry.intervention.name}
+                        </Link>
+                      </div>
                     )}
-                    {entry.study_type && (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
-                        {STUDY_TYPE[entry.study_type]}
-                      </span>
+
+                    {entry.summary && (
+                      <p className="text-gray-700 mb-2 text-sm sm:text-base">{entry.summary}</p>
+                    )}
+
+                    {entry.population && (
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        <span className="font-medium">Population:</span> {entry.population}
+                      </p>
+                    )}
+
+                    {entry.references && entry.references.length > 0 && (
+                      <p className="text-xs text-gray-400 mt-2">
+                        {entry.references.length} reference(s)
+                      </p>
                     )}
                   </div>
 
-                  {entry.intervention && (
-                    <div className="flex items-center gap-2 mb-2">
-                      <Stethoscope className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      <Link
-                        to={`/interventions/${entry.intervention.id}`}
-                        className="text-sm font-medium text-green-600 hover:underline"
-                      >
-                        {entry.intervention.name}
-                      </Link>
-                    </div>
-                  )}
-
-                  {entry.summary && (
-                    <p className="text-gray-700 mb-2 text-sm sm:text-base">{entry.summary}</p>
-                  )}
-
-                  {entry.population && (
-                    <p className="text-xs sm:text-sm text-gray-500">
-                      <span className="font-medium">Population:</span> {entry.population}
-                    </p>
-                  )}
-
-                  {entry.references && entry.references.length > 0 && (
-                    <p className="text-xs text-gray-400 mt-2">
-                      {entry.references.length} reference(s)
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex gap-1 self-end sm:self-start">
-                  <Link
-                    to={`/evidence/${entry.id}/edit`}
-                    className="action-btn"
-                    title="Edit"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(entry.id)}
-                    className="action-btn hover:bg-red-50 active:bg-red-100"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
+                  <div className="flex gap-1 self-end sm:self-start">
+                    <Link
+                      to={`/evidence/${entry.id}/edit`}
+                      className="action-btn"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(entry.id)}
+                      className="action-btn hover:bg-red-50 active:bg-red-100"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={pagination.lastPage}
+            onPageChange={setCurrentPage}
+            totalItems={pagination.total}
+            itemsPerPage={pagination.perPage}
+          />
+        </>
       )}
     </div>
   );

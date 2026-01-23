@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\InterventionController;
 use App\Http\Controllers\Api\RecipeController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ScriptureController;
+use App\Http\Controllers\Api\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,9 @@ Route::prefix('v1')->group(function () {
 
 // Public API routes (read-only)
 Route::prefix('v1')->group(function () {
+
+    // Global Search
+    Route::get('/search', [SearchController::class, 'search']);
 
     // Care Domains
     Route::apiResource('care-domains', CareDomainController::class)->only(['index', 'show']);

@@ -14,7 +14,8 @@
       "Bash(ls -la \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\\\\admin-dashboard\\\\src\\\\pages\"\" | grep -i \"attach|section \")",
       "Bash(python -c \"from docx import Document; doc = Document\\(''Nicotine Addiction_ Lifestyle Medicine Treatment Guide.docx''\\); print\\(''\\\\n''.join\\([p.text for p in doc.paragraphs]\\)\\)\")",
       "Bash(pip install:*)",
-      "Bash(python -c:*)"
+      "Bash(python -c:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

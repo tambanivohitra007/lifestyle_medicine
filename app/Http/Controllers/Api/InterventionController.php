@@ -15,10 +15,16 @@ class InterventionController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Intervention::with('careDomain');
+        $query = Intervention::with(['careDomain', 'tags']);
 
         if ($request->has('care_domain_id')) {
             $query->where('care_domain_id', $request->care_domain_id);
+        }
+
+        if ($request->has('tag_id')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->where('content_tags.id', $request->tag_id);
+            });
         }
 
         if ($request->has('search')) {
@@ -47,11 +53,20 @@ class InterventionController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'mechanism' => 'nullable|string',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'exists:content_tags,id',
         ]);
+
+        $tagIds = $validated['tag_ids'] ?? [];
+        unset($validated['tag_ids']);
 
         $intervention = Intervention::create($validated);
 
-        return new InterventionResource($intervention);
+        if (!empty($tagIds)) {
+            $intervention->tags()->attach($tagIds);
+        }
+
+        return new InterventionResource($intervention->load(['careDomain', 'tags']));
     }
 
     public function update(Request $request, Intervention $intervention): InterventionResource
@@ -61,11 +76,20 @@ class InterventionController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'mechanism' => 'nullable|string',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'exists:content_tags,id',
         ]);
+
+        $tagIds = $validated['tag_ids'] ?? null;
+        unset($validated['tag_ids']);
 
         $intervention->update($validated);
 
-        return new InterventionResource($intervention);
+        if ($tagIds !== null) {
+            $intervention->tags()->sync($tagIds);
+        }
+
+        return new InterventionResource($intervention->load(['careDomain', 'tags']));
     }
 
     public function destroy(Intervention $intervention): Response

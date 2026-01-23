@@ -41,16 +41,16 @@ const CareDomains = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Care Domains</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Care Domains</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Manage care domains that categorize interventions
           </p>
         </div>
-        <Link to="/care-domains/new" className="btn-primary flex items-center gap-2">
+        <Link to="/care-domains/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
           <Plus className="w-5 h-5" />
           Add Care Domain
         </Link>
@@ -58,7 +58,7 @@ const CareDomains = () => {
 
       {/* Search */}
       <div className="card">
-        <div className="relative max-w-md">
+        <div className="relative">
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -76,12 +76,12 @@ const CareDomains = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       ) : filteredDomains.length === 0 ? (
-        <div className="card text-center py-12">
-          <Layers className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <div className="card text-center py-8 sm:py-12">
+          <Layers className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {searchTerm ? 'No care domains found' : 'No care domains yet'}
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 text-sm sm:text-base">
             {searchTerm
               ? 'Try adjusting your search term'
               : 'Get started by creating your first care domain.'}
@@ -94,27 +94,27 @@ const CareDomains = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredDomains.map((domain) => (
             <div
               key={domain.id}
               className="card hover:shadow-lg transition-shadow duration-200"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className="p-3 rounded-lg bg-secondary-100">
-                  <Layers className="w-6 h-6 text-secondary-600" />
+                <div className="p-2 sm:p-3 rounded-lg bg-secondary-100">
+                  <Layers className="w-5 sm:w-6 h-5 sm:h-6 text-secondary-600" />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1">
                   <Link
                     to={`/care-domains/${domain.id}/edit`}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="action-btn"
                     title="Edit"
                   >
                     <Edit className="w-4 h-4 text-gray-600" />
                   </Link>
                   <button
                     onClick={() => handleDelete(domain.id)}
-                    className="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                    className="action-btn hover:bg-red-50 active:bg-red-100"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4 text-red-600" />
@@ -122,7 +122,7 @@ const CareDomains = () => {
                 </div>
               </div>
 
-              <h3 className="font-semibold text-xl text-gray-900 mb-2">
+              <h3 className="font-semibold text-lg sm:text-xl text-gray-900 mb-2">
                 {domain.name}
               </h3>
 

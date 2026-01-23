@@ -12,11 +12,13 @@ import {
   TestTube,
   Library,
   Settings,
+  Search,
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/search', icon: Search, label: 'Search' },
     { to: '/conditions', icon: Heart, label: 'Conditions' },
     { to: '/interventions', icon: Activity, label: 'Interventions' },
     { to: '/care-domains', icon: Bookmark, label: 'Care Domains' },

@@ -42,6 +42,9 @@ export const apiEndpoints = {
   updateProfile: '/profile',
   updatePassword: '/password',
 
+  // Global Search
+  search: '/search',
+
   // Care Domains
   careDomains: '/care-domains',
   careDomainsAdmin: '/admin/care-domains',
