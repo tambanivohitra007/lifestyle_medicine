@@ -15,6 +15,7 @@ import {
   Download,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete, confirmRemove } from '../lib/swal';
 import ConditionWorkflowGuide from '../components/ConditionWorkflowGuide';
 
 const SECTION_TYPES = {
@@ -78,7 +79,7 @@ const ConditionDetail = () => {
       setCareDomains(careDomainsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching condition:', error);
-      alert('Failed to load condition');
+      toast.error('Failed to load condition');
       navigate('/conditions');
     } finally {
       setLoading(false);
@@ -86,62 +87,72 @@ const ConditionDetail = () => {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this condition?')) return;
+    const confirmed = await confirmDelete(condition?.name || 'this condition');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.conditionsAdmin}/${id}`);
+      toast.success('Condition deleted successfully');
       navigate('/conditions');
     } catch (error) {
       console.error('Error deleting condition:', error);
-      alert('Failed to delete condition');
+      toast.error('Failed to delete condition');
     }
   };
 
-  const handleDeleteSection = async (sectionId) => {
-    if (!confirm('Are you sure you want to delete this section?')) return;
+  const handleDeleteSection = async (sectionId, sectionTitle) => {
+    const confirmed = await confirmDelete(sectionTitle || 'this section');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.conditionSectionsAdmin}/${sectionId}`);
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
+      toast.success('Section deleted');
     } catch (error) {
       console.error('Error deleting section:', error);
-      alert('Failed to delete section');
+      toast.error('Failed to delete section');
     }
   };
 
-  const handleDetachIntervention = async (interventionId) => {
-    if (!confirm('Remove this intervention from the condition?')) return;
+  const handleDetachIntervention = async (interventionId, interventionName) => {
+    const confirmed = await confirmRemove(`Remove "${interventionName}" from this condition?`);
+    if (!confirmed) return;
 
     try {
       await api.delete(apiEndpoints.attachConditionIntervention(id, interventionId));
       setInterventions((prev) => prev.filter((i) => i.id !== interventionId));
+      toast.success('Intervention removed');
     } catch (error) {
       console.error('Error detaching intervention:', error);
-      alert('Failed to remove intervention');
+      toast.error('Failed to remove intervention');
     }
   };
 
-  const handleDetachScripture = async (scriptureId) => {
-    if (!confirm('Remove this scripture from the condition?')) return;
+  const handleDetachScripture = async (scriptureId, reference) => {
+    const confirmed = await confirmRemove(`Remove "${reference}" from this condition?`);
+    if (!confirmed) return;
 
     try {
       await api.delete(apiEndpoints.attachConditionScripture(id, scriptureId));
       setScriptures((prev) => prev.filter((s) => s.id !== scriptureId));
+      toast.success('Scripture removed');
     } catch (error) {
       console.error('Error detaching scripture:', error);
-      alert('Failed to remove scripture');
+      toast.error('Failed to remove scripture');
     }
   };
 
-  const handleDetachRecipe = async (recipeId) => {
-    if (!confirm('Remove this recipe from the condition?')) return;
+  const handleDetachRecipe = async (recipeId, recipeTitle) => {
+    const confirmed = await confirmRemove(`Remove "${recipeTitle}" from this condition?`);
+    if (!confirmed) return;
 
     try {
       await api.delete(apiEndpoints.attachConditionRecipe(id, recipeId));
       setRecipes((prev) => prev.filter((r) => r.id !== recipeId));
+      toast.success('Recipe removed');
     } catch (error) {
       console.error('Error detaching recipe:', error);
-      alert('Failed to remove recipe');
+      toast.error('Failed to remove recipe');
     }
   };
 
@@ -329,7 +340,7 @@ const ConditionDetail = () => {
                             <Edit className="w-4 h-4 text-gray-600" />
                           </Link>
                           <button
-                            onClick={() => handleDeleteSection(section.id)}
+                            onClick={() => handleDeleteSection(section.id, section.title)}
                             className="action-btn hover:bg-red-50 active:bg-red-100"
                             title="Delete"
                           >
@@ -426,7 +437,7 @@ const ConditionDetail = () => {
                           <ChevronRight className="w-5 h-5 text-gray-400" />
                         </Link>
                         <button
-                          onClick={() => handleDetachIntervention(intervention.id)}
+                          onClick={() => handleDetachIntervention(intervention.id, intervention.name)}
                           className="action-btn hover:bg-red-50 active:bg-red-100"
                           title="Remove from Condition"
                         >
@@ -469,7 +480,7 @@ const ConditionDetail = () => {
                         {scripture.reference}
                       </h3>
                       <button
-                        onClick={() => handleDetachScripture(scripture.id)}
+                        onClick={() => handleDetachScripture(scripture.id, scripture.reference)}
                         className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
                         title="Remove"
                       >
@@ -515,7 +526,7 @@ const ConditionDetail = () => {
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{recipe.title}</h3>
                       <button
-                        onClick={() => handleDetachRecipe(recipe.id)}
+                        onClick={() => handleDetachRecipe(recipe.id, recipe.title)}
                         className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
                         title="Remove"
                       >

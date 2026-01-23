@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 import RichTextEditor from '../components/Editor/RichTextEditor';
 
 const SECTION_TYPES = [
@@ -67,7 +68,7 @@ const ConditionSectionForm = () => {
       });
     } catch (error) {
       console.error('Error fetching section:', error);
-      alert('Failed to load section');
+      toast.error('Failed to load section');
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -103,7 +104,7 @@ const ConditionSectionForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        alert('Failed to save section');
+        toast.error('Failed to save section');
       }
     } finally {
       setSaving(false);

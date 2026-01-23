@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 
 const CareDomainForm = () => {
   const { id } = useParams();
@@ -31,7 +32,7 @@ const CareDomainForm = () => {
       });
     } catch (error) {
       console.error('Error fetching care domain:', error);
-      alert('Failed to load care domain');
+      toast.error('Failed to load care domain');
       navigate('/care-domains');
     } finally {
       setLoading(false);
@@ -64,9 +65,9 @@ const CareDomainForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else if (error.response?.data?.message) {
-        alert(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        alert('Failed to save care domain');
+        toast.error('Failed to save care domain');
       }
     } finally {
       setSaving(false);

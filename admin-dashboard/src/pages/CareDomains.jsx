@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Layers, Edit, Trash2, Stethoscope } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 
 const CareDomains = () => {
   const [careDomains, setCareDomains] = useState([]);
@@ -24,15 +25,17 @@ const CareDomains = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this care domain?')) return;
+  const handleDelete = async (id, name) => {
+    const confirmed = await confirmDelete(name || 'this care domain');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.careDomainsAdmin}/${id}`);
+      toast.success('Care domain deleted');
       fetchCareDomains();
     } catch (error) {
       console.error('Error deleting care domain:', error);
-      alert('Failed to delete care domain. It may have linked interventions.');
+      toast.error('Failed to delete care domain. It may have linked interventions.');
     }
   };
 
@@ -113,7 +116,7 @@ const CareDomains = () => {
                     <Edit className="w-4 h-4 text-gray-600" />
                   </Link>
                   <button
-                    onClick={() => handleDelete(domain.id)}
+                    onClick={() => handleDelete(domain.id, domain.name)}
                     className="action-btn hover:bg-red-50 active:bg-red-100"
                     title="Delete"
                   >

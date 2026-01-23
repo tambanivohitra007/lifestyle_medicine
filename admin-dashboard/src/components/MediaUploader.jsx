@@ -11,6 +11,7 @@ import {
   Check,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 
 const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
   const [uploading, setUploading] = useState(false);
@@ -66,7 +67,7 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
         newMedia.push(response.data.data);
       } catch (error) {
         console.error('Error uploading file:', error);
-        alert(`Failed to upload ${file.name}: ${error.response?.data?.message || 'Unknown error'}`);
+        toast.error(`Failed to upload ${file.name}: ${error.response?.data?.message || 'Unknown error'}`);
       }
     }
 
@@ -75,14 +76,16 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
   };
 
   const handleDelete = async (mediaItem) => {
-    if (!confirm('Are you sure you want to delete this file?')) return;
+    const confirmed = await confirmDelete(mediaItem.original_filename || 'this file');
+    if (!confirmed) return;
 
     try {
       await api.delete(apiEndpoints.interventionMediaItem(interventionId, mediaItem.id));
+      toast.success('File deleted');
       onMediaChange(media.filter((m) => m.id !== mediaItem.id));
     } catch (error) {
       console.error('Error deleting media:', error);
-      alert('Failed to delete file');
+      toast.error('Failed to delete file');
     }
   };
 
@@ -107,7 +110,7 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
       setEditingId(null);
     } catch (error) {
       console.error('Error updating media:', error);
-      alert('Failed to update file details');
+      toast.error('Failed to update file details');
     }
   };
 

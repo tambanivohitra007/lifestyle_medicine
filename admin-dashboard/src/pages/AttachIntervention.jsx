@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Search, Check, Loader2, Stethoscope, Layers } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 
 const EVIDENCE_STRENGTH = [
   { value: 'high', label: 'High' },
@@ -58,7 +59,7 @@ const AttachIntervention = () => {
       setCareDomains(domainsRes.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
-      alert('Failed to load data');
+      toast.error('Failed to load data');
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -87,7 +88,7 @@ const AttachIntervention = () => {
       navigate(`/conditions/${conditionId}`);
     } catch (error) {
       console.error('Error attaching intervention:', error);
-      alert('Failed to attach intervention');
+      toast.error('Failed to attach intervention');
     } finally {
       setSaving(false);
     }

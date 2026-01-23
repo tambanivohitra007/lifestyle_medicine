@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 
 const STUDY_TYPES = [
   { value: 'rct', label: 'Randomized Controlled Trial' },
@@ -73,7 +74,7 @@ const EvidenceForm = () => {
       });
     } catch (error) {
       console.error('Error fetching evidence:', error);
-      alert('Failed to load evidence');
+      toast.error('Failed to load evidence');
       navigate('/evidence');
     } finally {
       setLoading(false);
@@ -106,7 +107,7 @@ const EvidenceForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        alert('Failed to save evidence');
+        toast.error('Failed to save evidence');
       }
     } finally {
       setSaving(false);

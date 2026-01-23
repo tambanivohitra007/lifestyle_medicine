@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Search, Check, Loader2, ChefHat, Clock } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 
 const AttachRecipe = () => {
   const { id: conditionId } = useParams();
@@ -33,7 +34,7 @@ const AttachRecipe = () => {
       setLinkedRecipeIds(linkedRes.data.data.map((r) => r.id));
     } catch (error) {
       console.error('Error fetching data:', error);
-      alert('Failed to load data');
+      toast.error('Failed to load data');
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -49,7 +50,7 @@ const AttachRecipe = () => {
       navigate(`/conditions/${conditionId}`);
     } catch (error) {
       console.error('Error attaching recipe:', error);
-      alert('Failed to attach recipe');
+      toast.error('Failed to attach recipe');
     } finally {
       setSaving(false);
     }

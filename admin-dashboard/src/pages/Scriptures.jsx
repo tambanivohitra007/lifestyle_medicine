@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, BookOpen, Edit, Trash2, Tag } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
 
 const Scriptures = () => {
@@ -57,15 +58,17 @@ const Scriptures = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this scripture?')) return;
+  const handleDelete = async (id, reference) => {
+    const confirmed = await confirmDelete(reference || 'this scripture');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.scripturesAdmin}/${id}`);
+      toast.success('Scripture deleted');
       fetchScriptures();
     } catch (error) {
       console.error('Error deleting scripture:', error);
-      alert('Failed to delete scripture');
+      toast.error('Failed to delete scripture');
     }
   };
 
@@ -167,7 +170,7 @@ const Scriptures = () => {
                       <Edit className="w-4 h-4 text-gray-600" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(scripture.id)}
+                      onClick={() => handleDelete(scripture.id, scripture.reference)}
                       className="action-btn hover:bg-red-50 active:bg-red-100"
                       title="Delete"
                     >

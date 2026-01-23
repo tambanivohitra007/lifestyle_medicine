@@ -10,6 +10,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -28,7 +29,7 @@ const RecipeDetail = () => {
       setRecipe(response.data.data);
     } catch (error) {
       console.error('Error fetching recipe:', error);
-      alert('Failed to load recipe');
+      toast.error('Failed to load recipe');
       navigate('/recipes');
     } finally {
       setLoading(false);
@@ -36,14 +37,16 @@ const RecipeDetail = () => {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this recipe?')) return;
+    const confirmed = await confirmDelete(recipe?.title || 'this recipe');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.recipesAdmin}/${id}`);
+      toast.success('Recipe deleted');
       navigate('/recipes');
     } catch (error) {
       console.error('Error deleting recipe:', error);
-      alert('Failed to delete recipe');
+      toast.error('Failed to delete recipe');
     }
   };
 

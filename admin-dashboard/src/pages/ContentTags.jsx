@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, Tag, Edit, Trash2, Loader2, X, Check, Activity, ChefHat, Book } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 
 const ContentTags = () => {
   const [tags, setTags] = useState([]);
@@ -33,14 +34,15 @@ const ContentTags = () => {
     try {
       setSaving(true);
       await api.post(apiEndpoints.contentTagsAdmin, { tag: newTag.trim() });
+      toast.success('Tag created');
       setNewTag('');
       fetchTags();
     } catch (error) {
       console.error('Error creating tag:', error);
       if (error.response?.data?.message) {
-        alert(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        alert('Failed to create tag');
+        toast.error('Failed to create tag');
       }
     } finally {
       setSaving(false);
@@ -53,25 +55,28 @@ const ContentTags = () => {
     try {
       setSaving(true);
       await api.put(`${apiEndpoints.contentTagsAdmin}/${id}`, { tag: editValue.trim() });
+      toast.success('Tag updated');
       setEditingId(null);
       fetchTags();
     } catch (error) {
       console.error('Error updating tag:', error);
-      alert('Failed to update tag');
+      toast.error('Failed to update tag');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this tag?')) return;
+  const handleDelete = async (id, name) => {
+    const confirmed = await confirmDelete(name || 'this tag');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.contentTagsAdmin}/${id}`);
+      toast.success('Tag deleted');
       fetchTags();
     } catch (error) {
       console.error('Error deleting tag:', error);
-      alert('Failed to delete tag');
+      toast.error('Failed to delete tag');
     }
   };
 
@@ -227,7 +232,7 @@ const ContentTags = () => {
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
-                        onClick={() => handleDelete(tag.id)}
+                        onClick={() => handleDelete(tag.id, tag.name || tag.tag)}
                         className="action-btn hover:bg-red-50 active:bg-red-100"
                         title="Delete"
                       >

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Image } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 import MediaUploader from '../components/MediaUploader';
 
 const InterventionForm = () => {
@@ -56,7 +57,7 @@ const InterventionForm = () => {
       setMedia(intervention.media || []);
     } catch (error) {
       console.error('Error fetching intervention:', error);
-      alert('Failed to load intervention');
+      toast.error('Failed to load intervention');
       navigate('/interventions');
     } finally {
       setLoading(false);
@@ -92,9 +93,9 @@ const InterventionForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else if (error.response?.data?.message) {
-        alert(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        alert('Failed to save intervention');
+        toast.error('Failed to save intervention');
       }
     } finally {
       setSaving(false);

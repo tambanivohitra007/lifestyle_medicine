@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, ChefHat, Edit, Trash2, Eye, Clock, Tag } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
 
 const Recipes = () => {
@@ -68,15 +69,17 @@ const Recipes = () => {
     return [...tags].sort();
   }, [recipes]);
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this recipe?')) return;
+  const handleDelete = async (id, title) => {
+    const confirmed = await confirmDelete(title || 'this recipe');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.recipesAdmin}/${id}`);
+      toast.success('Recipe deleted');
       fetchRecipes();
     } catch (error) {
       console.error('Error deleting recipe:', error);
-      alert('Failed to delete recipe');
+      toast.error('Failed to delete recipe');
     }
   };
 
@@ -186,7 +189,7 @@ const Recipes = () => {
                       <Edit className="w-4 h-4 text-gray-600" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(recipe.id)}
+                      onClick={() => handleDelete(recipe.id, recipe.title)}
                       className="action-btn hover:bg-red-50 active:bg-red-100"
                       title="Delete"
                     >

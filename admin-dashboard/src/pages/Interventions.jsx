@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Stethoscope, Edit, Trash2, Eye, Layers, Tag } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
 
 const Interventions = () => {
@@ -62,15 +63,17 @@ const Interventions = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this intervention?')) return;
+  const handleDelete = async (id, name) => {
+    const confirmed = await confirmDelete(name || 'this intervention');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.interventionsAdmin}/${id}`);
+      toast.success('Intervention deleted');
       fetchInterventions();
     } catch (error) {
       console.error('Error deleting intervention:', error);
-      alert('Failed to delete intervention');
+      toast.error('Failed to delete intervention');
     }
   };
 
@@ -182,7 +185,7 @@ const Interventions = () => {
                       <Edit className="w-4 h-4 text-gray-600" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(intervention.id)}
+                      onClick={() => handleDelete(intervention.id, intervention.name)}
                       className="action-btn hover:bg-red-50 active:bg-red-100"
                       title="Delete"
                     >

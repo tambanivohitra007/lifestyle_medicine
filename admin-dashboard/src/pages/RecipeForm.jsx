@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 
 const RecipeForm = () => {
   const { id } = useParams();
@@ -47,7 +48,7 @@ const RecipeForm = () => {
       });
     } catch (error) {
       console.error('Error fetching recipe:', error);
-      alert('Failed to load recipe');
+      toast.error('Failed to load recipe');
       navigate('/recipes');
     } finally {
       setLoading(false);
@@ -87,7 +88,7 @@ const RecipeForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        alert('Failed to save recipe');
+        toast.error('Failed to save recipe');
       }
     } finally {
       setSaving(false);

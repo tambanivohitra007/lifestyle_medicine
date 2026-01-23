@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 
 const ScriptureForm = () => {
   const { id } = useParams();
@@ -35,7 +36,7 @@ const ScriptureForm = () => {
       });
     } catch (error) {
       console.error('Error fetching scripture:', error);
-      alert('Failed to load scripture');
+      toast.error('Failed to load scripture');
       navigate('/scriptures');
     } finally {
       setLoading(false);
@@ -71,7 +72,7 @@ const ScriptureForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        alert('Failed to save scripture');
+        toast.error('Failed to save scripture');
       }
     } finally {
       setSaving(false);

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, BookMarked, Edit, Trash2, ExternalLink } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
 
 const References = () => {
@@ -41,15 +42,17 @@ const References = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this reference?')) return;
+  const handleDelete = async (id, citation) => {
+    const confirmed = await confirmDelete(citation ? `"${citation.substring(0, 50)}..."` : 'this reference');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.referencesAdmin}/${id}`);
+      toast.success('Reference deleted');
       fetchReferences();
     } catch (error) {
       console.error('Error deleting reference:', error);
-      alert('Failed to delete reference');
+      toast.error('Failed to delete reference');
     }
   };
 
@@ -185,7 +188,7 @@ const References = () => {
                       <Edit className="w-4 h-4 text-gray-600" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(reference.id)}
+                      onClick={() => handleDelete(reference.id, reference.citation)}
                       className="action-btn hover:bg-red-50 active:bg-red-100"
                       title="Delete"
                     >

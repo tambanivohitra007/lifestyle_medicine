@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Search, Check, Loader2, BookOpen } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 
 const AttachScripture = () => {
   const { id: conditionId } = useParams();
@@ -34,7 +35,7 @@ const AttachScripture = () => {
       setLinkedScriptureIds(linkedRes.data.data.map((s) => s.id));
     } catch (error) {
       console.error('Error fetching data:', error);
-      alert('Failed to load data');
+      toast.error('Failed to load data');
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -50,7 +51,7 @@ const AttachScripture = () => {
       navigate(`/conditions/${conditionId}`);
     } catch (error) {
       console.error('Error attaching scripture:', error);
-      alert('Failed to attach scripture');
+      toast.error('Failed to attach scripture');
     } finally {
       setSaving(false);
     }

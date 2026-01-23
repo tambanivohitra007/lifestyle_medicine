@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 
 const QUALITY_RATING = {
   A: { label: 'A - High', color: 'bg-green-100 text-green-700' },
@@ -58,7 +59,7 @@ const InterventionDetail = () => {
       setConditions(conditionsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching intervention:', error);
-      alert('Failed to load intervention');
+      toast.error('Failed to load intervention');
       navigate('/interventions');
     } finally {
       setLoading(false);
@@ -66,14 +67,16 @@ const InterventionDetail = () => {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this intervention?')) return;
+    const confirmed = await confirmDelete(intervention?.name || 'this intervention');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.interventionsAdmin}/${id}`);
+      toast.success('Intervention deleted');
       navigate('/interventions');
     } catch (error) {
       console.error('Error deleting intervention:', error);
-      alert('Failed to delete intervention');
+      toast.error('Failed to delete intervention');
     }
   };
 

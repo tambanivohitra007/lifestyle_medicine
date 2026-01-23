@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, FileText, Edit, Trash2, Stethoscope } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
 
 const QUALITY_RATING = {
@@ -59,15 +60,17 @@ const Evidence = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this evidence entry?')) return;
+  const handleDelete = async (id, summary) => {
+    const confirmed = await confirmDelete(summary ? `"${summary.substring(0, 50)}..."` : 'this evidence entry');
+    if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.evidenceEntriesAdmin}/${id}`);
+      toast.success('Evidence entry deleted');
       fetchEntries();
     } catch (error) {
       console.error('Error deleting evidence:', error);
-      alert('Failed to delete evidence entry');
+      toast.error('Failed to delete evidence entry');
     }
   };
 
@@ -212,7 +215,7 @@ const Evidence = () => {
                       <Edit className="w-4 h-4 text-gray-600" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(entry.id)}
+                      onClick={() => handleDelete(entry.id, entry.summary)}
                       className="action-btn hover:bg-red-50 active:bg-red-100"
                       title="Delete"
                     >

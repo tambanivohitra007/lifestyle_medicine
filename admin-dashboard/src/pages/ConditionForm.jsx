@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
+import { toast } from '../lib/swal';
 
 const ConditionForm = () => {
   const { id } = useParams();
@@ -35,7 +36,7 @@ const ConditionForm = () => {
       });
     } catch (error) {
       console.error('Error fetching condition:', error);
-      alert('Failed to load condition');
+      toast.error('Failed to load condition');
       navigate('/conditions');
     } finally {
       setLoading(false);
@@ -68,7 +69,7 @@ const ConditionForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        alert('Failed to save condition');
+        toast.error('Failed to save condition');
       }
     } finally {
       setSaving(false);
