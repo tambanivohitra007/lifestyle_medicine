@@ -4,6 +4,8 @@ import Layout from './components/Layout/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Conditions from './pages/Conditions';
+import ConditionForm from './pages/ConditionForm';
+import ConditionDetail from './pages/ConditionDetail';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -47,6 +49,9 @@ function App() {
           >
             <Route index element={<Dashboard />} />
             <Route path="conditions" element={<Conditions />} />
+            <Route path="conditions/new" element={<ConditionForm />} />
+            <Route path="conditions/:id" element={<ConditionDetail />} />
+            <Route path="conditions/:id/edit" element={<ConditionForm />} />
             <Route
               path="interventions"
               element={<ComingSoon title="Interventions" />}
