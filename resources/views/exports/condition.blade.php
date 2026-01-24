@@ -17,23 +17,59 @@
             color: #333;
         }
         .header {
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            background: linear-gradient(135deg, #d31e3a, #c1213a);
             color: white;
-            padding: 30px;
+            padding: 25px 30px;
             margin-bottom: 20px;
+            position: relative;
+        }
+        .header-top {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .logo-section {
+            display: table-cell;
+            vertical-align: middle;
+            width: 80px;
+        }
+        .logo-section img {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+        }
+        .title-section {
+            display: table-cell;
+            vertical-align: middle;
+            padding-left: 20px;
+        }
+        .org-name {
+            font-size: 11px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
         }
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 26px;
+            margin-bottom: 5px;
+            line-height: 1.2;
         }
         .header .category {
-            font-size: 14px;
-            opacity: 0.9;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 5px;
         }
         .header .summary {
-            margin-top: 15px;
-            font-size: 13px;
+            margin-top: 12px;
+            font-size: 12px;
             line-height: 1.5;
+            opacity: 0.95;
         }
         .section {
             margin: 20px 30px;
@@ -41,8 +77,8 @@
         }
         .section-title {
             font-size: 18px;
-            color: #2563eb;
-            border-bottom: 2px solid #2563eb;
+            color: #d31e3a;
+            border-bottom: 2px solid #d31e3a;
             padding-bottom: 8px;
             margin-bottom: 15px;
         }
@@ -101,12 +137,12 @@
             color: #991b1b;
         }
         .domain-header {
-            background: #f1f5f9;
+            background: #fef2f2;
             padding: 10px 15px;
             margin: 20px 0 10px 0;
-            border-left: 4px solid #2563eb;
+            border-left: 4px solid #d31e3a;
             font-weight: bold;
-            color: #1e40af;
+            color: #991b1b;
         }
         .intervention-item {
             margin-bottom: 15px;
@@ -118,7 +154,7 @@
         }
         .evidence-item {
             background: white;
-            border-left: 3px solid #2563eb;
+            border-left: 3px solid #d31e3a;
             padding: 10px 15px;
             margin-bottom: 10px;
         }
@@ -170,10 +206,26 @@
             right: 0;
             background: #f1f5f9;
             padding: 10px 30px;
-            font-size: 10px;
+            font-size: 9px;
             color: #64748b;
-            text-align: center;
             border-top: 1px solid #e2e8f0;
+        }
+        .footer-content {
+            display: table;
+            width: 100%;
+        }
+        .footer-left {
+            display: table-cell;
+            width: 70%;
+            text-align: left;
+        }
+        .footer-right {
+            display: table-cell;
+            width: 30%;
+            text-align: right;
+        }
+        .page-number:after {
+            content: counter(page);
         }
         .section-type-badge {
             display: inline-block;
@@ -194,10 +246,18 @@
 </head>
 <body>
     <div class="header">
-        <h1>{{ $condition->name }}</h1>
-        @if($condition->category)
-            <div class="category">{{ $condition->category }}</div>
-        @endif
+        <div class="header-top">
+            <div class="logo-section">
+                <img src="{{ public_path('lifestyle.png') }}" alt="Logo">
+            </div>
+            <div class="title-section">
+                <div class="org-name">Lifestyle Medicine & Gospel Medical Evangelism</div>
+                <h1>{{ $condition->name }}</h1>
+                @if($condition->category)
+                    <div class="category">{{ $condition->category }}</div>
+                @endif
+            </div>
+        </div>
         @if($condition->summary)
             <div class="summary">{{ strip_tags($condition->summary) }}</div>
         @endif
@@ -358,7 +418,15 @@
     @endif
 
     <div class="footer">
-        Lifestyle Medicine Treatment Guide - Generated on {{ now()->format('F j, Y') }} | For educational purposes only. Consult a healthcare professional for medical advice.
+        <div class="footer-content">
+            <div class="footer-left">
+                <strong>{{ $condition->name }}</strong> - Lifestyle Medicine Treatment Guide<br>
+                Generated on {{ now()->format('F j, Y') }} | For educational purposes only. Consult a healthcare professional for medical advice.
+            </div>
+            <div class="footer-right">
+                Page <span class="page-number"></span>
+            </div>
+        </div>
     </div>
 </body>
 </html>

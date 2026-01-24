@@ -17,17 +17,45 @@
             color: #333;
         }
         .header {
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            background: linear-gradient(135deg, #d31e3a, #c1213a);
             color: white;
             padding: 25px 30px;
             margin-bottom: 20px;
         }
+        .header-top {
+            display: table;
+            width: 100%;
+        }
+        .logo-section {
+            display: table-cell;
+            vertical-align: middle;
+            width: 80px;
+        }
+        .logo-section img {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+        }
+        .title-section {
+            display: table-cell;
+            vertical-align: middle;
+            padding-left: 20px;
+        }
+        .org-name {
+            font-size: 10px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
         .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
+            font-size: 22px;
+            margin-bottom: 3px;
         }
         .header p {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.9;
         }
         .content {
@@ -39,12 +67,12 @@
             margin-bottom: 20px;
         }
         th {
-            background: #f1f5f9;
+            background: #fef2f2;
             color: #374151;
             font-weight: bold;
             text-align: left;
             padding: 12px 10px;
-            border-bottom: 2px solid #2563eb;
+            border-bottom: 2px solid #d31e3a;
         }
         td {
             padding: 10px;
@@ -59,15 +87,6 @@
             color: #1e293b;
             font-size: 12px;
         }
-        .condition-category {
-            display: inline-block;
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 9px;
-            margin-top: 3px;
-        }
         .condition-summary {
             color: #64748b;
             font-size: 10px;
@@ -76,11 +95,20 @@
         .intervention-count {
             text-align: center;
             font-weight: bold;
-            color: #2563eb;
+            color: #d31e3a;
         }
         .intervention-list {
             font-size: 10px;
             color: #475569;
+        }
+        .condition-category {
+            display: inline-block;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            margin-top: 3px;
         }
         .intervention-list li {
             margin-bottom: 2px;
@@ -114,7 +142,7 @@
         .stat-number {
             font-size: 24px;
             font-weight: bold;
-            color: #2563eb;
+            color: #d31e3a;
         }
         .stat-label {
             font-size: 11px;
@@ -128,8 +156,16 @@
 </head>
 <body>
     <div class="header">
-        <h1>Conditions Summary</h1>
-        <p>Lifestyle Medicine Knowledge Base</p>
+        <div class="header-top">
+            <div class="logo-section">
+                <img src="{{ public_path('lifestyle.png') }}" alt="Logo">
+            </div>
+            <div class="title-section">
+                <div class="org-name">Lifestyle Medicine & Gospel Medical Evangelism</div>
+                <h1>Conditions Summary</h1>
+                <p>Comprehensive Knowledge Base</p>
+            </div>
+        </div>
     </div>
 
     <div class="content">
