@@ -34,6 +34,7 @@ import UserForm from './pages/UserForm';
 import EgwReferences from './pages/EgwReferences';
 import EgwReferenceForm from './pages/EgwReferenceForm';
 import AttachEgwReference from './pages/AttachEgwReference';
+import Analytics from './pages/Analytics';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -132,6 +133,9 @@ function App() {
 
             {/* Search */}
             <Route path="search" element={<Search />} />
+
+            {/* Analytics */}
+            <Route path="analytics" element={<Analytics />} />
 
             {/* Import */}
             <Route path="import" element={<Import />} />

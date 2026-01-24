@@ -15,6 +15,7 @@ import {
   Search,
   Upload,
   Users,
+  BarChart3,
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
@@ -23,6 +24,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
       title: 'Overview',
       items: [
         { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+        { to: '/analytics', icon: BarChart3, label: 'Analytics' },
         { to: '/search', icon: Search, label: 'Search' },
       ],
     },

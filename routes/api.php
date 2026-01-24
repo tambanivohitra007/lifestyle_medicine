@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AiSuggestionController;
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BibleController;
 use App\Http\Controllers\Api\CareDomainController;
@@ -137,4 +138,16 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     // AI Suggestions
     Route::post('ai/suggest-scriptures', [AiSuggestionController::class, 'suggestScriptures']);
     Route::post('ai/suggest-egw-references', [AiSuggestionController::class, 'suggestEgwReferences']);
+
+    // Analytics
+    Route::prefix('analytics')->group(function () {
+        Route::get('overview', [AnalyticsController::class, 'overview']);
+        Route::get('conditions-by-category', [AnalyticsController::class, 'conditionsByCategory']);
+        Route::get('interventions-by-domain', [AnalyticsController::class, 'interventionsByDomain']);
+        Route::get('growth', [AnalyticsController::class, 'growth']);
+        Route::get('user-activity', [AnalyticsController::class, 'userActivity']);
+        Route::get('evidence-quality', [AnalyticsController::class, 'evidenceQuality']);
+        Route::get('content-completeness', [AnalyticsController::class, 'contentCompleteness']);
+        Route::get('export', [AnalyticsController::class, 'exportReport']);
+    });
 });

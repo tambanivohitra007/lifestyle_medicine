@@ -129,4 +129,14 @@ export const apiEndpoints = {
   bibleSearch: '/bible/search',
   bibleVerse: '/bible/verse',
   biblePassage: '/bible/passage',
+
+  // Analytics
+  analyticsOverview: '/admin/analytics/overview',
+  analyticsConditionsByCategory: '/admin/analytics/conditions-by-category',
+  analyticsInterventionsByDomain: '/admin/analytics/interventions-by-domain',
+  analyticsGrowth: '/admin/analytics/growth',
+  analyticsUserActivity: '/admin/analytics/user-activity',
+  analyticsEvidenceQuality: '/admin/analytics/evidence-quality',
+  analyticsContentCompleteness: '/admin/analytics/content-completeness',
+  analyticsExport: '/admin/analytics/export',
 };
