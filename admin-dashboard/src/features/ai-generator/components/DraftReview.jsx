@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, RefreshCw, Check, Edit3 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const DraftReview = ({
   conditionName,
@@ -74,51 +75,11 @@ const DraftReview = ({
           />
         ) : (
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-h-[600px] overflow-y-auto">
-            <div className="prose prose-sm max-w-none">
-              {(isEditing ? editedDraft : draft).split('\n').map((line, index) => {
-                // Handle markdown-style headers
-                if (line.startsWith('### ')) {
-                  return (
-                    <h3 key={index} className="text-base font-semibold text-gray-900 mt-6 mb-2">
-                      {line.replace('### ', '')}
-                    </h3>
-                  );
-                }
-                if (line.startsWith('## ')) {
-                  return (
-                    <h2 key={index} className="text-lg font-bold text-gray-900 mt-8 mb-3 border-b pb-2">
-                      {line.replace('## ', '')}
-                    </h2>
-                  );
-                }
-                if (line.startsWith('# ')) {
-                  return (
-                    <h1 key={index} className="text-xl font-bold text-primary-700 mb-4">
-                      {line.replace('# ', '')}
-                    </h1>
-                  );
-                }
-                if (line.startsWith('- ') || line.startsWith('* ')) {
-                  return (
-                    <li key={index} className="ml-4 text-gray-700">
-                      {line.replace(/^[-*] /, '')}
-                    </li>
-                  );
-                }
-                if (line.trim() === '') {
-                  return <br key={index} />;
-                }
-                // Handle bold text
-                const boldProcessed = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                return (
-                  <p
-                    key={index}
-                    className="text-gray-700 mb-2"
-                    dangerouslySetInnerHTML={{ __html: boldProcessed }}
-                  />
-                );
-              })}
-            </div>
+            <article className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-h1:text-xl prose-h1:font-bold prose-h1:text-primary-700 prose-h1:border-b prose-h1:border-primary-200 prose-h1:pb-2 prose-h1:mb-4 prose-h2:text-lg prose-h2:font-bold prose-h2:mt-8 prose-h2:mb-3 prose-h2:text-gray-800 prose-h2:border-b prose-h2:border-gray-200 prose-h2:pb-2 prose-h3:text-base prose-h3:font-semibold prose-h3:mt-6 prose-h3:mb-2 prose-h3:text-gray-700 prose-p:text-gray-700 prose-p:mb-3 prose-p:leading-relaxed prose-ul:my-3 prose-ul:pl-6 prose-li:text-gray-700 prose-li:mb-1 prose-strong:text-gray-900 prose-blockquote:border-l-4 prose-blockquote:border-primary-300 prose-blockquote:bg-primary-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:italic prose-blockquote:text-gray-600">
+              <ReactMarkdown>
+                {isEditing ? editedDraft : draft}
+              </ReactMarkdown>
+            </article>
           </div>
         )}
       </div>
