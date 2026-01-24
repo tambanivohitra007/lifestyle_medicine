@@ -184,10 +184,10 @@ const SkeletonCard = () => (
 ---
 
 #### 5. View Mode Toggle
-**Status:** ✅ COMPLETED (2026-01-23)
+**Status:** ✅ COMPLETED (2026-01-24)
 **Impact:** Medium - Limited viewing preferences
-**Effort:** Low-Medium (4-5 hours)
-**Pages Affected:** Conditions, Interventions, Recipes, Scriptures
+**Effort:** Low-Medium (7-8 hours)
+**Pages Affected:** Conditions, Interventions, Recipes
 
 **Requirements:**
 - [x] Toggle buttons: Grid / List / Table views
@@ -200,12 +200,18 @@ const SkeletonCard = () => (
 
 **Completed Implementation:**
 - Created `ViewModeToggle` component with three view modes
-- Created `ConditionTable` component with sortable columns and actions
-- Created `ConditionList` component with compact layout
-- Implemented on Conditions page with full switching capability
-- localStorage persistence saves preference as `conditions_view_mode`
+- Created view components for all three pages:
+  - `ConditionTable` and `ConditionList`
+  - `InterventionTable` and `InterventionList`
+  - `RecipeTable` and `RecipeList`
+- Implemented on **Conditions, Interventions, and Recipes** pages
+- localStorage persistence with unique keys per page:
+  - `conditions_view_mode`
+  - `interventions_view_mode`
+  - `recipes_view_mode`
 - All three views share same delete handler and navigation
 - Installed date-fns for relative time formatting ("2 hours ago")
+- Each table view includes specific metadata (care domains, dietary tags, cooking times, etc.)
 
 **Implementation Notes:**
 ```javascript
@@ -616,13 +622,19 @@ theme: {
   - Created `LoadingButton` and `InlineSpinner` components
   - Replaced spinners with skeleton screens on 5+ pages
   - Improved perceived performance with shimmer animations
-- ✅ **View Mode Toggle Completed** (Priority 1)
+
+### 2026-01-24
+- ✅ **View Mode Toggle Completed - Expanded Implementation** (Priority 1)
   - Created `ViewModeToggle` component with Grid/List/Table modes
-  - Created `ConditionTable` and `ConditionList` view components
-  - Implemented full view switching on Conditions page
-  - localStorage persistence for user preference
+  - Created view components for three pages:
+    - `ConditionTable` and `ConditionList`
+    - `InterventionTable` and `InterventionList`
+    - `RecipeTable` and `RecipeList`
+  - Implemented full view switching on Conditions, Interventions, and Recipes pages
+  - localStorage persistence with unique keys per page
   - Installed date-fns for better date formatting
   - All views share same functionality (delete, navigate, etc.)
+  - Table views include page-specific metadata (care domains, dietary tags, cooking times)
 
 ---
 

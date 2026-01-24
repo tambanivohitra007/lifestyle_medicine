@@ -5,6 +5,9 @@ import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
 import { SkeletonCard } from '../components/Skeleton';
+import ViewModeToggle from '../components/ViewModeToggle';
+import InterventionTable from '../components/views/InterventionTable';
+import InterventionList from '../components/views/InterventionList';
 
 const Interventions = () => {
   const [interventions, setInterventions] = useState([]);
@@ -16,6 +19,9 @@ const Interventions = () => {
   const [tagFilter, setTagFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('interventions_view_mode') || 'grid';
+  });
 
   useEffect(() => {
     fetchData();
@@ -76,6 +82,11 @@ const Interventions = () => {
       console.error('Error deleting intervention:', error);
       toast.error('Failed to delete intervention');
     }
+  };
+
+  const handleViewModeChange = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem('interventions_view_mode', mode);
   };
 
   return (
@@ -139,7 +150,15 @@ const Interventions = () => {
         </div>
       </div>
 
-      {/* Interventions Grid */}
+      {/* View Mode Toggle Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50 px-4 py-3 rounded-lg border border-gray-200">
+        <div className="text-sm text-gray-500">
+          {pagination.total} {pagination.total === 1 ? 'intervention' : 'interventions'}
+        </div>
+        <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
+      </div>
+
+      {/* Interventions Content */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {Array.from({ length: 6 }).map((_, index) => (
@@ -162,88 +181,103 @@ const Interventions = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {interventions.map((intervention) => (
-              <div
-                key={intervention.id}
-                className="card hover:shadow-lg transition-shadow duration-200"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="p-2 rounded-lg bg-green-100">
-                    <Stethoscope className="w-5 sm:w-6 h-5 sm:h-6 text-green-600" />
+          {/* Grid View */}
+          {viewMode === 'grid' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {interventions.map((intervention) => (
+                <div
+                  key={intervention.id}
+                  className="card hover:shadow-lg transition-shadow duration-200"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="p-2 rounded-lg bg-green-100">
+                      <Stethoscope className="w-5 sm:w-6 h-5 sm:h-6 text-green-600" />
+                    </div>
+                    <div className="flex gap-1">
+                      <Link
+                        to={`/interventions/${intervention.id}`}
+                        className="action-btn"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <Link
+                        to={`/interventions/${intervention.id}/edit`}
+                        className="action-btn"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(intervention.id, intervention.name)}
+                        className="action-btn hover:bg-red-50 active:bg-red-100"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-1">
+
+                  <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
+                    {intervention.name}
+                  </h3>
+
+                  {intervention.care_domain && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <Layers className="w-4 h-4 text-secondary-500" />
+                      <span className="text-sm text-secondary-600 font-medium">
+                        {intervention.care_domain.name}
+                      </span>
+                    </div>
+                  )}
+
+                  {intervention.tags && intervention.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {intervention.tags.slice(0, 3).map((tag) => (
+                        <span
+                          key={tag.id}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded-full"
+                        >
+                          <Tag className="w-3 h-3" />
+                          {tag.name}
+                        </span>
+                      ))}
+                      {intervention.tags.length > 3 && (
+                        <span className="text-xs text-gray-500">+{intervention.tags.length - 3}</span>
+                      )}
+                    </div>
+                  )}
+
+                  {intervention.description && (
+                    <p className="text-sm text-gray-600 line-clamp-3">
+                      {intervention.description}
+                    </p>
+                  )}
+
+                  <div className="mt-4 pt-4 border-t border-gray-200">
                     <Link
                       to={`/interventions/${intervention.id}`}
-                      className="action-btn"
-                      title="View Details"
+                      className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
                     >
-                      <Eye className="w-4 h-4 text-gray-600" />
+                      View Details →
                     </Link>
-                    <Link
-                      to={`/interventions/${intervention.id}/edit`}
-                      className="action-btn"
-                      title="Edit"
-                    >
-                      <Edit className="w-4 h-4 text-gray-600" />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(intervention.id, intervention.name)}
-                      className="action-btn hover:bg-red-50 active:bg-red-100"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
 
-                <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
-                  {intervention.name}
-                </h3>
+          {/* List View */}
+          {viewMode === 'list' && (
+            <InterventionList interventions={interventions} onDelete={handleDelete} />
+          )}
 
-                {intervention.care_domain && (
-                  <div className="flex items-center gap-2 mb-3">
-                    <Layers className="w-4 h-4 text-secondary-500" />
-                    <span className="text-sm text-secondary-600 font-medium">
-                      {intervention.care_domain.name}
-                    </span>
-                  </div>
-                )}
+          {/* Table View */}
+          {viewMode === 'table' && (
+            <InterventionTable interventions={interventions} onDelete={handleDelete} />
+          )}
 
-                {intervention.tags && intervention.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {intervention.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag.id}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded-full"
-                      >
-                        <Tag className="w-3 h-3" />
-                        {tag.name}
-                      </span>
-                    ))}
-                    {intervention.tags.length > 3 && (
-                      <span className="text-xs text-gray-500">+{intervention.tags.length - 3}</span>
-                    )}
-                  </div>
-                )}
-
-                {intervention.description && (
-                  <p className="text-sm text-gray-600 line-clamp-3">
-                    {intervention.description}
-                  </p>
-                )}
-
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <Link
-                    to={`/interventions/${intervention.id}`}
-                    className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
-                  >
-                    View Details →
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={pagination.lastPage}
