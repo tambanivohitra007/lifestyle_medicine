@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, Heart } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import RichTextPreview from '../RichTextPreview';
 
 /**
  * Compact list view for conditions
@@ -34,11 +35,11 @@ const ConditionList = ({ conditions, onDelete }) => {
                       {condition.category}
                     </span>
                   )}
-                  {condition.summary && (
-                    <p className="text-sm text-gray-600 line-clamp-1">
-                      {condition.summary}
-                    </p>
-                  )}
+                  <RichTextPreview
+                    content={condition.summary}
+                    maxLines={1}
+                    className="text-sm"
+                  />
                 </div>
 
                 {/* Actions */}

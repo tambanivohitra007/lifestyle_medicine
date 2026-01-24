@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import RichTextPreview from '../RichTextPreview';
 
 /**
  * Table view for conditions list
@@ -48,8 +49,15 @@ const ConditionTable = ({ conditions, onDelete }) => {
                   )}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-gray-600 line-clamp-2 max-w-md">
-                    {condition.summary || 'No summary available'}
+                  <div className="max-w-md">
+                    <RichTextPreview
+                      content={condition.summary}
+                      maxLines={2}
+                      className="text-sm"
+                    />
+                    {!condition.summary && (
+                      <span className="text-sm text-gray-400">No summary available</span>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

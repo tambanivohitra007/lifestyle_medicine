@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Heart, Activity, Book, ChefHat, TrendingUp } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { Link } from 'react-router-dom';
+import RichTextPreview from '../components/RichTextPreview';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -157,11 +158,11 @@ const Dashboard = () => {
                       {condition.category}
                     </p>
                   )}
-                  {condition.summary && (
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 line-clamp-2 hidden sm:block">
-                      {condition.summary}
-                    </p>
-                  )}
+                  <RichTextPreview
+                    content={condition.summary}
+                    maxLines={2}
+                    className="text-xs sm:text-sm mt-1 sm:mt-2 hidden sm:block"
+                  />
                 </div>
                 <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400 flex-shrink-0 hidden sm:block" />
               </Link>

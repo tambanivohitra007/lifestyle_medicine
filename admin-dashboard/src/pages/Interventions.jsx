@@ -8,6 +8,7 @@ import { SkeletonCard } from '../components/Skeleton';
 import ViewModeToggle from '../components/ViewModeToggle';
 import InterventionTable from '../components/views/InterventionTable';
 import InterventionList from '../components/views/InterventionList';
+import RichTextPreview from '../components/RichTextPreview';
 
 const Interventions = () => {
   const [interventions, setInterventions] = useState([]);
@@ -248,11 +249,11 @@ const Interventions = () => {
                     </div>
                   )}
 
-                  {intervention.description && (
-                    <p className="text-sm text-gray-600 line-clamp-3">
-                      {intervention.description}
-                    </p>
-                  )}
+                  <RichTextPreview
+                    content={intervention.description}
+                    maxLines={3}
+                    className="text-sm"
+                  />
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <Link

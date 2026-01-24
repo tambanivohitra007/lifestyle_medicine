@@ -9,6 +9,7 @@ import { SkeletonCard } from '../components/Skeleton';
 import ViewModeToggle from '../components/ViewModeToggle';
 import ConditionTable from '../components/views/ConditionTable';
 import ConditionList from '../components/views/ConditionList';
+import RichTextPreview from '../components/RichTextPreview';
 
 const Conditions = () => {
   const [conditions, setConditions] = useState([]);
@@ -251,11 +252,11 @@ const Conditions = () => {
                     </span>
                   )}
 
-                  {condition.summary && (
-                    <p className="text-sm text-gray-600 line-clamp-3">
-                      {condition.summary}
-                    </p>
-                  )}
+                  <RichTextPreview
+                    content={condition.summary}
+                    maxLines={3}
+                    className="text-sm"
+                  />
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <Link

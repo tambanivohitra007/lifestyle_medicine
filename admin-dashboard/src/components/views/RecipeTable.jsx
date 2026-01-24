@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, Clock, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import RichTextPreview from '../RichTextPreview';
 
 /**
  * Table view for recipes
@@ -77,8 +78,15 @@ const RecipeTable = ({ recipes, onDelete }) => {
                   )}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-gray-600 max-w-xs truncate">
-                    {recipe.description || '-'}
+                  <div className="max-w-xs">
+                    <RichTextPreview
+                      content={recipe.description}
+                      maxLines={2}
+                      className="text-sm"
+                    />
+                    {!recipe.description && (
+                      <span className="text-sm text-gray-400">-</span>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

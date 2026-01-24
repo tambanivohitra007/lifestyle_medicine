@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, Layers, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import RichTextPreview from '../RichTextPreview';
 
 /**
  * Table view for interventions
@@ -76,8 +77,15 @@ const InterventionTable = ({ interventions, onDelete }) => {
                   )}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-gray-600 max-w-xs truncate">
-                    {intervention.description || '-'}
+                  <div className="max-w-xs">
+                    <RichTextPreview
+                      content={intervention.description}
+                      maxLines={2}
+                      className="text-sm"
+                    />
+                    {!intervention.description && (
+                      <span className="text-sm text-gray-400">-</span>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, ChefHat, Clock, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import RichTextPreview from '../RichTextPreview';
 
 /**
  * Compact list view for recipes
@@ -77,11 +78,11 @@ const RecipeList = ({ recipes, onDelete }) => {
                     </div>
                   )}
 
-                  {recipe.description && (
-                    <p className="text-sm text-gray-600 line-clamp-1">
-                      {recipe.description}
-                    </p>
-                  )}
+                  <RichTextPreview
+                    content={recipe.description}
+                    maxLines={1}
+                    className="text-sm"
+                  />
                 </div>
 
                 {/* Actions */}

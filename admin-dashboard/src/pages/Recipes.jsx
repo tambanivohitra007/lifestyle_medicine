@@ -8,6 +8,7 @@ import { SkeletonCard } from '../components/Skeleton';
 import ViewModeToggle from '../components/ViewModeToggle';
 import RecipeTable from '../components/views/RecipeTable';
 import RecipeList from '../components/views/RecipeList';
+import RichTextPreview from '../components/RichTextPreview';
 
 const Recipes = () => {
   const [recipes, setRecipes] = useState([]);
@@ -272,11 +273,11 @@ const Recipes = () => {
                     </div>
                   )}
 
-                  {recipe.description && (
-                    <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
-                      {recipe.description}
-                    </p>
-                  )}
+                  <RichTextPreview
+                    content={recipe.description}
+                    maxLines={2}
+                    className="text-xs sm:text-sm"
+                  />
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <Link
