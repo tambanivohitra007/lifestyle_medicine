@@ -6,6 +6,9 @@ import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
 import SortableHeader from '../components/SortableHeader';
 import { SkeletonCard } from '../components/Skeleton';
+import ViewModeToggle from '../components/ViewModeToggle';
+import ConditionTable from '../components/views/ConditionTable';
+import ConditionList from '../components/views/ConditionList';
 
 const Conditions = () => {
   const [conditions, setConditions] = useState([]);
@@ -16,6 +19,9 @@ const Conditions = () => {
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState('desc');
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('conditions_view_mode') || 'grid';
+  });
 
   useEffect(() => {
     setCurrentPage(1);
@@ -53,6 +59,11 @@ const Conditions = () => {
   const handleSort = (field, order) => {
     setSortBy(field);
     setSortOrder(order);
+  };
+
+  const handleViewModeChange = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem('conditions_view_mode', mode);
   };
 
   const handleDelete = async (id, name) => {
@@ -129,8 +140,8 @@ const Conditions = () => {
         </div>
       </div>
 
-      {/* Sort Bar */}
-      <div className="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg border border-gray-200">
+      {/* Sort and View Mode Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50 px-4 py-3 rounded-lg border border-gray-200">
         <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
           <span className="text-sm text-gray-600 font-medium">Sort by:</span>
           <SortableHeader
@@ -162,12 +173,15 @@ const Conditions = () => {
             onSort={handleSort}
           />
         </div>
-        <div className="text-sm text-gray-500">
-          {pagination.total} {pagination.total === 1 ? 'condition' : 'conditions'}
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-gray-500">
+            {pagination.total} {pagination.total === 1 ? 'condition' : 'conditions'}
+          </div>
+          <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
         </div>
       </div>
 
-      {/* Conditions Grid */}
+      {/* Conditions Content */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {Array.from({ length: 6 }).map((_, index) => (
@@ -190,68 +204,83 @@ const Conditions = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {conditions.map((condition) => (
-              <div
-                key={condition.id}
-                className="card hover:shadow-lg transition-shadow duration-200"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="p-2 rounded-lg bg-primary-100">
-                    <Heart className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
+          {/* Grid View */}
+          {viewMode === 'grid' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {conditions.map((condition) => (
+                <div
+                  key={condition.id}
+                  className="card hover:shadow-lg transition-shadow duration-200"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="p-2 rounded-lg bg-primary-100">
+                      <Heart className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
+                    </div>
+                    <div className="flex gap-1">
+                      <Link
+                        to={`/conditions/${condition.id}`}
+                        className="action-btn"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <Link
+                        to={`/conditions/${condition.id}/edit`}
+                        className="action-btn"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(condition.id, condition.name)}
+                        className="action-btn hover:bg-red-50 active:bg-red-100"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-1">
+
+                  <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
+                    {condition.name}
+                  </h3>
+
+                  {condition.category && (
+                    <span className="inline-block px-3 py-1 bg-secondary-100 text-secondary-700 text-xs font-medium rounded-full mb-3">
+                      {condition.category}
+                    </span>
+                  )}
+
+                  {condition.summary && (
+                    <p className="text-sm text-gray-600 line-clamp-3">
+                      {condition.summary}
+                    </p>
+                  )}
+
+                  <div className="mt-4 pt-4 border-t border-gray-200">
                     <Link
                       to={`/conditions/${condition.id}`}
-                      className="action-btn"
-                      title="View Details"
+                      className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
                     >
-                      <Eye className="w-4 h-4 text-gray-600" />
+                      View Details →
                     </Link>
-                    <Link
-                      to={`/conditions/${condition.id}/edit`}
-                      className="action-btn"
-                      title="Edit"
-                    >
-                      <Edit className="w-4 h-4 text-gray-600" />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(condition.id, condition.name)}
-                      className="action-btn hover:bg-red-50 active:bg-red-100"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
 
-                <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
-                  {condition.name}
-                </h3>
+          {/* List View */}
+          {viewMode === 'list' && (
+            <ConditionList conditions={conditions} onDelete={handleDelete} />
+          )}
 
-                {condition.category && (
-                  <span className="inline-block px-3 py-1 bg-secondary-100 text-secondary-700 text-xs font-medium rounded-full mb-3">
-                    {condition.category}
-                  </span>
-                )}
+          {/* Table View */}
+          {viewMode === 'table' && (
+            <ConditionTable conditions={conditions} onDelete={handleDelete} />
+          )}
 
-                {condition.summary && (
-                  <p className="text-sm text-gray-600 line-clamp-3">
-                    {condition.summary}
-                  </p>
-                )}
-
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <Link
-                    to={`/conditions/${condition.id}`}
-                    className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
-                  >
-                    View Details →
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={pagination.lastPage}
