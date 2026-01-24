@@ -4,6 +4,7 @@ import { Plus, Search, Stethoscope, Edit, Trash2, Eye, Layers, Tag } from 'lucid
 import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
+import { SkeletonCard } from '../components/Skeleton';
 
 const Interventions = () => {
   const [interventions, setInterventions] = useState([]);
@@ -140,8 +141,10 @@ const Interventions = () => {
 
       {/* Interventions Grid */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
         </div>
       ) : interventions.length === 0 ? (
         <div className="card text-center py-12">

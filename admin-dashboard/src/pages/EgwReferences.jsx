@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Search, BookMarked, Edit, Trash2, Filter } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete } from '../lib/swal';
+import { SkeletonList } from '../components/Skeleton';
 
 const EgwReferences = () => {
   const [references, setReferences] = useState([]);
@@ -154,9 +155,7 @@ const EgwReferences = () => {
 
       {/* References List */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
+        <SkeletonList items={5} />
       ) : references.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
           <BookMarked className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />

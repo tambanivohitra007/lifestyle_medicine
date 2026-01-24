@@ -4,6 +4,7 @@ import { Plus, Search, BookOpen, Edit, Trash2, Tag } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
+import { SkeletonList } from '../components/Skeleton';
 
 const Scriptures = () => {
   const [scriptures, setScriptures] = useState([]);
@@ -132,9 +133,7 @@ const Scriptures = () => {
 
       {/* Scriptures Grid */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
+        <SkeletonList items={5} />
       ) : scriptures.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
           <BookOpen className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
