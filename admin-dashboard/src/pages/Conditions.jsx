@@ -4,6 +4,7 @@ import { Plus, Search, Heart, Edit, Trash2, Eye, Download } from 'lucide-react';
 import api, { apiEndpoints } from '../lib/api';
 import { toast, confirmDelete } from '../lib/swal';
 import Pagination from '../components/Pagination';
+import SortableHeader from '../components/SortableHeader';
 
 const Conditions = () => {
   const [conditions, setConditions] = useState([]);
@@ -12,19 +13,25 @@ const Conditions = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState('desc');
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, categoryFilter]);
+  }, [searchTerm, categoryFilter, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchConditions();
-  }, [searchTerm, categoryFilter, currentPage]);
+  }, [searchTerm, categoryFilter, currentPage, sortBy, sortOrder]);
 
   const fetchConditions = async () => {
     try {
       setLoading(true);
-      const params = { page: currentPage };
+      const params = {
+        page: currentPage,
+        sort_by: sortBy,
+        sort_order: sortOrder
+      };
       if (searchTerm) params.search = searchTerm;
       if (categoryFilter) params.category = categoryFilter;
 
@@ -40,6 +47,11 @@ const Conditions = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSort = (field, order) => {
+    setSortBy(field);
+    setSortOrder(order);
   };
 
   const handleDelete = async (id, name) => {
@@ -113,6 +125,44 @@ const Conditions = () => {
               </option>
             ))}
           </select>
+        </div>
+      </div>
+
+      {/* Sort Bar */}
+      <div className="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg border border-gray-200">
+        <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
+          <span className="text-sm text-gray-600 font-medium">Sort by:</span>
+          <SortableHeader
+            field="name"
+            label="Name"
+            currentSort={sortBy}
+            currentOrder={sortOrder}
+            onSort={handleSort}
+          />
+          <SortableHeader
+            field="category"
+            label="Category"
+            currentSort={sortBy}
+            currentOrder={sortOrder}
+            onSort={handleSort}
+          />
+          <SortableHeader
+            field="created_at"
+            label="Date Created"
+            currentSort={sortBy}
+            currentOrder={sortOrder}
+            onSort={handleSort}
+          />
+          <SortableHeader
+            field="updated_at"
+            label="Last Updated"
+            currentSort={sortBy}
+            currentOrder={sortOrder}
+            onSort={handleSort}
+          />
+        </div>
+        <div className="text-sm text-gray-500">
+          {pagination.total} {pagination.total === 1 ? 'condition' : 'conditions'}
         </div>
       </div>
 

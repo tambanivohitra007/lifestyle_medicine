@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\HasSorting;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Http\Response;
 
 class RecipeController extends Controller
 {
+    use HasSorting;
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Recipe::with('tags');
@@ -31,6 +33,10 @@ class RecipeController extends Controller
                 $q->where('content_tags.id', $request->tag_id);
             });
         }
+
+        // Apply sorting
+        $allowedSortColumns = ['title', 'prep_time', 'cook_time', 'servings', 'created_at', 'updated_at'];
+        $query = $this->applySorting($query, $request, $allowedSortColumns);
 
         $recipes = $query->paginate(20);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\HasSorting;
 use App\Http\Resources\ConditionResource;
 use App\Http\Resources\EvidenceEntryResource;
 use App\Http\Resources\InterventionResource;
@@ -13,6 +14,7 @@ use Illuminate\Http\Response;
 
 class InterventionController extends Controller
 {
+    use HasSorting;
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Intervention::with(['careDomain', 'tags']);
@@ -33,6 +35,10 @@ class InterventionController extends Controller
                   ->orWhere('description', 'like', '%' . $request->search . '%');
             });
         }
+
+        // Apply sorting
+        $allowedSortColumns = ['name', 'care_domain_id', 'created_at', 'updated_at'];
+        $query = $this->applySorting($query, $request, $allowedSortColumns);
 
         $interventions = $query->paginate(20);
 

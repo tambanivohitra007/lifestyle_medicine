@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\HasSorting;
 use App\Http\Resources\ScriptureResource;
 use App\Models\Scripture;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Http\Response;
 
 class ScriptureController extends Controller
 {
+    use HasSorting;
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Scripture::with('tags');
@@ -32,6 +34,10 @@ class ScriptureController extends Controller
                   ->orWhere('theme', 'like', '%' . $request->search . '%');
             });
         }
+
+        // Apply sorting
+        $allowedSortColumns = ['reference', 'theme', 'created_at', 'updated_at'];
+        $query = $this->applySorting($query, $request, $allowedSortColumns);
 
         $scriptures = $query->paginate(20);
 

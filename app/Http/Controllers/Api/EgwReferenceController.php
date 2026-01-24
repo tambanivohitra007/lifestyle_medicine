@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\HasSorting;
 use App\Http\Resources\EgwReferenceResource;
 use App\Models\EgwReference;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Http\Response;
 
 class EgwReferenceController extends Controller
 {
+    use HasSorting;
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = EgwReference::with('tags');
@@ -42,7 +44,11 @@ class EgwReferenceController extends Controller
             });
         }
 
-        $references = $query->orderBy('book')->orderBy('page_start')->paginate(20);
+        // Apply sorting
+        $allowedSortColumns = ['book', 'page_start', 'topic', 'created_at', 'updated_at'];
+        $query = $this->applySorting($query, $request, $allowedSortColumns, 'book');
+
+        $references = $query->paginate(20);
 
         return EgwReferenceResource::collection($references);
     }

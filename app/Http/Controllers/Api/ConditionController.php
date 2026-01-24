@@ -35,6 +35,21 @@ class ConditionController extends Controller
             });
         }
 
+        // Sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+
+        // Validate sort column to prevent SQL injection
+        $allowedSortColumns = ['name', 'category', 'created_at', 'updated_at'];
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'created_at';
+        }
+
+        // Validate sort order
+        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
+
+        $query->orderBy($sortBy, $sortOrder);
+
         $conditions = $query->paginate(20);
 
         return ConditionResource::collection($conditions);
