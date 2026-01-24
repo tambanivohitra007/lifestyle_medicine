@@ -1,40 +1,38 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Layout from './components/Layout/Layout';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Conditions from './pages/Conditions';
-import ConditionForm from './pages/ConditionForm';
-import ConditionDetail from './pages/ConditionDetail';
-import ConditionSectionForm from './pages/ConditionSectionForm';
-import AttachIntervention from './pages/AttachIntervention';
-import AttachScripture from './pages/AttachScripture';
-import AttachRecipe from './pages/AttachRecipe';
-import ConditionPreview from './pages/ConditionPreview';
-import CareDomains from './pages/CareDomains';
-import CareDomainForm from './pages/CareDomainForm';
-import Interventions from './pages/Interventions';
-import InterventionForm from './pages/InterventionForm';
-import InterventionDetail from './pages/InterventionDetail';
-import Evidence from './pages/Evidence';
-import EvidenceForm from './pages/EvidenceForm';
-import References from './pages/References';
-import ReferenceForm from './pages/ReferenceForm';
-import Scriptures from './pages/Scriptures';
-import ScriptureForm from './pages/ScriptureForm';
-import Recipes from './pages/Recipes';
-import RecipeForm from './pages/RecipeForm';
-import RecipeDetail from './pages/RecipeDetail';
-import ContentTags from './pages/ContentTags';
-import Profile from './pages/Profile';
-import Search from './pages/Search';
-import Import from './pages/Import';
-import Users from './pages/Users';
-import UserForm from './pages/UserForm';
-import EgwReferences from './pages/EgwReferences';
-import EgwReferenceForm from './pages/EgwReferenceForm';
-import AttachEgwReference from './pages/AttachEgwReference';
-import Analytics from './pages/Analytics';
+
+// Layout
+import { Layout } from './components/layout';
+
+// Features
+import { Login } from './features/auth';
+import { Dashboard } from './features/dashboard';
+import { Analytics } from './features/analytics';
+import { Search } from './features/search';
+import { Import } from './features/import';
+import { Profile } from './features/profile';
+
+import {
+  Conditions,
+  ConditionForm,
+  ConditionDetail,
+  ConditionPreview,
+  ConditionSectionForm,
+  AttachIntervention,
+  AttachScripture,
+  AttachRecipe,
+  AttachEgwReference,
+} from './features/conditions';
+
+import { CareDomains, CareDomainForm } from './features/care-domains';
+import { Interventions, InterventionForm, InterventionDetail } from './features/interventions';
+import { Evidence, EvidenceForm } from './features/evidence';
+import { References, ReferenceForm } from './features/references';
+import { Scriptures, ScriptureForm } from './features/scriptures';
+import { Recipes, RecipeForm, RecipeDetail } from './features/recipes';
+import { EgwReferences, EgwReferenceForm } from './features/egw-references';
+import { ContentTags } from './features/content-tags';
+import { Users, UserForm } from './features/users';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {

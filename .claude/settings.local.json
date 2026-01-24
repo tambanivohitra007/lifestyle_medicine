@@ -28,7 +28,9 @@
       "Bash(findstr:*)",
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
-      "Bash(powershell -Command \"Stop-Process -Name php -Force -ErrorAction SilentlyContinue; Write-Host ''PHP processes stopped''\")"
+      "Bash(powershell -Command \"Stop-Process -Name php -Force -ErrorAction SilentlyContinue; Write-Host ''PHP processes stopped''\")",
+      "Bash(done)",
+      "Bash(find:*)"
     ]
   }
 }
