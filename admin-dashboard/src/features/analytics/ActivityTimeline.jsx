@@ -1,8 +1,8 @@
-import { Heart, Activity, Book, ChefHat, BookMarked, Plus, Edit2, Clock } from 'lucide-react';
+import { HeartPulse, Activity, Book, ChefHat, BookMarked, Plus, Edit2, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const typeIcons = {
-  condition: Heart,
+  condition: HeartPulse,
   intervention: Activity,
   scripture: Book,
   recipe: ChefHat,
@@ -62,7 +62,7 @@ const ActivityTimeline = ({ data, loading }) => {
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
       <div className="space-y-4 max-h-[400px] overflow-y-auto">
         {data.map((activity, index) => {
-          const Icon = typeIcons[activity.type] || Heart;
+          const Icon = typeIcons[activity.type] || HeartPulse;
           const colorClass = typeColors[activity.type] || 'bg-gray-100 text-gray-700';
           const typeLabel = typeLabels[activity.type] || activity.type;
 

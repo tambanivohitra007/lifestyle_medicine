@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Eye, Edit, Trash2, Heart } from 'lucide-react';
+import { Eye, Edit, Trash2, HeartPulse } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
 
@@ -20,7 +20,7 @@ const ConditionList = ({ conditions, onDelete }) => {
           <div className="flex items-start gap-4">
             {/* Icon */}
             <div className="p-2 rounded-lg bg-primary-100 flex-shrink-0">
-              <Heart className="w-5 h-5 text-primary-600" />
+              <HeartPulse className="w-5 h-5 text-primary-600" />
             </div>
 
             {/* Content */}

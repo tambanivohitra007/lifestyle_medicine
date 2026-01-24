@@ -6,7 +6,7 @@ import {
   Stethoscope,
   Layers,
   FileText,
-  Heart,
+  HeartPulse,
   AlertCircle,
   Image,
   Download,
@@ -107,7 +107,7 @@ const InterventionDetail = () => {
   const tabs = [
     { id: 'details', label: 'Details', icon: Stethoscope },
     { id: 'evidence', label: 'Evidence', icon: FileText, count: evidence.length },
-    { id: 'conditions', label: 'Conditions', icon: Heart, count: conditions.length },
+    { id: 'conditions', label: 'Conditions', icon: HeartPulse, count: conditions.length },
     { id: 'media', label: 'Media', icon: Image, count: mediaItems.length },
   ];
 
@@ -302,7 +302,7 @@ const InterventionDetail = () => {
           <div className="space-y-4">
             {conditions.length === 0 ? (
               <div className="card text-center py-8">
-                <Heart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <HeartPulse className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-600">Not linked to any conditions yet</p>
                 <Link
                   to="/conditions"
@@ -320,7 +320,7 @@ const InterventionDetail = () => {
                     className="card hover:shadow-lg transition-shadow"
                   >
                     <div className="flex items-center gap-3 mb-2">
-                      <Heart className="w-5 h-5 text-primary-500" />
+                      <HeartPulse className="w-5 h-5 text-primary-500" />
                       <h3 className="font-semibold text-gray-900">{condition.name}</h3>
                     </div>
                     {condition.category && (

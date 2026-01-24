@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, X, FileText, Stethoscope, Heart } from 'lucide-react';
+import { Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, X, FileText, Stethoscope, HeartPulse } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { useNotifications } from '../../contexts/NotificationContext';
 
@@ -14,7 +14,7 @@ const Import = () => {
   const fileInputRef = useRef(null);
 
   const importTypes = [
-    { id: 'conditions', label: 'Conditions', icon: Heart, color: 'primary' },
+    { id: 'conditions', label: 'Conditions', icon: HeartPulse, color: 'primary' },
     { id: 'interventions', label: 'Interventions', icon: Stethoscope, color: 'secondary' },
   ];
 

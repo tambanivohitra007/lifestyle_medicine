@@ -1,4 +1,4 @@
-import { Heart, Activity, Book, ChefHat, BookMarked, TestTube, Users, Plus, RefreshCw } from 'lucide-react';
+import { HeartPulse, Activity, Book, ChefHat, BookMarked, TestTube, Users, Plus, RefreshCw } from 'lucide-react';
 
 const StatCard = ({ title, value, icon: Icon, color, subValue, subLabel }) => (
   <div className="bg-white rounded-lg shadow p-6">
@@ -42,7 +42,7 @@ const OverviewCards = ({ data, loading }) => {
     {
       title: 'Conditions',
       value: data?.counts?.conditions,
-      icon: Heart,
+      icon: HeartPulse,
       color: 'bg-primary-600',
       subValue: data?.this_week?.created,
       subLabel: 'this week',

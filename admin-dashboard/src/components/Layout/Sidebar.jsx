@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { X, LogOut, User } from 'lucide-react';
 import {
   LayoutDashboard,
-  Heart,
+  HeartPulse,
   Activity,
   Book,
   BookMarked,
@@ -45,7 +45,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
     {
       title: 'Content',
       items: [
-        { to: '/conditions', icon: Heart, label: 'Conditions' },
+        { to: '/conditions', icon: HeartPulse, label: 'Conditions' },
         { to: '/interventions', icon: Activity, label: 'Interventions' },
         { to: '/care-domains', icon: Bookmark, label: 'Care Domains' },
       ],

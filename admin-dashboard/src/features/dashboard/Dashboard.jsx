@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Heart, Activity, Book, ChefHat, TrendingUp } from 'lucide-react';
+import { HeartPulse, Activity, Book, ChefHat, TrendingUp } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { Link } from 'react-router-dom';
 import RichTextPreview from '../../components/shared/RichTextPreview';
@@ -46,7 +46,7 @@ const Dashboard = () => {
     {
       title: 'Conditions',
       value: stats.conditions,
-      icon: Heart,
+      icon: HeartPulse,
       color: 'bg-primary-500',
       textColor: 'text-primary-600',
       bgColor: 'bg-primary-50',
@@ -149,7 +149,7 @@ const Dashboard = () => {
                 className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50/30 active:bg-primary-100/30 transition-all duration-200 touch-manipulation"
               >
                 <div className="p-1.5 sm:p-2 rounded-lg bg-primary-100 flex-shrink-0">
-                  <Heart className="w-4 sm:w-5 h-4 sm:h-5 text-primary-600" />
+                  <HeartPulse className="w-4 sm:w-5 h-4 sm:h-5 text-primary-600" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{condition.name}</h3>
@@ -177,7 +177,7 @@ const Dashboard = () => {
           to="/conditions/new"
           className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
         >
-          <Heart className="w-10 sm:w-12 h-10 sm:h-12 text-primary-600 mx-auto mb-2 sm:mb-3" />
+          <HeartPulse className="w-10 sm:w-12 h-10 sm:h-12 text-primary-600 mx-auto mb-2 sm:mb-3" />
           <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
             Add New Condition
           </h3>
