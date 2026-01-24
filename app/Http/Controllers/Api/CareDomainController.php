@@ -8,6 +8,7 @@ use App\Models\CareDomain;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class CareDomainController extends Controller
 {
@@ -31,7 +32,12 @@ class CareDomainController extends Controller
     public function store(Request $request): CareDomainResource
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:care_domains,name',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('care_domains', 'name')->whereNull('deleted_at'),
+            ],
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:50',
             'order_index' => 'nullable|integer|min:0',
@@ -45,7 +51,12 @@ class CareDomainController extends Controller
     public function update(Request $request, CareDomain $careDomain): CareDomainResource
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:care_domains,name,' . $careDomain->id,
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('care_domains', 'name')->ignore($careDomain->id)->whereNull('deleted_at'),
+            ],
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:50',
             'order_index' => 'nullable|integer|min:0',

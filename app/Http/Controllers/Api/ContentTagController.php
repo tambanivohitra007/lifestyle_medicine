@@ -8,6 +8,7 @@ use App\Models\ContentTag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class ContentTagController extends Controller
 {
@@ -37,7 +38,12 @@ class ContentTagController extends Controller
     public function store(Request $request): ContentTagResource
     {
         $validated = $request->validate([
-            'tag' => 'required|string|max:255|unique:content_tags,tag',
+            'tag' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('content_tags', 'tag')->whereNull('deleted_at'),
+            ],
         ]);
 
         $tag = ContentTag::create($validated);
@@ -48,7 +54,12 @@ class ContentTagController extends Controller
     public function update(Request $request, ContentTag $contentTag): ContentTagResource
     {
         $validated = $request->validate([
-            'tag' => 'required|string|max:255|unique:content_tags,tag,' . $contentTag->id,
+            'tag' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('content_tags', 'tag')->ignore($contentTag->id)->whereNull('deleted_at'),
+            ],
         ]);
 
         $contentTag->update($validated);

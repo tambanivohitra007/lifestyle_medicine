@@ -17,6 +17,7 @@ use App\Models\Scripture;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class ConditionController extends Controller
 {
@@ -65,7 +66,12 @@ class ConditionController extends Controller
     public function store(Request $request): ConditionResource
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:conditions,name',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('conditions', 'name')->whereNull('deleted_at'),
+            ],
             'category' => 'nullable|string|max:255',
             'summary' => 'nullable|string',
         ]);
@@ -78,7 +84,12 @@ class ConditionController extends Controller
     public function update(Request $request, Condition $condition): ConditionResource
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:conditions,name,' . $condition->id,
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('conditions', 'name')->ignore($condition->id)->whereNull('deleted_at'),
+            ],
             'category' => 'nullable|string|max:255',
             'summary' => 'nullable|string',
         ]);
