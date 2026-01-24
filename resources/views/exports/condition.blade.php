@@ -17,59 +17,59 @@
             color: #333;
         }
         .header {
-            background: linear-gradient(135deg, #d31e3a, #c1213a);
+            background-color: #d31e3a;
             color: white;
             padding: 25px 30px;
             margin-bottom: 20px;
-            position: relative;
         }
-        .header-top {
-            display: table;
-            width: 100%;
+        .logo-wrapper {
+            text-align: center;
             margin-bottom: 15px;
         }
-        .logo-section {
-            display: table-cell;
-            vertical-align: middle;
-            width: 80px;
-        }
-        .logo-section img {
-            width: 60px;
-            height: 60px;
+        .logo-wrapper img {
+            max-width: 100px;
+            height: auto;
             background: white;
             border-radius: 8px;
             padding: 8px;
         }
-        .title-section {
-            display: table-cell;
-            vertical-align: middle;
-            padding-left: 20px;
+        .title-wrapper {
+            text-align: center;
         }
         .org-name {
             font-size: 11px;
-            opacity: 0.9;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
         }
-        .header h1 {
+        .document-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 8px;
+        }
+        .condition-name {
             font-size: 26px;
+            font-weight: bold;
             margin-bottom: 5px;
             line-height: 1.2;
         }
         .header .category {
             display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.2);
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 12px;
             margin-top: 5px;
         }
         .header .summary {
-            margin-top: 12px;
+            margin-top: 15px;
             font-size: 12px;
             line-height: 1.5;
-            opacity: 0.95;
+            text-align: left;
         }
         .section {
             margin: 20px 30px;
@@ -246,17 +246,16 @@
 </head>
 <body>
     <div class="header">
-        <div class="header-top">
-            <div class="logo-section">
-                <img src="{{ public_path('lifestyle.png') }}" alt="Logo">
-            </div>
-            <div class="title-section">
-                <div class="org-name">Lifestyle Medicine & Gospel Medical Evangelism</div>
-                <h1>{{ $condition->name }}</h1>
-                @if($condition->category)
-                    <div class="category">{{ $condition->category }}</div>
-                @endif
-            </div>
+        <div class="logo-wrapper">
+            <img src="{{ public_path('lifestyle.png') }}" alt="Logo">
+        </div>
+        <div class="title-wrapper">
+            <div class="org-name">Lifestyle Medicine & Gospel Medical Evangelism</div>
+            <div class="document-title">Lifestyle Treatment Guide</div>
+            <div class="condition-name">{{ $condition->name }}</div>
+            @if($condition->category)
+                <div class="category">{{ $condition->category }}</div>
+            @endif
         </div>
         @if($condition->summary)
             <div class="summary">{{ strip_tags($condition->summary) }}</div>
