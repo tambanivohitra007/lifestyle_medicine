@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react';
 import { Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, X, FileText, Stethoscope, Heart } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const Import = () => {
+  const { notifyImport } = useNotifications();
   const [activeType, setActiveType] = useState('conditions');
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -83,11 +85,26 @@ const Import = () => {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+
+      // Send success notification
+      notifyImport({
+        success: true,
+        type: activeType === 'conditions' ? 'condition' : 'intervention',
+        imported: response.data.imported || 0,
+        skipped: response.data.skipped || 0,
+      });
     } catch (error) {
       console.error('Import error:', error);
       setResult({
         success: false,
         message: error.response?.data?.message || 'Import failed. Please try again.',
+      });
+
+      // Send error notification
+      notifyImport({
+        success: false,
+        type: activeType === 'conditions' ? 'condition' : 'intervention',
+        message: error.response?.data?.message || 'Import failed. Please check your file and try again.',
       });
     } finally {
       setUploading(false);

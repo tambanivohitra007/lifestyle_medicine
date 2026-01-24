@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 // Layout
 import { Layout } from './components/layout';
@@ -53,8 +54,9 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+      <NotificationProvider>
+        <BrowserRouter>
+          <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
 
@@ -145,8 +147,9 @@ function App() {
 
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
+import { useNotifications } from '../../contexts/NotificationContext';
 import ConditionInput from './components/ConditionInput';
 import DraftReview from './components/DraftReview';
 import StructuredPreview from './components/StructuredPreview';
@@ -15,6 +16,7 @@ const PHASES = {
 };
 
 const AiContentGenerator = () => {
+  const { notifyAiGeneration } = useNotifications();
   const [phase, setPhase] = useState(PHASES.INPUT);
   const [aiConfigured, setAiConfigured] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -87,9 +89,21 @@ const AiContentGenerator = () => {
       });
       setImportResult(response.data);
       setPhase(PHASES.COMPLETE);
+      // Send success notification
+      notifyAiGeneration({
+        success: true,
+        conditionName: conditionName,
+        message: `Successfully imported "${conditionName}" with ${response.data.sections_created || 0} sections, ${response.data.interventions_created || 0} interventions.`,
+      });
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to import content');
       setPhase(PHASES.STRUCTURED);
+      // Send error notification
+      notifyAiGeneration({
+        success: false,
+        conditionName: conditionName,
+        message: err.response?.data?.error || 'Failed to import AI-generated content.',
+      });
     } finally {
       setLoading(false);
     }
