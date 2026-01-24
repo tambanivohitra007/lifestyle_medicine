@@ -84,13 +84,18 @@ class AiContentController extends Controller
         // Extend execution time for database operations
         set_time_limit(120);
 
-        $validated = $request->validate([
+        // Validate minimum required fields
+        $request->validate([
             'structured' => 'required|array',
             'structured.condition' => 'required|array',
             'structured.condition.name' => 'required|string|max:255',
         ]);
 
-        $result = $this->aiService->importContent($validated['structured']);
+        // Use the full structured data, not just validated fields
+        // Validation above ensures minimum required fields exist
+        $structured = $request->input('structured');
+
+        $result = $this->aiService->importContent($structured);
 
         if (isset($result['error'])) {
             return response()->json($result, 422);

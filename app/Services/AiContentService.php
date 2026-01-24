@@ -126,6 +126,11 @@ class AiContentService
             'errors' => [],
         ];
 
+        // Log the incoming structured data for debugging
+        Log::info('AI Content Import - Incoming data keys: ' . implode(', ', array_keys($structured)));
+        Log::info('AI Content Import - Sections count: ' . count($structured['condition_sections'] ?? []));
+        Log::info('AI Content Import - Interventions count: ' . count($structured['interventions'] ?? []));
+
         DB::beginTransaction();
 
         try {
@@ -137,6 +142,7 @@ class AiContentService
                     'summary' => $structured['condition']['summary'] ?? null,
                 ]);
                 $results['condition'] = $condition->id;
+                Log::info('AI Content Import - Condition created: ' . $condition->id);
             }
 
             if (!$results['condition']) {
@@ -144,17 +150,26 @@ class AiContentService
             }
 
             // 2. Create condition sections
-            if (isset($structured['condition_sections'])) {
+            if (isset($structured['condition_sections']) && is_array($structured['condition_sections'])) {
+                Log::info('AI Content Import - Processing ' . count($structured['condition_sections']) . ' sections');
                 foreach ($structured['condition_sections'] as $index => $sectionData) {
-                    $section = ConditionSection::create([
-                        'condition_id' => $results['condition'],
-                        'section_type' => $sectionData['section_type'],
-                        'title' => $sectionData['title'] ?? null,
-                        'body' => $sectionData['body'],
-                        'order_index' => $sectionData['order_index'] ?? $index,
-                    ]);
-                    $results['condition_sections'][] = $section->id;
+                    try {
+                        $section = ConditionSection::create([
+                            'condition_id' => $results['condition'],
+                            'section_type' => $sectionData['section_type'],
+                            'title' => $sectionData['title'] ?? null,
+                            'body' => $sectionData['body'],
+                            'order_index' => $sectionData['order_index'] ?? $index,
+                        ]);
+                        $results['condition_sections'][] = $section->id;
+                        Log::info('AI Content Import - Section created: ' . $section->section_type);
+                    } catch (\Exception $e) {
+                        Log::error('AI Content Import - Section error: ' . $e->getMessage());
+                        $results['errors'][] = "Section error: {$e->getMessage()}";
+                    }
                 }
+            } else {
+                Log::warning('AI Content Import - No condition_sections found in structured data');
             }
 
             // 3. Create/link content tags
@@ -167,11 +182,13 @@ class AiContentService
 
             // 4. Create interventions and link to condition
             $interventionMap = []; // name => id mapping
-            if (isset($structured['interventions'])) {
+            if (isset($structured['interventions']) && is_array($structured['interventions'])) {
+                Log::info('AI Content Import - Processing ' . count($structured['interventions']) . ' interventions');
                 foreach ($structured['interventions'] as $index => $intData) {
                     // Find care domain
                     $careDomain = CareDomain::where('name', $intData['care_domain'])->first();
                     if (!$careDomain) {
+                        Log::warning('AI Content Import - Care domain not found: ' . ($intData['care_domain'] ?? 'unknown'));
                         $results['errors'][] = "Care domain not found: {$intData['care_domain']}";
                         continue;
                     }
