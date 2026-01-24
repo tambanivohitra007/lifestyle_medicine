@@ -156,8 +156,8 @@ const Recipes = () => {
       </div>
 
       {/* View Mode Toggle Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50 px-4 py-3 rounded-lg border border-gray-200">
-        <div className="text-sm text-gray-500">
+      <div className="flex items-center justify-between gap-3 bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200">
+        <div className="text-xs sm:text-sm text-gray-500">
           {pagination.total} {pagination.total === 1 ? 'recipe' : 'recipes'}
         </div>
         <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />

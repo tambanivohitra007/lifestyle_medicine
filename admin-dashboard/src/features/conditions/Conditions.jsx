@@ -142,43 +142,88 @@ const Conditions = () => {
       </div>
 
       {/* Sort and View Mode Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50 px-4 py-3 rounded-lg border border-gray-200">
-        <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
-          <span className="text-sm text-gray-600 font-medium">Sort by:</span>
-          <SortableHeader
-            field="name"
-            label="Name"
-            currentSort={sortBy}
-            currentOrder={sortOrder}
-            onSort={handleSort}
-          />
-          <SortableHeader
-            field="category"
-            label="Category"
-            currentSort={sortBy}
-            currentOrder={sortOrder}
-            onSort={handleSort}
-          />
-          <SortableHeader
-            field="created_at"
-            label="Date Created"
-            currentSort={sortBy}
-            currentOrder={sortOrder}
-            onSort={handleSort}
-          />
-          <SortableHeader
-            field="updated_at"
-            label="Last Updated"
-            currentSort={sortBy}
-            currentOrder={sortOrder}
-            onSort={handleSort}
-          />
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-gray-500">
-            {pagination.total} {pagination.total === 1 ? 'condition' : 'conditions'}
+      <div className="bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200">
+        {/* Mobile: Stacked layout */}
+        <div className="flex flex-col gap-3 sm:hidden">
+          {/* View mode toggle and count - top row on mobile */}
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-gray-500">
+              {pagination.total} {pagination.total === 1 ? 'condition' : 'conditions'}
+            </div>
+            <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
           </div>
-          <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
+          {/* Sort options - scrollable on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+            <span className="text-xs text-gray-600 font-medium whitespace-nowrap">Sort:</span>
+            <SortableHeader
+              field="name"
+              label="Name"
+              currentSort={sortBy}
+              currentOrder={sortOrder}
+              onSort={handleSort}
+            />
+            <SortableHeader
+              field="category"
+              label="Category"
+              currentSort={sortBy}
+              currentOrder={sortOrder}
+              onSort={handleSort}
+            />
+            <SortableHeader
+              field="created_at"
+              label="Created"
+              currentSort={sortBy}
+              currentOrder={sortOrder}
+              onSort={handleSort}
+            />
+            <SortableHeader
+              field="updated_at"
+              label="Updated"
+              currentSort={sortBy}
+              currentOrder={sortOrder}
+              onSort={handleSort}
+            />
+          </div>
+        </div>
+        {/* Desktop: Single row layout */}
+        <div className="hidden sm:flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <span className="text-sm text-gray-600 font-medium">Sort by:</span>
+            <SortableHeader
+              field="name"
+              label="Name"
+              currentSort={sortBy}
+              currentOrder={sortOrder}
+              onSort={handleSort}
+            />
+            <SortableHeader
+              field="category"
+              label="Category"
+              currentSort={sortBy}
+              currentOrder={sortOrder}
+              onSort={handleSort}
+            />
+            <SortableHeader
+              field="created_at"
+              label="Date Created"
+              currentSort={sortBy}
+              currentOrder={sortOrder}
+              onSort={handleSort}
+            />
+            <SortableHeader
+              field="updated_at"
+              label="Last Updated"
+              currentSort={sortBy}
+              currentOrder={sortOrder}
+              onSort={handleSort}
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-500">
+              {pagination.total} {pagination.total === 1 ? 'condition' : 'conditions'}
+            </div>
+            <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
+          </div>
         </div>
       </div>
 

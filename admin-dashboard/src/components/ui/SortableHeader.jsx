@@ -32,19 +32,19 @@ const SortableHeader = ({
 
   const renderIcon = () => {
     if (!isActive) {
-      return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
+      return <ChevronsUpDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />;
     }
 
     return currentOrder === 'asc'
-      ? <ChevronUp className="w-4 h-4 text-primary-600" />
-      : <ChevronDown className="w-4 h-4 text-primary-600" />;
+      ? <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 text-primary-600" />
+      : <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-primary-600" />;
   };
 
   return (
     <button
       onClick={handleClick}
       className={`
-        flex items-center gap-2 font-semibold transition-colors
+        flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold transition-colors whitespace-nowrap
         hover:text-primary-600 focus:outline-none focus:text-primary-600
         ${isActive ? 'text-primary-600' : 'text-gray-700'}
         ${className}
