@@ -15,6 +15,11 @@
             font-size: 12px;
             line-height: 1.6;
             color: #333;
+            padding-bottom: 20px;
+        }
+        @page {
+            margin-top: 40px;
+            margin-bottom: 20px;
         }
         .header {
             background-color: #d31e3a;
@@ -209,6 +214,10 @@
             font-size: 9px;
             color: #64748b;
             border-top: 1px solid #e2e8f0;
+            height: 50px;
+        }
+        .content-wrapper {
+            padding-bottom: 60px;
         }
         .footer-content {
             display: table;
@@ -245,6 +254,7 @@
     </style>
 </head>
 <body>
+    <div class="content-wrapper">
     <div class="header">
         <div class="logo-wrapper">
             <img src="{{ public_path('lifestyle.png') }}" alt="Logo">
@@ -399,7 +409,14 @@
                             <div class="card-content">
                                 <ul style="margin: 5px 0; padding-left: 20px;">
                                     @foreach($recipe->ingredients as $ingredient)
-                                        <li style="margin-bottom: 3px;">{{ $ingredient }}</li>
+                                        <li style="margin-bottom: 3px;">
+                                            @if(is_array($ingredient) || is_object($ingredient))
+                                                @php $ing = (array) $ingredient; @endphp
+                                                {{ $ing['amount'] ?? '' }} {{ $ing['item'] ?? '' }}
+                                            @else
+                                                {{ $ingredient }}
+                                            @endif
+                                        </li>
                                     @endforeach
                                 </ul>
                             </div>
@@ -415,6 +432,7 @@
             @endforeach
         </div>
     @endif
+    </div><!-- end content-wrapper -->
 
     <div class="footer">
         <div class="footer-content">
