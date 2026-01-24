@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Heart, Edit, Trash2, Eye, Download } from 'lucide-react';
+import { Plus, Search, ShieldAlert, Edit, Trash2, Eye, Download } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -236,7 +236,7 @@ const Conditions = () => {
         </div>
       ) : conditions.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
-          <Heart className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
+          <ShieldAlert className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No conditions found
           </h3>
@@ -260,7 +260,7 @@ const Conditions = () => {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-2 rounded-lg bg-primary-100">
-                      <Heart className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
+                      <ShieldAlert className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
                     </div>
                     <div className="flex gap-1">
                       <Link
