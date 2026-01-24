@@ -189,5 +189,27 @@ export const hideLoading = () => {
   Swal.close();
 };
 
+// Confirm logout dialog
+export const confirmLogout = async () => {
+  const result = await Swal.fire({
+    title: 'Sign Out',
+    text: 'Are you sure you want to sign out?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: theme.danger,
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Yes, sign out',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
+    customClass: {
+      popup: 'rounded-2xl',
+      confirmButton: 'rounded-lg px-4 py-2',
+      cancelButton: 'rounded-lg px-4 py-2',
+    },
+  });
+
+  return result.isConfirmed;
+};
+
 // Export Swal for advanced usage
 export { Swal };

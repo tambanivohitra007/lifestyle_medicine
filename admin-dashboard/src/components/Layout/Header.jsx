@@ -1,15 +1,9 @@
-import { Bell, User, LogOut, Menu, Settings, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Bell, User, Menu, Settings, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Header = ({ onMenuClick, isCollapsed, onToggleCollapse }) => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const { user } = useAuth();
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
@@ -83,33 +77,17 @@ const Header = ({ onMenuClick, isCollapsed, onToggleCollapse }) => {
             >
               <Settings className="w-5 h-5 text-gray-600" />
             </Link>
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
-              title="Logout"
-            >
-              <LogOut className="w-5 h-5 text-gray-600" />
-            </button>
           </div>
 
-          {/* User Menu - Mobile */}
-          <div className="flex sm:hidden items-center gap-1">
-            <Link
-              to="/profile"
-              className="p-1 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
-            >
-              <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center">
-                <User className="w-4 h-4 text-primary-600" />
-              </div>
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
-              title="Logout"
-            >
-              <LogOut className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
+          {/* User Avatar - Mobile (tapping opens sidebar with logout) */}
+          <Link
+            to="/profile"
+            className="flex sm:hidden p-1 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+          >
+            <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center">
+              <User className="w-4 h-4 text-primary-600" />
+            </div>
+          </Link>
         </div>
       </div>
     </header>

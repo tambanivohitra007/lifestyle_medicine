@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { X, LogOut, User } from 'lucide-react';
 import {
   LayoutDashboard,
   Heart,
@@ -18,8 +18,21 @@ import {
   BarChart3,
   Sparkles,
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { confirmLogout } from '../../lib/swal';
 
 const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const confirmed = await confirmLogout();
+    if (confirmed) {
+      logout();
+      navigate('/login');
+    }
+  };
+
   const navSections = [
     {
       title: 'Overview',
@@ -75,7 +88,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         className={`
           fixed left-0 top-0 z-50 h-full bg-secondary-900 text-white
           transform transition-all duration-300 ease-in-out
-          overflow-y-auto sidebar-scroll
+          flex flex-col
           ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
           w-64
           lg:translate-x-0
@@ -108,8 +121,8 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className={`p-3 sm:p-4 ${isCollapsed ? 'lg:p-2' : ''}`}>
+        {/* Navigation - scrollable */}
+        <nav className={`flex-1 overflow-y-auto sidebar-scroll p-3 sm:p-4 ${isCollapsed ? 'lg:p-2' : ''}`}>
           {navSections.map((section, sectionIndex) => (
             <div key={section.title} className={sectionIndex > 0 ? 'mt-6' : ''}>
               {/* Section Title */}
@@ -133,6 +146,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                       to={item.to}
                       end={item.to === '/'}
                       title={isCollapsed ? item.label : undefined}
+                      onClick={onClose}
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-3 sm:px-4 py-2.5 rounded-lg transition-colors duration-200 touch-manipulation ${
                           isCollapsed ? 'lg:px-0 lg:justify-center' : ''
@@ -154,6 +168,45 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
             </div>
           ))}
         </nav>
+
+        {/* User Info & Logout - fixed at bottom */}
+        <div className={`border-t border-secondary-800 p-3 sm:p-4 ${isCollapsed ? 'lg:p-2' : ''}`}>
+          {/* User Info */}
+          <NavLink
+            to="/profile"
+            onClick={onClose}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 text-gray-300 hover:bg-secondary-800 hover:text-white active:bg-secondary-700 touch-manipulation ${
+              isCollapsed ? 'lg:justify-center lg:px-0' : ''
+            }`}
+            title={isCollapsed ? user?.name || 'Profile' : undefined}
+          >
+            <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
+              <User className="w-4 h-4 text-white" />
+            </div>
+            <div className={`flex-1 min-w-0 ${isCollapsed ? 'lg:hidden' : ''}`}>
+              <p className="text-sm font-medium text-white truncate">
+                {user?.name || 'Admin User'}
+              </p>
+              <p className="text-xs text-gray-400 truncate">
+                {user?.email || 'admin@example.com'}
+              </p>
+            </div>
+          </NavLink>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 mt-2 rounded-lg transition-colors duration-200 text-gray-300 hover:bg-red-600/20 hover:text-red-400 active:bg-red-600/30 touch-manipulation ${
+              isCollapsed ? 'lg:justify-center lg:px-0' : ''
+            }`}
+            title={isCollapsed ? 'Sign Out' : undefined}
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <span className={`font-medium text-sm ${isCollapsed ? 'lg:hidden' : ''}`}>
+              Sign Out
+            </span>
+          </button>
+        </div>
       </aside>
     </>
   );
