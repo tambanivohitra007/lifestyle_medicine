@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AiContentController;
 use App\Http\Controllers\Api\AiSuggestionController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
@@ -138,6 +139,12 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     // AI Suggestions
     Route::post('ai/suggest-scriptures', [AiSuggestionController::class, 'suggestScriptures']);
     Route::post('ai/suggest-egw-references', [AiSuggestionController::class, 'suggestEgwReferences']);
+
+    // AI Content Generator
+    Route::get('ai/status', [AiContentController::class, 'status']);
+    Route::post('ai/generate-draft', [AiContentController::class, 'generateDraft']);
+    Route::post('ai/structure-content', [AiContentController::class, 'structureContent']);
+    Route::post('ai/import-content', [AiContentController::class, 'importContent']);
 
     // Analytics
     Route::prefix('analytics')->group(function () {

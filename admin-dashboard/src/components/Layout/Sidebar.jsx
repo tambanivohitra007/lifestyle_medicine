@@ -16,6 +16,7 @@ import {
   Upload,
   Users,
   BarChart3,
+  Sparkles,
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
@@ -52,6 +53,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         { to: '/users', icon: Users, label: 'Users' },
         { to: '/tags', icon: Tag, label: 'Content Tags' },
         { to: '/import', icon: Upload, label: 'Import Data' },
+        { to: '/ai-generator', icon: Sparkles, label: 'AI Generator' },
         { to: '/profile', icon: Settings, label: 'Settings' },
       ],
     },

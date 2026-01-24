@@ -124,6 +124,12 @@ export const apiEndpoints = {
   aiSuggestScriptures: '/admin/ai/suggest-scriptures',
   aiSuggestEgwReferences: '/admin/ai/suggest-egw-references',
 
+  // AI Content Generator
+  aiStatus: '/admin/ai/status',
+  aiGenerateDraft: '/admin/ai/generate-draft',
+  aiStructureContent: '/admin/ai/structure-content',
+  aiImportContent: '/admin/ai/import-content',
+
   // Bible API
   bibleVersions: '/bible/versions',
   bibleSearch: '/bible/search',

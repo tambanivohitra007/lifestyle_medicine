@@ -11,6 +11,7 @@ import { Analytics } from './features/analytics';
 import { Search } from './features/search';
 import { Import } from './features/import';
 import { Profile } from './features/profile';
+import { AiContentGenerator } from './features/ai-generator';
 
 import {
   Conditions,
@@ -137,6 +138,9 @@ function App() {
 
             {/* Import */}
             <Route path="import" element={<Import />} />
+
+            {/* AI Content Generator */}
+            <Route path="ai-generator" element={<AiContentGenerator />} />
           </Route>
 
           {/* Catch all */}
