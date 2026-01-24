@@ -178,7 +178,7 @@
                         </td>
                         <td>
                             <div class="condition-summary">
-                                {{ Str::limit($condition->summary, 150) }}
+                                {{ Str::limit(strip_tags($condition->summary ?? ''), 150) }}
                             </div>
                         </td>
                         <td class="intervention-count">

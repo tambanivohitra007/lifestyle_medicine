@@ -199,7 +199,7 @@
             <div class="category">{{ $condition->category }}</div>
         @endif
         @if($condition->summary)
-            <div class="summary">{{ $condition->summary }}</div>
+            <div class="summary">{{ strip_tags($condition->summary) }}</div>
         @endif
     </div>
 
@@ -250,7 +250,7 @@
 
                             @if($intervention->description)
                                 <div class="card-content" style="margin-top: 10px;">
-                                    {{ $intervention->description }}
+                                    {{ strip_tags($intervention->description) }}
                                 </div>
                             @endif
 
@@ -278,7 +278,7 @@
                                             @endif
                                             @if($evidence->summary)
                                                 <div class="card-content" style="margin-top: 5px;">
-                                                    {{ $evidence->summary }}
+                                                    {{ strip_tags($evidence->summary ?? '') }}
                                                 </div>
                                             @endif
                                             @if($evidence->references && $evidence->references->count() > 0)
@@ -327,23 +327,29 @@
                 <div class="recipe-card">
                     <div class="recipe-title">{{ $recipe->title }}</div>
                     <div class="recipe-meta">
-                        @if($recipe->prep_time)Prep: {{ $recipe->prep_time }} min @endif
-                        @if($recipe->cook_time)| Cook: {{ $recipe->cook_time }} min @endif
+                        @if($recipe->prep_time_minutes)Prep: {{ $recipe->prep_time_minutes }} min @endif
+                        @if($recipe->cook_time_minutes)| Cook: {{ $recipe->cook_time_minutes }} min @endif
                         @if($recipe->servings)| Servings: {{ $recipe->servings }}@endif
                     </div>
                     @if($recipe->description)
-                        <div class="card-content">{{ $recipe->description }}</div>
+                        <div class="card-content">{{ strip_tags($recipe->description) }}</div>
                     @endif
-                    @if($recipe->ingredients)
+                    @if($recipe->ingredients && is_array($recipe->ingredients) && count($recipe->ingredients) > 0)
                         <div style="margin-top: 10px;">
                             <strong style="font-size: 11px;">Ingredients:</strong>
-                            <div class="card-content">{!! nl2br(e($recipe->ingredients)) !!}</div>
+                            <div class="card-content">
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    @foreach($recipe->ingredients as $ingredient)
+                                        <li style="margin-bottom: 3px;">{{ $ingredient }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         </div>
                     @endif
                     @if($recipe->instructions)
                         <div style="margin-top: 10px;">
                             <strong style="font-size: 11px;">Instructions:</strong>
-                            <div class="card-content">{!! nl2br(e($recipe->instructions)) !!}</div>
+                            <div class="card-content">{!! nl2br(e($recipe->instructions ?? '')) !!}</div>
                         </div>
                     @endif
                 </div>
