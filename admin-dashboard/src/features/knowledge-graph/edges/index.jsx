@@ -9,7 +9,10 @@ export {
 };
 
 // Export edge types object for React Flow
+// Include 'default' and 'smoothstep' to ensure all edges use step paths
 export const edgeTypes = {
   'condition-intervention': ConditionInterventionEdge,
   'relationship': RelationshipEdge,
+  'default': RelationshipEdge,
+  'smoothstep': RelationshipEdge,
 };

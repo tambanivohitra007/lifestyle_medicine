@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import {
   BaseEdge,
   EdgeLabelRenderer,
-  getStraightPath,
+  getSmoothStepPath,
 } from 'reactflow';
 
 const STRENGTH_CONFIG = {
@@ -44,6 +44,8 @@ const ConditionInterventionEdge = memo(({
   sourceY,
   targetX,
   targetY,
+  sourcePosition,
+  targetPosition,
   data,
   selected,
   markerEnd,
@@ -57,11 +59,14 @@ const ConditionInterventionEdge = memo(({
   const config = STRENGTH_CONFIG[strength] || STRENGTH_CONFIG.emerging;
   const recConfig = RECOMMENDATION_CONFIG[recommendation] || RECOMMENDATION_CONFIG.optional;
 
-  const [edgePath, labelX, labelY] = getStraightPath({
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
+    sourcePosition,
     targetX,
     targetY,
+    targetPosition,
+    borderRadius: 8,
   });
 
   return (

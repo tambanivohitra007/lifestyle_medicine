@@ -45,16 +45,22 @@ const FullGraphInner = () => {
       const response = await api.get(`/knowledge-graph/full?page=${pageNum}&limit=${limit}`);
       const { nodes: apiNodes, edges: apiEdges, meta: apiMeta } = response.data;
 
+      // Ensure all edges use step path by setting type
+      const processedEdges = apiEdges.map(edge => ({
+        ...edge,
+        type: edge.type || 'smoothstep',
+      }));
+
       // Apply layout
-      const layoutedNodes = applyLayout(apiNodes, apiEdges, layoutType);
+      const layoutedNodes = applyLayout(apiNodes, processedEdges, layoutType);
 
       if (pageNum === 1) {
         setAllNodes(layoutedNodes);
-        setAllEdges(apiEdges);
+        setAllEdges(processedEdges);
       } else {
         // Append for lazy loading
         setAllNodes((prev) => [...prev, ...layoutedNodes]);
-        setAllEdges((prev) => [...prev, ...apiEdges]);
+        setAllEdges((prev) => [...prev, ...processedEdges]);
       }
 
       setMeta(apiMeta);
@@ -214,7 +220,7 @@ const FullGraphInner = () => {
           maxZoom={2}
           attributionPosition="bottom-left"
           defaultEdgeOptions={{
-            type: 'straight',
+            type: 'smoothstep',
             animated: false,
           }}
         >

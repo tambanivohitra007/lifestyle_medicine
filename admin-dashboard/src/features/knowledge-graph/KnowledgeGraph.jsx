@@ -52,12 +52,18 @@ const KnowledgeGraphInner = ({
       const response = await api.get(endpoint);
       const { nodes: apiNodes, edges: apiEdges, meta: apiMeta } = response.data;
 
+      // Ensure all edges use step path by setting type
+      const processedEdges = apiEdges.map(edge => ({
+        ...edge,
+        type: edge.type || 'smoothstep',
+      }));
+
       // Apply layout
-      const layoutedNodes = applyLayout(apiNodes, apiEdges, layoutType);
+      const layoutedNodes = applyLayout(apiNodes, processedEdges, layoutType);
 
       // Store original data for filtering
       setAllNodes(layoutedNodes);
-      setAllEdges(apiEdges);
+      setAllEdges(processedEdges);
 
       // Apply current filter
       applyFilter(layoutedNodes, apiEdges, hiddenTypes);
@@ -223,7 +229,7 @@ const KnowledgeGraphInner = ({
         maxZoom={2}
         attributionPosition="bottom-left"
         defaultEdgeOptions={{
-          type: 'straight',
+          type: 'smoothstep',
           animated: false,
         }}
       >

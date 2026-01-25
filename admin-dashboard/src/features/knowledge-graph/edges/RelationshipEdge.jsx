@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { BaseEdge, getStraightPath } from 'reactflow';
+import { BaseEdge, getSmoothStepPath } from 'reactflow';
 
 /**
  * Generic styled edge for non-intervention relationships.
@@ -11,15 +11,20 @@ const RelationshipEdge = memo(({
   sourceY,
   targetX,
   targetY,
+  sourcePosition,
+  targetPosition,
   selected,
   markerEnd,
   style,
 }) => {
-  const [edgePath] = getStraightPath({
+  const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
+    sourcePosition,
     targetX,
     targetY,
+    targetPosition,
+    borderRadius: 8,
   });
 
   // Merge default style with passed style
