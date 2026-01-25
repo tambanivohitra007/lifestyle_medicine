@@ -3,13 +3,6 @@ import {
   Search,
   BookOpen,
   HeartPulse,
-  Church,
-  Apple,
-  Moon,
-  CloudSun,
-  HandHeart,
-  Dumbbell,
-  Scale,
   Copy,
   Check,
   Plus,
@@ -21,19 +14,19 @@ import {
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 
-// Theme icon mapping
-const themeIcons = {
-  'heart-pulse': HeartPulse,
-  'church': Church,
-  'apple': Apple,
-  'moon': Moon,
-  'cloud-sun': CloudSun,
-  'hand-heart': HandHeart,
-  'dumbbell': Dumbbell,
-  'scale': Scale,
+// Theme images mapping (using Unsplash for high-quality free images)
+const themeImages = {
+  healing: 'https://images.unsplash.com/photo-1447452001602-7090c7ab2db3?w=800&q=80', // Sunrise/hope
+  body_temple: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80', // Meditation/yoga
+  diet_nutrition: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80', // Healthy food
+  rest_sabbath: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80', // Peaceful rest
+  peace_anxiety: 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&q=80', // Calm water
+  trust_faith: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80', // Hands reaching sky
+  strength_endurance: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80', // Fitness/strength
+  temperance: 'https://images.unsplash.com/photo-1506126279646-a697353d3166?w=800&q=80', // Balance/nature
 };
 
-// Theme color classes
+// Fallback theme colors for badges and accents
 const themeColors = {
   rose: 'bg-rose-100 text-rose-700 border-rose-200',
   purple: 'bg-purple-100 text-purple-700 border-purple-200',
@@ -381,51 +374,106 @@ const BibleExplorer = () => {
         {activeTab === 'themes' && (
           <div className="space-y-6">
             {!selectedTheme ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {themes.map((theme) => {
-                  const Icon = themeIcons[theme.icon] || HeartPulse;
-                  return (
+              <>
+                {/* Section Header */}
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Health & Wellness Themes</h2>
+                  <p className="text-gray-600 max-w-2xl mx-auto">
+                    Explore biblical wisdom organized by health topics. Each theme contains carefully selected verses to support your physical, mental, and spiritual well-being.
+                  </p>
+                </div>
+
+                {/* Theme Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {themes.map((theme) => (
                     <button
                       key={theme.key}
                       onClick={() => fetchThemeVerses(theme.key)}
-                      className={`card hover:shadow-lg transition-all text-left ${themeBgColors[theme.color] || 'bg-gray-50'}`}
+                      className="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 text-left h-64"
                     >
-                      <div className={`inline-flex p-3 rounded-lg ${themeColors[theme.color] || 'bg-gray-100 text-gray-700'} mb-3`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <h3 className="font-semibold text-gray-900 mb-1">{theme.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{theme.description}</p>
-                      <div className="flex items-center text-xs text-gray-500">
-                        <BookOpen className="w-3 h-3 mr-1" />
-                        {theme.verse_count} verses
-                        <ArrowRight className="w-3 h-3 ml-auto" />
+                      {/* Background Image */}
+                      <div
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                        style={{
+                          backgroundImage: `url(${themeImages[theme.key] || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80'})`,
+                        }}
+                      />
+
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+
+                      {/* Content */}
+                      <div className="relative h-full flex flex-col justify-end p-5 text-white">
+                        {/* Verse Count Badge */}
+                        <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                          <span className="text-xs font-medium text-white flex items-center gap-1">
+                            <BookOpen className="w-3 h-3" />
+                            {theme.verse_count} verses
+                          </span>
+                        </div>
+
+                        {/* Theme Name */}
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary-200 transition-colors">
+                          {theme.name}
+                        </h3>
+
+                        {/* Description */}
+                        <p className="text-sm text-gray-200 line-clamp-2 mb-3">
+                          {theme.description}
+                        </p>
+
+                        {/* Explore Button */}
+                        <div className="flex items-center text-sm font-medium text-primary-300 group-hover:text-white transition-colors">
+                          Explore verses
+                          <ArrowRight className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </div>
                     </button>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              </>
             ) : (
-              <div className="space-y-4">
-                {/* Theme Header */}
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => setSelectedTheme(null)}
-                    className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
-                  >
-                    <ChevronRight className="w-4 h-4 rotate-180" />
-                    All Themes
-                  </button>
-                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${themeColors[selectedTheme.color] || 'bg-gray-100'}`}>
-                    {(() => {
-                      const Icon = themeIcons[selectedTheme.icon] || HeartPulse;
-                      return <Icon className="w-4 h-4" />;
-                    })()}
-                    <span className="font-medium">{selectedTheme.theme}</span>
+              <div className="space-y-6">
+                {/* Theme Header Banner */}
+                <div className="relative overflow-hidden rounded-2xl h-48 sm:h-56">
+                  {/* Background Image */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(${themeImages[selectedTheme.key] || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80'})`,
+                    }}
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+
+                  {/* Content */}
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    {/* Back Button */}
+                    <button
+                      onClick={() => setSelectedTheme(null)}
+                      className="self-start flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm"
+                    >
+                      <ChevronRight className="w-4 h-4 rotate-180" />
+                      All Themes
+                    </button>
+
+                    {/* Theme Info */}
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                        {selectedTheme.theme}
+                      </h2>
+                      <p className="text-white/80 text-sm sm:text-base max-w-xl">
+                        {selectedTheme.description}
+                      </p>
+                      <div className="flex items-center gap-2 mt-3">
+                        <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white flex items-center gap-1">
+                          <BookOpen className="w-3 h-3" />
+                          {themeVerses.length} verses
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                {/* Theme Description */}
-                <p className="text-gray-600">{selectedTheme.description}</p>
 
                 {/* Verses */}
                 {loading ? (
