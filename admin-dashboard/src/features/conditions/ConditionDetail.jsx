@@ -494,20 +494,32 @@ const ConditionDetail = () => {
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {scriptures.map((scripture) => (
-                  <div key={scripture.id} className="card">
+                  <div key={scripture.id} className="card hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                      <Link
+                        to={`/scriptures/${scripture.id}`}
+                        className="font-semibold text-gray-900 text-sm sm:text-base hover:text-primary-600 transition-colors"
+                      >
                         {scripture.reference}
-                      </h3>
-                      {canEdit && (
-                        <button
-                          onClick={() => handleDetachScripture(scripture.id, scripture.reference)}
-                          className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
-                          title="Remove"
+                      </Link>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Link
+                          to={`/scriptures/${scripture.id}`}
+                          className="action-btn"
+                          title="View"
                         >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </button>
-                      )}
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </Link>
+                        {canEdit && (
+                          <button
+                            onClick={() => handleDetachScripture(scripture.id, scripture.reference)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Remove"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     {scripture.theme && (
                       <span className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full mb-2">
@@ -546,27 +558,39 @@ const ConditionDetail = () => {
             ) : (
               <div className="space-y-4">
                 {egwReferences.map((egwRef) => (
-                  <div key={egwRef.id} className="card">
+                  <div key={egwRef.id} className="card hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                      <div className="flex flex-wrap items-center gap-2 min-w-0">
+                        <Link
+                          to={`/egw-references/${egwRef.id}`}
+                          className="font-semibold text-gray-900 text-sm sm:text-base hover:text-primary-600 transition-colors"
+                        >
                           {egwRef.citation}
-                        </h3>
+                        </Link>
                         {egwRef.topic && (
                           <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
                             {egwRef.topic}
                           </span>
                         )}
                       </div>
-                      {canEdit && (
-                        <button
-                          onClick={() => handleDetachEgwReference(egwRef.id, egwRef.citation)}
-                          className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
-                          title="Remove"
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Link
+                          to={`/egw-references/${egwRef.id}`}
+                          className="action-btn"
+                          title="View"
                         >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </button>
-                      )}
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </Link>
+                        {canEdit && (
+                          <button
+                            onClick={() => handleDetachEgwReference(egwRef.id, egwRef.citation)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Remove"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <p className="text-gray-600 text-xs sm:text-sm italic break-words">"{egwRef.quote}"</p>
                     {egwRef.context && (
@@ -603,18 +627,32 @@ const ConditionDetail = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {recipes.map((recipe) => (
-                  <div key={recipe.id} className="card">
+                  <div key={recipe.id} className="card hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{recipe.title}</h3>
-                      {canEdit && (
-                        <button
-                          onClick={() => handleDetachRecipe(recipe.id, recipe.title)}
-                          className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
-                          title="Remove"
+                      <Link
+                        to={`/recipes/${recipe.id}`}
+                        className="font-semibold text-gray-900 text-sm sm:text-base hover:text-primary-600 transition-colors"
+                      >
+                        {recipe.title}
+                      </Link>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Link
+                          to={`/recipes/${recipe.id}`}
+                          className="action-btn"
+                          title="View"
                         >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </button>
-                      )}
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </Link>
+                        {canEdit && (
+                          <button
+                            onClick={() => handleDetachRecipe(recipe.id, recipe.title)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Remove"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     {recipe.dietary_tags && recipe.dietary_tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-2">

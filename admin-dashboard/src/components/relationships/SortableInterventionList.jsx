@@ -50,7 +50,7 @@ const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) =
     <div
       ref={setNodeRef}
       style={style}
-      className={`card group ${isDragging ? 'shadow-lg ring-2 ring-primary-300 bg-primary-50 z-10' : ''}`}
+      className={`card group hover:shadow-md transition-shadow ${isDragging ? 'shadow-lg ring-2 ring-primary-300 bg-primary-50 z-10' : ''}`}
     >
       <div className="flex items-start gap-2 sm:gap-3">
         {/* Drag Handle */}
@@ -69,9 +69,12 @@ const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) =
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+            <Link
+              to={`/interventions/${intervention.id}`}
+              className="font-semibold text-gray-900 text-sm sm:text-base hover:text-primary-600 transition-colors"
+            >
               {intervention.name}
-            </h3>
+            </Link>
             {intervention.pivot?.strength_of_evidence && (
               <span
                 className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium ${
