@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
+import BottomNav from './BottomNav';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -58,13 +59,16 @@ const Layout = () => {
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={toggleCollapse}
         />
-        <main className="p-3 sm:p-4 md:p-6 lg:p-8 flex-1 overflow-x-hidden w-full max-w-full">
+        <main className="p-3 sm:p-4 md:p-6 lg:p-8 flex-1 overflow-x-hidden w-full max-w-full pb-20 lg:pb-8">
           <div className="max-w-7xl mx-auto w-full">
             <Outlet />
           </div>
         </main>
         <Footer />
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <BottomNav onMenuClick={() => setSidebarOpen(true)} />
     </div>
   );
 };

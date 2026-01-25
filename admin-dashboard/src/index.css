@@ -146,6 +146,11 @@
   @apply border-t-2 border-dashed border-gray-300 my-6;
 }
 
+/* Safe area for iOS devices with notch */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide {
   -ms-overflow-style: none;
