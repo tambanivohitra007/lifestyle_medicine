@@ -37,30 +37,6 @@ const KnowledgeGraphPage = () => {
     fetchEntityName();
   }, [type, id]);
 
-  // Handle node click - navigate to the entity or open new graph
-  const handleNodeClick = (node) => {
-    const nodeType = node.type;
-    const entityId = node.data.entityId;
-
-    // Map node types to routes
-    const routeMap = {
-      condition: `/conditions/${entityId}`,
-      intervention: `/interventions/${entityId}`,
-      scripture: `/scriptures/${entityId}`,
-      recipe: `/recipes/${entityId}`,
-      egwReference: `/egw-references/${entityId}`,
-      evidenceEntry: null, // No detail page
-      reference: null, // No detail page
-      careDomain: null, // No detail page
-    };
-
-    const route = routeMap[nodeType];
-    if (route) {
-      // Open in new tab with Ctrl/Cmd+click
-      window.open(route, '_blank');
-    }
-  };
-
   const backButton = (
     <Link
       to={`/${type}s/${id}`}
@@ -77,7 +53,6 @@ const KnowledgeGraphPage = () => {
         centerType={type}
         centerId={id}
         initialDepth={parseInt(searchParams.get('depth') || '2')}
-        onNodeClick={handleNodeClick}
         className="h-full w-full"
         backButton={backButton}
       />

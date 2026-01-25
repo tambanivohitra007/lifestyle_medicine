@@ -246,7 +246,6 @@ const KnowledgeGraphInner = ({
 
   // Navigate to entity detail page
   const handleNavigateToEntity = useCallback((type, entityId) => {
-    // This could be customized based on your routing structure
     const routes = {
       condition: `/conditions/${entityId}`,
       intervention: `/interventions/${entityId}`,

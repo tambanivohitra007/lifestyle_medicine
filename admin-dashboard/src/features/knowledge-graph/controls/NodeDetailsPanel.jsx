@@ -274,7 +274,7 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
         <div className="p-4 border-t border-gray-100 bg-gray-50">
           <button
             onClick={() => onNavigate(node.type, data.entityId)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors hover:opacity-90"
             style={{ backgroundColor: config.color }}
           >
             <ExternalLink className="w-4 h-4" />
