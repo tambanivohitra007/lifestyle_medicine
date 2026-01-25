@@ -4,12 +4,14 @@ import { ChefHat } from 'lucide-react';
 
 const RecipeNode = memo(({ data, selected }) => {
   const tags = data.dietaryTags || [];
+  const isHighlighted = data.isHighlighted;
 
   return (
     <div
       className={`
         group relative px-4 py-3 rounded-xl shadow-lg border-2 transition-all duration-200
         bg-gradient-to-br from-white to-amber-50
+        ${isHighlighted ? 'ring-4 ring-yellow-400 ring-offset-2 animate-pulse' : ''}
         ${selected ? 'shadow-xl scale-105 border-amber-400' : 'border-amber-200 hover:border-amber-300 hover:shadow-xl'}
       `}
       style={{ minWidth: '150px', maxWidth: '200px' }}

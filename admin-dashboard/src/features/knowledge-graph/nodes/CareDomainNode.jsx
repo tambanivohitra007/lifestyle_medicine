@@ -3,11 +3,14 @@ import { Handle, Position } from 'reactflow';
 import { Shield } from 'lucide-react';
 
 const CareDomainNode = memo(({ data, selected }) => {
+  const isHighlighted = data.isHighlighted;
+
   return (
     <div
       className={`
         group relative px-4 py-3 rounded-xl shadow-lg border-2 transition-all duration-200
         bg-gradient-to-br from-white to-blue-50
+        ${isHighlighted ? 'ring-4 ring-yellow-400 ring-offset-2 animate-pulse' : ''}
         ${selected ? 'shadow-xl scale-105 border-blue-400' : 'border-blue-200 hover:border-blue-300 hover:shadow-xl'}
       `}
       style={{ minWidth: '140px', maxWidth: '180px' }}

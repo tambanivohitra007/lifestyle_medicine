@@ -4,12 +4,14 @@ import { ExternalLink, FileText } from 'lucide-react';
 
 const ReferenceNode = memo(({ data, selected }) => {
   const hasLink = data.doi || data.pmid || data.url;
+  const isHighlighted = data.isHighlighted;
 
   return (
     <div
       className={`
         group relative px-3 py-2.5 rounded-lg shadow-md border-2 transition-all duration-200
         bg-gradient-to-br from-white to-slate-50
+        ${isHighlighted ? 'ring-4 ring-yellow-400 ring-offset-2 animate-pulse' : ''}
         ${selected ? 'shadow-xl scale-105 border-slate-400' : 'border-slate-200 hover:border-slate-300 hover:shadow-lg'}
       `}
       style={{ minWidth: '120px', maxWidth: '160px' }}

@@ -3,11 +3,14 @@ import { Handle, Position } from 'reactflow';
 import { BookMarked } from 'lucide-react';
 
 const EgwReferenceNode = memo(({ data, selected }) => {
+  const isHighlighted = data.isHighlighted;
+
   return (
     <div
       className={`
         group relative px-4 py-3 rounded-xl shadow-lg border-2 transition-all duration-200
         bg-gradient-to-br from-white to-purple-50
+        ${isHighlighted ? 'ring-4 ring-yellow-400 ring-offset-2 animate-pulse' : ''}
         ${selected ? 'shadow-xl scale-105 border-purple-400' : 'border-purple-200 hover:border-purple-300 hover:shadow-xl'}
       `}
       style={{ minWidth: '150px', maxWidth: '200px' }}

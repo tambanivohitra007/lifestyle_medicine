@@ -3,11 +3,14 @@ import { Handle, Position } from 'reactflow';
 import { BookOpen } from 'lucide-react';
 
 const ScriptureNode = memo(({ data, selected }) => {
+  const isHighlighted = data.isHighlighted;
+
   return (
     <div
       className={`
         group relative px-4 py-3 rounded-xl shadow-lg border-2 transition-all duration-200
         bg-gradient-to-br from-white to-indigo-50
+        ${isHighlighted ? 'ring-4 ring-yellow-400 ring-offset-2 animate-pulse' : ''}
         ${selected ? 'shadow-xl scale-105 border-indigo-400' : 'border-indigo-200 hover:border-indigo-300 hover:shadow-xl'}
       `}
       style={{ minWidth: '150px', maxWidth: '200px' }}

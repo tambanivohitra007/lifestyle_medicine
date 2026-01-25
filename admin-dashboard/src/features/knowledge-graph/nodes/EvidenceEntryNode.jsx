@@ -21,12 +21,14 @@ const STUDY_TYPE_SHORT = {
 const EvidenceEntryNode = memo(({ data, selected }) => {
   const quality = QUALITY_COLORS[data.qualityRating] || QUALITY_COLORS.C;
   const studyType = STUDY_TYPE_SHORT[data.studyType] || data.studyType;
+  const isHighlighted = data.isHighlighted;
 
   return (
     <div
       className={`
         group relative px-4 py-3 rounded-xl shadow-lg border-2 transition-all duration-200
         bg-gradient-to-br from-white to-emerald-50
+        ${isHighlighted ? 'ring-4 ring-yellow-400 ring-offset-2 animate-pulse' : ''}
         ${selected ? 'shadow-xl scale-105 border-emerald-400' : 'border-emerald-200 hover:border-emerald-300 hover:shadow-xl'}
       `}
       style={{ minWidth: '140px', maxWidth: '180px' }}

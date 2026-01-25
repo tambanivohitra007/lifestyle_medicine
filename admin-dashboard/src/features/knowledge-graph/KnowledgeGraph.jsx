@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import ReactFlow, {
   Background,
   Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
+  useReactFlow,
+  ReactFlowProvider,
   Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -12,9 +14,10 @@ import { Loader2, Layout, Maximize2 } from 'lucide-react';
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
+import { FilterPanel, SearchBar } from './controls';
 import api from '../../lib/api';
 
-const KnowledgeGraph = ({
+const KnowledgeGraphInner = ({
   centerType = 'condition',
   centerId,
   initialDepth = 2,
@@ -23,11 +26,16 @@ const KnowledgeGraph = ({
 }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [allNodes, setAllNodes] = useState([]); // Store original unfiltered nodes
+  const [allEdges, setAllEdges] = useState([]); // Store original unfiltered edges
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [depth, setDepth] = useState(initialDepth);
   const [layoutType, setLayoutType] = useState('dagre-tb');
   const [meta, setMeta] = useState(null);
+  const [hiddenTypes, setHiddenTypes] = useState([]);
+  const [highlightedNodeId, setHighlightedNodeId] = useState(null);
+  const { fitView, setCenter } = useReactFlow();
 
   // Fetch graph data
   const fetchGraphData = useCallback(async () => {
@@ -44,8 +52,12 @@ const KnowledgeGraph = ({
       // Apply layout
       const layoutedNodes = applyLayout(apiNodes, apiEdges, layoutType);
 
-      setNodes(layoutedNodes);
-      setEdges(apiEdges);
+      // Store original data for filtering
+      setAllNodes(layoutedNodes);
+      setAllEdges(apiEdges);
+
+      // Apply current filter
+      applyFilter(layoutedNodes, apiEdges, hiddenTypes);
       setMeta(apiMeta);
     } catch (err) {
       console.error('Failed to fetch knowledge graph:', err);
@@ -53,7 +65,69 @@ const KnowledgeGraph = ({
     } finally {
       setLoading(false);
     }
-  }, [centerId, centerType, depth, layoutType, setNodes, setEdges]);
+  }, [centerId, centerType, depth, layoutType]);
+
+  // Apply filter to nodes and edges
+  const applyFilter = useCallback((nodeList, edgeList, hidden) => {
+    const visibleNodeIds = new Set(
+      nodeList
+        .filter((node) => !hidden.includes(node.type))
+        .map((node) => node.id)
+    );
+
+    const filteredNodes = nodeList.filter((node) => visibleNodeIds.has(node.id));
+    const filteredEdges = edgeList.filter(
+      (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
+    );
+
+    setNodes(filteredNodes);
+    setEdges(filteredEdges);
+  }, [setNodes, setEdges]);
+
+  // Handle filter toggle
+  const handleToggleType = useCallback((type) => {
+    setHiddenTypes((prev) => {
+      const newHidden = prev.includes(type)
+        ? prev.filter((t) => t !== type)
+        : [...prev, type];
+      applyFilter(allNodes, allEdges, newHidden);
+      return newHidden;
+    });
+  }, [allNodes, allEdges, applyFilter]);
+
+  const handleShowAll = useCallback(() => {
+    setHiddenTypes([]);
+    applyFilter(allNodes, allEdges, []);
+  }, [allNodes, allEdges, applyFilter]);
+
+  const handleHideAll = useCallback(() => {
+    const allTypes = ['condition', 'intervention', 'careDomain', 'scripture', 'egwReference', 'recipe', 'evidenceEntry', 'reference'];
+    setHiddenTypes(allTypes);
+    applyFilter(allNodes, allEdges, allTypes);
+  }, [allNodes, allEdges, applyFilter]);
+
+  // Handle search node selection
+  const handleSelectNode = useCallback((node) => {
+    setHighlightedNodeId(node.id);
+
+    // Center view on selected node
+    const targetNode = nodes.find((n) => n.id === node.id);
+    if (targetNode?.position) {
+      setCenter(
+        targetNode.position.x + 90, // Center on node (accounting for node width)
+        targetNode.position.y + 40, // Center on node (accounting for node height)
+        { zoom: 1.2, duration: 800 }
+      );
+    }
+
+    // Clear highlight after 3 seconds
+    setTimeout(() => setHighlightedNodeId(null), 3000);
+  }, [nodes, setCenter]);
+
+  const handleClearSearch = useCallback(() => {
+    setHighlightedNodeId(null);
+    fitView({ padding: 0.2, duration: 500 });
+  }, [fitView]);
 
   useEffect(() => {
     fetchGraphData();
@@ -63,12 +137,13 @@ const KnowledgeGraph = ({
   const handleLayoutChange = useCallback(
     (newLayout) => {
       setLayoutType(newLayout);
-      if (nodes.length > 0) {
-        const layoutedNodes = applyLayout(nodes, edges, newLayout);
-        setNodes(layoutedNodes);
+      if (allNodes.length > 0) {
+        const layoutedNodes = applyLayout(allNodes, allEdges, newLayout);
+        setAllNodes(layoutedNodes);
+        applyFilter(layoutedNodes, allEdges, hiddenTypes);
       }
     },
-    [nodes, edges, setNodes]
+    [allNodes, allEdges, hiddenTypes, applyFilter]
   );
 
   // Handle node click
@@ -114,10 +189,19 @@ const KnowledgeGraph = ({
     );
   }
 
+  // Add highlight state to nodes
+  const displayNodes = nodes.map((node) => ({
+    ...node,
+    data: {
+      ...node.data,
+      isHighlighted: node.id === highlightedNodeId,
+    },
+  }));
+
   return (
     <div className={`h-full ${className}`}>
       <ReactFlow
-        nodes={nodes}
+        nodes={displayNodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -143,6 +227,21 @@ const KnowledgeGraph = ({
           pannable
           className="!bg-white !border !border-gray-200 !rounded-lg !shadow-md"
         />
+
+        {/* Search and Filter Panel */}
+        <Panel position="top-left" className="flex flex-col gap-2">
+          <SearchBar
+            nodes={allNodes}
+            onSelectNode={handleSelectNode}
+            onClearSearch={handleClearSearch}
+          />
+          <FilterPanel
+            hiddenTypes={hiddenTypes}
+            onToggleType={handleToggleType}
+            onShowAll={handleShowAll}
+            onHideAll={handleHideAll}
+          />
+        </Panel>
 
         {/* Control Panel */}
         <Panel position="top-right" className="flex flex-col gap-2">
@@ -189,8 +288,8 @@ const KnowledgeGraph = ({
           {/* Stats */}
           {meta && (
             <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600">
-              <div>Nodes: {meta.totalNodes}</div>
-              <div>Edges: {meta.totalEdges}</div>
+              <div>Nodes: {nodes.length}{nodes.length !== meta.totalNodes ? ` / ${meta.totalNodes}` : ''}</div>
+              <div>Edges: {edges.length}{edges.length !== meta.totalEdges ? ` / ${meta.totalEdges}` : ''}</div>
             </div>
           )}
         </Panel>
@@ -239,5 +338,12 @@ const KnowledgeGraph = ({
     </div>
   );
 };
+
+// Wrap with ReactFlowProvider for useReactFlow hook
+const KnowledgeGraph = (props) => (
+  <ReactFlowProvider>
+    <KnowledgeGraphInner {...props} />
+  </ReactFlowProvider>
+);
 
 export default KnowledgeGraph;

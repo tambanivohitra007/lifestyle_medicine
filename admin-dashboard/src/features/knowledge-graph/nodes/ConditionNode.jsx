@@ -4,6 +4,7 @@ import { AlertCircle } from 'lucide-react';
 
 const ConditionNode = memo(({ data, selected }) => {
   const isCenter = data.isCenter;
+  const isHighlighted = data.isHighlighted;
 
   return (
     <div
@@ -11,6 +12,7 @@ const ConditionNode = memo(({ data, selected }) => {
         group relative px-4 py-3 rounded-xl shadow-lg border-2 transition-all duration-200
         bg-gradient-to-br from-white to-red-50
         ${isCenter ? 'ring-4 ring-red-200 ring-offset-2 scale-110' : ''}
+        ${isHighlighted ? 'ring-4 ring-yellow-400 ring-offset-2 animate-pulse' : ''}
         ${selected ? 'shadow-xl scale-105 border-red-400' : 'border-red-200 hover:border-red-300 hover:shadow-xl'}
       `}
       style={{ minWidth: '160px', maxWidth: '220px' }}
