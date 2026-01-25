@@ -365,7 +365,300 @@ export function applyClusterLayout(nodes, edges) {
   }));
 }
 
+/**
+ * Medical grouped layout - organizes nodes into logical medical categories
+ * with visible container boxes.
+ *
+ * Layout structure:
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │                         CONDITION (Center)                       │
+ * ├─────────────────────────────────────────────────────────────────┤
+ * │                           SOLUTIONS                              │
+ * │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+ * │  │ Culinary │ │ Physical │ │  Water   │ │ Spiritual│           │
+ * │  │ Medicine │ │ Activity │ │ Therapy  │ │   Care   │           │
+ * │  └──────────┘ └──────────┘ └──────────┘ └──────────┘           │
+ * │  ┌──────────┐ ┌──────────┐                                      │
+ * │  │  Mental  │ │Meds/Herbs│                                      │
+ * │  │  Health  │ │          │                                      │
+ * │  └──────────┘ └──────────┘                                      │
+ * ├─────────────────────────────────────────────────────────────────┤
+ * │                    RESEARCH / EVIDENCE                          │
+ * └─────────────────────────────────────────────────────────────────┘
+ */
+export function applyMedicalGroupedLayout(nodes, edges) {
+  if (nodes.length === 0) return nodes;
+
+  const positions = new Map();
+
+  // Layout dimensions
+  const startX = 100;
+  const centerX = 600;
+  const nodeSpacingX = 220;
+  const nodeSpacingY = 110;
+  const groupSpacingY = 200;
+  const columnWidth = 260;
+  const groupPadding = 30;
+  const nodeWidth = 200;
+  const nodeHeight = 80;
+
+  // Find center condition node
+  const centerNode = nodes.find(n => n.data?.isCenter) || nodes.find(n => n.type === 'condition') || nodes[0];
+
+  // Map care domains to solution categories
+  const careDomainToCategory = {
+    'nutrition': 'culinary',
+    'exercise': 'physical',
+    'water therapy': 'water',
+    'hydrotherapy': 'water',
+    'sunlight': 'physical',
+    'temperance': 'mental',
+    'air': 'physical',
+    'rest': 'mental',
+    'trust in god': 'spiritual',
+    'mental health': 'mental',
+    'supplements': 'medication',
+    'medications': 'medication',
+  };
+
+  // Define solution category columns with styling
+  const solutionCategories = [
+    { id: 'culinary', label: 'Culinary Medicine', icon: '🥗', color: '#f59e0b', bgColor: '#fffbeb', borderColor: '#fcd34d' },
+    { id: 'physical', label: 'Physical Activity', icon: '🏃', color: '#10b981', bgColor: '#ecfdf5', borderColor: '#6ee7b7' },
+    { id: 'water', label: 'Water Therapy', icon: '💧', color: '#3b82f6', bgColor: '#eff6ff', borderColor: '#93c5fd' },
+    { id: 'mental', label: 'Mental Health', icon: '🧠', color: '#8b5cf6', bgColor: '#f5f3ff', borderColor: '#c4b5fd' },
+    { id: 'spiritual', label: 'Spiritual Care', icon: '✝️', color: '#6366f1', bgColor: '#eef2ff', borderColor: '#a5b4fc' },
+    { id: 'medication', label: 'Medication/Herbs', icon: '💊', color: '#ec4899', bgColor: '#fdf2f8', borderColor: '#f9a8d4' },
+  ];
+
+  // Group nodes by category
+  const groups = {
+    condition: [],
+    culinary: [],
+    physical: [],
+    water: [],
+    mental: [],
+    spiritual: [],
+    medication: [],
+    research: [],
+    other: [],
+  };
+
+  // Categorize each node
+  nodes.forEach(node => {
+    if (node.id === centerNode.id || node.type === 'condition') {
+      groups.condition.push(node);
+    } else if (node.type === 'intervention') {
+      const careDomain = (node.data?.careDomain || '').toLowerCase();
+      const category = careDomainToCategory[careDomain] || 'other';
+      if (groups[category]) {
+        groups[category].push(node);
+      } else {
+        groups.other.push(node);
+      }
+    } else if (node.type === 'careDomain') {
+      const domainName = (node.data?.label || '').toLowerCase();
+      const category = careDomainToCategory[domainName] || 'other';
+      if (groups[category]) {
+        groups[category].push(node);
+      } else {
+        groups.other.push(node);
+      }
+    } else if (node.type === 'recipe') {
+      groups.culinary.push(node);
+    } else if (node.type === 'scripture') {
+      groups.spiritual.push(node);
+    } else if (node.type === 'egwReference') {
+      groups.spiritual.push(node);
+    } else if (node.type === 'evidenceEntry' || node.type === 'reference') {
+      groups.research.push(node);
+    } else {
+      groups.other.push(node);
+    }
+  });
+
+  // Array to collect group container nodes
+  const groupNodes = [];
+  // Map to track which group each node belongs to and its relative position
+  const nodeParents = new Map();
+  let currentY = 50;
+
+  // Row 1: Condition (center) - with container
+  const conditionY = currentY;
+  const conditionGroupX = centerX - groupPadding;
+  const conditionGroupWidth = Math.max(groups.condition.length * nodeSpacingX, nodeWidth) + (groupPadding * 2);
+  const conditionGroupHeight = nodeHeight + (groupPadding * 2) + 20;
+
+  if (groups.condition.length > 0) {
+    groupNodes.push({
+      id: 'group-condition',
+      type: 'group',
+      position: { x: conditionGroupX, y: conditionY - groupPadding },
+      data: {
+        label: 'Condition',
+        icon: '🩺',
+        width: conditionGroupWidth,
+        height: conditionGroupHeight,
+        color: '#ef4444',
+        bgColor: '#fef2f2',
+        borderColor: '#fca5a5',
+        count: groups.condition.length,
+      },
+      style: { zIndex: -1 },
+      draggable: true,
+    });
+
+    groups.condition.forEach((node, index) => {
+      // Position relative to parent group
+      const relativeX = groupPadding + (index * nodeSpacingX);
+      const relativeY = groupPadding + 10;
+      positions.set(node.id, { x: relativeX, y: relativeY });
+      nodeParents.set(node.id, 'group-condition');
+    });
+  }
+  currentY += conditionGroupHeight + 40;
+
+  // Row 2: Solutions (grouped by category in columns)
+  const solutionsStartY = currentY;
+  const solutionsStartX = startX;
+
+  // Calculate max rows needed for solutions
+  const maxSolutionRows = Math.max(
+    ...solutionCategories.map(cat => (groups[cat.id] || []).length),
+    1
+  );
+  const solutionsGroupHeight = (maxSolutionRows * nodeSpacingY) + (groupPadding * 2) + 10;
+
+  solutionCategories.forEach((category, colIndex) => {
+    const categoryNodes = groups[category.id] || [];
+    const columnX = solutionsStartX + (colIndex * columnWidth);
+
+    // Create group container for this category
+    if (categoryNodes.length > 0) {
+      const groupHeight = (categoryNodes.length * nodeSpacingY) + (groupPadding * 2) + 10;
+
+      groupNodes.push({
+        id: `group-${category.id}`,
+        type: 'group',
+        position: { x: columnX - groupPadding, y: solutionsStartY - groupPadding },
+        data: {
+          label: category.label,
+          icon: category.icon,
+          width: nodeWidth + (groupPadding * 2),
+          height: groupHeight,
+          color: category.color,
+          bgColor: category.bgColor,
+          borderColor: category.borderColor,
+          count: categoryNodes.length,
+        },
+        style: { zIndex: -1 },
+        draggable: true,
+      });
+
+      categoryNodes.forEach((node, rowIndex) => {
+        // Position relative to parent group
+        const relativeX = groupPadding;
+        const relativeY = groupPadding + 10 + (rowIndex * nodeSpacingY);
+        positions.set(node.id, { x: relativeX, y: relativeY });
+        nodeParents.set(node.id, `group-${category.id}`);
+      });
+    }
+  });
+
+  currentY = solutionsStartY + solutionsGroupHeight + 40;
+
+  // Row 3: Research/Evidence
+  const researchY = currentY;
+  const researchNodes = groups.research;
+  const researchCols = Math.max(Math.ceil(Math.sqrt(researchNodes.length * 2)), 3);
+  const researchRows = Math.ceil(researchNodes.length / researchCols);
+
+  if (researchNodes.length > 0) {
+    const researchGroupWidth = (researchCols * nodeSpacingX) + (groupPadding * 2) - (nodeSpacingX - nodeWidth);
+    const researchGroupHeight = (researchRows * nodeSpacingY) + (groupPadding * 2) + 10;
+
+    groupNodes.push({
+      id: 'group-research',
+      type: 'group',
+      position: { x: startX - groupPadding, y: researchY - groupPadding },
+      data: {
+        label: 'Research & Evidence',
+        icon: '📚',
+        width: researchGroupWidth,
+        height: researchGroupHeight,
+        color: '#64748b',
+        bgColor: '#f8fafc',
+        borderColor: '#cbd5e1',
+        count: researchNodes.length,
+      },
+      style: { zIndex: -1 },
+      draggable: true,
+    });
+
+    researchNodes.forEach((node, index) => {
+      const col = index % researchCols;
+      const row = Math.floor(index / researchCols);
+      // Position relative to parent group
+      const relativeX = groupPadding + (col * nodeSpacingX);
+      const relativeY = groupPadding + 10 + (row * nodeSpacingY);
+      positions.set(node.id, { x: relativeX, y: relativeY });
+      nodeParents.set(node.id, 'group-research');
+    });
+  }
+
+  // Handle "other" nodes
+  if (groups.other.length > 0) {
+    const otherY = researchY + (researchRows * nodeSpacingY) + groupSpacingY;
+    const otherCols = 4;
+    const otherRows = Math.ceil(groups.other.length / otherCols);
+
+    groupNodes.push({
+      id: 'group-other',
+      type: 'group',
+      position: { x: startX - groupPadding, y: otherY - groupPadding },
+      data: {
+        label: 'Other',
+        icon: '📦',
+        width: (otherCols * nodeSpacingX) + (groupPadding * 2) - (nodeSpacingX - nodeWidth),
+        height: (otherRows * nodeSpacingY) + (groupPadding * 2) + 10,
+        color: '#9ca3af',
+        bgColor: '#f9fafb',
+        borderColor: '#d1d5db',
+        count: groups.other.length,
+      },
+      style: { zIndex: -1 },
+      draggable: true,
+    });
+
+    groups.other.forEach((node, index) => {
+      const col = index % otherCols;
+      const row = Math.floor(index / otherCols);
+      // Position relative to parent group
+      const relativeX = groupPadding + (col * nodeSpacingX);
+      const relativeY = groupPadding + 10 + (row * nodeSpacingY);
+      positions.set(node.id, { x: relativeX, y: relativeY });
+      nodeParents.set(node.id, 'group-other');
+    });
+  }
+
+  // Apply positions to content nodes with parent relationships
+  const positionedNodes = nodes.map(node => {
+    const parentId = nodeParents.get(node.id);
+    return {
+      ...node,
+      position: positions.get(node.id) || { x: 0, y: 0 },
+      ...(parentId && { parentId, extent: 'parent' }),
+      style: { ...node.style, zIndex: 1 },
+      expandParent: true,
+    };
+  });
+
+  // Return group nodes first (parents), then content nodes (children)
+  return [...groupNodes, ...positionedNodes];
+}
+
 export const layoutOptions = [
+  { value: 'medical', label: 'Medical Grouped', icon: '🏥' },
   { value: 'dagre-tb', label: 'Hierarchical (Top-Down)', icon: '↓' },
   { value: 'dagre-lr', label: 'Hierarchical (Left-Right)', icon: '→' },
   { value: 'radial', label: 'Radial', icon: '◎' },
@@ -373,8 +666,10 @@ export const layoutOptions = [
   { value: 'cluster', label: 'Clustered', icon: '▣' },
 ];
 
-export function applyLayout(nodes, edges, layoutType = 'dagre-tb') {
+export function applyLayout(nodes, edges, layoutType = 'medical') {
   switch (layoutType) {
+    case 'medical':
+      return applyMedicalGroupedLayout(nodes, edges);
     case 'dagre-tb':
       return applyDagreLayout(nodes, edges, 'TB');
     case 'dagre-lr':
@@ -390,6 +685,6 @@ export function applyLayout(nodes, edges, layoutType = 'dagre-tb') {
     case 'cluster':
       return applyClusterLayout(nodes, edges);
     default:
-      return applyDagreLayout(nodes, edges, 'TB');
+      return applyMedicalGroupedLayout(nodes, edges);
   }
 }

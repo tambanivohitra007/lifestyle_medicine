@@ -7,6 +7,7 @@ import EgwReferenceNode from './EgwReferenceNode';
 import RecipeNode from './RecipeNode';
 import EvidenceEntryNode from './EvidenceEntryNode';
 import ReferenceNode from './ReferenceNode';
+import GroupNode from './GroupNode';
 
 // Export individual components
 export {
@@ -18,6 +19,7 @@ export {
   RecipeNode,
   EvidenceEntryNode,
   ReferenceNode,
+  GroupNode,
 };
 
 // Export node types object for React Flow
@@ -30,4 +32,5 @@ export const nodeTypes = {
   recipe: RecipeNode,
   evidenceEntry: EvidenceEntryNode,
   reference: ReferenceNode,
+  group: GroupNode,
 };

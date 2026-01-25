@@ -19,9 +19,11 @@ const SearchBar = ({ nodes = [], onSelectNode, onClearSearch }) => {
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  // Filter nodes based on query
+  // Filter nodes based on query (exclude group container nodes)
   const filteredNodes = query.length >= 2
     ? nodes.filter((node) => {
+        // Skip group container nodes
+        if (node.type === 'group') return false;
         const label = node.data?.label || '';
         return label.toLowerCase().includes(query.toLowerCase());
       }).slice(0, 10) // Limit to 10 results

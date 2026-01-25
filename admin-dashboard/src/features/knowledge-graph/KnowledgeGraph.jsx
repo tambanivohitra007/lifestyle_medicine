@@ -33,7 +33,7 @@ const KnowledgeGraphInner = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [depth, setDepth] = useState(initialDepth);
-  const [layoutType, setLayoutType] = useState('dagre-tb');
+  const [layoutType, setLayoutType] = useState('medical');
   const [meta, setMeta] = useState(null);
   const [hiddenTypes, setHiddenTypes] = useState([]);
   const [highlightedNodeId, setHighlightedNodeId] = useState(null);
@@ -78,13 +78,53 @@ const KnowledgeGraphInner = ({
 
   // Apply filter to nodes and edges
   const applyFilter = useCallback((nodeList, edgeList, hidden) => {
-    const visibleNodeIds = new Set(
-      nodeList
-        .filter((node) => !hidden.includes(node.type))
-        .map((node) => node.id)
+    // First, filter content nodes (non-group nodes)
+    const visibleContentNodes = nodeList.filter(
+      (node) => node.type !== 'group' && !hidden.includes(node.type)
     );
+    const visibleNodeIds = new Set(visibleContentNodes.map((node) => node.id));
 
-    const filteredNodes = nodeList.filter((node) => visibleNodeIds.has(node.id));
+    // Determine which group containers should be visible based on their content
+    const visibleGroupIds = new Set();
+    nodeList.forEach((node) => {
+      if (node.type === 'group') {
+        // Check if any content nodes belong to this group
+        const groupCategory = node.id.replace('group-', '');
+        const hasVisibleContent = visibleContentNodes.some((contentNode) => {
+          // Match group to content nodes by category
+          if (groupCategory === 'condition') return contentNode.type === 'condition';
+          if (groupCategory === 'research') return contentNode.type === 'evidenceEntry' || contentNode.type === 'reference';
+          if (groupCategory === 'culinary') return contentNode.type === 'recipe' || (contentNode.data?.careDomain?.toLowerCase() === 'nutrition');
+          if (groupCategory === 'spiritual') return contentNode.type === 'scripture' || contentNode.type === 'egwReference' || (contentNode.data?.careDomain?.toLowerCase() === 'trust in god');
+          // For other solution categories, check careDomain
+          const careDomainMap = {
+            'physical': ['exercise', 'sunlight', 'air'],
+            'water': ['water therapy', 'hydrotherapy'],
+            'mental': ['temperance', 'rest', 'mental health'],
+            'medication': ['supplements', 'medications'],
+          };
+          const domains = careDomainMap[groupCategory] || [];
+          return domains.includes(contentNode.data?.careDomain?.toLowerCase());
+        });
+        if (hasVisibleContent) {
+          visibleGroupIds.add(node.id);
+        }
+      }
+    });
+
+    // Filter nodes: include visible content nodes and their group containers
+    // Also handle parent-child relationships - remove parentId if parent is not visible
+    const filteredNodes = nodeList
+      .filter((node) => visibleNodeIds.has(node.id) || visibleGroupIds.has(node.id))
+      .map((node) => {
+        // If this node has a parent but the parent is not visible, remove the parent relationship
+        if (node.parentId && !visibleGroupIds.has(node.parentId)) {
+          const { parentId, extent, ...nodeWithoutParent } = node;
+          return nodeWithoutParent;
+        }
+        return node;
+      });
+
     const filteredEdges = edgeList.filter(
       (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
     );
