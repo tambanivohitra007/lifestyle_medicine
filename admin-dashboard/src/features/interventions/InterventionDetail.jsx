@@ -11,6 +11,7 @@ import {
   Image,
   Download,
   ExternalLink,
+  Network,
 } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
@@ -138,6 +139,14 @@ const InterventionDetail = () => {
           )}
         </div>
         <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+          <Link
+            to={`/knowledge-graph/intervention/${id}`}
+            className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
+            title="View Knowledge Graph"
+          >
+            <Network className="w-4 h-4" />
+            <span className="hidden sm:inline">Graph</span>
+          </Link>
           <Link
             to={`/interventions/${id}/edit`}
             className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"

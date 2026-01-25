@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Eye,
   Download,
+  Network,
 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../lib/swal';
@@ -288,6 +289,14 @@ const ConditionDetail = () => {
             <Eye className="w-4 h-4" />
             <span className="hidden sm:inline">Preview</span>
             <span className="sm:hidden">Preview</span>
+          </Link>
+          <Link
+            to={`/knowledge-graph/condition/${id}`}
+            className="btn-outline flex items-center justify-center gap-2 text-sm touch-manipulation"
+            title="View Knowledge Graph"
+          >
+            <Network className="w-4 h-4" />
+            <span className="hidden sm:inline">Graph</span>
           </Link>
           <a
             href={`${getApiBaseUrl()}/api/v1/export/conditions/${id}/pdf`}

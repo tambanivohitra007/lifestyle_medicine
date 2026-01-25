@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\EvidenceEntryController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\InterventionController;
+use App\Http\Controllers\Api\KnowledgeGraphController;
 use App\Http\Controllers\Api\RecipeController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ScriptureController;
@@ -81,6 +82,10 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('egw-references', EgwReferenceController::class)->only(['index', 'show']);
     Route::get('egw-references-books', [EgwReferenceController::class, 'books']);
     Route::get('egw-references-topics', [EgwReferenceController::class, 'topics']);
+
+    // Knowledge Graph
+    Route::get('knowledge-graph/condition/{condition}', [KnowledgeGraphController::class, 'conditionGraph']);
+    Route::get('knowledge-graph/intervention/{intervention}', [KnowledgeGraphController::class, 'interventionGraph']);
     Route::get('egw-references-abbreviations', [EgwReferenceController::class, 'abbreviations']);
 
     // Content Tags
