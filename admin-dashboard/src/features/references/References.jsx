@@ -183,22 +183,24 @@ const References = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-1 self-end sm:self-start">
-                    <Link
-                      to={`/references/${reference.id}/edit`}
-                      className="action-btn"
-                      title="Edit"
-                    >
-                      <Edit className="w-4 h-4 text-gray-600" />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(reference.id, reference.citation)}
-                      className="action-btn hover:bg-red-50 active:bg-red-100"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </button>
-                  </div>
+                  {canEdit && (
+                    <div className="flex gap-1 self-end sm:self-start">
+                      <Link
+                        to={`/references/${reference.id}/edit`}
+                        className="action-btn"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(reference.id, reference.citation)}
+                        className="action-btn hover:bg-red-50 active:bg-red-100"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

@@ -8,8 +8,9 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  *
  * @param {Array} interventions - Array of intervention objects
  * @param {function} onDelete - Callback for delete action
+ * @param {boolean} canEdit - Whether user has edit permissions
  */
-const InterventionList = ({ interventions, onDelete }) => {
+const InterventionList = ({ interventions, onDelete, canEdit }) => {
   return (
     <div className="space-y-3">
       {interventions.map((intervention) => (
@@ -75,20 +76,24 @@ const InterventionList = ({ interventions, onDelete }) => {
                   >
                     <Eye className="w-4 h-4 text-gray-600" />
                   </Link>
-                  <Link
-                    to={`/interventions/${intervention.id}/edit`}
-                    className="action-btn"
-                    title="Edit"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </Link>
-                  <button
-                    onClick={() => onDelete(intervention.id, intervention.name)}
-                    className="action-btn"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
+                  {canEdit && (
+                    <>
+                      <Link
+                        to={`/interventions/${intervention.id}/edit`}
+                        className="action-btn"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <button
+                        onClick={() => onDelete(intervention.id, intervention.name)}
+                        className="action-btn"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 

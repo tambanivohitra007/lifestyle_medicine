@@ -208,20 +208,24 @@ const Interventions = () => {
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
-                      <Link
-                        to={`/interventions/${intervention.id}/edit`}
-                        className="action-btn"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(intervention.id, intervention.name)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      {canEdit && (
+                        <>
+                          <Link
+                            to={`/interventions/${intervention.id}/edit`}
+                            className="action-btn"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4 text-gray-600" />
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(intervention.id, intervention.name)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -276,12 +280,12 @@ const Interventions = () => {
 
           {/* List View */}
           {viewMode === 'list' && (
-            <InterventionList interventions={interventions} onDelete={handleDelete} />
+            <InterventionList interventions={interventions} onDelete={handleDelete} canEdit={canEdit} />
           )}
 
           {/* Table View */}
           {viewMode === 'table' && (
-            <InterventionTable interventions={interventions} onDelete={handleDelete} />
+            <InterventionTable interventions={interventions} onDelete={handleDelete} canEdit={canEdit} />
           )}
 
           {/* Pagination */}

@@ -274,20 +274,24 @@ const Conditions = () => {
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
-                      <Link
-                        to={`/conditions/${condition.id}/edit`}
-                        className="action-btn"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(condition.id, condition.name)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      {canEdit && (
+                        <>
+                          <Link
+                            to={`/conditions/${condition.id}/edit`}
+                            className="action-btn"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4 text-gray-600" />
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(condition.id, condition.name)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -322,12 +326,12 @@ const Conditions = () => {
 
           {/* List View */}
           {viewMode === 'list' && (
-            <ConditionList conditions={conditions} onDelete={handleDelete} />
+            <ConditionList conditions={conditions} onDelete={handleDelete} canEdit={canEdit} />
           )}
 
           {/* Table View */}
           {viewMode === 'table' && (
-            <ConditionTable conditions={conditions} onDelete={handleDelete} />
+            <ConditionTable conditions={conditions} onDelete={handleDelete} canEdit={canEdit} />
           )}
 
           {/* Pagination */}

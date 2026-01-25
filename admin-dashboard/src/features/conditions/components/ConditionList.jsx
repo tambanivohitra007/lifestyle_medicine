@@ -8,8 +8,9 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  *
  * @param {Array} conditions - Array of condition objects
  * @param {function} onDelete - Callback for delete action
+ * @param {boolean} canEdit - Whether user has edit permissions
  */
-const ConditionList = ({ conditions, onDelete }) => {
+const ConditionList = ({ conditions, onDelete, canEdit }) => {
   return (
     <div className="space-y-3">
       {conditions.map((condition) => (
@@ -51,20 +52,24 @@ const ConditionList = ({ conditions, onDelete }) => {
                   >
                     <Eye className="w-4 h-4 text-gray-600" />
                   </Link>
-                  <Link
-                    to={`/conditions/${condition.id}/edit`}
-                    className="action-btn"
-                    title="Edit"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </Link>
-                  <button
-                    onClick={() => onDelete(condition.id, condition.name)}
-                    className="action-btn"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
+                  {canEdit && (
+                    <>
+                      <Link
+                        to={`/conditions/${condition.id}/edit`}
+                        className="action-btn"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <button
+                        onClick={() => onDelete(condition.id, condition.name)}
+                        className="action-btn"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 

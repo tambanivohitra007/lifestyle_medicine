@@ -9,8 +9,9 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  *
  * @param {Array} interventions - Array of intervention objects
  * @param {function} onDelete - Callback for delete action
+ * @param {boolean} canEdit - Whether user has edit permissions
  */
-const InterventionTable = ({ interventions, onDelete }) => {
+const InterventionTable = ({ interventions, onDelete, canEdit }) => {
   return (
     <>
       {/* Mobile Card Layout */}
@@ -39,20 +40,24 @@ const InterventionTable = ({ interventions, onDelete }) => {
                 >
                   <Eye className="w-4 h-4" />
                 </Link>
-                <Link
-                  to={`/interventions/${intervention.id}/edit`}
-                  className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Edit"
-                >
-                  <Edit className="w-4 h-4" />
-                </Link>
-                <button
-                  onClick={() => onDelete(intervention.id, intervention.name)}
-                  className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {canEdit && (
+                  <>
+                    <Link
+                      to={`/interventions/${intervention.id}/edit`}
+                      className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={() => onDelete(intervention.id, intervention.name)}
+                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
             {intervention.tags && intervention.tags.length > 0 && (
@@ -181,20 +186,24 @@ const InterventionTable = ({ interventions, onDelete }) => {
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
-                      <Link
-                        to={`/interventions/${intervention.id}/edit`}
-                        className="action-btn"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
-                      <button
-                        onClick={() => onDelete(intervention.id, intervention.name)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      {canEdit && (
+                        <>
+                          <Link
+                            to={`/interventions/${intervention.id}/edit`}
+                            className="action-btn"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4 text-gray-600" />
+                          </Link>
+                          <button
+                            onClick={() => onDelete(intervention.id, intervention.name)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

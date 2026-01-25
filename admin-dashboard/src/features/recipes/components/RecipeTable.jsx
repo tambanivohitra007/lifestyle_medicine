@@ -9,8 +9,9 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  *
  * @param {Array} recipes - Array of recipe objects
  * @param {function} onDelete - Callback for delete action
+ * @param {boolean} canEdit - Whether user has edit permissions
  */
-const RecipeTable = ({ recipes, onDelete }) => {
+const RecipeTable = ({ recipes, onDelete, canEdit }) => {
   return (
     <>
       {/* Mobile Card Layout */}
@@ -41,20 +42,24 @@ const RecipeTable = ({ recipes, onDelete }) => {
                 >
                   <Eye className="w-4 h-4" />
                 </Link>
-                <Link
-                  to={`/recipes/${recipe.id}/edit`}
-                  className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Edit"
-                >
-                  <Edit className="w-4 h-4" />
-                </Link>
-                <button
-                  onClick={() => onDelete(recipe.id, recipe.title)}
-                  className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {canEdit && (
+                  <>
+                    <Link
+                      to={`/recipes/${recipe.id}/edit`}
+                      className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={() => onDelete(recipe.id, recipe.title)}
+                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
             {recipe.dietary_tags && recipe.dietary_tags.length > 0 && (
@@ -183,20 +188,24 @@ const RecipeTable = ({ recipes, onDelete }) => {
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
-                      <Link
-                        to={`/recipes/${recipe.id}/edit`}
-                        className="action-btn"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
-                      <button
-                        onClick={() => onDelete(recipe.id, recipe.title)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      {canEdit && (
+                        <>
+                          <Link
+                            to={`/recipes/${recipe.id}/edit`}
+                            className="action-btn"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4 text-gray-600" />
+                          </Link>
+                          <button
+                            onClick={() => onDelete(recipe.id, recipe.title)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

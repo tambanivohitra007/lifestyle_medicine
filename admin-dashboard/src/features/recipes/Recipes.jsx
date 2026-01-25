@@ -212,20 +212,24 @@ const Recipes = () => {
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
-                      <Link
-                        to={`/recipes/${recipe.id}/edit`}
-                        className="action-btn"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(recipe.id, recipe.title)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      {canEdit && (
+                        <>
+                          <Link
+                            to={`/recipes/${recipe.id}/edit`}
+                            className="action-btn"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4 text-gray-600" />
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(recipe.id, recipe.title)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -300,12 +304,12 @@ const Recipes = () => {
 
           {/* List View */}
           {viewMode === 'list' && (
-            <RecipeList recipes={recipes} onDelete={handleDelete} />
+            <RecipeList recipes={recipes} onDelete={handleDelete} canEdit={canEdit} />
           )}
 
           {/* Table View */}
           {viewMode === 'table' && (
-            <RecipeTable recipes={recipes} onDelete={handleDelete} />
+            <RecipeTable recipes={recipes} onDelete={handleDelete} canEdit={canEdit} />
           )}
 
           {/* Pagination */}

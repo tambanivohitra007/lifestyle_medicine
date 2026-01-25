@@ -8,8 +8,9 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  *
  * @param {Array} recipes - Array of recipe objects
  * @param {function} onDelete - Callback for delete action
+ * @param {boolean} canEdit - Whether user has edit permissions
  */
-const RecipeList = ({ recipes, onDelete }) => {
+const RecipeList = ({ recipes, onDelete, canEdit }) => {
   return (
     <div className="space-y-3">
       {recipes.map((recipe) => (
@@ -94,20 +95,24 @@ const RecipeList = ({ recipes, onDelete }) => {
                   >
                     <Eye className="w-4 h-4 text-gray-600" />
                   </Link>
-                  <Link
-                    to={`/recipes/${recipe.id}/edit`}
-                    className="action-btn"
-                    title="Edit"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </Link>
-                  <button
-                    onClick={() => onDelete(recipe.id, recipe.title)}
-                    className="action-btn"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
+                  {canEdit && (
+                    <>
+                      <Link
+                        to={`/recipes/${recipe.id}/edit`}
+                        className="action-btn"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <button
+                        onClick={() => onDelete(recipe.id, recipe.title)}
+                        className="action-btn"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 

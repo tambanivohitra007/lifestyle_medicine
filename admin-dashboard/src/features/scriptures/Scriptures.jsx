@@ -164,22 +164,24 @@ const Scriptures = () => {
                   <div className="p-2 rounded-lg bg-indigo-100">
                     <BookOpen className="w-5 sm:w-6 h-5 sm:h-6 text-indigo-600" />
                   </div>
-                  <div className="flex gap-1">
-                    <Link
-                      to={`/scriptures/${scripture.id}/edit`}
-                      className="action-btn"
-                      title="Edit"
-                    >
-                      <Edit className="w-4 h-4 text-gray-600" />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(scripture.id, scripture.reference)}
-                      className="action-btn hover:bg-red-50 active:bg-red-100"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </button>
-                  </div>
+                  {canEdit && (
+                    <div className="flex gap-1">
+                      <Link
+                        to={`/scriptures/${scripture.id}/edit`}
+                        className="action-btn"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4 text-gray-600" />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(scripture.id, scripture.reference)}
+                        className="action-btn hover:bg-red-50 active:bg-red-100"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
