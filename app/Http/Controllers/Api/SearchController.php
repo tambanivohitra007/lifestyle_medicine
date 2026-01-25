@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Condition;
 use App\Models\Intervention;
 use App\Models\Scripture;
+use App\Models\EgwReference;
 use App\Models\Recipe;
 use App\Models\EvidenceEntry;
 use App\Models\Reference;
@@ -21,7 +22,7 @@ class SearchController extends Controller
     {
         $request->validate([
             'q' => 'required|string|min:2|max:255',
-            'types' => 'nullable|string', // comma-separated: conditions,interventions,scriptures,recipes,evidence,references
+            'types' => 'nullable|string', // comma-separated: conditions,interventions,scriptures,egw_references,recipes,evidence,references
             'limit' => 'nullable|integer|min:1|max:50',
         ]);
 
@@ -80,6 +81,26 @@ class SearchController extends Controller
                 'text' => \Str::limit($s->text, 150),
                 'theme' => $s->theme,
                 'type' => 'scripture',
+            ]);
+        }
+
+        // Search EGW References
+        if (!$types || in_array('egw_references', $types)) {
+            $egwReferences = EgwReference::where('book', 'like', "%{$query}%")
+                ->orWhere('book_abbreviation', 'like', "%{$query}%")
+                ->orWhere('quote', 'like', "%{$query}%")
+                ->orWhere('topic', 'like', "%{$query}%")
+                ->orWhere('context', 'like', "%{$query}%")
+                ->limit($limit)
+                ->get(['id', 'book', 'book_abbreviation', 'page_start', 'page_end', 'paragraph', 'quote', 'topic']);
+
+            $results['egw_references'] = $egwReferences->map(fn($e) => [
+                'id' => $e->id,
+                'reference' => $e->citation,
+                'text' => \Str::limit($e->quote, 150),
+                'theme' => $e->topic,
+                'book' => $e->book,
+                'type' => 'egw_reference',
             ]);
         }
 
