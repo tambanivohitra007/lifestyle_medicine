@@ -39,7 +39,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 overflow-x-hidden w-full">
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
@@ -49,7 +49,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
+        className={`flex-1 flex flex-col min-h-screen w-full min-w-0 transition-all duration-300 ${
           sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
         }`}
       >
@@ -58,8 +58,10 @@ const Layout = () => {
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={toggleCollapse}
         />
-        <main className="p-4 sm:p-6 lg:p-8 flex-1">
-          <Outlet />
+        <main className="p-3 sm:p-4 md:p-6 lg:p-8 flex-1 overflow-x-hidden w-full max-w-full">
+          <div className="max-w-7xl mx-auto w-full">
+            <Outlet />
+          </div>
         </main>
         <Footer />
       </div>

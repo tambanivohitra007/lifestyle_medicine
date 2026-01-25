@@ -138,7 +138,7 @@ const ConditionPreview = () => {
         <div className="flex gap-2">
           <Link
             to={`/conditions/${id}`}
-            className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+            className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
           >
             <Edit className="w-4 h-4" />
             <span className="hidden sm:inline">Edit Content</span>
@@ -146,7 +146,7 @@ const ConditionPreview = () => {
           </Link>
           <button
             onClick={handlePrint}
-            className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+            className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
           >
             <Printer className="w-4 h-4" />
             <span className="hidden sm:inline">Print / Save PDF</span>

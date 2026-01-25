@@ -259,7 +259,7 @@ const ConditionDetail = () => {
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 overflow-hidden">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -270,7 +270,7 @@ const ConditionDetail = () => {
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">
             {condition.name}
           </h1>
@@ -280,37 +280,36 @@ const ConditionDetail = () => {
             </span>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+        <div className="grid grid-cols-2 sm:flex gap-2 flex-shrink-0">
           <Link
             to={`/conditions/${id}/preview`}
-            className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+            className="btn-primary flex items-center justify-center gap-2 text-sm touch-manipulation"
           >
             <Eye className="w-4 h-4" />
-            <span className="hidden sm:inline">Preview Guide</span>
+            <span className="hidden sm:inline">Preview</span>
             <span className="sm:hidden">Preview</span>
           </Link>
           <a
             href={`${getApiBaseUrl()}/api/v1/export/conditions/${id}/pdf`}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+            className="btn-outline flex items-center justify-center gap-2 text-sm touch-manipulation"
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export PDF</span>
-            <span className="sm:hidden">PDF</span>
+            <span>PDF</span>
           </a>
           {canEdit && (
             <>
               <Link
                 to={`/conditions/${id}/edit`}
-                className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+                className="btn-outline flex items-center justify-center gap-2 text-sm touch-manipulation"
               >
                 <Edit className="w-4 h-4" />
-                Edit
+                <span>Edit</span>
               </Link>
               <button
                 onClick={handleDelete}
-                className="btn-outline text-red-600 border-red-200 hover:bg-red-50 active:bg-red-100 flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
+                className="btn-outline text-red-600 border-red-200 hover:bg-red-50 active:bg-red-100 flex items-center justify-center gap-2 text-sm touch-manipulation"
               >
                 <Trash2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Delete</span>
@@ -322,9 +321,9 @@ const ConditionDetail = () => {
 
       {/* Summary */}
       {condition.summary && (
-        <div className="card">
+        <div className="card overflow-hidden">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Summary</h2>
-          <p className="text-gray-600 whitespace-pre-wrap text-sm sm:text-base">{condition.summary}</p>
+          <p className="text-gray-600 whitespace-pre-wrap text-sm sm:text-base break-words">{condition.summary}</p>
         </div>
       )}
 
@@ -434,7 +433,7 @@ const ConditionDetail = () => {
                       </div>
                       {section.body && (
                         <div
-                          className="text-gray-600 prose prose-sm max-w-none text-sm sm:text-base"
+                          className="text-gray-600 prose prose-sm max-w-none text-sm sm:text-base overflow-x-auto break-words"
                           dangerouslySetInnerHTML={{ __html: section.body }}
                         />
                       )}
@@ -515,7 +514,7 @@ const ConditionDetail = () => {
                         {scripture.theme}
                       </span>
                     )}
-                    <p className="text-gray-600 text-xs sm:text-sm italic">"{scripture.text}"</p>
+                    <p className="text-gray-600 text-xs sm:text-sm italic break-words">"{scripture.text}"</p>
                   </div>
                 ))}
               </div>
@@ -569,7 +568,7 @@ const ConditionDetail = () => {
                         </button>
                       )}
                     </div>
-                    <p className="text-gray-600 text-xs sm:text-sm italic">"{egwRef.quote}"</p>
+                    <p className="text-gray-600 text-xs sm:text-sm italic break-words">"{egwRef.quote}"</p>
                     {egwRef.context && (
                       <p className="text-gray-500 text-xs mt-2">{egwRef.context}</p>
                     )}
