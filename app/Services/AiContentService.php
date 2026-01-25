@@ -302,13 +302,20 @@ class AiContentService
             }
 
             // 8. Create recipes and link to condition
+            // All AI-generated recipes must be vegetarian
             if (isset($structured['recipes']) && !empty($structured['recipes'])) {
                 $condition = Condition::find($results['condition']);
                 foreach ($structured['recipes'] as $recData) {
+                    // Ensure vegetarian tag is present
+                    $dietaryTags = $recData['dietary_tags'] ?? [];
+                    if (is_array($dietaryTags) && !in_array('vegetarian', array_map('strtolower', $dietaryTags))) {
+                        $dietaryTags[] = 'vegetarian';
+                    }
+
                     $recipe = Recipe::create([
                         'title' => $recData['title'],
                         'description' => $recData['description'] ?? null,
-                        'dietary_tags' => $recData['dietary_tags'] ?? null,
+                        'dietary_tags' => $dietaryTags,
                         'ingredients' => $recData['ingredients'] ?? null,
                         'instructions' => $recData['instructions'] ?? null,
                         'servings' => $recData['servings'] ?? null,
@@ -399,6 +406,9 @@ Organize interventions by care domain:
 
 ## 9. Suggested Recipes (if applicable)
 - Therapeutic food recommendations specific to this condition
+- **IMPORTANT: All recipes MUST be VEGETARIAN (no meat, no fish, no poultry)**
+- Prefer plant-based, whole food ingredients
+- Include vegan options when possible
 
 ## 10. Content Tags
 - List relevant tags for categorization (lowercase, e.g., cardiovascular, lifestyle_medicine)
@@ -509,7 +519,7 @@ Convert the above content into this exact JSON structure:
     {
       "title": "string",
       "description": "string",
-      "dietary_tags": ["vegan", "gluten-free"],
+      "dietary_tags": ["vegetarian", "vegan", "gluten-free"],
       "ingredients": [{"item": "string", "amount": "string"}],
       "instructions": "string",
       "servings": 4,
@@ -529,6 +539,7 @@ Convert the above content into this exact JSON structure:
 5. Quality ratings: A (high), B (moderate), C (low), D (very low)
 6. If no recipes are applicable, use empty array: "recipes": []
 7. All tags should be lowercase with underscores
+8. **ALL RECIPES MUST BE VEGETARIAN** - No meat, fish, or poultry. Include "vegetarian" in dietary_tags. Prefer plant-based, whole food ingredients.
 
 Output ONLY valid JSON, no markdown formatting or explanation.
 PROMPT;
