@@ -131,14 +131,15 @@ GET /api/v1/knowledge-graph/full?limit=100
 - [x] Add Graph buttons to ConditionDetail and InterventionDetail
 - [x] Add route in App.jsx
 
-### Phase 2: Custom Node Components
-- [ ] ConditionNode with styling
-- [ ] InterventionNode with care domain badge
-- [ ] ScriptureNode with theme
-- [ ] RecipeNode with dietary tags
-- [ ] EgwReferenceNode with topic
-- [ ] EvidenceNode with quality rating
-- [ ] CareDomainNode
+### Phase 2: Custom Node Components ✅ COMPLETE
+- [x] ConditionNode with gradient styling, category badge, center indicator
+- [x] InterventionNode with care domain badge
+- [x] ScriptureNode with theme badge and text preview
+- [x] RecipeNode with dietary tags (up to 3 shown)
+- [x] EgwReferenceNode with topic and book badges
+- [x] EvidenceEntryNode with quality rating (color-coded A-D) and study type
+- [x] CareDomainNode with icon
+- [x] ReferenceNode with year, citation preview, DOI/PMID/URL indicators
 
 ### Phase 3: Edge Styling & Metadata
 - [ ] Color-coded edges by strength_of_evidence

@@ -1,98 +1,24 @@
-import { memo } from 'react';
-import {
-  AlertCircle,
-  Stethoscope,
-  Shield,
-  BookOpen,
-  BookMarked,
-  ChefHat,
-  FileCheck,
-  ExternalLink,
-} from 'lucide-react';
-import BaseNode from './BaseNode';
+// Enhanced custom node components for React Flow knowledge graph
+import ConditionNode from './ConditionNode';
+import InterventionNode from './InterventionNode';
+import CareDomainNode from './CareDomainNode';
+import ScriptureNode from './ScriptureNode';
+import EgwReferenceNode from './EgwReferenceNode';
+import RecipeNode from './RecipeNode';
+import EvidenceEntryNode from './EvidenceEntryNode';
+import ReferenceNode from './ReferenceNode';
 
-// Condition Node
-export const ConditionNode = memo(({ data, selected }) => (
-  <BaseNode
-    data={{ ...data, subtitle: data.category }}
-    icon={AlertCircle}
-    selected={selected}
-  />
-));
-ConditionNode.displayName = 'ConditionNode';
-
-// Intervention Node
-export const InterventionNode = memo(({ data, selected }) => (
-  <BaseNode
-    data={{ ...data, subtitle: data.careDomain }}
-    icon={Stethoscope}
-    selected={selected}
-  />
-));
-InterventionNode.displayName = 'InterventionNode';
-
-// Care Domain Node
-export const CareDomainNode = memo(({ data, selected }) => (
-  <BaseNode
-    data={data}
-    icon={Shield}
-    selected={selected}
-  />
-));
-CareDomainNode.displayName = 'CareDomainNode';
-
-// Scripture Node
-export const ScriptureNode = memo(({ data, selected }) => (
-  <BaseNode
-    data={{ ...data, subtitle: data.theme }}
-    icon={BookOpen}
-    selected={selected}
-  />
-));
-ScriptureNode.displayName = 'ScriptureNode';
-
-// EGW Reference Node
-export const EgwReferenceNode = memo(({ data, selected }) => (
-  <BaseNode
-    data={{ ...data, subtitle: data.topic }}
-    icon={BookMarked}
-    selected={selected}
-  />
-));
-EgwReferenceNode.displayName = 'EgwReferenceNode';
-
-// Recipe Node
-export const RecipeNode = memo(({ data, selected }) => {
-  const tags = data.dietaryTags?.slice(0, 2).join(', ') || '';
-  return (
-    <BaseNode
-      data={{ ...data, subtitle: tags }}
-      icon={ChefHat}
-      selected={selected}
-    />
-  );
-});
-RecipeNode.displayName = 'RecipeNode';
-
-// Evidence Entry Node
-export const EvidenceEntryNode = memo(({ data, selected }) => (
-  <BaseNode
-    data={{ ...data, subtitle: data.qualityRating ? `Grade ${data.qualityRating}` : '' }}
-    icon={FileCheck}
-    selected={selected}
-  />
-));
-EvidenceEntryNode.displayName = 'EvidenceEntryNode';
-
-// Reference Node
-export const ReferenceNode = memo(({ data, selected }) => (
-  <BaseNode
-    data={{ ...data, subtitle: data.year ? `${data.year}` : '' }}
-    icon={ExternalLink}
-    selected={selected}
-  />
-));
-ReferenceNode.displayName = 'ReferenceNode';
+// Export individual components
+export {
+  ConditionNode,
+  InterventionNode,
+  CareDomainNode,
+  ScriptureNode,
+  EgwReferenceNode,
+  RecipeNode,
+  EvidenceEntryNode,
+  ReferenceNode,
+};
 
 // Export node types object for React Flow
 export const nodeTypes = {
