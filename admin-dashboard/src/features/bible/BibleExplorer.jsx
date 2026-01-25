@@ -272,9 +272,9 @@ const BibleExplorer = () => {
       {/* Daily Verse Card */}
       {dailyVerse && (
         <div className={`card border-l-4 border-l-primary-500 ${themeBgColors[dailyVerse.themeColor] || 'bg-primary-50'}`}>
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-primary-600" />
                 <span className="text-xs font-semibold text-primary-700 uppercase tracking-wide">
                   Verse of the Day
@@ -283,29 +283,29 @@ const BibleExplorer = () => {
                   {dailyVerse.theme}
                 </span>
               </div>
-              <p className="text-gray-800 italic leading-relaxed">"{dailyVerse.text}"</p>
+              <p className="text-gray-800 italic leading-relaxed text-sm sm:text-base">"{dailyVerse.text}"</p>
               <p className="text-sm font-semibold text-gray-900 mt-2">
                 — {dailyVerse.reference} ({dailyVerse.translation})
               </p>
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1 self-end sm:self-start">
               <button
                 onClick={() => copyVerse(dailyVerse.reference, dailyVerse.text)}
-                className="p-2 rounded-lg hover:bg-white/50 transition-colors"
+                className="p-2 rounded-lg hover:bg-white/50 active:bg-white/70 transition-colors"
                 title="Copy verse"
               >
                 {copiedRef === dailyVerse.reference ? (
-                  <Check className="w-4 h-4 text-green-600" />
+                  <Check className="w-5 h-5 sm:w-4 sm:h-4 text-green-600" />
                 ) : (
-                  <Copy className="w-4 h-4 text-gray-500" />
+                  <Copy className="w-5 h-5 sm:w-4 sm:h-4 text-gray-500" />
                 )}
               </button>
               <button
                 onClick={() => addToScriptures(dailyVerse.reference, dailyVerse.text, dailyVerse.theme)}
-                className="p-2 rounded-lg hover:bg-white/50 transition-colors"
+                className="p-2 rounded-lg hover:bg-white/50 active:bg-white/70 transition-colors"
                 title="Add to scriptures"
               >
-                <Plus className="w-4 h-4 text-gray-500" />
+                <Plus className="w-5 h-5 sm:w-4 sm:h-4 text-gray-500" />
               </button>
             </div>
           </div>
@@ -344,8 +344,8 @@ const BibleExplorer = () => {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="flex gap-4 sm:gap-8 overflow-x-auto">
+      <div className="border-b border-gray-200 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <nav className="flex gap-1 sm:gap-6 overflow-x-auto scrollbar-hide pb-px">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -355,14 +355,15 @@ const BibleExplorer = () => {
                 setSelectedBook(null);
                 setSelectedChapter(null);
               }}
-              className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
+              className={`flex items-center gap-1.5 sm:gap-2 py-3 px-3 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
                 activeTab === tab.id
                   ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 active:text-gray-900'
               }`}
             >
               <tab.icon className="w-4 h-4" />
-              {tab.label}
+              <span className="hidden xs:inline sm:inline">{tab.label}</span>
+              <span className="xs:hidden sm:hidden">{tab.label.split(' ')[0]}</span>
             </button>
           ))}
         </nav>
@@ -376,20 +377,20 @@ const BibleExplorer = () => {
             {!selectedTheme ? (
               <>
                 {/* Section Header */}
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Health & Wellness Themes</h2>
-                  <p className="text-gray-600 max-w-2xl mx-auto">
-                    Explore biblical wisdom organized by health topics. Each theme contains carefully selected verses to support your physical, mental, and spiritual well-being.
+                <div className="text-center mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Health & Wellness Themes</h2>
+                  <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto px-2">
+                    Explore biblical wisdom organized by health topics. Each theme contains carefully selected verses to support your well-being.
                   </p>
                 </div>
 
                 {/* Theme Cards Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                   {themes.map((theme) => (
                     <button
                       key={theme.key}
                       onClick={() => fetchThemeVerses(theme.key)}
-                      className="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 text-left h-64"
+                      className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-md hover:shadow-xl active:shadow-lg transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 text-left h-44 sm:h-64"
                     >
                       {/* Background Image */}
                       <div
@@ -403,29 +404,30 @@ const BibleExplorer = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
 
                       {/* Content */}
-                      <div className="relative h-full flex flex-col justify-end p-5 text-white">
+                      <div className="relative h-full flex flex-col justify-end p-3 sm:p-5 text-white">
                         {/* Verse Count Badge */}
-                        <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-                          <span className="text-xs font-medium text-white flex items-center gap-1">
-                            <BookOpen className="w-3 h-3" />
-                            {theme.verse_count} verses
+                        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/20 backdrop-blur-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
+                          <span className="text-[10px] sm:text-xs font-medium text-white flex items-center gap-1">
+                            <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                            {theme.verse_count}
                           </span>
                         </div>
 
                         {/* Theme Name */}
-                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary-200 transition-colors">
+                        <h3 className="text-sm sm:text-xl font-bold mb-1 sm:mb-2 group-hover:text-primary-200 transition-colors line-clamp-2">
                           {theme.name}
                         </h3>
 
-                        {/* Description */}
-                        <p className="text-sm text-gray-200 line-clamp-2 mb-3">
+                        {/* Description - Hidden on mobile */}
+                        <p className="hidden sm:block text-sm text-gray-200 line-clamp-2 mb-3">
                           {theme.description}
                         </p>
 
                         {/* Explore Button */}
-                        <div className="flex items-center text-sm font-medium text-primary-300 group-hover:text-white transition-colors">
-                          Explore verses
-                          <ArrowRight className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
+                        <div className="flex items-center text-xs sm:text-sm font-medium text-primary-300 group-hover:text-white transition-colors">
+                          <span className="hidden sm:inline">Explore verses</span>
+                          <span className="sm:hidden">View</span>
+                          <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
                     </button>
@@ -433,9 +435,9 @@ const BibleExplorer = () => {
                 </div>
               </>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Theme Header Banner */}
-                <div className="relative overflow-hidden rounded-2xl h-48 sm:h-56">
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl h-40 sm:h-56 -mx-4 sm:mx-0">
                   {/* Background Image */}
                   <div
                     className="absolute inset-0 bg-cover bg-center"
@@ -444,30 +446,30 @@ const BibleExplorer = () => {
                     }}
                   />
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+                  <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
 
                   {/* Content */}
-                  <div className="relative h-full flex flex-col justify-between p-6">
+                  <div className="relative h-full flex flex-col justify-between p-4 sm:p-6">
                     {/* Back Button */}
                     <button
                       onClick={() => setSelectedTheme(null)}
-                      className="self-start flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm"
+                      className="self-start flex items-center gap-1.5 sm:gap-2 text-white/90 hover:text-white active:text-white transition-colors bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm"
                     >
-                      <ChevronRight className="w-4 h-4 rotate-180" />
-                      All Themes
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180" />
+                      Back
                     </button>
 
                     {/* Theme Info */}
                     <div>
-                      <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                      <h2 className="text-xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                         {selectedTheme.theme}
                       </h2>
-                      <p className="text-white/80 text-sm sm:text-base max-w-xl">
+                      <p className="text-white/80 text-xs sm:text-base max-w-xl line-clamp-2 sm:line-clamp-none">
                         {selectedTheme.description}
                       </p>
-                      <div className="flex items-center gap-2 mt-3">
-                        <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white flex items-center gap-1">
-                          <BookOpen className="w-3 h-3" />
+                      <div className="flex items-center gap-2 mt-2 sm:mt-3">
+                        <span className="bg-white/20 backdrop-blur-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs text-white flex items-center gap-1">
+                          <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                           {themeVerses.length} verses
                         </span>
                       </div>
@@ -526,21 +528,21 @@ const BibleExplorer = () => {
 
         {/* Verse Lookup Tab */}
         {activeTab === 'lookup' && (
-          <div className="space-y-6">
-            <form onSubmit={handleLookup} className="flex gap-3">
+          <div className="space-y-4 sm:space-y-6">
+            <form onSubmit={handleLookup} className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <div className="flex-1">
                 <input
                   type="text"
                   value={lookupQuery}
                   onChange={(e) => setLookupQuery(e.target.value)}
-                  placeholder="Enter reference (e.g., John 3:16, Psalm 23:1-3)"
+                  placeholder="Enter reference (e.g., John 3:16)"
                   className="input-field w-full"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading || !lookupQuery.trim()}
-                className="btn-primary flex items-center gap-2"
+                className="btn-primary flex items-center justify-center gap-2 py-2.5 sm:py-2"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -611,21 +613,21 @@ const BibleExplorer = () => {
 
         {/* Search Tab */}
         {activeTab === 'search' && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Search Mode Toggle */}
-            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg w-full sm:w-fit overflow-x-auto">
               <button
                 onClick={() => {
                   setSearchMode('bible');
                   setSearchResults([]);
                 }}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                   searchMode === 'bible'
                     ? 'bg-white text-primary-700 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
                 }`}
               >
-                <BookOpen className="w-4 h-4 inline mr-2" />
+                <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1.5 sm:mr-2" />
                 Entire Bible
               </button>
               <button
@@ -633,19 +635,19 @@ const BibleExplorer = () => {
                   setSearchMode('health');
                   setSearchResults([]);
                 }}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                   searchMode === 'health'
                     ? 'bg-white text-primary-700 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
                 }`}
               >
-                <HeartPulse className="w-4 h-4 inline mr-2" />
+                <HeartPulse className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1.5 sm:mr-2" />
                 Health Themes
               </button>
             </div>
 
             {/* Search Form */}
-            <form onSubmit={handleSearch} className="flex gap-3">
+            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <div className="flex-1">
                 <input
                   type="text"
@@ -653,8 +655,8 @@ const BibleExplorer = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={
                     searchMode === 'bible'
-                      ? 'Search the entire Bible (e.g., love, faith, salvation, forgiveness)'
-                      : 'Search health-themed verses (e.g., healing, peace, strength)'
+                      ? 'Search Bible (e.g., love, faith)'
+                      : 'Search health verses (e.g., healing)'
                   }
                   className="input-field w-full"
                 />
@@ -662,7 +664,7 @@ const BibleExplorer = () => {
               <button
                 type="submit"
                 disabled={loading || searchQuery.length < 2}
-                className="btn-primary flex items-center gap-2"
+                className="btn-primary flex items-center justify-center gap-2 py-2.5 sm:py-2"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -780,21 +782,22 @@ const BibleExplorer = () => {
 
         {/* Browse Tab */}
         {activeTab === 'browse' && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {!selectedBook ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Old Testament */}
                 <div className="card">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-amber-600" />
+                  <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                    <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
                     Old Testament
+                    <span className="text-xs text-gray-400 font-normal">({books.old_testament.length} books)</span>
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-3 gap-1.5 sm:gap-2">
                     {books.old_testament.map((book) => (
                       <button
                         key={book.id}
                         onClick={() => setSelectedBook(book)}
-                        className="px-3 py-2 text-sm text-left bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors border border-amber-200"
+                        className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-left bg-amber-50 hover:bg-amber-100 active:bg-amber-200 rounded-lg transition-colors border border-amber-200 truncate"
                       >
                         {book.name}
                       </button>
@@ -804,16 +807,17 @@ const BibleExplorer = () => {
 
                 {/* New Testament */}
                 <div className="card">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                    <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                     New Testament
+                    <span className="text-xs text-gray-400 font-normal">({books.new_testament.length} books)</span>
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-3 gap-1.5 sm:gap-2">
                     {books.new_testament.map((book) => (
                       <button
                         key={book.id}
                         onClick={() => setSelectedBook(book)}
-                        className="px-3 py-2 text-sm text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+                        className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-left bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-lg transition-colors border border-blue-200 truncate"
                       >
                         {book.name}
                       </button>
@@ -823,25 +827,25 @@ const BibleExplorer = () => {
               </div>
             ) : !selectedChapter ? (
               <div className="space-y-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <button
                     onClick={() => setSelectedBook(null)}
-                    className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                    className="text-xs sm:text-sm text-primary-600 hover:text-primary-700 active:text-primary-800 flex items-center gap-1 bg-primary-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full"
                   >
-                    <ChevronRight className="w-4 h-4 rotate-180" />
-                    All Books
+                    <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180" />
+                    Back
                   </button>
-                  <h2 className="text-xl font-semibold text-gray-900">{selectedBook.name}</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{selectedBook.name}</h2>
                 </div>
 
                 <div className="card">
-                  <h3 className="font-medium text-gray-700 mb-4">Select Chapter</h3>
-                  <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
+                  <h3 className="font-medium text-gray-700 mb-3 sm:mb-4 text-sm sm:text-base">Select Chapter</h3>
+                  <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-1.5 sm:gap-2">
                     {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map((chapter) => (
                       <button
                         key={chapter}
                         onClick={() => handleChapterSelect(chapter)}
-                        className="px-3 py-2 text-sm bg-gray-100 hover:bg-primary-100 hover:text-primary-700 rounded-lg transition-colors"
+                        className="px-2 sm:px-3 py-2 sm:py-2 text-xs sm:text-sm bg-gray-100 hover:bg-primary-100 active:bg-primary-200 hover:text-primary-700 rounded-lg transition-colors font-medium"
                       >
                         {chapter}
                       </button>
@@ -851,16 +855,16 @@ const BibleExplorer = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                   <button
                     onClick={() => setSelectedChapter(null)}
-                    className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                    className="text-xs sm:text-sm text-primary-600 hover:text-primary-700 active:text-primary-800 flex items-center gap-1 bg-primary-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full"
                   >
-                    <ChevronRight className="w-4 h-4 rotate-180" />
+                    <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180" />
                     {selectedBook.name}
                   </button>
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {selectedBook.name} {selectedChapter}
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                    Chapter {selectedChapter}
                   </h2>
                 </div>
 
@@ -869,14 +873,14 @@ const BibleExplorer = () => {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                   </div>
                 ) : chapterContent ? (
-                  <div className="card">
+                  <div className="card p-3 sm:p-6">
                     {/* Chapter Header */}
-                    <div className="flex items-start justify-between gap-4 mb-6 pb-4 border-b border-gray-200">
+                    <div className="flex items-start justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200">
                       <div>
-                        <h3 className="font-semibold text-xl text-gray-900">
+                        <h3 className="font-semibold text-lg sm:text-xl text-gray-900">
                           {chapterContent.reference}
                         </h3>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
                           {chapterContent.translation} • {chapterContent.verseCount} verses
                         </p>
                       </div>
@@ -887,41 +891,41 @@ const BibleExplorer = () => {
                             .join('\n') || '';
                           copyVerse(chapterContent.reference, fullText);
                         }}
-                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors"
                         title="Copy chapter"
                       >
                         {copiedRef === chapterContent.reference ? (
-                          <Check className="w-4 h-4 text-green-600" />
+                          <Check className="w-5 h-5 sm:w-4 sm:h-4 text-green-600" />
                         ) : (
-                          <Copy className="w-4 h-4 text-gray-500" />
+                          <Copy className="w-5 h-5 sm:w-4 sm:h-4 text-gray-500" />
                         )}
                       </button>
                     </div>
 
                     {/* Legend */}
-                    <div className="flex items-center gap-4 mb-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-4 mb-3 sm:mb-4 text-[10px] sm:text-xs text-gray-500">
                       <span className="flex items-center gap-1">
-                        <span className="w-3 h-3 rounded bg-red-100 border border-red-200"></span>
+                        <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-red-100 border border-red-200"></span>
                         Words of Jesus
                       </span>
                     </div>
 
                     {/* Verses */}
-                    <div className="space-y-3">
+                    <div className="space-y-1 sm:space-y-3">
                       {chapterContent.verses?.map((verse) => (
                         <div
                           key={verse.number}
-                          className={`group flex gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors ${
+                          className={`group flex gap-2 sm:gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors ${
                             verse.hasWordsOfJesus ? 'bg-red-50/50' : ''
                           }`}
                         >
                           {/* Verse Number */}
-                          <span className="flex-shrink-0 w-8 text-right font-bold text-primary-600 text-sm pt-0.5">
+                          <span className="flex-shrink-0 w-6 sm:w-8 text-right font-bold text-primary-600 text-xs sm:text-sm pt-0.5">
                             {verse.number}
                           </span>
 
                           {/* Verse Content */}
-                          <div className="flex-1 leading-relaxed text-gray-800">
+                          <div className="flex-1 leading-relaxed text-gray-800 text-sm sm:text-base">
                             {verse.segments.map((segment, idx) => (
                               <span
                                 key={idx}
@@ -936,20 +940,20 @@ const BibleExplorer = () => {
                             ))}
                           </div>
 
-                          {/* Copy Button (appears on hover) */}
+                          {/* Copy Button - Always visible on mobile, hover on desktop */}
                           <button
                             onClick={() => {
                               const verseText = verse.segments.map(s => s.text).join(' ');
                               const verseRef = `${chapterContent.reference}:${verse.number}`;
                               copyVerse(verseRef, verseText);
                             }}
-                            className="flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-gray-200 transition-all"
+                            className="flex-shrink-0 p-1.5 sm:p-1 rounded opacity-60 sm:opacity-0 group-hover:opacity-100 hover:bg-gray-200 active:bg-gray-300 transition-all"
                             title="Copy verse"
                           >
                             {copiedRef === `${chapterContent.reference}:${verse.number}` ? (
-                              <Check className="w-3 h-3 text-green-600" />
+                              <Check className="w-4 h-4 sm:w-3 sm:h-3 text-green-600" />
                             ) : (
-                              <Copy className="w-3 h-3 text-gray-400" />
+                              <Copy className="w-4 h-4 sm:w-3 sm:h-3 text-gray-400" />
                             )}
                           </button>
                         </div>
@@ -959,20 +963,24 @@ const BibleExplorer = () => {
                 ) : null}
 
                 {/* Chapter Navigation */}
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-3">
                   <button
                     onClick={() => handleChapterSelect(selectedChapter - 1)}
                     disabled={selectedChapter <= 1}
-                    className="btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-outline flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base py-2.5 sm:py-2"
                   >
-                    Previous Chapter
+                    <ChevronRight className="w-4 h-4 rotate-180 inline mr-1 sm:hidden" />
+                    <span className="hidden sm:inline">Previous Chapter</span>
+                    <span className="sm:hidden">Previous</span>
                   </button>
                   <button
                     onClick={() => handleChapterSelect(selectedChapter + 1)}
                     disabled={selectedChapter >= selectedBook.chapters}
-                    className="btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-outline flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base py-2.5 sm:py-2"
                   >
-                    Next Chapter
+                    <span className="hidden sm:inline">Next Chapter</span>
+                    <span className="sm:hidden">Next</span>
+                    <ChevronRight className="w-4 h-4 inline ml-1 sm:hidden" />
                   </button>
                 </div>
               </div>
