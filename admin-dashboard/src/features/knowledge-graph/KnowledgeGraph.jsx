@@ -41,6 +41,7 @@ const KnowledgeGraphInner = ({
   const [selectedNode, setSelectedNode] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [contextMenu, setContextMenu] = useState(null); // { node, position: { x, y } }
+  const [draggingNodeParent, setDraggingNodeParent] = useState(null); // Track parent of dragging node
   const { fitView, setCenter } = useReactFlow();
 
   // Layout persistence
@@ -240,6 +241,60 @@ const KnowledgeGraphInner = ({
     setHoveredNodeId(null);
   }, []);
 
+  // Handle node drag start - track parent group for visual feedback
+  const handleNodeDragStart = useCallback((event, node) => {
+    if (node.parentId) {
+      setDraggingNodeParent(node.parentId);
+    }
+  }, []);
+
+  // Handle node drag stop - recalculate parent group bounds to shrink/fit
+  const handleNodeDragStop = useCallback((event, node) => {
+    setDraggingNodeParent(null);
+
+    // If the dragged node has a parent, recalculate the parent's bounds
+    if (node.parentId) {
+      const padding = 30;
+      const headerSpace = 20; // Space for the header label
+
+      setNodes((currentNodes) => {
+        // Find all children of this parent
+        const children = currentNodes.filter(n => n.parentId === node.parentId && n.type !== 'group');
+        if (children.length === 0) return currentNodes;
+
+        // Calculate bounding box of all children
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        children.forEach(child => {
+          const childWidth = 200; // Approximate node width
+          const childHeight = 80; // Approximate node height
+          minX = Math.min(minX, child.position.x);
+          minY = Math.min(minY, child.position.y);
+          maxX = Math.max(maxX, child.position.x + childWidth);
+          maxY = Math.max(maxY, child.position.y + childHeight);
+        });
+
+        // Calculate required group size
+        const requiredWidth = maxX + padding;
+        const requiredHeight = maxY + padding + headerSpace;
+
+        // Update the parent group's dimensions
+        return currentNodes.map(n => {
+          if (n.id === node.parentId) {
+            return {
+              ...n,
+              style: {
+                ...n.style,
+                width: Math.max(requiredWidth, 200),
+                height: Math.max(requiredHeight, 100),
+              },
+            };
+          }
+          return n;
+        });
+      });
+    }
+  }, [setNodes]);
+
   // Close details panel
   const handleCloseDetails = useCallback(() => {
     setSelectedNode(null);
@@ -262,11 +317,11 @@ const KnowledgeGraphInner = ({
   // Handle double-click on group nodes to zoom to fit
   const handleNodeDoubleClick = useCallback((event, node) => {
     if (node.type === 'group') {
-      // Get group bounds
+      // Get group bounds (dimensions are in style for group nodes)
       const groupX = node.position.x;
       const groupY = node.position.y;
-      const groupWidth = node.data?.width || 250;
-      const groupHeight = node.data?.height || 200;
+      const groupWidth = parseFloat(node.style?.width) || node.width || 250;
+      const groupHeight = parseFloat(node.style?.height) || node.height || 200;
 
       // Calculate center of the group
       const centerX = groupX + groupWidth / 2;
@@ -292,8 +347,10 @@ const KnowledgeGraphInner = ({
 
   const handleFocusNode = useCallback((node) => {
     if (node.type === 'group') {
-      const centerX = node.position.x + (node.data?.width || 250) / 2;
-      const centerY = node.position.y + (node.data?.height || 200) / 2;
+      const groupWidth = parseFloat(node.style?.width) || node.width || 250;
+      const groupHeight = parseFloat(node.style?.height) || node.height || 200;
+      const centerX = node.position.x + groupWidth / 2;
+      const centerY = node.position.y + groupHeight / 2;
       setCenter(centerX, centerY, { zoom: 1.5, duration: 500 });
     } else {
       setCenter(
@@ -356,6 +413,8 @@ const KnowledgeGraphInner = ({
         (e.source === hoveredNodeId && e.target === node.id) ||
         (e.target === hoveredNodeId && e.source === node.id)
       )) : true,
+      // For group nodes: indicate if a child is being dragged
+      hasChildDragging: node.type === 'group' && draggingNodeParent === node.id,
     },
     style: {
       ...node.style,
@@ -390,6 +449,8 @@ const KnowledgeGraphInner = ({
         onNodeContextMenu={handleNodeContextMenu}
         onNodeMouseEnter={handleNodeMouseEnter}
         onNodeMouseLeave={handleNodeMouseLeave}
+        onNodeDragStart={handleNodeDragStart}
+        onNodeDragStop={handleNodeDragStop}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView

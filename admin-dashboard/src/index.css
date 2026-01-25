@@ -264,3 +264,24 @@
 .react-flow__edgelabel-renderer > div:hover {
   z-index: 1000 !important;
 }
+
+/* Group node styling - let our custom GroupNode handle the visuals */
+.react-flow__node-group {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Ensure group node content fills the wrapper */
+.react-flow__node-group > div {
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* When dragging nodes, keep proper z-index layering */
+.react-flow__node.dragging {
+  z-index: 1000 !important;
+}

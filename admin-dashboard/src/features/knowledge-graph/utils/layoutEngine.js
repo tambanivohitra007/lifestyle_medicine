@@ -497,14 +497,16 @@ export function applyMedicalGroupedLayout(nodes, edges) {
       data: {
         label: 'Condition',
         icon: '🩺',
-        width: conditionGroupWidth,
-        height: conditionGroupHeight,
         color: '#ef4444',
         bgColor: '#fef2f2',
         borderColor: '#fca5a5',
         count: groups.condition.length,
       },
-      style: { zIndex: -1 },
+      style: {
+        width: conditionGroupWidth,
+        height: conditionGroupHeight,
+        zIndex: -1,
+      },
       draggable: true,
     });
 
@@ -544,14 +546,16 @@ export function applyMedicalGroupedLayout(nodes, edges) {
         data: {
           label: category.label,
           icon: category.icon,
-          width: nodeWidth + (groupPadding * 2),
-          height: groupHeight,
           color: category.color,
           bgColor: category.bgColor,
           borderColor: category.borderColor,
           count: categoryNodes.length,
         },
-        style: { zIndex: -1 },
+        style: {
+          width: nodeWidth + (groupPadding * 2),
+          height: groupHeight,
+          zIndex: -1,
+        },
         draggable: true,
       });
 
@@ -584,14 +588,16 @@ export function applyMedicalGroupedLayout(nodes, edges) {
       data: {
         label: 'Research & Evidence',
         icon: '📚',
-        width: researchGroupWidth,
-        height: researchGroupHeight,
         color: '#64748b',
         bgColor: '#f8fafc',
         borderColor: '#cbd5e1',
         count: researchNodes.length,
       },
-      style: { zIndex: -1 },
+      style: {
+        width: researchGroupWidth,
+        height: researchGroupHeight,
+        zIndex: -1,
+      },
       draggable: true,
     });
 
@@ -619,14 +625,16 @@ export function applyMedicalGroupedLayout(nodes, edges) {
       data: {
         label: 'Other',
         icon: '📦',
-        width: (otherCols * nodeSpacingX) + (groupPadding * 2) - (nodeSpacingX - nodeWidth),
-        height: (otherRows * nodeSpacingY) + (groupPadding * 2) + 10,
         color: '#9ca3af',
         bgColor: '#f9fafb',
         borderColor: '#d1d5db',
         count: groups.other.length,
       },
-      style: { zIndex: -1 },
+      style: {
+        width: (otherCols * nodeSpacingX) + (groupPadding * 2) - (nodeSpacingX - nodeWidth),
+        height: (otherRows * nodeSpacingY) + (groupPadding * 2) + 10,
+        zIndex: -1,
+      },
       draggable: true,
     });
 
