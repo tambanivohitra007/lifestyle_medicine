@@ -6,6 +6,7 @@ import {
   Activity,
   Book,
   BookMarked,
+  BookOpen,
   ChefHat,
   Bookmark,
   Tag,
@@ -53,6 +54,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
     {
       title: 'Resources',
       items: [
+        { to: '/bible', icon: BookOpen, label: 'Bible Explorer' },
         { to: '/evidence', icon: TestTube, label: 'Evidence' },
         { to: '/references', icon: Library, label: 'References' },
         { to: '/scriptures', icon: Book, label: 'Scriptures' },

@@ -38,11 +38,19 @@ Route::prefix('v1')->group(function () {
     // Global Search
     Route::get('/search', [SearchController::class, 'search']);
 
-    // Bible API
-    Route::get('/bible/versions', [BibleController::class, 'getBibles']);
-    Route::get('/bible/search', [BibleController::class, 'searchVerses']);
-    Route::get('/bible/verse', [BibleController::class, 'getVerse']);
-    Route::get('/bible/passage', [BibleController::class, 'getPassage']);
+    // Bible Explorer API
+    Route::prefix('bible')->group(function () {
+        Route::get('/lookup', [BibleController::class, 'lookup']);
+        Route::get('/search', [BibleController::class, 'search']);
+        Route::get('/translations', [BibleController::class, 'getTranslations']);
+        Route::get('/bibles', [BibleController::class, 'getBibles']);
+        Route::get('/books', [BibleController::class, 'getBooks']);
+        Route::get('/chapter', [BibleController::class, 'getChapter']);
+        Route::get('/daily-verse', [BibleController::class, 'getDailyVerse']);
+        Route::get('/health-themes', [BibleController::class, 'getHealthThemes']);
+        Route::get('/health-themes/{themeKey}', [BibleController::class, 'getThemeVerses']);
+        Route::get('/search-health', [BibleController::class, 'searchHealthVerses']);
+    });
 
     // Care Domains
     Route::apiResource('care-domains', CareDomainController::class)->only(['index', 'show']);

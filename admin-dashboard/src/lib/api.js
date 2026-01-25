@@ -130,11 +130,17 @@ export const apiEndpoints = {
   aiStructureContent: '/admin/ai/structure-content',
   aiImportContent: '/admin/ai/import-content',
 
-  // Bible API
-  bibleVersions: '/bible/versions',
+  // Bible Explorer API
+  bibleLookup: '/bible/lookup',
   bibleSearch: '/bible/search',
-  bibleVerse: '/bible/verse',
-  biblePassage: '/bible/passage',
+  bibleTranslations: '/bible/translations',
+  bibleBibles: '/bible/bibles',
+  bibleBooks: '/bible/books',
+  bibleChapter: '/bible/chapter',
+  bibleDailyVerse: '/bible/daily-verse',
+  bibleHealthThemes: '/bible/health-themes',
+  bibleHealthTheme: (themeKey) => `/bible/health-themes/${themeKey}`,
+  bibleSearchHealth: '/bible/search-health',
 
   // Analytics
   analyticsOverview: '/admin/analytics/overview',

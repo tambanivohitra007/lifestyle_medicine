@@ -31,7 +31,8 @@
       "Bash(powershell -Command \"Stop-Process -Name php -Force -ErrorAction SilentlyContinue; Write-Host ''PHP processes stopped''\")",
       "Bash(done)",
       "Bash(find:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(del C:UsersrindraProjectslifestyle_medicinetest_bible_api.php)"
     ]
   }
 }

@@ -35,6 +35,7 @@ import { Recipes, RecipeForm, RecipeDetail } from './features/recipes';
 import { EgwReferences, EgwReferenceForm } from './features/egw-references';
 import { ContentTags } from './features/content-tags';
 import { Users, UserForm } from './features/users';
+import BibleExplorer from './features/bible/BibleExplorer';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -143,6 +144,9 @@ function App() {
 
             {/* AI Content Generator */}
             <Route path="ai-generator" element={<AiContentGenerator />} />
+
+            {/* Bible Explorer */}
+            <Route path="bible" element={<BibleExplorer />} />
           </Route>
 
           {/* Catch all */}
