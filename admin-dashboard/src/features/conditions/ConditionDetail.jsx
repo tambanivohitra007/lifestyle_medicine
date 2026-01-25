@@ -63,7 +63,7 @@ const ConditionDetail = () => {
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
-  const [workflowExpanded, setWorkflowExpanded] = useState(true);
+  const [workflowExpanded, setWorkflowExpanded] = useState(false);
 
   // Modal states
   const [attachModalType, setAttachModalType] = useState(null);

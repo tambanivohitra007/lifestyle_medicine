@@ -3,13 +3,9 @@ import {
   CheckCircle2,
   Circle,
   AlertTriangle,
-  FileText,
   Stethoscope,
-  BookOpen,
-  ChefHat,
   Plus,
-  ChevronRight,
-  Lightbulb,
+  ChevronDown,
   Activity,
   Utensils,
   Droplets,
@@ -21,6 +17,11 @@ import {
   Brain,
   Pill,
   Syringe,
+  FileText,
+  Sparkles,
+  BookOpen,
+  ChefHat,
+  ArrowRight,
 } from 'lucide-react';
 
 // Map care domain icons
@@ -40,15 +41,15 @@ const DOMAIN_ICONS = {
 
 // Required sections for a complete treatment guide
 const REQUIRED_SECTIONS = [
-  { type: 'risk_factors', label: 'Risk Factors / Causes', description: 'Identify what causes or contributes to this condition' },
-  { type: 'physiology', label: 'Physiology', description: 'Explain the underlying mechanisms and pathophysiology' },
-  { type: 'complications', label: 'Complications', description: 'List potential complications if untreated' },
+  { type: 'risk_factors', label: 'Risk Factors', icon: AlertTriangle },
+  { type: 'physiology', label: 'Physiology', icon: Activity },
+  { type: 'complications', label: 'Complications', icon: FileText },
 ];
 
 // Optional but recommended sections
 const OPTIONAL_SECTIONS = [
-  { type: 'additional_factors', label: 'Additional Factors', description: 'Other relevant considerations' },
-  { type: 'research_ideas', label: 'Research Ideas', description: 'Potential areas for future research' },
+  { type: 'additional_factors', label: 'Additional Factors' },
+  { type: 'research_ideas', label: 'Research Ideas' },
 ];
 
 // Core NEWSTART+ care domains for interventions
@@ -68,7 +69,7 @@ const ConditionWorkflowGuide = ({
   scriptures = [],
   recipes = [],
   careDomains = [],
-  isExpanded = true,
+  isExpanded = false,
   onToggle,
 }) => {
   // Check which sections exist
@@ -98,277 +99,337 @@ const ConditionWorkflowGuide = ({
   ];
   const completionScore = Math.round((completionItems.filter(Boolean).length / completionItems.length) * 100);
 
-  const getCompletionColor = (score) => {
-    if (score >= 80) return 'text-green-600 bg-green-100';
-    if (score >= 50) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
+  // Step completion status
+  const steps = [
+    { complete: requiredSectionsComplete === requiredSectionsTotal, count: requiredSectionsComplete, total: requiredSectionsTotal },
+    { complete: coreDomainsWithInterventions >= 3, count: coreDomainsWithInterventions, total: coreDomainsTotal },
+    { complete: hasScriptures, count: scriptures.length },
+    { complete: hasRecipes, count: recipes.length, optional: true },
+  ];
+
+  const getScoreGradient = (score) => {
+    if (score >= 80) return 'from-emerald-500 to-teal-500';
+    if (score >= 50) return 'from-amber-500 to-orange-500';
+    return 'from-rose-500 to-pink-500';
   };
 
-  const getProgressBarColor = (score) => {
-    if (score >= 80) return 'bg-green-500';
-    if (score >= 50) return 'bg-yellow-500';
-    return 'bg-red-500';
+  const getScoreBg = (score) => {
+    if (score >= 80) return 'bg-emerald-50 border-emerald-200';
+    if (score >= 50) return 'bg-amber-50 border-amber-200';
+    return 'bg-rose-50 border-rose-200';
   };
 
   return (
-    <div className="card border-l-4 border-l-primary-500 overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className={`p-2 rounded-lg flex-shrink-0 ${getCompletionColor(completionScore)}`}>
-            <Lightbulb className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Treatment Guide Workflow</h3>
-            <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Follow this guide to create a complete treatment protocol</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 justify-between sm:justify-end">
-          <div className="text-left sm:text-right">
-            <div className={`text-lg font-bold ${completionScore >= 80 ? 'text-green-600' : completionScore >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+    <div className={`rounded-xl border ${getScoreBg(completionScore)} overflow-hidden transition-all duration-300`}>
+      {/* Compact Header */}
+      <button
+        onClick={onToggle}
+        className="w-full p-4 flex items-center gap-4 hover:bg-white/50 transition-colors"
+      >
+        {/* Progress Ring */}
+        <div className="relative flex-shrink-0">
+          <svg className="w-14 h-14 -rotate-90" viewBox="0 0 36 36">
+            <circle
+              cx="18"
+              cy="18"
+              r="15.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              className="text-gray-200"
+            />
+            <circle
+              cx="18"
+              cy="18"
+              r="15.5"
+              fill="none"
+              stroke="url(#progressGradient)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray={`${completionScore} 100`}
+              className="transition-all duration-700 ease-out"
+            />
+            <defs>
+              <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" className={completionScore >= 80 ? 'text-emerald-500' : completionScore >= 50 ? 'text-amber-500' : 'text-rose-500'} stopColor="currentColor" />
+                <stop offset="100%" className={completionScore >= 80 ? 'text-teal-500' : completionScore >= 50 ? 'text-orange-500' : 'text-pink-500'} stopColor="currentColor" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className={`text-sm font-bold ${completionScore >= 80 ? 'text-emerald-600' : completionScore >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>
               {completionScore}%
-            </div>
-            <div className="text-xs text-gray-500">Complete</div>
+            </span>
           </div>
-          {onToggle && (
-            <button
-              onClick={onToggle}
-              className="p-2 hover:bg-gray-100 active:bg-gray-200 rounded transition-colors touch-manipulation"
-            >
-              <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-            </button>
-          )}
         </div>
-      </div>
 
-      {/* Progress Bar */}
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-        <div
-          className={`h-2 rounded-full transition-all duration-500 ${getProgressBarColor(completionScore)}`}
-          style={{ width: `${completionScore}%` }}
-        />
-      </div>
+        {/* Title & Quick Stats */}
+        <div className="flex-1 min-w-0 text-left">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className={`w-4 h-4 ${completionScore >= 80 ? 'text-emerald-500' : completionScore >= 50 ? 'text-amber-500' : 'text-rose-500'}`} />
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Treatment Workflow</h3>
+          </div>
 
-      {isExpanded && (
-        <div className="space-y-6">
-          {/* Step 1: Required Sections */}
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-sm font-bold flex-shrink-0">1</span>
-              <h4 className="font-medium text-gray-900 text-sm sm:text-base">Document the Condition</h4>
-              <span className="text-xs text-gray-500">({requiredSectionsComplete}/{requiredSectionsTotal})</span>
-            </div>
-            <div className="ml-4 sm:ml-8 space-y-2">
+          {/* Mini Progress Indicators */}
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <span className="flex items-center gap-1">
+              <FileText className="w-3.5 h-3.5" />
+              {requiredSectionsComplete}/{requiredSectionsTotal}
+            </span>
+            <span className="flex items-center gap-1">
+              <Stethoscope className="w-3.5 h-3.5" />
+              {interventions.length}
+            </span>
+            <span className="flex items-center gap-1">
+              <BookOpen className="w-3.5 h-3.5" />
+              {scriptures.length}
+            </span>
+            <span className="flex items-center gap-1">
+              <ChefHat className="w-3.5 h-3.5" />
+              {recipes.length}
+            </span>
+          </div>
+        </div>
+
+        {/* Expand Button */}
+        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`} />
+      </button>
+
+      {/* Expanded Content */}
+      <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="px-4 pb-4 space-y-4 bg-white/60">
+          {/* Step 1: Documentation */}
+          <WorkflowStep
+            number={1}
+            title="Documentation"
+            subtitle="Required sections"
+            isComplete={requiredSectionsComplete === requiredSectionsTotal}
+            progress={`${requiredSectionsComplete}/${requiredSectionsTotal}`}
+          >
+            <div className="flex flex-wrap gap-2">
               {REQUIRED_SECTIONS.map((section) => {
                 const isComplete = existingSectionTypes.has(section.type);
+                const Icon = section.icon;
                 return (
-                  <div key={section.type} className="flex items-start sm:items-center justify-between gap-2 p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100">
-                    <div className="flex items-start sm:items-center gap-2 sm:gap-3 min-w-0">
-                      {isComplete ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5 sm:mt-0" />
-                      ) : (
-                        <Circle className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5 sm:mt-0" />
-                      )}
-                      <div className="min-w-0">
-                        <span className={`font-medium text-sm ${isComplete ? 'text-gray-700' : 'text-gray-900'}`}>
-                          {section.label}
-                        </span>
-                        <p className="text-xs text-gray-500 hidden sm:block">{section.description}</p>
-                      </div>
-                    </div>
+                  <div
+                    key={section.type}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all ${
+                      isComplete
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {isComplete ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    ) : (
+                      <Icon className="w-4 h-4 text-gray-400" />
+                    )}
+                    <span className="text-sm font-medium">{section.label}</span>
                     {!isComplete && (
                       <Link
                         to={`/conditions/${conditionId}/sections/new?type=${section.type}`}
-                        className="text-primary-600 hover:text-primary-700 text-xs sm:text-sm font-medium flex items-center gap-1 flex-shrink-0 touch-manipulation"
+                        className="ml-1 p-1 rounded hover:bg-gray-100 text-primary-600"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <Plus className="w-4 h-4" />
-                        <span className="hidden sm:inline">Add</span>
+                        <Plus className="w-3.5 h-3.5" />
                       </Link>
                     )}
                   </div>
                 );
               })}
             </div>
-          </div>
+          </WorkflowStep>
 
-          {/* Step 2: Interventions by Care Domain */}
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-sm font-bold flex-shrink-0">2</span>
-              <h4 className="font-medium text-gray-900 text-sm sm:text-base">Add Interventions</h4>
-              <span className="text-xs text-gray-500">({coreDomainsWithInterventions}/{coreDomainsTotal} core)</span>
-            </div>
-            <div className="ml-4 sm:ml-8">
-              <div className="grid grid-cols-2 gap-2">
-                {careDomains.map((domain) => {
-                  const hasIntervention = domainsWithInterventions.has(domain.name);
-                  const isCoreDomain = CORE_DOMAINS.includes(domain.name);
-                  const DomainIcon = DOMAIN_ICONS[domain.name] || Stethoscope;
-                  const interventionCount = interventions.filter(i => i.care_domain?.name === domain.name).length;
+          {/* Step 2: Interventions */}
+          <WorkflowStep
+            number={2}
+            title="Interventions"
+            subtitle="Care domains"
+            isComplete={coreDomainsWithInterventions >= 3}
+            progress={`${coreDomainsWithInterventions}/${coreDomainsTotal} core`}
+          >
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+              {careDomains.map((domain) => {
+                const hasIntervention = domainsWithInterventions.has(domain.name);
+                const isCoreDomain = CORE_DOMAINS.includes(domain.name);
+                const DomainIcon = DOMAIN_ICONS[domain.name] || Stethoscope;
+                const count = interventions.filter(i => i.care_domain?.name === domain.name).length;
 
-                  return (
-                    <div
-                      key={domain.id}
-                      className={`p-2 rounded-lg border ${
-                        hasIntervention
-                          ? 'border-green-200 bg-green-50'
-                          : isCoreDomain
-                          ? 'border-yellow-200 bg-yellow-50'
-                          : 'border-gray-200 bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <DomainIcon className={`w-3.5 sm:w-4 h-3.5 sm:h-4 flex-shrink-0 ${
-                          hasIntervention ? 'text-green-600' : isCoreDomain ? 'text-yellow-600' : 'text-gray-400'
-                        }`} />
-                        <span className={`text-xs font-medium truncate ${
-                          hasIntervention ? 'text-green-700' : isCoreDomain ? 'text-yellow-700' : 'text-gray-600'
-                        }`}>
-                          {domain.name}
-                        </span>
-                        {hasIntervention && (
-                          <span className="ml-auto text-xs bg-green-200 text-green-700 px-1.5 rounded flex-shrink-0">
-                            {interventionCount}
-                          </span>
-                        )}
-                        {!hasIntervention && isCoreDomain && (
-                          <AlertTriangle className="w-3 h-3 text-yellow-500 ml-auto flex-shrink-0" />
-                        )}
-                      </div>
+                return (
+                  <div
+                    key={domain.id}
+                    className={`relative p-2.5 rounded-lg border text-center transition-all ${
+                      hasIntervention
+                        ? 'bg-emerald-50 border-emerald-200'
+                        : isCoreDomain
+                        ? 'bg-amber-50 border-amber-200'
+                        : 'bg-gray-50 border-gray-200'
+                    }`}
+                  >
+                    <DomainIcon className={`w-5 h-5 mx-auto mb-1 ${
+                      hasIntervention ? 'text-emerald-600' : isCoreDomain ? 'text-amber-600' : 'text-gray-400'
+                    }`} />
+                    <div className={`text-xs font-medium truncate ${
+                      hasIntervention ? 'text-emerald-700' : isCoreDomain ? 'text-amber-700' : 'text-gray-500'
+                    }`}>
+                      {domain.name.replace(' Therapy', '')}
                     </div>
-                  );
-                })}
-              </div>
-              <Link
-                to={`/conditions/${conditionId}/interventions/attach`}
-                className="mt-3 inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-xs sm:text-sm font-medium touch-manipulation"
-              >
-                <Plus className="w-4 h-4" />
-                Attach Interventions
-              </Link>
+                    {hasIntervention && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center bg-emerald-500 text-white text-xs font-bold rounded-full">
+                        {count}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          </div>
+            <Link
+              to={`/conditions/${conditionId}/interventions/attach`}
+              className="mt-3 inline-flex items-center gap-1.5 text-primary-600 hover:text-primary-700 text-sm font-medium"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Plus className="w-4 h-4" />
+              Attach Interventions
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </WorkflowStep>
 
-          {/* Step 3: Evidence & References */}
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-sm font-bold flex-shrink-0">3</span>
-              <h4 className="font-medium text-gray-900 text-sm sm:text-base">Add Evidence & References</h4>
-            </div>
-            <div className="ml-4 sm:ml-8 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-xs sm:text-sm text-blue-700">
-                Evidence entries are added to interventions individually.
-              </p>
-              <Link
-                to="/evidence"
-                className="mt-2 inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-xs sm:text-sm font-medium touch-manipulation"
-              >
-                Manage Evidence
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Step 4: Spiritual Care */}
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-sm font-bold flex-shrink-0">4</span>
-              <h4 className="font-medium text-gray-900 text-sm sm:text-base">Spiritual Guidance</h4>
-              <span className="text-xs text-gray-500">
-                {hasScriptures ? (
-                  <span className="text-green-600">({scriptures.length})</span>
-                ) : (
-                  <span className="text-yellow-600">(recommended)</span>
-                )}
-              </span>
-            </div>
-            <div className="ml-4 sm:ml-8 flex items-start sm:items-center justify-between gap-2 p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100">
-              <div className="flex items-start sm:items-center gap-2 sm:gap-3 min-w-0">
-                {hasScriptures ? (
-                  <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5 sm:mt-0" />
-                ) : (
-                  <Circle className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5 sm:mt-0" />
-                )}
-                <div className="min-w-0">
-                  <span className="font-medium text-gray-700 text-sm">Bible & Spirit of Prophecy</span>
-                  <p className="text-xs text-gray-500 hidden sm:block">Scripture passages and Ellen White quotes</p>
+          {/* Step 3: Spiritual Care */}
+          <WorkflowStep
+            number={3}
+            title="Spiritual Care"
+            subtitle="Scripture & EGW"
+            isComplete={hasScriptures}
+            progress={hasScriptures ? `${scriptures.length} added` : 'Recommended'}
+            progressWarning={!hasScriptures}
+          >
+            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${hasScriptures ? 'bg-emerald-100' : 'bg-gray-100'}`}>
+                  <BookOpen className={`w-5 h-5 ${hasScriptures ? 'text-emerald-600' : 'text-gray-400'}`} />
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900 text-sm">Bible & Spirit of Prophecy</div>
+                  <div className="text-xs text-gray-500">Scripture passages and Ellen White quotes</div>
                 </div>
               </div>
               <Link
                 to={`/conditions/${conditionId}/scriptures/attach`}
-                className="text-primary-600 hover:text-primary-700 text-xs sm:text-sm font-medium flex items-center gap-1 flex-shrink-0 touch-manipulation"
+                className="btn-outline text-sm py-1.5 px-3"
+                onClick={(e) => e.stopPropagation()}
               >
-                {hasScriptures ? 'Add' : <><Plus className="w-4 h-4" /><span className="hidden sm:inline">Add</span></>}
+                {hasScriptures ? 'Add More' : 'Add'}
               </Link>
             </div>
-          </div>
+          </WorkflowStep>
 
-          {/* Step 5: Recipes (Optional) */}
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-sm font-bold flex-shrink-0">5</span>
-              <h4 className="font-medium text-gray-700 text-sm sm:text-base">Recipes (Optional)</h4>
-              {hasRecipes && (
-                <span className="text-xs text-green-600">({recipes.length})</span>
-              )}
-            </div>
-            <div className="ml-4 sm:ml-8 flex items-start sm:items-center justify-between gap-2 p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100">
-              <div className="flex items-start sm:items-center gap-2 sm:gap-3 min-w-0">
-                {hasRecipes ? (
-                  <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5 sm:mt-0" />
-                ) : (
-                  <Circle className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5 sm:mt-0" />
-                )}
-                <div className="min-w-0">
-                  <span className="font-medium text-gray-700 text-sm">Therapeutic Recipes</span>
-                  <p className="text-xs text-gray-500 hidden sm:block">Culinary medicine recipes</p>
+          {/* Step 4: Recipes (Optional) */}
+          <WorkflowStep
+            number={4}
+            title="Recipes"
+            subtitle="Optional"
+            isComplete={hasRecipes}
+            progress={hasRecipes ? `${recipes.length} added` : 'Optional'}
+            isOptional
+          >
+            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${hasRecipes ? 'bg-emerald-100' : 'bg-gray-100'}`}>
+                  <ChefHat className={`w-5 h-5 ${hasRecipes ? 'text-emerald-600' : 'text-gray-400'}`} />
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900 text-sm">Therapeutic Recipes</div>
+                  <div className="text-xs text-gray-500">Culinary medicine for healing</div>
                 </div>
               </div>
               <Link
                 to={`/conditions/${conditionId}/recipes/attach`}
-                className="text-primary-600 hover:text-primary-700 text-xs sm:text-sm font-medium flex items-center gap-1 flex-shrink-0 touch-manipulation"
+                className="btn-outline text-sm py-1.5 px-3"
+                onClick={(e) => e.stopPropagation()}
               >
-                {hasRecipes ? 'Add' : <><Plus className="w-4 h-4" /><span className="hidden sm:inline">Add</span></>}
+                {hasRecipes ? 'Add More' : 'Add'}
               </Link>
             </div>
-          </div>
+          </WorkflowStep>
 
           {/* Optional Sections */}
-          <div className="pt-4 border-t border-gray-200">
-            <h4 className="text-xs sm:text-sm font-medium text-gray-500 mb-3">Optional Sections</h4>
-            <div className="space-y-2">
-              {OPTIONAL_SECTIONS.map((section) => {
-                const isComplete = existingSectionTypes.has(section.type);
-                return (
-                  <div key={section.type} className="flex items-start sm:items-center justify-between gap-2 p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100">
-                    <div className="flex items-start sm:items-center gap-2 sm:gap-3 min-w-0">
+          {OPTIONAL_SECTIONS.length > 0 && (
+            <div className="pt-3 border-t border-gray-200">
+              <div className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Optional Sections</div>
+              <div className="flex flex-wrap gap-2">
+                {OPTIONAL_SECTIONS.map((section) => {
+                  const isComplete = existingSectionTypes.has(section.type);
+                  return (
+                    <div
+                      key={section.type}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs ${
+                        isComplete
+                          ? 'bg-gray-100 border-gray-200 text-gray-600'
+                          : 'bg-white border-dashed border-gray-300 text-gray-500'
+                      }`}
+                    >
                       {isComplete ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-gray-400" />
                       ) : (
-                        <Circle className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5 sm:mt-0" />
+                        <Circle className="w-3.5 h-3.5 text-gray-300" />
                       )}
-                      <div className="min-w-0">
-                        <span className="font-medium text-gray-600 text-sm">{section.label}</span>
-                        <p className="text-xs text-gray-500 hidden sm:block">{section.description}</p>
-                      </div>
+                      <span>{section.label}</span>
+                      {!isComplete && (
+                        <Link
+                          to={`/conditions/${conditionId}/sections/new?type=${section.type}`}
+                          className="text-primary-600 hover:text-primary-700"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
                     </div>
-                    {!isComplete && (
-                      <Link
-                        to={`/conditions/${conditionId}/sections/new?type=${section.type}`}
-                        className="text-gray-500 hover:text-gray-700 text-xs sm:text-sm font-medium flex items-center gap-1 flex-shrink-0 touch-manipulation"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span className="hidden sm:inline">Add</span>
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
+
+// Workflow Step Component
+const WorkflowStep = ({ number, title, subtitle, isComplete, progress, progressWarning, isOptional, children }) => (
+  <div className="relative">
+    <div className="flex items-center gap-3 mb-3">
+      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+        isComplete
+          ? 'bg-emerald-500 text-white'
+          : isOptional
+          ? 'bg-gray-200 text-gray-500'
+          : 'bg-primary-100 text-primary-700'
+      }`}>
+        {isComplete ? <CheckCircle2 className="w-4 h-4" /> : number}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <h4 className="font-semibold text-gray-900 text-sm">{title}</h4>
+          <span className="text-xs text-gray-400">{subtitle}</span>
+        </div>
+      </div>
+      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+        isComplete
+          ? 'bg-emerald-100 text-emerald-700'
+          : progressWarning
+          ? 'bg-amber-100 text-amber-700'
+          : isOptional
+          ? 'bg-gray-100 text-gray-500'
+          : 'bg-gray-100 text-gray-600'
+      }`}>
+        {progress}
+      </span>
+    </div>
+    <div className="ml-10">
+      {children}
+    </div>
+  </div>
+);
 
 export default ConditionWorkflowGuide;
