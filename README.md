@@ -23,6 +23,7 @@ This platform enables healthcare practitioners and health educators to create, m
 - **MySQL/SQLite** - Database
 - **Laravel DomPDF** - PDF generation
 - **Maatwebsite Excel** - CSV/Excel import
+- **OpenAI PHP Client** - AI content generation
 
 ### Frontend (Admin Dashboard)
 - **React 19** - UI framework
@@ -30,8 +31,11 @@ This platform enables healthcare practitioners and health educators to create, m
 - **Tailwind CSS 3** - Styling
 - **React Router 7** - Navigation
 - **TipTap** - Rich text editor
+- **Recharts** - Data visualization charts
 - **Lucide React** - Icons
 - **Axios** - HTTP client
+- **SweetAlert2** - Toast notifications and dialogs
+- **date-fns** - Date formatting
 
 ## Features
 
@@ -110,10 +114,40 @@ Search across all content types:
 - Tag interventions, recipes, and scriptures
 - Filter content by tags
 
-### 12. Mobile Responsive
+### 12. AI Content Generator
+- Generate complete condition content using AI (OpenAI GPT integration)
+- Auto-generates structured sections: risk factors, physiology, complications, solutions
+- Preview generated content before importing
+- Markdown to rich text conversion
+- Progress tracking during generation
+- Error handling with retry capability
+
+### 13. Analytics Dashboard
+- **Overview Cards**: Real-time counts with weekly trends
+- **Category Distribution**: Pie chart of conditions by category
+- **Domain Distribution**: Bar chart of interventions by care domain
+- **Growth Metrics**: Line chart showing content creation over time
+- **Activity Timeline**: Recent create/update activity feed
+- **Evidence Quality**: Distribution of evidence ratings
+- **Content Completeness**: Scores for intervention completeness
+- **Export Reports**: Download analytics as PDF
+
+### 14. Notification System
+- Real-time notifications for async operations
+- AI content generation completion alerts
+- Import success/failure notifications
+- Notification bell with unread count badge
+- Persistent notification history (localStorage)
+- Quick links to relevant pages from notifications
+
+### 15. Mobile Responsive
 - Fully responsive admin dashboard
 - Touch-friendly interface
 - Collapsible sidebar navigation
+- Adaptive view modes (grid/list/table) with mobile-optimized layouts
+- Card-based table alternatives on small screens
+- Back button navigation for sub-level pages
+- Compact controls and touch targets for mobile
 
 ## Installation
 
@@ -146,6 +180,9 @@ php artisan key:generate
 # DB_DATABASE=lifestyle_medicine
 # DB_USERNAME=root
 # DB_PASSWORD=
+
+# Configure OpenAI for AI Content Generator (optional)
+# OPENAI_API_KEY=your-api-key-here
 
 # Run migrations
 php artisan migrate
@@ -266,6 +303,18 @@ POST   /api/v1/admin/conditions/{id}/scriptures/{scriptureId}
 DELETE /api/v1/admin/conditions/{id}/scriptures/{scriptureId}
 POST   /api/v1/admin/conditions/{id}/recipes/{recipeId}
 DELETE /api/v1/admin/conditions/{id}/recipes/{recipeId}
+
+# AI Content Generator
+POST /api/v1/admin/ai/generate-condition
+
+# Analytics
+GET /api/v1/admin/analytics/overview
+GET /api/v1/admin/analytics/conditions-by-category
+GET /api/v1/admin/analytics/interventions-by-domain
+GET /api/v1/admin/analytics/growth
+GET /api/v1/admin/analytics/user-activity
+GET /api/v1/admin/analytics/evidence-quality
+GET /api/v1/admin/analytics/content-completeness
 ```
 
 ## Data Models
@@ -361,8 +410,13 @@ lifestyle_medicine/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/Api/    # API controllers
+│   │   │   ├── AnalyticsController.php
+│   │   │   ├── AiGeneratorController.php
+│   │   │   └── ...
 │   │   └── Resources/          # API resources
 │   ├── Imports/                # Excel/CSV import classes
+│   ├── Services/               # Business logic services
+│   │   └── OpenAiService.php   # AI content generation
 │   └── Models/                 # Eloquent models
 ├── database/
 │   ├── migrations/             # Database migrations
@@ -373,10 +427,25 @@ lifestyle_medicine/
 │   └── api.php                 # API routes
 └── admin-dashboard/            # React frontend
     ├── src/
-    │   ├── components/         # Reusable components
-    │   ├── contexts/           # React contexts
-    │   ├── lib/                # API client
-    │   └── pages/              # Page components
+    │   ├── components/
+    │   │   ├── layout/         # Header, Sidebar, NotificationDropdown
+    │   │   ├── shared/         # Breadcrumbs, AuditInfo, RichTextPreview
+    │   │   └── ui/             # ViewModeToggle, SortableHeader
+    │   ├── contexts/
+    │   │   ├── AuthContext.jsx
+    │   │   └── NotificationContext.jsx
+    │   ├── features/
+    │   │   ├── ai-generator/   # AI Content Generator
+    │   │   ├── analytics/      # Analytics dashboard & charts
+    │   │   ├── conditions/     # Condition management
+    │   │   ├── interventions/  # Intervention management
+    │   │   ├── recipes/        # Recipe management
+    │   │   ├── scriptures/     # Scripture management
+    │   │   ├── import/         # Data import
+    │   │   └── dashboard/      # Main dashboard
+    │   └── lib/
+    │       ├── api.js          # API client & endpoints
+    │       └── swal.js         # Toast & dialog helpers
     └── public/
 ```
 
@@ -413,12 +482,41 @@ lifestyle_medicine/
 7. **Export**
    - Click "Export PDF" to generate a formatted treatment guide
 
+### AI Content Generator
+
+1. Navigate to AI Generator in the sidebar
+2. Enter a condition name (e.g., "Type 2 Diabetes")
+3. Click "Generate Content"
+4. Wait for AI to generate structured sections:
+   - Risk factors and causes
+   - Underlying physiology
+   - Potential complications
+   - Lifestyle solutions (organized by care domain)
+5. Preview the generated content in the formatted view
+6. Click "Import to Database" to create the condition with all sections
+7. Edit and refine the content as needed
+
+**Note:** Requires OpenAI API key configured in `.env` file.
+
 ### Bulk Import
 
 1. Navigate to Import Data
 2. Download the template for conditions or interventions
 3. Fill in your data following the template format
 4. Upload the file and click Import
+
+### Analytics Dashboard
+
+1. Navigate to Analytics in the sidebar
+2. View overview cards with content counts and weekly trends
+3. Explore charts:
+   - **Category Distribution**: See conditions by category
+   - **Domain Distribution**: View interventions by care domain
+   - **Growth Chart**: Track content creation over time
+4. Monitor recent activity in the timeline
+5. Check evidence quality distribution
+6. Review content completeness scores
+7. Export analytics report as PDF
 
 ## Contributing
 
