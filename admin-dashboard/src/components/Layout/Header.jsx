@@ -87,8 +87,8 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
 
   return (
     <>
-      {/* Mobile App Bar */}
-      <header className="lg:hidden bg-secondary-900 text-white sticky top-0 z-30 safe-area-top">
+      {/* Mobile App Bar - Fixed for reliable scroll behavior */}
+      <header className="lg:hidden bg-secondary-900 text-white fixed top-0 left-0 right-0 z-40 safe-area-top shadow-lg">
         <div className="flex items-center justify-between px-2 h-14">
           {/* Left: Back Button or Logo */}
           <div className="flex items-center gap-2 flex-1 min-w-0">
