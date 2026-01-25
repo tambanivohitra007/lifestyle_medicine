@@ -163,18 +163,25 @@ GET /api/v1/knowledge-graph/full?limit=100
 - [x] Legend panel - Already in KnowledgeGraph.jsx
 - [x] Node highlighting on search selection with yellow pulse animation
 
-### Phase 6: Full Graph View
-- [ ] Paginated full graph endpoint
-- [ ] Lazy loading for large graphs
-- [ ] Clustering for dense areas
-- [ ] Performance optimization
+### Phase 6: Full Graph View ✅ COMPLETE
+- [x] Paginated full graph endpoint (GET /api/v1/knowledge-graph/full)
+- [x] Lazy loading with "Load More" button
+- [x] Clustering layout for dense areas (cluster layout groups by node type)
+- [x] Performance optimization (pagination with limit, filtered edges)
+- [x] FullGraphPage.jsx with statistics panel
+- [x] Added to sidebar navigation
 
-### Phase 7: Export & Polish
-- [ ] PNG/SVG export
-- [ ] Share link generation
-- [ ] Keyboard shortcuts
-- [ ] Mobile responsiveness
-- [ ] Dark mode support
+### Phase 7: Export & Polish ✅ COMPLETE
+- [x] PNG/SVG export (ExportPanel.jsx using html-to-image)
+- [x] Share link generation (copy current URL to clipboard)
+- [x] Keyboard shortcuts (useKeyboardShortcuts.js hook)
+  - Ctrl+S: Save as PNG
+  - Ctrl+0: Reset zoom
+  - F: Fit view
+  - H/R/C: Switch layouts (Hierarchical/Radial/Cluster)
+- [x] KeyboardShortcutsHelp.jsx with shortcuts reference panel
+- [x] Mobile responsiveness (React Flow handles touch, responsive panels)
+- [ ] Dark mode support (deferred - requires broader app theming)
 
 ---
 

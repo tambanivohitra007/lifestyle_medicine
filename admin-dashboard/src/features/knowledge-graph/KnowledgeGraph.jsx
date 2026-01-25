@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -14,7 +14,8 @@ import { Loader2, Layout, Maximize2 } from 'lucide-react';
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
-import { FilterPanel, SearchBar } from './controls';
+import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp } from './controls';
+import { useKeyboardShortcuts } from './hooks';
 import api from '../../lib/api';
 
 const KnowledgeGraphInner = ({
@@ -145,6 +146,12 @@ const KnowledgeGraphInner = ({
     },
     [allNodes, allEdges, hiddenTypes, applyFilter]
   );
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onLayoutChange: handleLayoutChange,
+    graphTitle: `${centerType}-graph`,
+  });
 
   // Handle node click
   const handleNodeClick = useCallback(
@@ -292,6 +299,12 @@ const KnowledgeGraphInner = ({
               <div>Edges: {edges.length}{edges.length !== meta.totalEdges ? ` / ${meta.totalEdges}` : ''}</div>
             </div>
           )}
+
+          {/* Export */}
+          <ExportPanel graphTitle={`${centerType}-${centerId}`} />
+
+          {/* Keyboard Shortcuts */}
+          <KeyboardShortcutsHelp />
         </Panel>
 
         {/* Legend */}

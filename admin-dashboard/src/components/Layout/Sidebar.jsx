@@ -18,6 +18,7 @@ import {
   Users,
   BarChart3,
   Sparkles,
+  Network,
 } from 'lucide-react';
 import { useAuth, ROLES } from '../../contexts/AuthContext';
 import { confirmLogout } from '../../lib/swal';
@@ -48,6 +49,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
       items: [
         { to: '/', icon: LayoutDashboard, label: 'Dashboard', gradient: 'from-blue-500 to-blue-600' },
         { to: '/search', icon: Search, label: 'Search', gradient: 'from-slate-500 to-slate-600' },
+        { to: '/knowledge-graph', icon: Network, label: 'Graph', gradient: 'from-cyan-500 to-teal-600' },
       ],
     },
     {
@@ -99,6 +101,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
         { to: '/analytics', icon: BarChart3, label: 'Analytics', roles: [ROLES.ADMIN] },
         { to: '/search', icon: Search, label: 'Search' },
+        { to: '/knowledge-graph', icon: Network, label: 'Knowledge Graph' },
       ],
     },
     {

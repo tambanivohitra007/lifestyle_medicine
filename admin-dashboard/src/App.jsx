@@ -37,7 +37,7 @@ import { EgwReferences, EgwReferenceForm } from './features/egw-references';
 import { ContentTags } from './features/content-tags';
 import { Users, UserForm } from './features/users';
 import BibleExplorer from './features/bible/BibleExplorer';
-import { KnowledgeGraphPage } from './features/knowledge-graph';
+import { KnowledgeGraphPage, FullGraphPage } from './features/knowledge-graph';
 
 // Forbidden Page Component
 const Forbidden = () => {
@@ -199,6 +199,7 @@ function App() {
             <Route path="bible" element={<BibleExplorer />} />
 
             {/* Knowledge Graph - All authenticated users */}
+            <Route path="knowledge-graph" element={<FullGraphPage />} />
             <Route path="knowledge-graph/:type/:id" element={<KnowledgeGraphPage />} />
 
             {/* Forbidden page */}
