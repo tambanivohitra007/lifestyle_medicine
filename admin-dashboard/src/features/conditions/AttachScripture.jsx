@@ -78,7 +78,7 @@ const AttachScripture = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-24 sm:pb-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -90,9 +90,9 @@ const AttachScripture = () => {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Attach Scripture</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Attach Scripture</h1>
         {condition && (
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Link a scripture to: <span className="font-medium">{condition.name}</span>
           </p>
         )}
@@ -100,7 +100,7 @@ const AttachScripture = () => {
 
       {/* Filters */}
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="relative">
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -128,35 +128,35 @@ const AttachScripture = () => {
 
       {/* Scripture List */}
       {filteredScriptures.length === 0 ? (
-        <div className="card text-center py-12">
-          <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <div className="card text-center py-8 sm:py-12">
+          <BookOpen className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
             No available scriptures
           </h3>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm sm:text-base">
             All scriptures are already linked or none match your search.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {filteredScriptures.map((scripture) => (
             <button
               key={scripture.id}
               type="button"
               onClick={() => setSelectedScripture(scripture)}
-              className={`card text-left transition-all ${
+              className={`card text-left transition-all touch-manipulation ${
                 selectedScripture?.id === scripture.id
                   ? 'ring-2 ring-primary-500 bg-primary-50'
-                  : 'hover:shadow-lg'
+                  : 'hover:shadow-lg active:bg-gray-50'
               }`}
             >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-indigo-500" />
-                  <h3 className="font-semibold text-gray-900">{scripture.reference}</h3>
+              <div className="flex items-start justify-between mb-2 gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <BookOpen className="w-5 h-5 text-indigo-500 flex-shrink-0" />
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{scripture.reference}</h3>
                 </div>
                 {selectedScripture?.id === scripture.id && (
-                  <Check className="w-5 h-5 text-primary-500" />
+                  <Check className="w-5 h-5 text-primary-500 flex-shrink-0" />
                 )}
               </div>
               {scripture.theme && (
@@ -164,7 +164,7 @@ const AttachScripture = () => {
                   {scripture.theme}
                 </span>
               )}
-              <p className="text-sm text-gray-600 italic line-clamp-3">
+              <p className="text-xs sm:text-sm text-gray-600 italic line-clamp-3">
                 "{scripture.text}"
               </p>
             </button>
@@ -172,33 +172,36 @@ const AttachScripture = () => {
         </div>
       )}
 
-      {/* Actions */}
+      {/* Actions - Fixed bottom bar on mobile */}
       {selectedScripture && (
-        <div className="card sticky bottom-4 flex items-center justify-between">
-          <p className="text-gray-700">
-            Selected: <span className="font-medium">{selectedScripture.reference}</span>
-          </p>
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => setSelectedScripture(null)}
-              className="btn-outline"
-            >
-              Clear
-            </button>
-            <button
-              type="button"
-              onClick={handleAttach}
-              disabled={saving}
-              className="btn-primary flex items-center gap-2"
-            >
-              {saving ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Check className="w-5 h-5" />
-              )}
-              {saving ? 'Attaching...' : 'Attach Scripture'}
-            </button>
+        <div className="card fixed sm:sticky bottom-0 left-0 right-0 sm:bottom-4 rounded-none sm:rounded-lg shadow-lg sm:shadow border-t sm:border border-gray-200 z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <p className="text-gray-700 text-sm sm:text-base truncate">
+              Selected: <span className="font-medium">{selectedScripture.reference}</span>
+            </p>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <button
+                type="button"
+                onClick={() => setSelectedScripture(null)}
+                className="btn-outline flex-1 sm:flex-initial justify-center touch-manipulation"
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                onClick={handleAttach}
+                disabled={saving}
+                className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Check className="w-5 h-5" />
+                )}
+                <span className="hidden sm:inline">{saving ? 'Attaching...' : 'Attach Scripture'}</span>
+                <span className="sm:hidden">{saving ? 'Attaching...' : 'Attach'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

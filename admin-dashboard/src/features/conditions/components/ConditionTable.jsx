@@ -18,7 +18,7 @@ const ConditionTable = ({ conditions, onDelete, canEdit }) => {
       <div className="sm:hidden space-y-3">
         {conditions.map((condition) => (
           <div key={condition.id} className="card">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-gray-900 text-sm truncate">
                   {condition.name}
@@ -29,10 +29,10 @@ const ConditionTable = ({ conditions, onDelete, canEdit }) => {
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
+              <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1">
                 <Link
                   to={`/conditions/${condition.id}`}
-                  className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
                   title="View"
                 >
                   <Eye className="w-4 h-4" />
@@ -41,14 +41,14 @@ const ConditionTable = ({ conditions, onDelete, canEdit }) => {
                   <>
                     <Link
                       to={`/conditions/${condition.id}/edit`}
-                      className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </Link>
                     <button
                       onClick={() => onDelete(condition.id, condition.name)}
-                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />

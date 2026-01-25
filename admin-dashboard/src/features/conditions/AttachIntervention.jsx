@@ -113,7 +113,7 @@ const AttachIntervention = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -125,19 +125,19 @@ const AttachIntervention = () => {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Attach Intervention</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Attach Intervention</h1>
         {condition && (
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Link an intervention to: <span className="font-medium">{condition.name}</span>
           </p>
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left: Intervention Selection */}
         <div className="space-y-4">
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Intervention</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Select Intervention</h2>
 
             {/* Filters */}
             <div className="space-y-3 mb-4">
@@ -166,9 +166,9 @@ const AttachIntervention = () => {
             </div>
 
             {/* Intervention List */}
-            <div className="max-h-96 overflow-y-auto space-y-2">
+            <div className="max-h-64 sm:max-h-96 overflow-y-auto space-y-2 overscroll-contain">
               {filteredInterventions.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">
+                <p className="text-gray-500 text-center py-4 text-sm">
                   No available interventions found
                 </p>
               ) : (
@@ -177,17 +177,17 @@ const AttachIntervention = () => {
                     key={intervention.id}
                     type="button"
                     onClick={() => handleSelectIntervention(intervention)}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                    className={`w-full text-left p-3 rounded-lg border transition-colors touch-manipulation ${
                       selectedIntervention?.id === intervention.id
                         ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100'
                     }`}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Stethoscope className="w-4 h-4 text-green-500" />
-                          <span className="font-medium text-gray-900">
+                          <Stethoscope className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="font-medium text-gray-900 text-sm sm:text-base truncate">
                             {intervention.name}
                           </span>
                         </div>
@@ -201,7 +201,7 @@ const AttachIntervention = () => {
                         )}
                       </div>
                       {selectedIntervention?.id === intervention.id && (
-                        <Check className="w-5 h-5 text-primary-500" />
+                        <Check className="w-5 h-5 text-primary-500 flex-shrink-0" />
                       )}
                     </div>
                   </button>
@@ -213,16 +213,16 @@ const AttachIntervention = () => {
 
         {/* Right: Mapping Configuration */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
             Configure Mapping
           </h2>
 
           {!selectedIntervention ? (
-            <p className="text-gray-500 text-center py-8">
+            <p className="text-gray-500 text-center py-6 sm:py-8 text-sm">
               Select an intervention from the list
             </p>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div className="p-3 bg-green-50 rounded-lg">
                 <p className="text-sm text-green-700">
                   Selected: <span className="font-medium">{selectedIntervention.name}</span>
@@ -283,7 +283,7 @@ const AttachIntervention = () => {
                     }))
                   }
                   rows={3}
-                  className="input-field"
+                  className="input-field text-sm"
                   placeholder="Specific notes for this condition..."
                 />
               </div>
@@ -300,18 +300,18 @@ const AttachIntervention = () => {
                       order_index: parseInt(e.target.value) || 0,
                     }))
                   }
-                  className="input-field w-32"
+                  className="input-field w-full sm:w-32"
                   min="0"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 sm:gap-4 pt-4 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={handleAttach}
                   disabled={saving}
-                  className="btn-primary flex items-center gap-2"
+                  className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto touch-manipulation"
                 >
                   {saving ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -320,7 +320,7 @@ const AttachIntervention = () => {
                   )}
                   {saving ? 'Attaching...' : 'Attach Intervention'}
                 </button>
-                <Link to={`/conditions/${conditionId}`} className="btn-outline">
+                <Link to={`/conditions/${conditionId}`} className="btn-outline text-center w-full sm:w-auto">
                   Cancel
                 </Link>
               </div>
