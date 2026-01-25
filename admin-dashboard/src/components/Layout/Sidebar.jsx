@@ -108,7 +108,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
           {/* Collapsed logo icon - desktop only */}
           {isCollapsed && (
             <div className="hidden lg:flex items-center justify-center w-10 h-10 rounded-lg bg-primary-600">
-              <Heart className="w-6 h-6 text-white" />
+              <HeartPulse className="w-6 h-6 text-white" />
             </div>
           )}
           {/* Close button - visible only on mobile */}
