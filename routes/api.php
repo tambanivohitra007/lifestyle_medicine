@@ -58,6 +58,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
     // Conditions
     Route::apiResource('conditions', ConditionController::class)->only(['index', 'show']);
+    Route::get('conditions/{condition}/complete', [ConditionController::class, 'complete']); // All data in one request
     Route::get('conditions/{condition}/sections', [ConditionController::class, 'sections']);
     Route::get('conditions/{condition}/interventions', [ConditionController::class, 'interventions']);
     Route::get('conditions/{condition}/scriptures', [ConditionController::class, 'scriptures']);

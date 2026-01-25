@@ -76,23 +76,19 @@ const ConditionDetail = () => {
   const fetchConditionData = async () => {
     try {
       setLoading(true);
-      const [conditionRes, sectionsRes, interventionsRes, scripturesRes, egwRes, recipesRes, careDomainsRes] =
-        await Promise.all([
-          api.get(`${apiEndpoints.conditions}/${id}`),
-          api.get(apiEndpoints.conditionSections(id)),
-          api.get(apiEndpoints.conditionInterventions(id)),
-          api.get(apiEndpoints.conditionScriptures(id)),
-          api.get(apiEndpoints.conditionEgwReferences(id)),
-          api.get(apiEndpoints.conditionRecipes(id)),
-          api.get(apiEndpoints.careDomains),
-        ]);
+      // Fetch all data in ONE request instead of 7 separate calls
+      const [completeRes, careDomainsRes] = await Promise.all([
+        api.get(apiEndpoints.conditionComplete(id)),
+        api.get(apiEndpoints.careDomains),
+      ]);
 
-      setCondition(conditionRes.data.data);
-      setSections(sectionsRes.data.data || []);
-      setInterventions(interventionsRes.data.data || []);
-      setScriptures(scripturesRes.data.data || []);
-      setEgwReferences(egwRes.data.data || []);
-      setRecipes(recipesRes.data.data || []);
+      const data = completeRes.data.data;
+      setCondition(data.condition);
+      setSections(data.sections || []);
+      setInterventions(data.interventions || []);
+      setScriptures(data.scriptures || []);
+      setEgwReferences(data.egw_references || []);
+      setRecipes(data.recipes || []);
       setCareDomains(careDomainsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching condition:', error);

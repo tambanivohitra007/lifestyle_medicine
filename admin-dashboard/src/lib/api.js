@@ -115,6 +115,7 @@ export const apiEndpoints = {
   // Conditions
   conditions: '/conditions',
   conditionsAdmin: '/admin/conditions',
+  conditionComplete: (id) => `/conditions/${id}/complete`, // All related data in one request
   conditionSections: (id) => `/conditions/${id}/sections`,
   conditionInterventions: (id) => `/conditions/${id}/interventions`,
   conditionScriptures: (id) => `/conditions/${id}/scriptures`,

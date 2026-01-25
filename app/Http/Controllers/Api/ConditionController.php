@@ -64,6 +64,37 @@ class ConditionController extends Controller
         return new ConditionResource($condition);
     }
 
+    /**
+     * Get a condition with ALL related data in a single request.
+     * This eliminates the need for multiple API calls on the detail page.
+     */
+    public function complete(Condition $condition): JsonResponse
+    {
+        // Load all relationships in one query
+        $condition->load([
+            'sections' => fn($q) => $q->orderBy('order_index'),
+            'interventions' => fn($q) => $q->with('careDomain')
+                ->withPivot(['strength_of_evidence', 'recommendation_level', 'clinical_notes', 'order_index'])
+                ->orderBy('condition_interventions.order_index'),
+            'scriptures',
+            'recipes',
+            'egwReferences',
+            'creator',
+            'updater',
+        ]);
+
+        return response()->json([
+            'data' => [
+                'condition' => new ConditionResource($condition),
+                'sections' => ConditionSectionResource::collection($condition->sections),
+                'interventions' => InterventionResource::collection($condition->interventions),
+                'scriptures' => ScriptureResource::collection($condition->scriptures),
+                'recipes' => RecipeResource::collection($condition->recipes),
+                'egw_references' => EgwReferenceResource::collection($condition->egwReferences),
+            ],
+        ]);
+    }
+
     public function store(Request $request): ConditionResource
     {
         $validated = $request->validate([
