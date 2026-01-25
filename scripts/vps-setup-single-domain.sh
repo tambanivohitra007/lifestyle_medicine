@@ -44,12 +44,33 @@ APP_DIR="/var/www/lifestyle-medicine"
 
 # Check if application is already cloned
 if [ ! -f "$APP_DIR/artisan" ]; then
-    print_error "Application not found at $APP_DIR"
-    echo "Please clone the repository first:"
-    echo "  git clone YOUR_REPO_URL $APP_DIR"
-    exit 1
+    print_warning "Application not found at $APP_DIR"
+    echo ""
+    echo -e "${YELLOW}The application needs to be cloned first.${NC}"
+    echo ""
+    read -p "Enter Git repository URL (or press Enter to skip): " REPO_URL
+
+    if [ -n "$REPO_URL" ]; then
+        echo "Cloning repository..."
+        mkdir -p /var/www
+        git clone "$REPO_URL" "$APP_DIR"
+
+        if [ ! -f "$APP_DIR/artisan" ]; then
+            print_error "Clone failed or invalid Laravel project"
+            exit 1
+        fi
+        print_success "Repository cloned to $APP_DIR"
+    else
+        echo ""
+        echo "Please clone the repository manually:"
+        echo -e "  ${BLUE}git clone YOUR_REPO_URL $APP_DIR${NC}"
+        echo ""
+        echo "Then run this script again."
+        exit 1
+    fi
+else
+    print_success "Application found at $APP_DIR"
 fi
-print_success "Application found at $APP_DIR"
 
 echo -e "${YELLOW}This script sets up a single domain configuration:${NC}"
 echo "  - yourdomain.com     → Admin Dashboard (React)"
