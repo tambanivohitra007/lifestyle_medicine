@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { X, LogOut, User, Shield } from 'lucide-react';
+import { X, LogOut, User, Shield, ChevronRight } from 'lucide-react';
 import {
   LayoutDashboard,
   HeartPulse,
@@ -41,34 +41,55 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
     viewer: 'Viewer',
   };
 
-  // All navigation items for mobile grid
-  const mobileNavItems = [
-    { to: '/', icon: LayoutDashboard, label: 'Dashboard', color: 'bg-blue-500' },
-    { to: '/conditions', icon: HeartPulse, label: 'Conditions', color: 'bg-red-500' },
-    { to: '/interventions', icon: Activity, label: 'Interventions', color: 'bg-green-500' },
-    { to: '/care-domains', icon: Bookmark, label: 'Care Domains', color: 'bg-purple-500' },
-    { to: '/search', icon: Search, label: 'Search', color: 'bg-gray-500' },
-    { to: '/bible', icon: BookOpen, label: 'Bible Explorer', color: 'bg-indigo-500' },
-    { to: '/evidence', icon: TestTube, label: 'Evidence', color: 'bg-teal-500' },
-    { to: '/references', icon: Library, label: 'References', color: 'bg-amber-500' },
-    { to: '/scriptures', icon: Book, label: 'Scriptures', color: 'bg-sky-500' },
-    { to: '/egw-references', icon: BookMarked, label: 'EGW Writings', color: 'bg-violet-500' },
-    { to: '/recipes', icon: ChefHat, label: 'Recipes', color: 'bg-orange-500' },
-    { to: '/profile', icon: Settings, label: 'Settings', color: 'bg-slate-500' },
+  // Mobile navigation sections with gradients
+  const mobileSections = [
+    {
+      title: 'Main',
+      items: [
+        { to: '/', icon: LayoutDashboard, label: 'Dashboard', gradient: 'from-blue-500 to-blue-600' },
+        { to: '/search', icon: Search, label: 'Search', gradient: 'from-slate-500 to-slate-600' },
+      ],
+    },
+    {
+      title: 'Content',
+      items: [
+        { to: '/conditions', icon: HeartPulse, label: 'Conditions', gradient: 'from-rose-500 to-red-600' },
+        { to: '/interventions', icon: Activity, label: 'Interventions', gradient: 'from-emerald-500 to-green-600' },
+        { to: '/care-domains', icon: Bookmark, label: 'Care Domains', gradient: 'from-violet-500 to-purple-600' },
+      ],
+    },
+    {
+      title: 'Resources',
+      items: [
+        { to: '/bible', icon: BookOpen, label: 'Bible Explorer', gradient: 'from-indigo-500 to-indigo-600' },
+        { to: '/scriptures', icon: Book, label: 'Scriptures', gradient: 'from-sky-500 to-cyan-600' },
+        { to: '/egw-references', icon: BookMarked, label: 'EGW Writings', gradient: 'from-purple-500 to-violet-600' },
+        { to: '/evidence', icon: TestTube, label: 'Evidence', gradient: 'from-teal-500 to-teal-600' },
+        { to: '/references', icon: Library, label: 'References', gradient: 'from-amber-500 to-orange-600' },
+        { to: '/recipes', icon: ChefHat, label: 'Recipes', gradient: 'from-orange-500 to-red-500' },
+      ],
+    },
+    {
+      title: 'Administration',
+      roles: [ROLES.ADMIN],
+      items: [
+        { to: '/analytics', icon: BarChart3, label: 'Analytics', gradient: 'from-cyan-500 to-blue-600', roles: [ROLES.ADMIN] },
+        { to: '/users', icon: Users, label: 'Users', gradient: 'from-pink-500 to-rose-600', roles: [ROLES.ADMIN] },
+        { to: '/tags', icon: Tag, label: 'Tags', gradient: 'from-lime-500 to-green-600', roles: [ROLES.ADMIN] },
+        { to: '/import', icon: Upload, label: 'Import', gradient: 'from-emerald-500 to-teal-600', roles: [ROLES.ADMIN] },
+        { to: '/ai-generator', icon: Sparkles, label: 'AI Generator', gradient: 'from-fuchsia-500 to-pink-600', roles: [ROLES.ADMIN] },
+      ],
+    },
   ];
 
-  // Admin-only items
-  const adminNavItems = [
-    { to: '/analytics', icon: BarChart3, label: 'Analytics', color: 'bg-cyan-500', roles: [ROLES.ADMIN] },
-    { to: '/users', icon: Users, label: 'Users', color: 'bg-pink-500', roles: [ROLES.ADMIN] },
-    { to: '/tags', icon: Tag, label: 'Content Tags', color: 'bg-lime-500', roles: [ROLES.ADMIN] },
-    { to: '/import', icon: Upload, label: 'Import Data', color: 'bg-emerald-500', roles: [ROLES.ADMIN] },
-    { to: '/ai-generator', icon: Sparkles, label: 'AI Generator', color: 'bg-fuchsia-500', roles: [ROLES.ADMIN] },
-  ];
-
-  // Filter admin items based on role
-  const filteredAdminItems = adminNavItems.filter(item => !item.roles || hasRole(item.roles));
-  const allMobileItems = [...mobileNavItems, ...filteredAdminItems];
+  // Filter sections based on role
+  const filteredMobileSections = mobileSections
+    .filter(section => !section.roles || hasRole(section.roles))
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => !item.roles || hasRole(item.roles)),
+    }))
+    .filter(section => section.items.length > 0);
 
   // Desktop navigation sections
   const navSections = [
@@ -131,97 +152,146 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
-      {/* Mobile Menu - Bottom Sheet Style */}
+      {/* Mobile Menu - Elegant Bottom Sheet */}
       <div
         className={`
           lg:hidden fixed inset-x-0 bottom-0 z-50
-          bg-white rounded-t-3xl shadow-2xl
-          transform transition-transform duration-300 ease-out
+          bg-gradient-to-b from-white to-gray-50 rounded-t-[2rem] shadow-2xl
+          transform transition-all duration-300 ease-out
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}
         `}
-        style={{ maxHeight: '85vh' }}
+        style={{ maxHeight: '90vh' }}
       >
         {/* Handle Bar */}
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-              <User className="w-5 h-5 text-primary-600" />
+        {/* Header - User Profile Card */}
+        <div className="mx-4 mt-2 mb-4 p-4 bg-gradient-to-r from-secondary-800 to-secondary-900 rounded-2xl shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-md">
+                <User className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-base font-semibold text-white">{user?.name || 'User'}</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                    user?.role === 'admin'
+                      ? 'bg-purple-500/30 text-purple-200'
+                      : user?.role === 'editor'
+                      ? 'bg-blue-500/30 text-blue-200'
+                      : 'bg-gray-500/30 text-gray-200'
+                  }`}>
+                    {user?.role === 'admin' && <Shield className="w-2.5 h-2.5" />}
+                    {roleLabels[user?.role] || 'User'}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
-              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                user?.role === 'admin'
-                  ? 'bg-purple-100 text-purple-700'
-                  : user?.role === 'editor'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-700'
-              }`}>
-                {user?.role === 'admin' && <Shield className="w-2.5 h-2.5" />}
-                {roleLabels[user?.role] || 'User'}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 -mr-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
-            aria-label="Close menu"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-
-        {/* Grid Menu */}
-        <div className="overflow-y-auto overscroll-contain" style={{ maxHeight: 'calc(85vh - 140px)' }}>
-          <div className="grid grid-cols-4 gap-2 p-4">
-            {allMobileItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex flex-col items-center justify-center p-3 rounded-2xl transition-all touch-manipulation ${
-                    isActive
-                      ? 'bg-primary-50 ring-2 ring-primary-200'
-                      : 'hover:bg-gray-50 active:bg-gray-100'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-1.5 ${
-                      isActive ? 'bg-primary-500' : item.color
-                    }`}>
-                      <item.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <span className={`text-[10px] font-medium text-center leading-tight ${
-                      isActive ? 'text-primary-700' : 'text-gray-600'
-                    }`}>
-                      {item.label}
-                    </span>
-                  </>
-                )}
-              </NavLink>
-            ))}
+            <NavLink
+              to="/profile"
+              onClick={onClose}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors touch-manipulation"
+            >
+              <Settings className="w-5 h-5 text-white" />
+            </NavLink>
           </div>
         </div>
 
-        {/* Logout Button */}
-        <div className="border-t border-gray-100 p-4 safe-area-bottom">
+        {/* Scrollable Menu */}
+        <div className="overflow-y-auto overscroll-contain px-4 pb-2" style={{ maxHeight: 'calc(90vh - 220px)' }}>
+          {filteredMobileSections.map((section, sectionIndex) => (
+            <div key={section.title} className={sectionIndex > 0 ? 'mt-5' : ''}>
+              {/* Section Title */}
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-2 px-1">
+                {section.title}
+              </p>
+
+              {/* Section Items - Horizontal scroll for Resources, Grid for others */}
+              {section.items.length > 4 ? (
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+                  {section.items.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      end={item.to === '/'}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        `flex-shrink-0 flex flex-col items-center justify-center w-[72px] py-3 rounded-2xl transition-all duration-200 touch-manipulation ${
+                          isActive
+                            ? 'bg-primary-50 shadow-md shadow-primary-100'
+                            : 'bg-white shadow-sm hover:shadow-md active:scale-95'
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-2 shadow-sm bg-gradient-to-br ${
+                            isActive ? 'from-primary-500 to-primary-600' : item.gradient
+                          }`}>
+                            <item.icon className="w-5 h-5 text-white" />
+                          </div>
+                          <span className={`text-[10px] font-medium text-center leading-tight ${
+                            isActive ? 'text-primary-700' : 'text-gray-600'
+                          }`}>
+                            {item.label}
+                          </span>
+                        </>
+                      )}
+                    </NavLink>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-2">
+                  {section.items.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      end={item.to === '/'}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        `flex flex-col items-center justify-center py-3 rounded-2xl transition-all duration-200 touch-manipulation ${
+                          isActive
+                            ? 'bg-primary-50 shadow-md shadow-primary-100'
+                            : 'bg-white shadow-sm hover:shadow-md active:scale-95'
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-2 shadow-sm bg-gradient-to-br ${
+                            isActive ? 'from-primary-500 to-primary-600' : item.gradient
+                          }`}>
+                            <item.icon className="w-5 h-5 text-white" />
+                          </div>
+                          <span className={`text-[10px] font-medium text-center leading-tight ${
+                            isActive ? 'text-primary-700' : 'text-gray-600'
+                          }`}>
+                            {item.label}
+                          </span>
+                        </>
+                      )}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="border-t border-gray-200 p-4 bg-white safe-area-bottom">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-red-600 font-medium text-sm hover:bg-red-100 active:bg-red-200 transition-colors touch-manipulation"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-medium text-sm shadow-lg shadow-red-200 hover:shadow-xl hover:shadow-red-300 active:scale-[0.98] transition-all duration-200 touch-manipulation"
           >
             <LogOut className="w-5 h-5" />
             Sign Out
