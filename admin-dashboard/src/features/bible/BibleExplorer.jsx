@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Search,
   BookOpen,
@@ -68,6 +69,7 @@ const highlightSearchTerm = (text, searchTerm) => {
 };
 
 const BibleExplorer = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('themes');
   const [searchQuery, setSearchQuery] = useState('');
   const [lookupQuery, setLookupQuery] = useState('');
@@ -87,6 +89,7 @@ const BibleExplorer = () => {
   const [copiedRef, setCopiedRef] = useState(null);
   const [searchMode, setSearchMode] = useState('bible'); // 'bible' or 'health'
   const [loadingTheme, setLoadingTheme] = useState(null); // Track which theme is loading
+  const [pendingNavigation, setPendingNavigation] = useState(null); // For URL param navigation
 
   // Fetch initial data
   useEffect(() => {
@@ -94,6 +97,59 @@ const BibleExplorer = () => {
     fetchThemes();
     fetchBooks();
   }, []);
+
+  // Handle URL parameters for deep linking to book/chapter
+  useEffect(() => {
+    const bookParam = searchParams.get('book');
+    const chapterParam = searchParams.get('chapter');
+
+    if (bookParam && chapterParam) {
+      setPendingNavigation({ book: bookParam, chapter: parseInt(chapterParam, 10) });
+      // Clear the URL params after reading them
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  // Navigate to book/chapter when books are loaded and we have pending navigation
+  useEffect(() => {
+    if (pendingNavigation && books.old_testament.length > 0) {
+      const { book, chapter } = pendingNavigation;
+      const allBooks = [...books.old_testament, ...books.new_testament];
+
+      // Find the book by name (case-insensitive, partial match)
+      const foundBook = allBooks.find(
+        (b) =>
+          b.name.toLowerCase() === book.toLowerCase() ||
+          b.name.toLowerCase().startsWith(book.toLowerCase())
+      );
+
+      if (foundBook) {
+        setActiveTab('browse');
+        setSelectedBook(foundBook);
+
+        // Fetch chapter directly with the found book
+        if (chapter >= 1 && chapter <= foundBook.chapters) {
+          setSelectedChapter(chapter);
+          setLoading(true);
+          api.get(apiEndpoints.bibleChapter, {
+            params: { bookId: foundBook.id, chapter, bibleId },
+          })
+            .then((response) => {
+              setChapterContent(response.data.data);
+            })
+            .catch((error) => {
+              console.error('Error fetching chapter:', error);
+              toast.error('Failed to load chapter');
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        }
+      }
+
+      setPendingNavigation(null);
+    }
+  }, [books, pendingNavigation, bibleId]);
 
   // Fetch daily verse when translation changes
   useEffect(() => {

@@ -50,6 +50,43 @@ const RECOMMENDATION_LEVEL = {
   optional: { label: 'Optional', color: 'bg-gray-100 text-gray-700' },
 };
 
+// Parse scripture reference to extract book and chapter
+// Examples: "John 3:16", "1 John 2:3-5", "Psalm 23:1-3", "Genesis 1:1"
+const parseScriptureReference = (reference) => {
+  if (!reference) return null;
+
+  const ref = String(reference).trim();
+  if (!ref) return null;
+
+  // Split by the last occurrence of a number followed by : or end
+  // This handles "1 John 2:3" → ["1 John", "2", ":3"]
+  const parts = ref.split(/\s+/);
+
+  // Find the index where chapter number starts (first part that starts with a digit after the book name)
+  let bookParts = [];
+  let chapter = null;
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    // Check if this part starts with a digit and we already have book parts
+    if (/^\d/.test(part) && bookParts.length > 0) {
+      // This is the chapter:verse part
+      chapter = parseInt(part.split(':')[0], 10);
+      break;
+    } else {
+      bookParts.push(part);
+    }
+  }
+
+  const book = bookParts.join(' ');
+
+  if (book && chapter && chapter > 0) {
+    return { book, chapter };
+  }
+
+  return null;
+};
+
 const ConditionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -498,42 +535,50 @@ const ConditionDetail = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {scriptures.map((scripture) => (
-                  <div key={scripture.id} className="card hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <Link
-                        to={`/scriptures/${scripture.id}`}
-                        className="font-semibold text-gray-900 text-sm sm:text-base hover:text-primary-600 transition-colors"
-                      >
-                        {scripture.reference}
-                      </Link>
-                      <div className="flex gap-1 flex-shrink-0">
+                {scriptures.map((scripture) => {
+                  const parsed = parseScriptureReference(scripture.reference);
+                  const bibleExplorerUrl = parsed
+                    ? `/bible?book=${encodeURIComponent(parsed.book)}&chapter=${parsed.chapter}`
+                    : '/bible';
+
+                  return (
+                    <div key={scripture.id} className="card hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between gap-2 mb-2">
                         <Link
-                          to={`/scriptures/${scripture.id}`}
-                          className="action-btn"
-                          title="View"
+                          to={bibleExplorerUrl}
+                          className="font-semibold text-gray-900 text-sm sm:text-base hover:text-primary-600 transition-colors"
+                          title={parsed ? 'Read full chapter in Bible Explorer' : 'Open Bible Explorer'}
                         >
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                          {scripture.reference}
                         </Link>
-                        {canEdit && (
-                          <button
-                            onClick={() => handleDetachScripture(scripture.id, scripture.reference)}
-                            className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title="Remove"
+                        <div className="flex gap-1 flex-shrink-0">
+                          <Link
+                            to={bibleExplorerUrl}
+                            className="action-btn"
+                            title={parsed ? 'Read full chapter' : 'Open Bible Explorer'}
                           >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </button>
-                        )}
+                            <BookOpen className="w-4 h-4 text-primary-500" />
+                          </Link>
+                          {canEdit && (
+                            <button
+                              onClick={() => handleDetachScripture(scripture.id, scripture.reference)}
+                              className="action-btn hover:bg-red-50 active:bg-red-100"
+                              title="Remove"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </button>
+                          )}
+                        </div>
                       </div>
+                      {scripture.theme && (
+                        <span className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full mb-2">
+                          {scripture.theme}
+                        </span>
+                      )}
+                      <p className="text-gray-600 text-xs sm:text-sm italic break-words">"{scripture.text}"</p>
                     </div>
-                    {scripture.theme && (
-                      <span className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full mb-2">
-                        {scripture.theme}
-                      </span>
-                    )}
-                    <p className="text-gray-600 text-xs sm:text-sm italic break-words">"{scripture.text}"</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
