@@ -23,6 +23,53 @@ class AiContentService
     protected ?Client $client = null;
     protected ?string $apiKey = null;
 
+    /**
+     * Valid study types for evidence entries (must match database enum).
+     */
+    protected const VALID_STUDY_TYPES = [
+        'rct',
+        'meta_analysis',
+        'systematic_review',
+        'observational',
+        'case_series',
+        'expert_opinion',
+    ];
+
+    /**
+     * Mapping of common AI-generated study type variations to valid values.
+     */
+    protected const STUDY_TYPE_ALIASES = [
+        'randomized controlled trial' => 'rct',
+        'randomised controlled trial' => 'rct',
+        'randomized_controlled_trial' => 'rct',
+        'clinical trial' => 'rct',
+        'clinical_trial' => 'rct',
+        'meta-analysis' => 'meta_analysis',
+        'metaanalysis' => 'meta_analysis',
+        'systematic review' => 'systematic_review',
+        'systematic-review' => 'systematic_review',
+        'review' => 'systematic_review',
+        'longitudinal' => 'observational',
+        'longitudinal study' => 'observational',
+        'cohort' => 'observational',
+        'cohort study' => 'observational',
+        'cohort_study' => 'observational',
+        'cross-sectional' => 'observational',
+        'cross_sectional' => 'observational',
+        'prospective' => 'observational',
+        'retrospective' => 'observational',
+        'epidemiological' => 'observational',
+        'case study' => 'case_series',
+        'case_study' => 'case_series',
+        'case report' => 'case_series',
+        'case-series' => 'case_series',
+        'expert opinion' => 'expert_opinion',
+        'expert-opinion' => 'expert_opinion',
+        'consensus' => 'expert_opinion',
+        'guideline' => 'expert_opinion',
+        'guidelines' => 'expert_opinion',
+    ];
+
     public function __construct()
     {
         $this->apiKey = config('services.gemini.api_key');
@@ -263,7 +310,7 @@ class AiContentService
 
                     $evidence = EvidenceEntry::create([
                         'intervention_id' => $interventionId,
-                        'study_type' => $evData['study_type'],
+                        'study_type' => $this->normalizeStudyType($evData['study_type'] ?? 'observational'),
                         'population' => $evData['population'] ?? null,
                         'quality_rating' => $evData['quality_rating'] ?? null,
                         'summary' => $evData['summary'],
@@ -625,9 +672,56 @@ Convert the above content into this exact JSON structure:
 6. If no recipes are applicable, use empty array: "recipes": []
 7. All tags should be lowercase with underscores
 8. **ALL RECIPES MUST BE VEGETARIAN** - No meat, fish, or poultry. Include "vegetarian" in dietary_tags. Prefer plant-based, whole food ingredients.
+9. **STUDY TYPES MUST BE EXACT**: Use ONLY these exact values for study_type: "rct", "meta_analysis", "systematic_review", "observational", "case_series", "expert_opinion". Do NOT use variations like "longitudinal", "cohort", "cross-sectional" - use "observational" for these.
 
 Output ONLY valid JSON, no markdown formatting or explanation.
 PROMPT;
+    }
+
+    /**
+     * Normalize a study type value to a valid enum value.
+     * Maps common variations and aliases to the correct database enum values.
+     */
+    protected function normalizeStudyType(string $studyType): string
+    {
+        $normalized = strtolower(trim($studyType));
+
+        // Check if already valid
+        if (in_array($normalized, self::VALID_STUDY_TYPES)) {
+            return $normalized;
+        }
+
+        // Check aliases
+        if (isset(self::STUDY_TYPE_ALIASES[$normalized])) {
+            Log::info("AI Content Import - Mapped study type '{$studyType}' to '" . self::STUDY_TYPE_ALIASES[$normalized] . "'");
+            return self::STUDY_TYPE_ALIASES[$normalized];
+        }
+
+        // Try partial matching for common patterns
+        if (str_contains($normalized, 'rct') || str_contains($normalized, 'randomized') || str_contains($normalized, 'randomised')) {
+            Log::info("AI Content Import - Mapped study type '{$studyType}' to 'rct' (pattern match)");
+            return 'rct';
+        }
+        if (str_contains($normalized, 'meta') || str_contains($normalized, 'analysis')) {
+            Log::info("AI Content Import - Mapped study type '{$studyType}' to 'meta_analysis' (pattern match)");
+            return 'meta_analysis';
+        }
+        if (str_contains($normalized, 'systematic') || str_contains($normalized, 'review')) {
+            Log::info("AI Content Import - Mapped study type '{$studyType}' to 'systematic_review' (pattern match)");
+            return 'systematic_review';
+        }
+        if (str_contains($normalized, 'cohort') || str_contains($normalized, 'longitudinal') || str_contains($normalized, 'observ') || str_contains($normalized, 'cross')) {
+            Log::info("AI Content Import - Mapped study type '{$studyType}' to 'observational' (pattern match)");
+            return 'observational';
+        }
+        if (str_contains($normalized, 'case')) {
+            Log::info("AI Content Import - Mapped study type '{$studyType}' to 'case_series' (pattern match)");
+            return 'case_series';
+        }
+
+        // Default fallback
+        Log::warning("AI Content Import - Unknown study type '{$studyType}', defaulting to 'observational'");
+        return 'observational';
     }
 
     /**
