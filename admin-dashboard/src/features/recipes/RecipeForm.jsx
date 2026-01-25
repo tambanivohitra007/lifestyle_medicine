@@ -156,7 +156,7 @@ const RecipeForm = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -167,7 +167,7 @@ const RecipeForm = () => {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
           {isEditing ? 'Edit Recipe' : 'New Recipe'}
         </h1>
         <p className="text-gray-600 mt-1">
@@ -175,7 +175,7 @@ const RecipeForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="card max-w-3xl">
+      <form onSubmit={handleSubmit} className="card">
         <div className="space-y-6">
           {/* Title */}
           <div>

@@ -92,7 +92,7 @@ const CareDomainForm = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-xl mx-auto space-y-4 sm:space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -103,10 +103,10 @@ const CareDomainForm = () => {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
           {isEditing ? 'Edit Care Domain' : 'New Care Domain'}
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">
           {isEditing
             ? 'Update the care domain details below'
             : 'Create a new care domain to categorize interventions'}
@@ -114,7 +114,7 @@ const CareDomainForm = () => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="card max-w-xl">
+      <form onSubmit={handleSubmit} className="card">
         <div className="space-y-6">
           {/* Name */}
           <div>
@@ -138,11 +138,11 @@ const CareDomainForm = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
+          <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 sm:gap-4 pt-4 border-t border-gray-200">
             <button
               type="submit"
               disabled={saving}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               {saving ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -151,7 +151,7 @@ const CareDomainForm = () => {
               )}
               {saving ? 'Saving...' : 'Save Care Domain'}
             </button>
-            <Link to="/care-domains" className="btn-outline">
+            <Link to="/care-domains" className="btn-outline text-center w-full sm:w-auto">
               Cancel
             </Link>
           </div>

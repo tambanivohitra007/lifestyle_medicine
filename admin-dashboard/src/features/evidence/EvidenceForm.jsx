@@ -132,7 +132,7 @@ const EvidenceForm = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -143,7 +143,7 @@ const EvidenceForm = () => {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
           {isEditing ? 'Edit Evidence' : 'New Evidence Entry'}
         </h1>
         <p className="text-gray-600 mt-1">
@@ -151,7 +151,7 @@ const EvidenceForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="card max-w-2xl">
+      <form onSubmit={handleSubmit} className="card">
         <div className="space-y-6">
           {/* Intervention */}
           <div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, Save, ArrowLeft, Shield, PenTool, Eye } from 'lucide-react';
+import { Loader2, Save, Shield, PenTool, Eye } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
@@ -146,25 +146,17 @@ const UserForm = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
       <Breadcrumbs items={breadcrumbItems} />
 
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/users')}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            {isEditing ? 'Edit User' : 'New User'}
-          </h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            {isEditing ? 'Update user information and permissions' : 'Create a new user account'}
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          {isEditing ? 'Edit User' : 'New User'}
+        </h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">
+          {isEditing ? 'Update user information and permissions' : 'Create a new user account'}
+        </p>
       </div>
 
       {/* Form */}

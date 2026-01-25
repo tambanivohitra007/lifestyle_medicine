@@ -95,7 +95,7 @@ const ConditionForm = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -117,7 +117,7 @@ const ConditionForm = () => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="card max-w-2xl">
+      <form onSubmit={handleSubmit} className="card">
         <div className="space-y-5 sm:space-y-6">
           {/* Name */}
           <div>
