@@ -445,6 +445,8 @@ const FullGraphInner = () => {
           onNodeDragStop={handleNodeDragStop}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
+          snapToGrid={true}
+          snapGrid={[20, 20]}
           fitView
           fitViewOptions={{ padding: 0.1 }}
           minZoom={0.05}
