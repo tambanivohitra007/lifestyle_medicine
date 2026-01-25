@@ -713,15 +713,23 @@ const BibleExplorer = () => {
                   </div>
                 ) : chapterContent ? (
                   <div className="card">
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                      <h3 className="font-semibold text-lg text-gray-900">
-                        {chapterContent.reference}
-                        <span className="ml-2 text-sm font-normal text-gray-500">
-                          ({chapterContent.translation})
-                        </span>
-                      </h3>
+                    {/* Chapter Header */}
+                    <div className="flex items-start justify-between gap-4 mb-6 pb-4 border-b border-gray-200">
+                      <div>
+                        <h3 className="font-semibold text-xl text-gray-900">
+                          {chapterContent.reference}
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {chapterContent.translation} • {chapterContent.verseCount} verses
+                        </p>
+                      </div>
                       <button
-                        onClick={() => copyVerse(chapterContent.reference, chapterContent.text)}
+                        onClick={() => {
+                          const fullText = chapterContent.verses
+                            ?.map(v => `${v.number}. ${v.segments.map(s => s.text).join(' ')}`)
+                            .join('\n') || '';
+                          copyVerse(chapterContent.reference, fullText);
+                        }}
                         className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                         title="Copy chapter"
                       >
@@ -732,10 +740,63 @@ const BibleExplorer = () => {
                         )}
                       </button>
                     </div>
-                    <div className="prose prose-sm max-w-none">
-                      <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
-                        {chapterContent.text}
-                      </p>
+
+                    {/* Legend */}
+                    <div className="flex items-center gap-4 mb-4 text-xs text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <span className="w-3 h-3 rounded bg-red-100 border border-red-200"></span>
+                        Words of Jesus
+                      </span>
+                    </div>
+
+                    {/* Verses */}
+                    <div className="space-y-3">
+                      {chapterContent.verses?.map((verse) => (
+                        <div
+                          key={verse.number}
+                          className={`group flex gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors ${
+                            verse.hasWordsOfJesus ? 'bg-red-50/50' : ''
+                          }`}
+                        >
+                          {/* Verse Number */}
+                          <span className="flex-shrink-0 w-8 text-right font-bold text-primary-600 text-sm pt-0.5">
+                            {verse.number}
+                          </span>
+
+                          {/* Verse Content */}
+                          <div className="flex-1 leading-relaxed text-gray-800">
+                            {verse.segments.map((segment, idx) => (
+                              <span
+                                key={idx}
+                                className={
+                                  segment.type === 'jesus'
+                                    ? 'text-red-700 font-medium'
+                                    : ''
+                                }
+                              >
+                                {segment.text}{' '}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Copy Button (appears on hover) */}
+                          <button
+                            onClick={() => {
+                              const verseText = verse.segments.map(s => s.text).join(' ');
+                              const verseRef = `${chapterContent.reference}:${verse.number}`;
+                              copyVerse(verseRef, verseText);
+                            }}
+                            className="flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-gray-200 transition-all"
+                            title="Copy verse"
+                          >
+                            {copiedRef === `${chapterContent.reference}:${verse.number}` ? (
+                              <Check className="w-3 h-3 text-green-600" />
+                            ) : (
+                              <Copy className="w-3 h-3 text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ) : null}

@@ -360,7 +360,7 @@ class BibleApiService
         $chapterId = "{$bookId}.{$chapter}";
         $cacheKey = "bible.chapter.{$bibleId}.{$chapterId}";
 
-        return Cache::remember($cacheKey, 86400, function () use ($chapterId, $bibleId) {
+        return Cache::remember($cacheKey, 86400, function () use ($chapterId, $bibleId, $bookId, $chapter) {
             $result = $this->request("/bibles/{$bibleId}/chapters/{$chapterId}");
 
             if (isset($result['error'])) {
@@ -368,21 +368,90 @@ class BibleApiService
             }
 
             $data = $result['data'] ?? [];
+            $content = $data['content'] ?? '';
 
-            // Strip HTML tags and clean up the text
-            $text = $data['content'] ?? '';
-            $text = preg_replace('/<[^>]*>/', ' ', $text);
-            $text = preg_replace('/\s+/', ' ', $text);
-            $text = trim($text);
+            // Parse verses from HTML content
+            $verses = $this->parseChapterVerses($content);
 
             return [
                 'success' => true,
                 'reference' => $data['reference'] ?? $chapterId,
-                'text' => $text,
+                'bookId' => $bookId,
+                'chapter' => $chapter,
+                'verses' => $verses,
+                'verseCount' => $data['verseCount'] ?? count($verses),
                 'translation' => $this->getTranslationAbbreviation($bibleId),
                 'bibleId' => $bibleId,
+                'next' => $data['next'] ?? null,
+                'previous' => $data['previous'] ?? null,
             ];
         });
+    }
+
+    /**
+     * Parse chapter HTML content into individual verses.
+     */
+    protected function parseChapterVerses(string $html): array
+    {
+        $verses = [];
+
+        // Match verse patterns: <span data-number="X" class="v">X</span> followed by content
+        // The content can include <span class="wj"> for words of Jesus
+        preg_match_all(
+            '/<span[^>]*data-number="(\d+)"[^>]*class="v"[^>]*>\d+<\/span>(.*?)(?=<span[^>]*data-number="\d+"[^>]*class="v"|$)/s',
+            $html,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        foreach ($matches as $match) {
+            $verseNum = (int) $match[1];
+            $verseContent = $match[2];
+
+            // Check if this verse contains words of Jesus
+            $hasWordsOfJesus = str_contains($verseContent, 'class="wj"');
+
+            // Extract words of Jesus segments
+            $segments = [];
+            if ($hasWordsOfJesus) {
+                // Split content into regular text and words of Jesus
+                $parts = preg_split('/(<span[^>]*class="wj"[^>]*>.*?<\/span>)/s', $verseContent, -1, PREG_SPLIT_DELIM_CAPTURE);
+                foreach ($parts as $part) {
+                    if (empty(trim(strip_tags($part)))) continue;
+
+                    if (preg_match('/class="wj"/', $part)) {
+                        // Words of Jesus
+                        $text = strip_tags($part);
+                        $text = preg_replace('/\s+/', ' ', $text);
+                        $segments[] = ['text' => trim($text), 'type' => 'jesus'];
+                    } else {
+                        // Regular text
+                        $text = strip_tags($part);
+                        $text = preg_replace('/\s+/', ' ', $text);
+                        if (!empty(trim($text))) {
+                            $segments[] = ['text' => trim($text), 'type' => 'normal'];
+                        }
+                    }
+                }
+            } else {
+                // No words of Jesus, just clean the text
+                $text = strip_tags($verseContent);
+                $text = preg_replace('/\s+/', ' ', $text);
+                if (!empty(trim($text))) {
+                    $segments[] = ['text' => trim($text), 'type' => 'normal'];
+                }
+            }
+
+            if (!empty($segments)) {
+                $verses[] = [
+                    'number' => $verseNum,
+                    'segments' => $segments,
+                    'hasWordsOfJesus' => $hasWordsOfJesus,
+                ];
+            }
+        }
+
+        return $verses;
     }
 
     /**
