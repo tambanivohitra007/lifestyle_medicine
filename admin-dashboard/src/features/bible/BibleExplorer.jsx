@@ -291,44 +291,83 @@ const BibleExplorer = () => {
         </p>
       </div>
 
-      {/* Daily Verse Card */}
+      {/* Verse of the Day - Elegant Gradient Design */}
       {dailyVerse && (
-        <div className={`card border-l-4 border-l-primary-500 ${themeBgColors[dailyVerse.themeColor] || 'bg-primary-50'}`}>
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <Sparkles className="w-4 h-4 text-primary-600" />
-                <span className="text-xs font-semibold text-primary-700 uppercase tracking-wide">
+        <div className="relative overflow-hidden rounded-2xl shadow-lg">
+          {/* Subtle gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+
+          {/* Accent gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-900/40 via-transparent to-indigo-900/30" />
+
+          {/* Subtle pattern/texture */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+
+          {/* Soft glow effects */}
+          <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary-500/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-indigo-500/15 rounded-full blur-3xl" />
+
+          {/* Content */}
+          <div className="relative px-5 sm:px-8 py-6 sm:py-8">
+            {/* Header Row */}
+            <div className="flex items-center justify-between mb-4 sm:mb-5">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span className="text-xs font-semibold text-white/70 uppercase tracking-wider">
                   Verse of the Day
                 </span>
-                <span className={`px-2 py-0.5 rounded-full text-xs ${themeColors[dailyVerse.themeColor] || 'bg-gray-100 text-gray-700'}`}>
-                  {dailyVerse.theme}
+              </div>
+              <span className="text-xs text-white/50 bg-white/5 px-2.5 py-1 rounded-full">
+                {dailyVerse.theme}
+              </span>
+            </div>
+
+            {/* Verse Text */}
+            <blockquote className="relative">
+              <p className="text-base sm:text-lg text-white/90 leading-relaxed font-light italic">
+                "{dailyVerse.text}"
+              </p>
+            </blockquote>
+
+            {/* Footer Row */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5 pt-4 border-t border-white/10">
+              <div className="flex items-center gap-3">
+                <p className="text-sm font-medium text-white">
+                  {dailyVerse.reference}
+                </p>
+                <span className="text-xs text-white/40">
+                  {dailyVerse.translation}
                 </span>
               </div>
-              <p className="text-gray-800 italic leading-relaxed text-sm sm:text-base">"{dailyVerse.text}"</p>
-              <p className="text-sm font-semibold text-gray-900 mt-2">
-                — {dailyVerse.reference} ({dailyVerse.translation})
-              </p>
-            </div>
-            <div className="flex gap-1 self-end sm:self-start">
-              <button
-                onClick={() => copyVerse(dailyVerse.reference, dailyVerse.text)}
-                className="p-2 rounded-lg hover:bg-white/50 active:bg-white/70 transition-colors"
-                title="Copy verse"
-              >
-                {copiedRef === dailyVerse.reference ? (
-                  <Check className="w-5 h-5 sm:w-4 sm:h-4 text-green-600" />
-                ) : (
-                  <Copy className="w-5 h-5 sm:w-4 sm:h-4 text-gray-500" />
-                )}
-              </button>
-              <button
-                onClick={() => addToScriptures(dailyVerse.reference, dailyVerse.text, dailyVerse.theme)}
-                className="p-2 rounded-lg hover:bg-white/50 active:bg-white/70 transition-colors"
-                title="Add to scriptures"
-              >
-                <Plus className="w-5 h-5 sm:w-4 sm:h-4 text-gray-500" />
-              </button>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => copyVerse(dailyVerse.reference, dailyVerse.text)}
+                  className="flex items-center gap-1.5 text-white/60 hover:text-white hover:bg-white/10 active:bg-white/15 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                >
+                  {copiedRef === dailyVerse.reference ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-green-400" />
+                      <span>Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => addToScriptures(dailyVerse.reference, dailyVerse.text, dailyVerse.theme)}
+                  className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Save</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
