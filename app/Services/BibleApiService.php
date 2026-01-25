@@ -334,11 +334,13 @@ class BibleApiService
             }
 
             $verses = [];
+            $translation = $this->getTranslationAbbreviation($bibleId);
             foreach ($result['data']['verses'] ?? [] as $verse) {
                 $verses[] = [
                     'reference' => $verse['reference'] ?? '',
                     'text' => trim(strip_tags($verse['text'] ?? '')),
                     'verseId' => $verse['id'] ?? '',
+                    'translation' => $translation,
                 ];
             }
 
@@ -347,6 +349,7 @@ class BibleApiService
                 'query' => $query,
                 'total' => $result['data']['total'] ?? count($verses),
                 'results' => $verses,
+                'translation' => $translation,
             ];
         });
     }

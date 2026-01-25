@@ -56,6 +56,24 @@ const themeBgColors = {
   teal: 'bg-teal-50',
 };
 
+// Helper function to highlight search terms in text
+const highlightSearchTerm = (text, searchTerm) => {
+  if (!searchTerm || searchTerm.length < 2) return text;
+
+  const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const parts = text.split(regex);
+
+  return parts.map((part, index) =>
+    regex.test(part) ? (
+      <mark key={index} className="bg-yellow-200 text-yellow-900 px-0.5 rounded">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
+};
+
 const BibleExplorer = () => {
   const [activeTab, setActiveTab] = useState('themes');
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,6 +92,7 @@ const BibleExplorer = () => {
   const [chapterContent, setChapterContent] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copiedRef, setCopiedRef] = useState(null);
+  const [searchMode, setSearchMode] = useState('bible'); // 'bible' or 'health'
 
   // Fetch initial data
   useEffect(() => {
@@ -173,10 +192,21 @@ const BibleExplorer = () => {
 
     setLoading(true);
     try {
-      const response = await api.get(apiEndpoints.bibleSearchHealth, {
-        params: { query: searchQuery, bibleId },
-      });
-      setSearchResults(response.data.data?.results || []);
+      if (searchMode === 'health') {
+        // Search only health-themed verses
+        const response = await api.get(apiEndpoints.bibleSearchHealth, {
+          params: { query: searchQuery, bibleId },
+        });
+        setSearchResults(response.data.data?.results || []);
+      } else {
+        // Search entire Bible
+        const response = await api.get(apiEndpoints.bibleSearch, {
+          params: { query: searchQuery, bibleId, limit: 50 },
+        });
+        const results = response.data.data?.results || [];
+        // Add search mode indicator to results
+        setSearchResults(results.map(r => ({ ...r, fromBibleSearch: true })));
+      }
     } catch (error) {
       console.error('Error searching:', error);
       toast.error('Search failed');
@@ -534,13 +564,50 @@ const BibleExplorer = () => {
         {/* Search Tab */}
         {activeTab === 'search' && (
           <div className="space-y-6">
+            {/* Search Mode Toggle */}
+            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+              <button
+                onClick={() => {
+                  setSearchMode('bible');
+                  setSearchResults([]);
+                }}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  searchMode === 'bible'
+                    ? 'bg-white text-primary-700 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 inline mr-2" />
+                Entire Bible
+              </button>
+              <button
+                onClick={() => {
+                  setSearchMode('health');
+                  setSearchResults([]);
+                }}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  searchMode === 'health'
+                    ? 'bg-white text-primary-700 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <HeartPulse className="w-4 h-4 inline mr-2" />
+                Health Themes
+              </button>
+            </div>
+
+            {/* Search Form */}
             <form onSubmit={handleSearch} className="flex gap-3">
               <div className="flex-1">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search health-themed verses (e.g., healing, peace, strength)"
+                  placeholder={
+                    searchMode === 'bible'
+                      ? 'Search the entire Bible (e.g., love, faith, salvation, forgiveness)'
+                      : 'Search health-themed verses (e.g., healing, peace, strength)'
+                  }
                   className="input-field w-full"
                 />
               </div>
@@ -558,29 +625,57 @@ const BibleExplorer = () => {
               </button>
             </form>
 
+            {/* Search Results */}
             {searchResults.length > 0 && (
               <div className="space-y-4">
-                <p className="text-sm text-gray-500">
-                  Found {searchResults.length} verse{searchResults.length !== 1 ? 's' : ''}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-500">
+                    Found {searchResults.length} verse{searchResults.length !== 1 ? 's' : ''}
+                    {searchMode === 'bible' && ' (showing top 50)'}
+                  </p>
+                  <span className={`px-2 py-1 rounded text-xs ${
+                    searchMode === 'bible'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-green-100 text-green-700'
+                  }`}>
+                    {searchMode === 'bible' ? 'Full Bible Search' : 'Health Themes'}
+                  </span>
+                </div>
+
                 {searchResults.map((result, index) => (
-                  <div key={index} className={`card ${themeBgColors[result.themeColor] || 'bg-gray-50'}`}>
+                  <div
+                    key={index}
+                    className={`card ${
+                      result.fromBibleSearch
+                        ? 'bg-white border border-gray-200'
+                        : themeBgColors[result.themeColor] || 'bg-gray-50'
+                    }`}
+                  >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className={`px-2 py-0.5 rounded-full text-xs ${themeColors[result.themeColor] || 'bg-gray-100 text-gray-700'}`}>
-                            {result.theme}
-                          </span>
-                        </div>
-                        <p className="text-gray-800 leading-relaxed">"{result.text}"</p>
-                        <p className="text-sm font-semibold text-gray-900 mt-2">
-                          — {result.reference} ({result.translation})
+                        {/* Theme badge for health search results */}
+                        {result.theme && (
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={`px-2 py-0.5 rounded-full text-xs ${themeColors[result.themeColor] || 'bg-gray-100 text-gray-700'}`}>
+                              {result.theme}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Verse text with highlighted search term */}
+                        <p className="text-gray-800 leading-relaxed">
+                          "{highlightSearchTerm(result.text, searchQuery)}"
+                        </p>
+
+                        <p className="text-sm font-semibold text-primary-700 mt-2">
+                          — {result.reference}
+                          {result.translation && ` (${result.translation})`}
                         </p>
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
                         <button
                           onClick={() => copyVerse(result.reference, result.text)}
-                          className="p-2 rounded-lg hover:bg-white/50 transition-colors"
+                          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                           title="Copy verse"
                         >
                           {copiedRef === result.reference ? (
@@ -590,8 +685,8 @@ const BibleExplorer = () => {
                           )}
                         </button>
                         <button
-                          onClick={() => addToScriptures(result.reference, result.text, result.theme)}
-                          className="p-2 rounded-lg hover:bg-white/50 transition-colors"
+                          onClick={() => addToScriptures(result.reference, result.text, result.theme || '')}
+                          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                           title="Add to scriptures"
                         >
                           <Plus className="w-4 h-4 text-gray-500" />
@@ -603,11 +698,25 @@ const BibleExplorer = () => {
               </div>
             )}
 
-            {/* Popular Search Terms */}
+            {/* No Results Message */}
+            {searchResults.length === 0 && searchQuery.length >= 2 && !loading && (
+              <div className="text-center py-8 text-gray-500">
+                <Search className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>No results found for "{searchQuery}"</p>
+                <p className="text-sm mt-1">Try different keywords or switch search mode</p>
+              </div>
+            )}
+
+            {/* Quick Search Suggestions */}
             <div className="card bg-gray-50">
-              <h4 className="font-medium text-gray-900 mb-3">Popular Health Topics</h4>
+              <h4 className="font-medium text-gray-900 mb-3">
+                {searchMode === 'bible' ? 'Popular Bible Topics' : 'Popular Health Topics'}
+              </h4>
               <div className="flex flex-wrap gap-2">
-                {['healing', 'peace', 'strength', 'trust', 'rest', 'heart', 'body', 'faith'].map((term) => (
+                {(searchMode === 'bible'
+                  ? ['love', 'faith', 'hope', 'salvation', 'forgiveness', 'grace', 'prayer', 'wisdom', 'eternal life', 'Holy Spirit']
+                  : ['healing', 'peace', 'strength', 'trust', 'rest', 'heart', 'body', 'faith', 'anxiety', 'fear']
+                ).map((term) => (
                   <button
                     key={term}
                     onClick={() => setSearchQuery(term)}
