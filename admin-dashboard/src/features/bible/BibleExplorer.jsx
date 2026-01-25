@@ -86,6 +86,7 @@ const BibleExplorer = () => {
   const [loading, setLoading] = useState(false);
   const [copiedRef, setCopiedRef] = useState(null);
   const [searchMode, setSearchMode] = useState('bible'); // 'bible' or 'health'
+  const [loadingTheme, setLoadingTheme] = useState(null); // Track which theme is loading
 
   // Fetch initial data
   useEffect(() => {
@@ -143,16 +144,37 @@ const BibleExplorer = () => {
 
   // Fetch theme verses
   const fetchThemeVerses = async (themeKey) => {
+    // Find theme info from local themes list for instant display
+    const themeInfo = themes.find(t => t.key === themeKey);
+
+    // Show loading on the card immediately
+    setLoadingTheme(themeKey);
+
+    // Small delay to show loading feedback on the card
+    await new Promise(resolve => setTimeout(resolve, 150));
+
+    // Immediately show the theme view with loading state
+    setSelectedTheme({
+      key: themeKey,
+      theme: themeInfo?.name || 'Loading...',
+      description: themeInfo?.description || '',
+      color: themeInfo?.color,
+    });
+    setThemeVerses([]);
     setLoading(true);
+    setLoadingTheme(null);
+
     try {
       const response = await api.get(apiEndpoints.bibleHealthTheme(themeKey), {
         params: { bibleId },
       });
       setThemeVerses(response.data.data?.verses || []);
+      // Update with full theme data
       setSelectedTheme(response.data.data);
     } catch (error) {
       console.error('Error fetching theme verses:', error);
       toast.error('Failed to load verses');
+      setSelectedTheme(null); // Go back on error
     } finally {
       setLoading(false);
     }
@@ -386,52 +408,77 @@ const BibleExplorer = () => {
 
                 {/* Theme Cards Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-                  {themes.map((theme) => (
-                    <button
-                      key={theme.key}
-                      onClick={() => fetchThemeVerses(theme.key)}
-                      className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-md hover:shadow-xl active:shadow-lg transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 text-left h-44 sm:h-64"
-                    >
-                      {/* Background Image */}
-                      <div
-                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                        style={{
-                          backgroundImage: `url(${themeImages[theme.key] || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80'})`,
-                        }}
-                      />
+                  {themes.map((theme) => {
+                    const isLoading = loadingTheme === theme.key;
+                    return (
+                      <button
+                        key={theme.key}
+                        onClick={() => !isLoading && fetchThemeVerses(theme.key)}
+                        disabled={isLoading}
+                        className={`group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-md hover:shadow-xl active:shadow-lg transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 text-left h-44 sm:h-64 ${
+                          isLoading ? 'cursor-wait' : ''
+                        }`}
+                      >
+                        {/* Background Image */}
+                        <div
+                          className={`absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110 ${
+                            isLoading ? 'scale-105' : ''
+                          }`}
+                          style={{
+                            backgroundImage: `url(${themeImages[theme.key] || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80'})`,
+                          }}
+                        />
 
-                      {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+                        {/* Gradient Overlay */}
+                        <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10 transition-opacity ${
+                          isLoading ? 'opacity-90' : ''
+                        }`} />
 
-                      {/* Content */}
-                      <div className="relative h-full flex flex-col justify-end p-3 sm:p-5 text-white">
-                        {/* Verse Count Badge */}
-                        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/20 backdrop-blur-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
-                          <span className="text-[10px] sm:text-xs font-medium text-white flex items-center gap-1">
-                            <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                            {theme.verse_count}
-                          </span>
+                        {/* Loading Overlay */}
+                        {isLoading && (
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                              <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Content */}
+                        <div className="relative h-full flex flex-col justify-end p-3 sm:p-5 text-white">
+                          {/* Verse Count Badge */}
+                          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/20 backdrop-blur-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
+                            <span className="text-[10px] sm:text-xs font-medium text-white flex items-center gap-1">
+                              <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                              {theme.verse_count}
+                            </span>
+                          </div>
+
+                          {/* Theme Name */}
+                          <h3 className="text-sm sm:text-xl font-bold mb-1 sm:mb-2 group-hover:text-primary-200 transition-colors line-clamp-2">
+                            {theme.name}
+                          </h3>
+
+                          {/* Description - Hidden on mobile */}
+                          <p className="hidden sm:block text-sm text-gray-200 line-clamp-2 mb-3">
+                            {theme.description}
+                          </p>
+
+                          {/* Explore Button */}
+                          <div className="flex items-center text-xs sm:text-sm font-medium text-primary-300 group-hover:text-white transition-colors">
+                            {isLoading ? (
+                              <span>Loading...</span>
+                            ) : (
+                              <>
+                                <span className="hidden sm:inline">Explore verses</span>
+                                <span className="sm:hidden">View</span>
+                                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-1 transition-transform" />
+                              </>
+                            )}
+                          </div>
                         </div>
-
-                        {/* Theme Name */}
-                        <h3 className="text-sm sm:text-xl font-bold mb-1 sm:mb-2 group-hover:text-primary-200 transition-colors line-clamp-2">
-                          {theme.name}
-                        </h3>
-
-                        {/* Description - Hidden on mobile */}
-                        <p className="hidden sm:block text-sm text-gray-200 line-clamp-2 mb-3">
-                          {theme.description}
-                        </p>
-
-                        {/* Explore Button */}
-                        <div className="flex items-center text-xs sm:text-sm font-medium text-primary-300 group-hover:text-white transition-colors">
-                          <span className="hidden sm:inline">Explore verses</span>
-                          <span className="sm:hidden">View</span>
-                          <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             ) : (
@@ -479,8 +526,27 @@ const BibleExplorer = () => {
 
                 {/* Verses */}
                 {loading ? (
-                  <div className="flex justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                  <div className="space-y-4">
+                    {/* Skeleton loaders */}
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="card animate-pulse">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 space-y-3">
+                            <div className="h-4 bg-gray-200 rounded w-full"></div>
+                            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                            <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+                            <div className="h-4 bg-gray-300 rounded w-32 mt-3"></div>
+                          </div>
+                          <div className="flex gap-1 flex-shrink-0">
+                            <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                            <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <p className="text-center text-sm text-gray-500 py-2">
+                      Loading verses...
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -490,7 +556,7 @@ const BibleExplorer = () => {
                         <div key={index} className="card hover:shadow-md transition-shadow">
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
-                              <p className="text-gray-800 leading-relaxed">"{verse.text}"</p>
+                              <p className="text-gray-800 leading-relaxed text-sm sm:text-base">"{verse.text}"</p>
                               <p className="text-sm font-semibold text-primary-700 mt-2">
                                 — {displayRef} ({verse.translation})
                               </p>
@@ -498,21 +564,21 @@ const BibleExplorer = () => {
                             <div className="flex gap-1 flex-shrink-0">
                               <button
                                 onClick={() => copyVerse(displayRef, verse.text)}
-                                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors"
                                 title="Copy verse"
                               >
                                 {copiedRef === displayRef ? (
-                                  <Check className="w-4 h-4 text-green-600" />
+                                  <Check className="w-5 h-5 sm:w-4 sm:h-4 text-green-600" />
                                 ) : (
-                                  <Copy className="w-4 h-4 text-gray-500" />
+                                  <Copy className="w-5 h-5 sm:w-4 sm:h-4 text-gray-500" />
                                 )}
                               </button>
                               <button
                                 onClick={() => addToScriptures(displayRef, verse.text, selectedTheme.theme)}
-                                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors"
                                 title="Add to scriptures"
                               >
-                                <Plus className="w-4 h-4 text-gray-500" />
+                                <Plus className="w-5 h-5 sm:w-4 sm:h-4 text-gray-500" />
                               </button>
                             </div>
                           </div>
