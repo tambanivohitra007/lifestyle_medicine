@@ -36,6 +36,9 @@ This platform enables healthcare practitioners and health educators to create, m
 - **Axios** - HTTP client
 - **SweetAlert2** - Toast notifications and dialogs
 - **date-fns** - Date formatting
+- **React Flow** - Interactive node-based graph visualization
+- **Dagre** - Graph layout algorithm
+- **html-to-image** - Graph export to PNG/SVG
 
 ## Features
 
@@ -142,7 +145,28 @@ Search across all content types:
 - Persistent notification history (localStorage)
 - Quick links to relevant pages from notifications
 
-### 15. Mobile-First Design (Capacitor-Ready)
+### 15. Knowledge Graph Visualization
+Interactive node-based visualization of relationships between entities using React Flow:
+
+**Features:**
+- **Multiple Layout Algorithms**: Hierarchical (top-down/left-right), Radial, Force-directed, Clustered
+- **Custom Node Types**: Color-coded nodes for conditions, interventions, care domains, scriptures, recipes, EGW references, evidence entries, and references
+- **Interactive Edges**: Condition-intervention edges show evidence strength (color-coded) and recommendation level
+- **Filtering**: Toggle visibility of node types, filter by category
+- **Search**: Find and highlight specific nodes with autocomplete
+- **Export**: Save graph as PNG or SVG image
+- **Keyboard Shortcuts**: Quick navigation and layout switching (F=fit, H=hierarchical, R=radial, C=cluster, Ctrl+S=export)
+
+**Views:**
+- **Condition-Centric**: View all relationships for a specific condition
+- **Intervention-Centric**: View all relationships for a specific intervention
+- **Full Graph Explorer**: Browse the entire knowledge base with pagination
+
+**Access:**
+- Sidebar: "Knowledge Graph" link for full explorer
+- Detail pages: "View Graph" button on condition and intervention detail pages
+
+### 16. Mobile-First Design (Capacitor-Ready)
 - **Native App-Like Experience**: Optimized for Capacitor hybrid app builds
 - **Fixed App Bar**: Branded header with dynamic page titles and back navigation
 - **Bottom Navigation**: Quick access to Home, Conditions, Interventions, Search
@@ -312,6 +336,11 @@ GET /api/v1/content-tags
 
 GET /api/v1/export/conditions/{id}/pdf
 GET /api/v1/export/conditions/summary/pdf
+
+# Knowledge Graph
+GET /api/v1/knowledge-graph/full?page={n}&limit={n}
+GET /api/v1/knowledge-graph/condition/{id}?depth={1-3}
+GET /api/v1/knowledge-graph/intervention/{id}?depth={1-3}
 ```
 
 ### Admin Endpoints (Authenticated)
@@ -459,6 +488,7 @@ lifestyle_medicine/
 │   │   ├── Controllers/Api/    # API controllers
 │   │   │   ├── AnalyticsController.php
 │   │   │   ├── AiGeneratorController.php
+│   │   │   ├── KnowledgeGraphController.php
 │   │   │   └── ...
 │   │   └── Resources/          # API resources
 │   ├── Imports/                # Excel/CSV import classes
@@ -487,6 +517,7 @@ lifestyle_medicine/
     │   │   ├── analytics/      # Analytics dashboard & charts
     │   │   ├── conditions/     # Condition management
     │   │   ├── interventions/  # Intervention management
+    │   │   ├── knowledge-graph/ # Interactive graph visualization
     │   │   ├── recipes/        # Recipe management
     │   │   ├── scriptures/     # Scripture management
     │   │   ├── import/         # Data import
