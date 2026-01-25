@@ -194,7 +194,11 @@ const QuickAttachModal = ({
       handleClose();
     } catch (error) {
       console.error('Error attaching item:', error);
-      toast.error('Failed to attach item');
+      if (error.response?.status === 422) {
+        toast.error(error.response?.data?.message || 'Item is already attached');
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to attach item');
+      }
     } finally {
       setAttaching(false);
     }

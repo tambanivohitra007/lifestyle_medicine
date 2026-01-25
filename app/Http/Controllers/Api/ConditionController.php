@@ -16,6 +16,7 @@ use App\Models\Recipe;
 use App\Models\Scripture;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
@@ -134,28 +135,37 @@ class ConditionController extends Controller
         return RecipeResource::collection($condition->recipes);
     }
 
-    public function attachIntervention(Request $request, Condition $condition, Intervention $intervention): Response
+    public function attachIntervention(Request $request, Condition $condition, Intervention $intervention): JsonResponse
     {
+        // Check if already attached
+        if ($condition->interventions()->where('intervention_id', $intervention->id)->exists()) {
+            return response()->json(['message' => 'Intervention is already attached'], 422);
+        }
+
         $validated = $request->validate([
-            'strength_of_evidence' => 'required|in:high,moderate,emerging,insufficient',
-            'recommendation_level' => 'required|in:core,adjunct,optional',
+            'strength_of_evidence' => 'nullable|in:high,moderate,emerging,insufficient',
+            'recommendation_level' => 'nullable|in:core,adjunct,optional',
             'clinical_notes' => 'nullable|string',
             'order_index' => 'nullable|integer|min:0',
         ]);
+
+        // Set defaults if not provided
+        $validated['strength_of_evidence'] = $validated['strength_of_evidence'] ?? 'moderate';
+        $validated['recommendation_level'] = $validated['recommendation_level'] ?? 'adjunct';
 
         $condition->interventions()->attach($intervention->id, $validated);
 
         return response()->json(['message' => 'Intervention attached successfully']);
     }
 
-    public function detachIntervention(Condition $condition, Intervention $intervention): Response
+    public function detachIntervention(Condition $condition, Intervention $intervention): JsonResponse
     {
         $condition->interventions()->detach($intervention->id);
 
         return response()->json(['message' => 'Intervention detached successfully']);
     }
 
-    public function updateIntervention(Request $request, Condition $condition, Intervention $intervention): Response
+    public function updateIntervention(Request $request, Condition $condition, Intervention $intervention): JsonResponse
     {
         $validated = $request->validate([
             'strength_of_evidence' => 'sometimes|required|in:high,moderate,emerging,insufficient',
@@ -176,11 +186,11 @@ class ConditionController extends Controller
         ]);
     }
 
-    public function reorderInterventions(Request $request, Condition $condition): Response
+    public function reorderInterventions(Request $request, Condition $condition): JsonResponse
     {
         $validated = $request->validate([
             'order' => 'required|array',
-            'order.*' => 'required|integer|exists:interventions,id',
+            'order.*' => 'required|uuid|exists:interventions,id',
         ]);
 
         foreach ($validated['order'] as $index => $interventionId) {
@@ -190,28 +200,38 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Interventions reordered successfully']);
     }
 
-    public function attachScripture(Condition $condition, Scripture $scripture): Response
+    public function attachScripture(Condition $condition, Scripture $scripture): JsonResponse
     {
+        // Check if already attached
+        if ($condition->scriptures()->where('scripture_id', $scripture->id)->exists()) {
+            return response()->json(['message' => 'Scripture is already attached'], 422);
+        }
+
         $condition->scriptures()->attach($scripture->id);
 
         return response()->json(['message' => 'Scripture attached successfully']);
     }
 
-    public function detachScripture(Condition $condition, Scripture $scripture): Response
+    public function detachScripture(Condition $condition, Scripture $scripture): JsonResponse
     {
         $condition->scriptures()->detach($scripture->id);
 
         return response()->json(['message' => 'Scripture detached successfully']);
     }
 
-    public function attachRecipe(Condition $condition, Recipe $recipe): Response
+    public function attachRecipe(Condition $condition, Recipe $recipe): JsonResponse
     {
+        // Check if already attached
+        if ($condition->recipes()->where('recipe_id', $recipe->id)->exists()) {
+            return response()->json(['message' => 'Recipe is already attached'], 422);
+        }
+
         $condition->recipes()->attach($recipe->id);
 
         return response()->json(['message' => 'Recipe attached successfully']);
     }
 
-    public function detachRecipe(Condition $condition, Recipe $recipe): Response
+    public function detachRecipe(Condition $condition, Recipe $recipe): JsonResponse
     {
         $condition->recipes()->detach($recipe->id);
 
@@ -223,14 +243,19 @@ class ConditionController extends Controller
         return EgwReferenceResource::collection($condition->egwReferences);
     }
 
-    public function attachEgwReference(Condition $condition, EgwReference $egwReference): Response
+    public function attachEgwReference(Condition $condition, EgwReference $egwReference): JsonResponse
     {
+        // Check if already attached
+        if ($condition->egwReferences()->where('egw_reference_id', $egwReference->id)->exists()) {
+            return response()->json(['message' => 'EGW reference is already attached'], 422);
+        }
+
         $condition->egwReferences()->attach($egwReference->id);
 
         return response()->json(['message' => 'EGW reference attached successfully']);
     }
 
-    public function detachEgwReference(Condition $condition, EgwReference $egwReference): Response
+    public function detachEgwReference(Condition $condition, EgwReference $egwReference): JsonResponse
     {
         $condition->egwReferences()->detach($egwReference->id);
 
