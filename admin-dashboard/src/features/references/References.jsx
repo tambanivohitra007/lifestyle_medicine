@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, BookMarked, Edit, Trash2, ExternalLink } from 'lucide-react';
-import api, { apiEndpoints } from '../../lib/api';
+import { Plus, Search, BookMarked, Edit, Trash2, ExternalLink, Download } from 'lucide-react';
+import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
 import { useAuth } from '../../contexts/AuthContext';
@@ -70,12 +70,21 @@ const References = () => {
             Manage citations and scientific references
           </p>
         </div>
-        {canEdit && (
-          <Link to="/references/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-            <Plus className="w-5 h-5" />
-            Add Reference
-          </Link>
-        )}
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <a
+            href={`${getApiBaseUrl()}/api/v1${apiEndpoints.exportReferencesCsv}`}
+            className="btn-outline flex items-center justify-center gap-2"
+          >
+            <Download className="w-5 h-5" />
+            Export CSV
+          </a>
+          {canEdit && (
+            <Link to="/references/new" className="btn-primary flex items-center justify-center gap-2">
+              <Plus className="w-5 h-5" />
+              Add Reference
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Filters */}

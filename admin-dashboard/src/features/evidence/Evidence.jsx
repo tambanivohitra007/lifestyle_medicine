@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, FileText, Edit, Trash2, Stethoscope } from 'lucide-react';
-import api, { apiEndpoints } from '../../lib/api';
+import { Plus, Search, FileText, Edit, Trash2, Stethoscope, Download } from 'lucide-react';
+import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
 import { useAuth } from '../../contexts/AuthContext';
@@ -86,12 +86,21 @@ const Evidence = () => {
             Manage evidence supporting interventions
           </p>
         </div>
-        {canEdit && (
-          <Link to="/evidence/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-            <Plus className="w-5 h-5" />
-            Add Evidence
-          </Link>
-        )}
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <a
+            href={`${getApiBaseUrl()}/api/v1${apiEndpoints.exportEvidenceCsv}`}
+            className="btn-outline flex items-center justify-center gap-2"
+          >
+            <Download className="w-5 h-5" />
+            Export CSV
+          </a>
+          {canEdit && (
+            <Link to="/evidence/new" className="btn-primary flex items-center justify-center gap-2">
+              <Plus className="w-5 h-5" />
+              Add Evidence
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
