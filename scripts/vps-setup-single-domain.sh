@@ -288,10 +288,19 @@ else
     sudo -u $DEPLOY_USER sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
     sudo -u $DEPLOY_USER sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
     sudo -u $DEPLOY_USER sed -i "s|APP_URL=http://localhost:8000|APP_URL=https://$DOMAIN|g" .env
+    sudo -u $DEPLOY_USER sed -i "s|APP_URL=http://localhost|APP_URL=https://$DOMAIN|g" .env
     sudo -u $DEPLOY_USER sed -i "s|DB_CONNECTION=sqlite|DB_CONNECTION=mysql|g" .env
+    # Handle various default database names
+    sudo -u $DEPLOY_USER sed -i "s|DB_DATABASE=laravel|DB_DATABASE=$DB_NAME|g" .env
     sudo -u $DEPLOY_USER sed -i "s|DB_DATABASE=lifestyle_medicine|DB_DATABASE=$DB_NAME|g" .env
+    # Handle both commented and uncommented DB credentials
+    sudo -u $DEPLOY_USER sed -i "s|# DB_HOST=127.0.0.1|DB_HOST=127.0.0.1|g" .env
+    sudo -u $DEPLOY_USER sed -i "s|# DB_PORT=3306|DB_PORT=3306|g" .env
+    sudo -u $DEPLOY_USER sed -i "s|# DB_USERNAME=root|DB_USERNAME=$DB_USER|g" .env
     sudo -u $DEPLOY_USER sed -i "s|# DB_USERNAME=|DB_USERNAME=$DB_USER|g" .env
+    sudo -u $DEPLOY_USER sed -i "s|DB_USERNAME=root|DB_USERNAME=$DB_USER|g" .env
     sudo -u $DEPLOY_USER sed -i "s|# DB_PASSWORD=|DB_PASSWORD=$DB_PASSWORD|g" .env
+    sudo -u $DEPLOY_USER sed -i "s|DB_PASSWORD=$|DB_PASSWORD=$DB_PASSWORD|g" .env
     sudo -u $DEPLOY_USER sed -i "s|CORS_ALLOWED_ORIGINS=http://localhost:5173|CORS_ALLOWED_ORIGINS=https://$DOMAIN|g" .env
     sudo -u $DEPLOY_USER sed -i "s|SANCTUM_STATEFUL_DOMAINS=localhost,localhost:5173,127.0.0.1,127.0.0.1:8000|SANCTUM_STATEFUL_DOMAINS=$DOMAIN|g" .env
 
