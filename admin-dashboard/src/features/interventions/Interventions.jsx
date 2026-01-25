@@ -171,12 +171,12 @@ const Interventions = () => {
           ))}
         </div>
       ) : interventions.length === 0 ? (
-        <div className="card text-center py-12">
-          <Stethoscope className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <div className="card text-center py-8 sm:py-12">
+          <Stethoscope className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No interventions found
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Get started by creating your first intervention.
           </p>
           {canEdit && (

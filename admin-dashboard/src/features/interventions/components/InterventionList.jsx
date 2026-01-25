@@ -18,7 +18,7 @@ const InterventionList = ({ interventions, onDelete, canEdit }) => {
           key={intervention.id}
           className="card hover:shadow-md transition-shadow duration-200"
         >
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3 sm:gap-4">
             {/* Icon */}
             <div className="p-2 rounded-lg bg-green-100 flex-shrink-0">
               <Stethoscope className="w-5 h-5 text-green-600" />
@@ -26,9 +26,9 @@ const InterventionList = ({ interventions, onDelete, canEdit }) => {
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-2 sm:gap-3">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold text-gray-900 mb-1 truncate">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 truncate">
                     {intervention.name}
                   </h3>
 
@@ -63,15 +63,15 @@ const InterventionList = ({ interventions, onDelete, canEdit }) => {
                   <RichTextPreview
                     content={intervention.description}
                     maxLines={1}
-                    className="text-sm"
+                    className="text-xs sm:text-sm"
                   />
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-1 flex-shrink-0">
+                <div className="flex gap-0.5 sm:gap-1 flex-shrink-0 -mr-1">
                   <Link
                     to={`/interventions/${intervention.id}`}
-                    className="action-btn"
+                    className="action-btn p-2 touch-manipulation"
                     title="View Details"
                   >
                     <Eye className="w-4 h-4 text-gray-600" />
@@ -80,14 +80,14 @@ const InterventionList = ({ interventions, onDelete, canEdit }) => {
                     <>
                       <Link
                         to={`/interventions/${intervention.id}/edit`}
-                        className="action-btn"
+                        className="action-btn p-2 touch-manipulation"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
                       </Link>
                       <button
                         onClick={() => onDelete(intervention.id, intervention.name)}
-                        className="action-btn"
+                        className="action-btn p-2 touch-manipulation hover:bg-red-50 active:bg-red-100"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />

@@ -32,10 +32,10 @@ const InterventionTable = ({ interventions, onDelete, canEdit }) => {
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
+              <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1">
                 <Link
                   to={`/interventions/${intervention.id}`}
-                  className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
                   title="View"
                 >
                   <Eye className="w-4 h-4" />
@@ -44,14 +44,14 @@ const InterventionTable = ({ interventions, onDelete, canEdit }) => {
                   <>
                     <Link
                       to={`/interventions/${intervention.id}/edit`}
-                      className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </Link>
                     <button
                       onClick={() => onDelete(intervention.id, intervention.name)}
-                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
