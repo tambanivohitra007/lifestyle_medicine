@@ -460,7 +460,7 @@ class KnowledgeGraphController extends Controller
         // Fetch edges only for visible nodes (if requested)
         if ($includeEdges && count($nodeIds) > 0) {
             // Condition-Intervention edges
-            $conditionInterventions = \DB::table('condition_intervention')
+            $conditionInterventions = \DB::table('condition_interventions')
                 ->get();
 
             foreach ($conditionInterventions as $pivot) {
