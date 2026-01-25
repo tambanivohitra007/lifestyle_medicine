@@ -308,7 +308,7 @@ class BibleApiService
                 'success' => true,
                 'reference' => $data['reference'] ?? $passageId,
                 'text' => $text,
-                'translation' => 'KJV',
+                'translation' => $this->getTranslationAbbreviation($bibleId),
                 'bibleId' => $bibleId,
             ];
         });
@@ -379,7 +379,7 @@ class BibleApiService
                 'success' => true,
                 'reference' => $data['reference'] ?? $chapterId,
                 'text' => $text,
-                'translation' => 'KJV',
+                'translation' => $this->getTranslationAbbreviation($bibleId),
                 'bibleId' => $bibleId,
             ];
         });
@@ -445,12 +445,33 @@ class BibleApiService
      */
     public function getTranslations(): array
     {
-        // Return a curated list of common translations
+        // Return a curated list of popular translations
         return [
-            ['code' => 'de4e12af7f28f599-02', 'name' => 'King James Version', 'abbreviation' => 'KJV'],
-            ['code' => '01b29f4b342acc35-01', 'name' => 'American Standard Version', 'abbreviation' => 'ASV'],
-            ['code' => '9879dbb7cfe39e4d-04', 'name' => 'World English Bible', 'abbreviation' => 'WEB'],
+            ['code' => 'de4e12af7f28f599-02', 'name' => 'King James Version', 'abbreviation' => 'KJV', 'description' => 'Classic English translation from 1611'],
+            ['code' => '06125adad2d5898a-01', 'name' => 'American Standard Version', 'abbreviation' => 'ASV', 'description' => 'Literal English translation from 1901'],
+            ['code' => 'bba9f40183526463-01', 'name' => 'Berean Standard Bible', 'abbreviation' => 'BSB', 'description' => 'Modern literal translation'],
+            ['code' => '9879dbb7cfe39e4d-04', 'name' => 'World English Bible', 'abbreviation' => 'WEB', 'description' => 'Modern public domain translation'],
+            ['code' => '01b29f4b342acc35-01', 'name' => 'Literal Standard Version', 'abbreviation' => 'LSV', 'description' => 'Modern literal translation'],
+            ['code' => '65eec8e0b60e656b-01', 'name' => 'Free Bible Version', 'abbreviation' => 'FBV', 'description' => 'Clear and accurate modern translation'],
+            ['code' => 'c315fa9f71d4af3a-01', 'name' => 'Geneva Bible', 'abbreviation' => 'GNV', 'description' => 'Historic Protestant Bible from 1599'],
+            ['code' => '179568874c45066f-01', 'name' => 'Douay-Rheims', 'abbreviation' => 'DRA', 'description' => 'Catholic translation from Latin Vulgate'],
+            ['code' => '66c22495370cdfc0-01', 'name' => 'Translation for Translators', 'abbreviation' => 'T4T', 'description' => 'Meaning-based translation'],
+            ['code' => 'f72b840c855f362c-04', 'name' => 'World Messianic Bible', 'abbreviation' => 'WMB', 'description' => 'Messianic Jewish perspective'],
         ];
+    }
+
+    /**
+     * Get translation abbreviation by Bible ID.
+     */
+    protected function getTranslationAbbreviation(string $bibleId): string
+    {
+        $translations = $this->getTranslations();
+        foreach ($translations as $translation) {
+            if ($translation['code'] === $bibleId) {
+                return $translation['abbreviation'];
+            }
+        }
+        return 'KJV'; // Default fallback
     }
 
     /**

@@ -79,9 +79,13 @@ const BibleExplorer = () => {
   useEffect(() => {
     fetchTranslations();
     fetchThemes();
-    fetchDailyVerse();
     fetchBooks();
   }, []);
+
+  // Fetch daily verse when translation changes
+  useEffect(() => {
+    fetchDailyVerse();
+  }, [bibleId]);
 
   // Fetch translations
   const fetchTranslations = async () => {
@@ -286,19 +290,34 @@ const BibleExplorer = () => {
       )}
 
       {/* Translation Selector */}
-      <div className="flex items-center gap-4">
-        <label className="text-sm font-medium text-gray-700">Translation:</label>
-        <select
-          value={bibleId}
-          onChange={(e) => setBibleId(e.target.value)}
-          className="input-field w-auto"
-        >
-          {translations.map((t) => (
-            <option key={t.code} value={t.code}>
-              {t.abbreviation} - {t.name}
-            </option>
-          ))}
-        </select>
+      <div className="card bg-gray-50">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <BookOpen className="w-5 h-5 text-primary-600" />
+            <label className="text-sm font-medium text-gray-700">Bible Translation:</label>
+          </div>
+          <select
+            value={bibleId}
+            onChange={(e) => setBibleId(e.target.value)}
+            className="input-field flex-1 sm:max-w-md"
+          >
+            {translations.map((t) => (
+              <option key={t.code} value={t.code}>
+                {t.abbreviation} - {t.name}
+              </option>
+            ))}
+          </select>
+          {translations.find(t => t.code === bibleId)?.description && (
+            <p className="text-xs text-gray-500 sm:hidden">
+              {translations.find(t => t.code === bibleId)?.description}
+            </p>
+          )}
+        </div>
+        {translations.find(t => t.code === bibleId)?.description && (
+          <p className="text-xs text-gray-500 mt-2 hidden sm:block">
+            {translations.find(t => t.code === bibleId)?.description}
+          </p>
+        )}
       </div>
 
       {/* Tabs */}
