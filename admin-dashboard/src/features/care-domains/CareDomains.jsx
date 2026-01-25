@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { Plus, Search, Layers, Edit, Trash2, Stethoscope } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CareDomains = () => {
+  const { canEdit } = useAuth();
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,10 +55,12 @@ const CareDomains = () => {
             Manage care domains that categorize interventions
           </p>
         </div>
-        <Link to="/care-domains/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-          <Plus className="w-5 h-5" />
-          Add Care Domain
-        </Link>
+        {canEdit && (
+          <Link to="/care-domains/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+            <Plus className="w-5 h-5" />
+            Add Care Domain
+          </Link>
+        )}
       </div>
 
       {/* Search */}
@@ -89,7 +93,7 @@ const CareDomains = () => {
               ? 'Try adjusting your search term'
               : 'Get started by creating your first care domain.'}
           </p>
-          {!searchTerm && (
+          {!searchTerm && canEdit && (
             <Link to="/care-domains/new" className="btn-primary inline-flex items-center gap-2">
               <Plus className="w-5 h-5" />
               Add Care Domain
@@ -107,22 +111,24 @@ const CareDomains = () => {
                 <div className="p-2 sm:p-3 rounded-lg bg-secondary-100">
                   <Layers className="w-5 sm:w-6 h-5 sm:h-6 text-secondary-600" />
                 </div>
-                <div className="flex gap-1">
-                  <Link
-                    to={`/care-domains/${domain.id}/edit`}
-                    className="action-btn"
-                    title="Edit"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(domain.id, domain.name)}
-                    className="action-btn hover:bg-red-50 active:bg-red-100"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
-                </div>
+                {canEdit && (
+                  <div className="flex gap-1">
+                    <Link
+                      to={`/care-domains/${domain.id}/edit`}
+                      className="action-btn"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(domain.id, domain.name)}
+                      className="action-btn hover:bg-red-50 active:bg-red-100"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <h3 className="font-semibold text-lg sm:text-xl text-gray-900 mb-2">

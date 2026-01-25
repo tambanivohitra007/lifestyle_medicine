@@ -4,8 +4,10 @@ import { Plus, Search, BookMarked, Edit, Trash2, ExternalLink } from 'lucide-rea
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
+import { useAuth } from '../../contexts/AuthContext';
 
 const References = () => {
+  const { canEdit } = useAuth();
   const [references, setReferences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,10 +70,12 @@ const References = () => {
             Manage citations and scientific references
           </p>
         </div>
-        <Link to="/references/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-          <Plus className="w-5 h-5" />
-          Add Reference
-        </Link>
+        {canEdit && (
+          <Link to="/references/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+            <Plus className="w-5 h-5" />
+            Add Reference
+          </Link>
+        )}
       </div>
 
       {/* Filters */}

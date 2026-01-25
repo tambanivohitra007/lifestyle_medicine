@@ -4,8 +4,10 @@ import { Plus, Search, BookMarked, Edit, Trash2, Filter } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import { SkeletonList } from '../../components/skeleton';
+import { useAuth } from '../../contexts/AuthContext';
 
 const EgwReferences = () => {
+  const { canEdit } = useAuth();
   const [references, setReferences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -88,13 +90,15 @@ const EgwReferences = () => {
             Ellen G. White writings for spiritual health guidance
           </p>
         </div>
-        <Link
-          to="/egw-references/new"
-          className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
-        >
-          <Plus className="w-5 h-5" />
-          Add Reference
-        </Link>
+        {canEdit && (
+          <Link
+            to="/egw-references/new"
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
+            <Plus className="w-5 h-5" />
+            Add Reference
+          </Link>
+        )}
       </div>
 
       {/* Filters */}

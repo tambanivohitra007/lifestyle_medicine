@@ -4,6 +4,7 @@ import { Plus, Search, FileText, Edit, Trash2, Stethoscope } from 'lucide-react'
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
+import { useAuth } from '../../contexts/AuthContext';
 
 const QUALITY_RATING = {
   A: { label: 'A - High', color: 'bg-green-100 text-green-700' },
@@ -22,6 +23,7 @@ const STUDY_TYPE = {
 };
 
 const Evidence = () => {
+  const { canEdit } = useAuth();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -84,10 +86,12 @@ const Evidence = () => {
             Manage evidence supporting interventions
           </p>
         </div>
-        <Link to="/evidence/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-          <Plus className="w-5 h-5" />
-          Add Evidence
-        </Link>
+        {canEdit && (
+          <Link to="/evidence/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+            <Plus className="w-5 h-5" />
+            Add Evidence
+          </Link>
+        )}
       </div>
 
       {/* Filters */}
@@ -145,10 +149,12 @@ const Evidence = () => {
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Get started by adding evidence for interventions.
           </p>
-          <Link to="/evidence/new" className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Add Evidence
-          </Link>
+          {canEdit && (
+            <Link to="/evidence/new" className="btn-primary inline-flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Add Evidence
+            </Link>
+          )}
         </div>
       ) : (
         <>

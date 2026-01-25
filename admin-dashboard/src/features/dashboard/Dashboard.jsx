@@ -3,8 +3,10 @@ import { HeartPulse, Activity, Book, ChefHat, TrendingUp } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { Link } from 'react-router-dom';
 import RichTextPreview from '../../components/shared/RichTextPreview';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Dashboard = () => {
+  const { canEdit } = useAuth();
   const [stats, setStats] = useState({
     conditions: 0,
     interventions: 0,
@@ -171,45 +173,47 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-        <Link
-          to="/conditions/new"
-          className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
-        >
-          <HeartPulse className="w-10 sm:w-12 h-10 sm:h-12 text-primary-600 mx-auto mb-2 sm:mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
-            Add New Condition
-          </h3>
-          <p className="text-xs sm:text-sm text-gray-600">
-            Create a new medical condition entry
-          </p>
-        </Link>
+      {/* Quick Actions - Only shown to users with edit permissions */}
+      {canEdit && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <Link
+            to="/conditions/new"
+            className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
+          >
+            <HeartPulse className="w-10 sm:w-12 h-10 sm:h-12 text-primary-600 mx-auto mb-2 sm:mb-3" />
+            <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
+              Add New Condition
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-600">
+              Create a new medical condition entry
+            </p>
+          </Link>
 
-        <Link
-          to="/interventions/new"
-          className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
-        >
-          <Activity className="w-10 sm:w-12 h-10 sm:h-12 text-secondary-600 mx-auto mb-2 sm:mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
-            Add Intervention
-          </h3>
-          <p className="text-xs sm:text-sm text-gray-600">
-            Create a lifestyle intervention
-          </p>
-        </Link>
+          <Link
+            to="/interventions/new"
+            className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
+          >
+            <Activity className="w-10 sm:w-12 h-10 sm:h-12 text-secondary-600 mx-auto mb-2 sm:mb-3" />
+            <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
+              Add Intervention
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-600">
+              Create a lifestyle intervention
+            </p>
+          </Link>
 
-        <Link
-          to="/scriptures/new"
-          className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
-        >
-          <Book className="w-10 sm:w-12 h-10 sm:h-12 text-purple-600 mx-auto mb-2 sm:mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Add Scripture</h3>
-          <p className="text-xs sm:text-sm text-gray-600">
-            Add spiritual care content
-          </p>
-        </Link>
-      </div>
+          <Link
+            to="/scriptures/new"
+            className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
+          >
+            <Book className="w-10 sm:w-12 h-10 sm:h-12 text-purple-600 mx-auto mb-2 sm:mb-3" />
+            <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Add Scripture</h3>
+            <p className="text-xs sm:text-sm text-gray-600">
+              Add spiritual care content
+            </p>
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

@@ -9,8 +9,10 @@ import ViewModeToggle from '../../components/ui/ViewModeToggle';
 import RecipeTable from './components/RecipeTable';
 import RecipeList from './components/RecipeList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Recipes = () => {
+  const { canEdit } = useAuth();
   const [recipes, setRecipes] = useState([]);
   const [contentTags, setContentTags] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -106,10 +108,12 @@ const Recipes = () => {
             Manage healthy recipes for dietary interventions
           </p>
         </div>
-        <Link to="/recipes/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-          <Plus className="w-5 h-5" />
-          Add Recipe
-        </Link>
+        {canEdit && (
+          <Link to="/recipes/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+            <Plus className="w-5 h-5" />
+            Add Recipe
+          </Link>
+        )}
       </div>
 
       {/* Search & Filter */}
@@ -179,10 +183,12 @@ const Recipes = () => {
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Get started by adding healthy recipes.
           </p>
-          <Link to="/recipes/new" className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Add Recipe
-          </Link>
+          {canEdit && (
+            <Link to="/recipes/new" className="btn-primary inline-flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Add Recipe
+            </Link>
+          )}
         </div>
       ) : (
         <>

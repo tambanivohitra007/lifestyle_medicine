@@ -5,8 +5,10 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
 import { SkeletonList } from '../../components/skeleton';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Scriptures = () => {
+  const { canEdit } = useAuth();
   const [scriptures, setScriptures] = useState([]);
   const [contentTags, setContentTags] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,10 +87,12 @@ const Scriptures = () => {
             Manage scripture references for spiritual care
           </p>
         </div>
-        <Link to="/scriptures/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-          <Plus className="w-5 h-5" />
-          Add Scripture
-        </Link>
+        {canEdit && (
+          <Link to="/scriptures/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+            <Plus className="w-5 h-5" />
+            Add Scripture
+          </Link>
+        )}
       </div>
 
       {/* Filters */}

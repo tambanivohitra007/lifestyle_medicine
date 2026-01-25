@@ -19,6 +19,7 @@ import { toast, confirmDelete, confirmRemove } from '../../lib/swal';
 import ConditionWorkflowGuide from '../../components/shared/ConditionWorkflowGuide';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AuditInfo from '../../components/shared/AuditInfo';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SECTION_TYPES = {
   risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
@@ -46,6 +47,7 @@ const RECOMMENDATION_LEVEL = {
 const ConditionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
   const [condition, setCondition] = useState(null);
   const [sections, setSections] = useState([]);
   const [interventions, setInterventions] = useState([]);
@@ -246,20 +248,24 @@ const ConditionDetail = () => {
             <span className="hidden sm:inline">Export PDF</span>
             <span className="sm:hidden">PDF</span>
           </a>
-          <Link
-            to={`/conditions/${id}/edit`}
-            className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"
-          >
-            <Edit className="w-4 h-4" />
-            Edit
-          </Link>
-          <button
-            onClick={handleDelete}
-            className="btn-outline text-red-600 border-red-200 hover:bg-red-50 active:bg-red-100 flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Delete</span>
-          </button>
+          {canEdit && (
+            <>
+              <Link
+                to={`/conditions/${id}/edit`}
+                className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+              >
+                <Edit className="w-4 h-4" />
+                Edit
+              </Link>
+              <button
+                onClick={handleDelete}
+                className="btn-outline text-red-600 border-red-200 hover:bg-red-50 active:bg-red-100 flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Delete</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -323,13 +329,15 @@ const ConditionDetail = () => {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Condition Sections</h2>
-              <Link
-                to={`/conditions/${id}/sections/new`}
-                className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
-              >
-                <Plus className="w-4 h-4" />
-                Add Section
-              </Link>
+              {canEdit && (
+                <Link
+                  to={`/conditions/${id}/sections/new`}
+                  className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Section
+                </Link>
+              )}
             </div>
 
             {sections.length === 0 ? (
@@ -354,22 +362,24 @@ const ConditionDetail = () => {
                           </span>
                           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{section.title}</h3>
                         </div>
-                        <div className="flex gap-1 self-end sm:self-start">
-                          <Link
-                            to={`/conditions/${id}/sections/${section.id}/edit`}
-                            className="action-btn"
-                            title="Edit"
-                          >
-                            <Edit className="w-4 h-4 text-gray-600" />
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteSection(section.id, section.title)}
-                            className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </button>
-                        </div>
+                        {canEdit && (
+                          <div className="flex gap-1 self-end sm:self-start">
+                            <Link
+                              to={`/conditions/${id}/sections/${section.id}/edit`}
+                              className="action-btn"
+                              title="Edit"
+                            >
+                              <Edit className="w-4 h-4 text-gray-600" />
+                            </Link>
+                            <button
+                              onClick={() => handleDeleteSection(section.id, section.title)}
+                              className="action-btn hover:bg-red-50 active:bg-red-100"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                       {section.body && (
                         <div
@@ -389,13 +399,15 @@ const ConditionDetail = () => {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Linked Interventions</h2>
-              <Link
-                to={`/conditions/${id}/interventions/attach`}
-                className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
-              >
-                <Plus className="w-4 h-4" />
-                Attach Intervention
-              </Link>
+              {canEdit && (
+                <Link
+                  to={`/conditions/${id}/interventions/attach`}
+                  className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  Attach Intervention
+                </Link>
+              )}
             </div>
 
             {interventions.length === 0 ? (
@@ -459,13 +471,15 @@ const ConditionDetail = () => {
                         >
                           <ChevronRight className="w-5 h-5 text-gray-400" />
                         </Link>
-                        <button
-                          onClick={() => handleDetachIntervention(intervention.id, intervention.name)}
-                          className="action-btn hover:bg-red-50 active:bg-red-100"
-                          title="Remove from Condition"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </button>
+                        {canEdit && (
+                          <button
+                            onClick={() => handleDetachIntervention(intervention.id, intervention.name)}
+                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            title="Remove from Condition"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -480,13 +494,15 @@ const ConditionDetail = () => {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Linked Scriptures</h2>
-              <Link
-                to={`/conditions/${id}/scriptures/attach`}
-                className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
-              >
-                <Plus className="w-4 h-4" />
-                Attach Scripture
-              </Link>
+              {canEdit && (
+                <Link
+                  to={`/conditions/${id}/scriptures/attach`}
+                  className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  Attach Scripture
+                </Link>
+              )}
             </div>
 
             {scriptures.length === 0 ? (
@@ -502,13 +518,15 @@ const ConditionDetail = () => {
                       <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
                         {scripture.reference}
                       </h3>
-                      <button
-                        onClick={() => handleDetachScripture(scripture.id, scripture.reference)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
-                        title="Remove"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
+                      {canEdit && (
+                        <button
+                          onClick={() => handleDetachScripture(scripture.id, scripture.reference)}
+                          className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </button>
+                      )}
                     </div>
                     {scripture.theme && (
                       <span className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full mb-2">
@@ -528,13 +546,15 @@ const ConditionDetail = () => {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Ellen G. White Writings</h2>
-              <Link
-                to={`/conditions/${id}/egw-references/attach`}
-                className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
-              >
-                <Plus className="w-4 h-4" />
-                Attach EGW Reference
-              </Link>
+              {canEdit && (
+                <Link
+                  to={`/conditions/${id}/egw-references/attach`}
+                  className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  Attach EGW Reference
+                </Link>
+              )}
             </div>
 
             {egwReferences.length === 0 ? (
@@ -557,13 +577,15 @@ const ConditionDetail = () => {
                           </span>
                         )}
                       </div>
-                      <button
-                        onClick={() => handleDetachEgwReference(egwRef.id, egwRef.citation)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
-                        title="Remove"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
+                      {canEdit && (
+                        <button
+                          onClick={() => handleDetachEgwReference(egwRef.id, egwRef.citation)}
+                          className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </button>
+                      )}
                     </div>
                     <p className="text-gray-600 text-xs sm:text-sm italic">"{egwRef.quote}"</p>
                     {egwRef.context && (
@@ -581,13 +603,15 @@ const ConditionDetail = () => {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Linked Recipes</h2>
-              <Link
-                to={`/conditions/${id}/recipes/attach`}
-                className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
-              >
-                <Plus className="w-4 h-4" />
-                Attach Recipe
-              </Link>
+              {canEdit && (
+                <Link
+                  to={`/conditions/${id}/recipes/attach`}
+                  className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  Attach Recipe
+                </Link>
+              )}
             </div>
 
             {recipes.length === 0 ? (
@@ -601,13 +625,15 @@ const ConditionDetail = () => {
                   <div key={recipe.id} className="card">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{recipe.title}</h3>
-                      <button
-                        onClick={() => handleDetachRecipe(recipe.id, recipe.title)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
-                        title="Remove"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
+                      {canEdit && (
+                        <button
+                          onClick={() => handleDetachRecipe(recipe.id, recipe.title)}
+                          className="action-btn hover:bg-red-50 active:bg-red-100 flex-shrink-0"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </button>
+                      )}
                     </div>
                     {recipe.dietary_tags && recipe.dietary_tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-2">

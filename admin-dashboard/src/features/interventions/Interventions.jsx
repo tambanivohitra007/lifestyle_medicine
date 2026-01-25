@@ -9,8 +9,10 @@ import ViewModeToggle from '../../components/ui/ViewModeToggle';
 import InterventionTable from './components/InterventionTable';
 import InterventionList from './components/InterventionList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Interventions = () => {
+  const { canEdit } = useAuth();
   const [interventions, setInterventions] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
   const [contentTags, setContentTags] = useState([]);
@@ -100,10 +102,12 @@ const Interventions = () => {
             Manage lifestyle interventions and strategies
           </p>
         </div>
-        <Link to="/interventions/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-          <Plus className="w-5 h-5" />
-          Add Intervention
-        </Link>
+        {canEdit && (
+          <Link to="/interventions/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+            <Plus className="w-5 h-5" />
+            Add Intervention
+          </Link>
+        )}
       </div>
 
       {/* Filters */}
@@ -175,10 +179,12 @@ const Interventions = () => {
           <p className="text-gray-600 mb-6">
             Get started by creating your first intervention.
           </p>
-          <Link to="/interventions/new" className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Add Intervention
-          </Link>
+          {canEdit && (
+            <Link to="/interventions/new" className="btn-primary inline-flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Add Intervention
+            </Link>
+          )}
         </div>
       ) : (
         <>
