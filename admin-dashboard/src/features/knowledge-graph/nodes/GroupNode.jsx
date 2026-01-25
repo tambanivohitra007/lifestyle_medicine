@@ -1,9 +1,11 @@
-import { memo } from 'react';
+import { memo, useState, useCallback } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 /**
  * Group/Container node for visually grouping related nodes.
  * Renders as a background container with a title label.
  * Draggable - when dragged, all child nodes move with it.
+ * Supports collapse/expand to hide/show child nodes.
  */
 const GroupNode = memo(({ data, selected, dragging }) => {
   const {
@@ -14,31 +16,53 @@ const GroupNode = memo(({ data, selected, dragging }) => {
     bgColor = '#f9fafb',
     borderColor = '#e5e7eb',
     icon,
+    onToggleCollapse,
+    isCollapsed = false,
   } = data;
+
+  const [collapsed, setCollapsed] = useState(isCollapsed);
+
+  const handleToggle = useCallback((e) => {
+    e.stopPropagation();
+    const newCollapsed = !collapsed;
+    setCollapsed(newCollapsed);
+    if (onToggleCollapse) {
+      onToggleCollapse(newCollapsed);
+    }
+  }, [collapsed, onToggleCollapse]);
+
+  const displayHeight = collapsed ? 50 : height;
 
   return (
     <div
       className={`
-        rounded-2xl border-2 transition-all duration-200 cursor-move
+        rounded-2xl border-2 transition-all duration-300 cursor-move relative
         ${selected || dragging ? 'shadow-xl border-solid' : 'shadow-sm border-dashed'}
       `}
       style={{
         width: `${width}px`,
-        height: `${height}px`,
+        height: `${displayHeight}px`,
         backgroundColor: bgColor,
         borderColor: selected || dragging ? color : borderColor,
         opacity: dragging ? 0.8 : 0.9,
+        overflow: 'hidden',
       }}
     >
-      {/* Header Label */}
+      {/* Header Label with Collapse Toggle */}
       <div
-        className="absolute -top-3 left-4 px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
+        className="absolute -top-3 left-4 px-3 py-1 rounded-full text-xs font-semibold shadow-sm cursor-pointer hover:scale-105 transition-transform"
         style={{
           backgroundColor: color,
           color: 'white',
         }}
+        onClick={handleToggle}
       >
         <span className="flex items-center gap-1.5">
+          {collapsed ? (
+            <ChevronRight className="w-3 h-3" />
+          ) : (
+            <ChevronDown className="w-3 h-3" />
+          )}
           {icon && <span>{icon}</span>}
           {label}
         </span>
@@ -51,6 +75,16 @@ const GroupNode = memo(({ data, selected, dragging }) => {
           style={{ borderColor: borderColor }}
         >
           {data.count} items
+        </div>
+      )}
+
+      {/* Collapsed indicator */}
+      {collapsed && (
+        <div
+          className="absolute inset-0 flex items-center justify-center text-[10px] font-medium"
+          style={{ color: color }}
+        >
+          Click header to expand
         </div>
       )}
     </div>

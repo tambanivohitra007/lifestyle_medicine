@@ -10,12 +10,12 @@ import ReactFlow, {
   Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Loader2, Layout, Maximize2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Layout, Maximize2, Eye, EyeOff, RotateCcw } from 'lucide-react';
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
-import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp } from './controls';
-import { useKeyboardShortcuts } from './hooks';
+import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp, NodeDetailsPanel } from './controls';
+import { useKeyboardShortcuts, useLayoutPersistence } from './hooks';
 import api from '../../lib/api';
 
 const KnowledgeGraphInner = ({
@@ -38,7 +38,18 @@ const KnowledgeGraphInner = ({
   const [hiddenTypes, setHiddenTypes] = useState([]);
   const [highlightedNodeId, setHighlightedNodeId] = useState(null);
   const [showUI, setShowUI] = useState(true);
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const { fitView, setCenter } = useReactFlow();
+
+  // Layout persistence
+  const graphId = `${centerType}-${centerId}`;
+  const { restorePositions, clearSavedPositions } = useLayoutPersistence(
+    graphId,
+    nodes,
+    setNodes,
+    true // enabled
+  );
 
   // Fetch graph data
   const fetchGraphData = useCallback(async () => {
@@ -61,12 +72,15 @@ const KnowledgeGraphInner = ({
       // Apply layout
       const layoutedNodes = applyLayout(apiNodes, processedEdges, layoutType);
 
+      // Restore saved positions if available
+      const restoredNodes = restorePositions(layoutedNodes);
+
       // Store original data for filtering
-      setAllNodes(layoutedNodes);
+      setAllNodes(restoredNodes);
       setAllEdges(processedEdges);
 
       // Apply current filter
-      applyFilter(layoutedNodes, apiEdges, hiddenTypes);
+      applyFilter(restoredNodes, apiEdges, hiddenTypes);
       setMeta(apiMeta);
     } catch (err) {
       console.error('Failed to fetch knowledge graph:', err);
@@ -74,7 +88,7 @@ const KnowledgeGraphInner = ({
     } finally {
       setLoading(false);
     }
-  }, [centerId, centerType, depth, layoutType]);
+  }, [centerId, centerType, depth, layoutType, restorePositions]);
 
   // Apply filter to nodes and edges
   const applyFilter = useCallback((nodeList, edgeList, hidden) => {
@@ -201,15 +215,49 @@ const KnowledgeGraphInner = ({
     graphTitle: `${centerType}-graph`,
   });
 
-  // Handle node click
+  // Handle node click - open details panel
   const handleNodeClick = useCallback(
     (event, node) => {
+      // Don't open panel for group nodes
+      if (node.type === 'group') return;
+      setSelectedNode(node);
       if (onNodeClick) {
         onNodeClick(node);
       }
     },
     [onNodeClick]
   );
+
+  // Handle node hover for edge highlighting
+  const handleNodeMouseEnter = useCallback((event, node) => {
+    if (node.type !== 'group') {
+      setHoveredNodeId(node.id);
+    }
+  }, []);
+
+  const handleNodeMouseLeave = useCallback(() => {
+    setHoveredNodeId(null);
+  }, []);
+
+  // Close details panel
+  const handleCloseDetails = useCallback(() => {
+    setSelectedNode(null);
+  }, []);
+
+  // Navigate to entity detail page
+  const handleNavigateToEntity = useCallback((type, entityId) => {
+    // This could be customized based on your routing structure
+    const routes = {
+      condition: `/conditions/${entityId}`,
+      intervention: `/interventions/${entityId}`,
+      recipe: `/recipes/${entityId}`,
+      scripture: `/scriptures/${entityId}`,
+      egwReference: `/egw-references/${entityId}`,
+    };
+    if (routes[type]) {
+      window.location.href = routes[type];
+    }
+  }, []);
 
   // Node color map for minimap
   const nodeColor = useCallback((node) => {
@@ -244,12 +292,44 @@ const KnowledgeGraphInner = ({
     );
   }
 
-  // Add highlight state to nodes
+  // Add highlight state to nodes and determine connected edges
+  const connectedEdgeIds = new Set();
+  if (hoveredNodeId) {
+    edges.forEach((edge) => {
+      if (edge.source === hoveredNodeId || edge.target === hoveredNodeId) {
+        connectedEdgeIds.add(edge.id);
+      }
+    });
+  }
+
   const displayNodes = nodes.map((node) => ({
     ...node,
     data: {
       ...node.data,
       isHighlighted: node.id === highlightedNodeId,
+      isConnected: hoveredNodeId ? (node.id === hoveredNodeId || connectedEdgeIds.size > 0 && edges.some(e =>
+        (e.source === hoveredNodeId && e.target === node.id) ||
+        (e.target === hoveredNodeId && e.source === node.id)
+      )) : true,
+    },
+    style: {
+      ...node.style,
+      opacity: hoveredNodeId && node.id !== hoveredNodeId && !edges.some(e =>
+        (e.source === hoveredNodeId && e.target === node.id) ||
+        (e.target === hoveredNodeId && e.source === node.id)
+      ) ? 0.3 : 1,
+      transition: 'opacity 0.2s ease',
+    },
+  }));
+
+  // Highlight connected edges
+  const displayEdges = edges.map((edge) => ({
+    ...edge,
+    style: {
+      ...edge.style,
+      opacity: hoveredNodeId ? (connectedEdgeIds.has(edge.id) ? 1 : 0.1) : (edge.style?.opacity || 1),
+      strokeWidth: connectedEdgeIds.has(edge.id) ? (edge.style?.strokeWidth || 2) + 1 : edge.style?.strokeWidth,
+      transition: 'opacity 0.2s ease, stroke-width 0.2s ease',
     },
   }));
 
@@ -257,10 +337,12 @@ const KnowledgeGraphInner = ({
     <div className={`h-full w-full overflow-hidden ${className}`}>
       <ReactFlow
         nodes={displayNodes}
-        edges={edges}
+        edges={displayEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
+        onNodeMouseEnter={handleNodeMouseEnter}
+        onNodeMouseLeave={handleNodeMouseLeave}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
@@ -360,6 +442,19 @@ const KnowledgeGraphInner = ({
               </div>
             </div>
 
+            {/* Reset Layout Button */}
+            <button
+              onClick={() => {
+                clearSavedPositions();
+                fetchGraphData();
+              }}
+              className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2"
+              title="Reset to default layout"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Reset Layout</span>
+            </button>
+
             {/* Stats */}
             {meta && (
               <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600">
@@ -419,6 +514,15 @@ const KnowledgeGraphInner = ({
           </Panel>
         )}
       </ReactFlow>
+
+      {/* Node Details Panel */}
+      {selectedNode && (
+        <NodeDetailsPanel
+          node={selectedNode}
+          onClose={handleCloseDetails}
+          onNavigate={handleNavigateToEntity}
+        />
+      )}
     </div>
   );
 };

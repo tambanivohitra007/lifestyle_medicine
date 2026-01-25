@@ -11,12 +11,12 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Link } from 'react-router-dom';
-import { Loader2, Layout, ChevronLeft, ChevronRight, BarChart3, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Layout, ChevronLeft, ChevronRight, BarChart3, Eye, EyeOff, RotateCcw } from 'lucide-react';
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
-import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp } from './controls';
-import { useKeyboardShortcuts } from './hooks';
+import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp, NodeDetailsPanel } from './controls';
+import { useKeyboardShortcuts, useLayoutPersistence } from './hooks';
 import api from '../../lib/api';
 
 const FullGraphInner = () => {
@@ -32,7 +32,17 @@ const FullGraphInner = () => {
   const [hiddenTypes, setHiddenTypes] = useState([]);
   const [highlightedNodeId, setHighlightedNodeId] = useState(null);
   const [showUI, setShowUI] = useState(true);
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const { fitView, setCenter } = useReactFlow();
+
+  // Layout persistence
+  const { restorePositions, clearSavedPositions } = useLayoutPersistence(
+    'full-graph',
+    nodes,
+    setNodes,
+    true
+  );
 
   const limit = 50;
 
@@ -54,12 +64,15 @@ const FullGraphInner = () => {
       // Apply layout
       const layoutedNodes = applyLayout(apiNodes, processedEdges, layoutType);
 
+      // Restore saved positions if available (only for first page)
+      const restoredNodes = pageNum === 1 ? restorePositions(layoutedNodes) : layoutedNodes;
+
       if (pageNum === 1) {
-        setAllNodes(layoutedNodes);
+        setAllNodes(restoredNodes);
         setAllEdges(processedEdges);
       } else {
         // Append for lazy loading
-        setAllNodes((prev) => [...prev, ...layoutedNodes]);
+        setAllNodes((prev) => [...prev, ...restoredNodes]);
         setAllEdges((prev) => [...prev, ...processedEdges]);
       }
 
@@ -70,7 +83,7 @@ const FullGraphInner = () => {
     } finally {
       setLoading(false);
     }
-  }, [layoutType]);
+  }, [layoutType, restorePositions]);
 
   useEffect(() => {
     fetchGraphData(1);
@@ -204,7 +217,56 @@ const FullGraphInner = () => {
   // Node color map for minimap
   const nodeColor = useCallback((node) => node.data?.color || '#666', []);
 
-  // Add highlight state to nodes
+  // Handle node click - open details panel
+  const handleNodeClick = useCallback((event, node) => {
+    if (node.type === 'group') return;
+    setSelectedNode(node);
+  }, []);
+
+  // Handle node hover for edge highlighting
+  const handleNodeMouseEnter = useCallback((event, node) => {
+    if (node.type !== 'group') {
+      setHoveredNodeId(node.id);
+    }
+  }, []);
+
+  const handleNodeMouseLeave = useCallback(() => {
+    setHoveredNodeId(null);
+  }, []);
+
+  // Close details panel
+  const handleCloseDetails = useCallback(() => {
+    setSelectedNode(null);
+  }, []);
+
+  // Navigate to entity detail page
+  const handleNavigateToEntity = useCallback((type, entityId) => {
+    const routes = {
+      condition: `/conditions/${entityId}`,
+      intervention: `/interventions/${entityId}`,
+      recipe: `/recipes/${entityId}`,
+      scripture: `/scriptures/${entityId}`,
+      egwReference: `/egw-references/${entityId}`,
+    };
+    if (routes[type]) {
+      window.location.href = routes[type];
+    }
+  }, []);
+
+  // Determine connected edges for highlighting
+  const connectedEdgeIds = useMemo(() => {
+    const ids = new Set();
+    if (hoveredNodeId) {
+      edges.forEach((edge) => {
+        if (edge.source === hoveredNodeId || edge.target === hoveredNodeId) {
+          ids.add(edge.id);
+        }
+      });
+    }
+    return ids;
+  }, [edges, hoveredNodeId]);
+
+  // Add highlight state to nodes with edge highlighting
   const displayNodes = useMemo(() =>
     nodes.map((node) => ({
       ...node,
@@ -212,8 +274,30 @@ const FullGraphInner = () => {
         ...node.data,
         isHighlighted: node.id === highlightedNodeId,
       },
+      style: {
+        ...node.style,
+        opacity: hoveredNodeId && node.id !== hoveredNodeId && !edges.some(e =>
+          (e.source === hoveredNodeId && e.target === node.id) ||
+          (e.target === hoveredNodeId && e.source === node.id)
+        ) ? 0.3 : 1,
+        transition: 'opacity 0.2s ease',
+      },
     })),
-    [nodes, highlightedNodeId]
+    [nodes, highlightedNodeId, hoveredNodeId, edges]
+  );
+
+  // Highlight connected edges
+  const displayEdges = useMemo(() =>
+    edges.map((edge) => ({
+      ...edge,
+      style: {
+        ...edge.style,
+        opacity: hoveredNodeId ? (connectedEdgeIds.has(edge.id) ? 1 : 0.1) : (edge.style?.opacity || 1),
+        strokeWidth: connectedEdgeIds.has(edge.id) ? (edge.style?.strokeWidth || 2) + 1 : edge.style?.strokeWidth,
+        transition: 'opacity 0.2s ease, stroke-width 0.2s ease',
+      },
+    })),
+    [edges, hoveredNodeId, connectedEdgeIds]
   );
 
   if (loading && allNodes.length === 0) {
@@ -249,9 +333,12 @@ const FullGraphInner = () => {
       <div className="h-full w-full">
         <ReactFlow
           nodes={displayNodes}
-          edges={edges}
+          edges={displayEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          onNodeClick={handleNodeClick}
+          onNodeMouseEnter={handleNodeMouseEnter}
+          onNodeMouseLeave={handleNodeMouseLeave}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           fitView
@@ -335,6 +422,19 @@ const FullGraphInner = () => {
                   ))}
                 </select>
               </div>
+
+              {/* Reset Layout Button */}
+              <button
+                onClick={() => {
+                  clearSavedPositions();
+                  fetchGraphData(1);
+                }}
+                className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                title="Reset to default layout"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>Reset Layout</span>
+              </button>
 
               {/* Stats */}
               {meta && (
@@ -443,6 +543,15 @@ const FullGraphInner = () => {
             </Panel>
           )}
         </ReactFlow>
+
+        {/* Node Details Panel */}
+        {selectedNode && (
+          <NodeDetailsPanel
+            node={selectedNode}
+            onClose={handleCloseDetails}
+            onNavigate={handleNavigateToEntity}
+          />
+        )}
       </div>
     </div>
   );
