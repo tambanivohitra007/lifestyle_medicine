@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { AuthProvider, useAuth, ROLES } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { ShieldX, Home } from 'lucide-react';
 
 // Layout
 import { Layout } from './components/layout';
@@ -37,6 +38,35 @@ import { ContentTags } from './features/content-tags';
 import { Users, UserForm } from './features/users';
 import BibleExplorer from './features/bible/BibleExplorer';
 
+// Forbidden Page Component
+const Forbidden = () => {
+  const { user } = useAuth();
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+      <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
+        <ShieldX className="w-10 h-10 text-red-600" />
+      </div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+      <p className="text-gray-600 mb-6 max-w-md">
+        You don't have permission to access this page.
+        {user?.role && (
+          <span className="block mt-2 text-sm">
+            Your role: <span className="font-medium capitalize">{user.role}</span>
+          </span>
+        )}
+      </p>
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+      >
+        <Home className="w-4 h-4" />
+        Go to Dashboard
+      </Link>
+    </div>
+  );
+};
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -50,6 +80,25 @@ const ProtectedRoute = ({ children }) => {
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
+// Role-Protected Route Component
+const RoleRoute = ({ children, allowedRoles }) => {
+  const { hasRole, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (!hasRole(allowedRoles)) {
+    return <Forbidden />;
+  }
+
+  return children;
 };
 
 function App() {
@@ -122,31 +171,34 @@ function App() {
             <Route path="egw-references/new" element={<EgwReferenceForm />} />
             <Route path="egw-references/:id/edit" element={<EgwReferenceForm />} />
 
-            {/* Content Tags */}
-            <Route path="tags" element={<ContentTags />} />
+            {/* Content Tags - Admin only */}
+            <Route path="tags" element={<RoleRoute allowedRoles={[ROLES.ADMIN]}><ContentTags /></RoleRoute>} />
 
-            {/* Users */}
-            <Route path="users" element={<Users />} />
-            <Route path="users/new" element={<UserForm />} />
-            <Route path="users/:id/edit" element={<UserForm />} />
+            {/* Users - Admin only */}
+            <Route path="users" element={<RoleRoute allowedRoles={[ROLES.ADMIN]}><Users /></RoleRoute>} />
+            <Route path="users/new" element={<RoleRoute allowedRoles={[ROLES.ADMIN]}><UserForm /></RoleRoute>} />
+            <Route path="users/:id/edit" element={<RoleRoute allowedRoles={[ROLES.ADMIN]}><UserForm /></RoleRoute>} />
 
-            {/* Profile */}
+            {/* Profile - All authenticated users */}
             <Route path="profile" element={<Profile />} />
 
-            {/* Search */}
+            {/* Search - All authenticated users */}
             <Route path="search" element={<Search />} />
 
-            {/* Analytics */}
-            <Route path="analytics" element={<Analytics />} />
+            {/* Analytics - Admin only */}
+            <Route path="analytics" element={<RoleRoute allowedRoles={[ROLES.ADMIN]}><Analytics /></RoleRoute>} />
 
-            {/* Import */}
-            <Route path="import" element={<Import />} />
+            {/* Import - Admin only */}
+            <Route path="import" element={<RoleRoute allowedRoles={[ROLES.ADMIN]}><Import /></RoleRoute>} />
 
-            {/* AI Content Generator */}
-            <Route path="ai-generator" element={<AiContentGenerator />} />
+            {/* AI Content Generator - Admin only */}
+            <Route path="ai-generator" element={<RoleRoute allowedRoles={[ROLES.ADMIN]}><AiContentGenerator /></RoleRoute>} />
 
-            {/* Bible Explorer */}
+            {/* Bible Explorer - All authenticated users */}
             <Route path="bible" element={<BibleExplorer />} />
+
+            {/* Forbidden page */}
+            <Route path="forbidden" element={<Forbidden />} />
           </Route>
 
           {/* Catch all */}

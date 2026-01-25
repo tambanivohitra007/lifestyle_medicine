@@ -91,8 +91,8 @@ Route::prefix('v1')->group(function () {
     Route::get('export/conditions/summary/pdf', [ExportController::class, 'conditionsSummaryPdf']);
 });
 
-// Admin API routes (full CRUD) - protected by auth:sanctum
-Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
+// Admin API routes - Content Management (admin and editor roles)
+Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->group(function () {
 
     // Care Domains
     Route::apiResource('care-domains', CareDomainController::class)->except(['index', 'show']);
@@ -134,7 +134,15 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     Route::post('conditions/{condition}/egw-references/{egwReference}', [ConditionController::class, 'attachEgwReference']);
     Route::delete('conditions/{condition}/egw-references/{egwReference}', [ConditionController::class, 'detachEgwReference']);
 
-    // Data Import
+    // AI Suggestions (for content editors)
+    Route::post('ai/suggest-scriptures', [AiSuggestionController::class, 'suggestScriptures']);
+    Route::post('ai/suggest-egw-references', [AiSuggestionController::class, 'suggestEgwReferences']);
+});
+
+// Admin API routes - Admin Only (user management, import, AI generator, analytics)
+Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
+
+    // Data Import (admin only)
     Route::post('import/conditions', [ImportController::class, 'importConditions']);
     Route::post('import/interventions', [ImportController::class, 'importInterventions']);
     Route::get('import/templates', [ImportController::class, 'getTemplates']);
@@ -144,17 +152,13 @@ Route::prefix('v1/admin')->middleware('auth:sanctum')->group(function () {
     Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive']);
     Route::post('users/{id}/restore', [UserController::class, 'restore']);
 
-    // AI Suggestions
-    Route::post('ai/suggest-scriptures', [AiSuggestionController::class, 'suggestScriptures']);
-    Route::post('ai/suggest-egw-references', [AiSuggestionController::class, 'suggestEgwReferences']);
-
-    // AI Content Generator
+    // AI Content Generator (admin only)
     Route::get('ai/status', [AiContentController::class, 'status']);
     Route::post('ai/generate-draft', [AiContentController::class, 'generateDraft']);
     Route::post('ai/structure-content', [AiContentController::class, 'structureContent']);
     Route::post('ai/import-content', [AiContentController::class, 'importContent']);
 
-    // Analytics
+    // Analytics (admin only)
     Route::prefix('analytics')->group(function () {
         Route::get('overview', [AnalyticsController::class, 'overview']);
         Route::get('conditions-by-category', [AnalyticsController::class, 'conditionsByCategory']);

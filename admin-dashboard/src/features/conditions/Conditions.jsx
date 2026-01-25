@@ -10,8 +10,10 @@ import ViewModeToggle from '../../components/ui/ViewModeToggle';
 import ConditionTable from './components/ConditionTable';
 import ConditionList from './components/ConditionList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Conditions = () => {
+  const { canEdit } = useAuth();
   const [conditions, setConditions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -103,10 +105,12 @@ const Conditions = () => {
             <Download className="w-5 h-5" />
             Export Summary
           </a>
-          <Link to="/conditions/new" className="btn-primary flex items-center justify-center gap-2">
-            <Plus className="w-5 h-5" />
-            Add Condition
-          </Link>
+          {canEdit && (
+            <Link to="/conditions/new" className="btn-primary flex items-center justify-center gap-2">
+              <Plus className="w-5 h-5" />
+              Add Condition
+            </Link>
+          )}
         </div>
       </div>
 

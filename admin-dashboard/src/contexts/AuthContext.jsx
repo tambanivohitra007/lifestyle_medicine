@@ -1,6 +1,13 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useMemo } from 'react';
 
 const AuthContext = createContext();
+
+// Role constants
+export const ROLES = {
+  ADMIN: 'admin',
+  EDITOR: 'editor',
+  VIEWER: 'viewer',
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -46,6 +53,21 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Role helper functions
+  const isAdmin = useMemo(() => user?.role === ROLES.ADMIN, [user?.role]);
+  const isEditor = useMemo(() => user?.role === ROLES.EDITOR, [user?.role]);
+  const isViewer = useMemo(() => user?.role === ROLES.VIEWER, [user?.role]);
+  const canEdit = useMemo(() => isAdmin || isEditor, [isAdmin, isEditor]);
+
+  // Check if user has one of the specified roles
+  const hasRole = (roles) => {
+    if (!user?.role) return false;
+    if (Array.isArray(roles)) {
+      return roles.includes(user.role);
+    }
+    return user.role === roles;
+  };
+
   const value = {
     user,
     token,
@@ -54,6 +76,12 @@ export const AuthProvider = ({ children }) => {
     logout,
     isAuthenticated: !!token,
     loading,
+    // Role helpers
+    isAdmin,
+    isEditor,
+    isViewer,
+    canEdit,
+    hasRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

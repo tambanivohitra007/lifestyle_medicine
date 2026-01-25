@@ -29,6 +29,13 @@ class AuthController extends Controller
             ]);
         }
 
+        // Check if user is active
+        if (! $user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['Your account has been deactivated. Please contact an administrator.'],
+            ]);
+        }
+
         // Delete existing tokens for this user (optional - for single session)
         // $user->tokens()->delete();
 
@@ -40,6 +47,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'role' => $user->role,
+                'is_active' => $user->is_active,
             ],
             'token' => $token,
         ]);
@@ -62,11 +71,15 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
+        $user = $request->user();
+
         return response()->json([
             'user' => [
-                'id' => $request->user()->id,
-                'name' => $request->user()->name,
-                'email' => $request->user()->email,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'is_active' => $user->is_active,
             ],
         ]);
     }
@@ -99,6 +112,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'role' => $user->role,
+                'is_active' => $user->is_active,
             ],
         ]);
     }

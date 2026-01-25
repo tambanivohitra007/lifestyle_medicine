@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { X, LogOut, User } from 'lucide-react';
+import { X, LogOut, User, Shield } from 'lucide-react';
 import {
   LayoutDashboard,
   HeartPulse,
@@ -19,11 +19,11 @@ import {
   BarChart3,
   Sparkles,
 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth, ROLES } from '../../contexts/AuthContext';
 import { confirmLogout } from '../../lib/swal';
 
 const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, hasRole, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -34,12 +34,19 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
     }
   };
 
+  // Role labels for display
+  const roleLabels = {
+    admin: 'Administrator',
+    editor: 'Editor',
+    viewer: 'Viewer',
+  };
+
   const navSections = [
     {
       title: 'Overview',
       items: [
         { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-        { to: '/analytics', icon: BarChart3, label: 'Analytics' },
+        { to: '/analytics', icon: BarChart3, label: 'Analytics', roles: [ROLES.ADMIN] },
         { to: '/search', icon: Search, label: 'Search' },
       ],
     },
@@ -64,15 +71,30 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
     },
     {
       title: 'System',
+      roles: [ROLES.ADMIN], // Entire section requires admin
       items: [
-        { to: '/users', icon: Users, label: 'Users' },
-        { to: '/tags', icon: Tag, label: 'Content Tags' },
-        { to: '/import', icon: Upload, label: 'Import Data' },
-        { to: '/ai-generator', icon: Sparkles, label: 'AI Generator' },
+        { to: '/users', icon: Users, label: 'Users', roles: [ROLES.ADMIN] },
+        { to: '/tags', icon: Tag, label: 'Content Tags', roles: [ROLES.ADMIN] },
+        { to: '/import', icon: Upload, label: 'Import Data', roles: [ROLES.ADMIN] },
+        { to: '/ai-generator', icon: Sparkles, label: 'AI Generator', roles: [ROLES.ADMIN] },
+      ],
+    },
+    {
+      title: 'Account',
+      items: [
         { to: '/profile', icon: Settings, label: 'Settings' },
       ],
     },
   ];
+
+  // Filter sections and items based on user role
+  const filteredSections = navSections
+    .filter(section => !section.roles || hasRole(section.roles))
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => !item.roles || hasRole(item.roles)),
+    }))
+    .filter(section => section.items.length > 0);
 
   return (
     <>
@@ -125,7 +147,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
 
         {/* Navigation - scrollable */}
         <nav className={`flex-1 overflow-y-auto sidebar-scroll p-3 sm:p-4 ${isCollapsed ? 'lg:p-2' : ''}`}>
-          {navSections.map((section, sectionIndex) => (
+          {filteredSections.map((section, sectionIndex) => (
             <div key={section.title} className={sectionIndex > 0 ? 'mt-6' : ''}>
               {/* Section Title */}
               <div
@@ -187,11 +209,20 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
             </div>
             <div className={`flex-1 min-w-0 ${isCollapsed ? 'lg:hidden' : ''}`}>
               <p className="text-sm font-medium text-white truncate">
-                {user?.name || 'Admin User'}
+                {user?.name || 'User'}
               </p>
-              <p className="text-xs text-gray-400 truncate">
-                {user?.email || 'admin@example.com'}
-              </p>
+              <div className="flex items-center gap-1.5">
+                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                  user?.role === 'admin'
+                    ? 'bg-purple-500/20 text-purple-300'
+                    : user?.role === 'editor'
+                    ? 'bg-blue-500/20 text-blue-300'
+                    : 'bg-gray-500/20 text-gray-300'
+                }`}>
+                  {user?.role === 'admin' && <Shield className="w-2.5 h-2.5" />}
+                  {roleLabels[user?.role] || 'User'}
+                </span>
+              </div>
             </div>
           </NavLink>
 
