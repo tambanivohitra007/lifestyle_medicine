@@ -80,7 +80,7 @@ const RecipeDetail = () => {
     (recipe.prep_time_minutes || 0) + (recipe.cook_time_minutes || 0);
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[

@@ -113,7 +113,7 @@ const AttachIntervention = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[

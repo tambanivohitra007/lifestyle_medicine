@@ -184,27 +184,29 @@ const EgwReferenceForm = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <Breadcrumbs items={breadcrumbItems} />
+      <div className={`${isEditing ? 'max-w-3xl' : 'max-w-6xl'} mx-auto`}>
+        <Breadcrumbs items={breadcrumbItems} />
 
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/egw-references')}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            {isEditing ? 'Edit EGW Reference' : 'New EGW Reference'}
-          </h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            {isEditing ? 'Update the reference details' : 'Add a new Ellen G. White reference'}
-          </p>
+        {/* Header */}
+        <div className="flex items-center gap-4 mt-4 sm:mt-6">
+          <button
+            onClick={() => navigate('/egw-references')}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors touch-manipulation"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              {isEditing ? 'Edit EGW Reference' : 'New EGW Reference'}
+            </h1>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">
+              {isEditing ? 'Update the reference details' : 'Add a new Ellen G. White reference'}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={`${isEditing ? 'max-w-3xl' : 'max-w-6xl'} mx-auto grid grid-cols-1 ${!isEditing ? 'lg:grid-cols-2' : ''} gap-6`}>
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Book Selection */}

@@ -117,14 +117,14 @@ const Profile = () => {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div>
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Profile Settings</h1>
         <p className="text-gray-600 mt-1 text-sm sm:text-base">
           Manage your account information and password
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+      <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Profile Information */}
         <div className="card">
           <div className="flex items-center gap-3 mb-6">

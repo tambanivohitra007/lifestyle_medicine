@@ -109,25 +109,27 @@ const ScriptureForm = () => {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <Breadcrumbs
-        items={[
-          { label: 'Scriptures', href: '/scriptures' },
-          { label: isEditing ? 'Edit Scripture' : 'New Scripture' },
-        ]}
-      />
+      <div className={`${isEditing ? 'max-w-2xl' : 'max-w-5xl'} mx-auto`}>
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Scriptures', href: '/scriptures' },
+            { label: isEditing ? 'Edit Scripture' : 'New Scripture' },
+          ]}
+        />
 
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          {isEditing ? 'Edit Scripture' : 'New Scripture'}
-        </h1>
-        <p className="text-gray-600 mt-1">
-          {isEditing ? 'Update the scripture details' : 'Add a new scripture reference'}
-        </p>
+        {/* Header */}
+        <div className="mt-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            {isEditing ? 'Edit Scripture' : 'New Scripture'}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {isEditing ? 'Update the scripture details' : 'Add a new scripture reference'}
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={`${isEditing ? 'max-w-2xl' : 'max-w-5xl'} mx-auto grid grid-cols-1 ${!isEditing ? 'lg:grid-cols-2' : ''} gap-6`}>
         {/* Form */}
         <form onSubmit={handleSubmit} className="card">
           <div className="space-y-6">
