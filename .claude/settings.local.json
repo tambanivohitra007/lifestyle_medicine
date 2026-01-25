@@ -36,7 +36,8 @@
       "WebFetch(domain:familyandlifestylemedicine.org)",
       "Bash(grep:*)",
       "Bash(git check-ignore:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

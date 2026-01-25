@@ -15,7 +15,7 @@ import { Loader2, Layout, ChevronLeft, ChevronRight, BarChart3, Eye, EyeOff, Rot
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
-import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp, NodeDetailsPanel } from './controls';
+import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp, NodeDetailsPanel, NodeContextMenu, InteractiveLegend } from './controls';
 import { useKeyboardShortcuts, useLayoutPersistence } from './hooks';
 import api from '../../lib/api';
 
@@ -34,6 +34,7 @@ const FullGraphInner = () => {
   const [showUI, setShowUI] = useState(true);
   const [selectedNode, setSelectedNode] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
   const { fitView, setCenter } = useReactFlow();
 
   // Layout persistence
@@ -253,6 +254,46 @@ const FullGraphInner = () => {
     }
   }, []);
 
+  // Handle double-click on group nodes to zoom to fit
+  const handleNodeDoubleClick = useCallback((event, node) => {
+    if (node.type === 'group') {
+      const groupX = node.position.x;
+      const groupY = node.position.y;
+      const groupWidth = node.data?.width || 250;
+      const groupHeight = node.data?.height || 200;
+      const centerX = groupX + groupWidth / 2;
+      const centerY = groupY + groupHeight / 2;
+      setCenter(centerX, centerY, { zoom: 1.5, duration: 500 });
+    }
+  }, [setCenter]);
+
+  // Handle right-click context menu
+  const handleNodeContextMenu = useCallback((event, node) => {
+    event.preventDefault();
+    setContextMenu({
+      node,
+      position: { x: event.clientX, y: event.clientY },
+    });
+  }, []);
+
+  const handleCloseContextMenu = useCallback(() => {
+    setContextMenu(null);
+  }, []);
+
+  const handleFocusNode = useCallback((node) => {
+    if (node.type === 'group') {
+      const centerX = node.position.x + (node.data?.width || 250) / 2;
+      const centerY = node.position.y + (node.data?.height || 200) / 2;
+      setCenter(centerX, centerY, { zoom: 1.5, duration: 500 });
+    } else {
+      setCenter(
+        node.position.x + 100,
+        node.position.y + 40,
+        { zoom: 1.5, duration: 500 }
+      );
+    }
+  }, [setCenter]);
+
   // Determine connected edges for highlighting
   const connectedEdgeIds = useMemo(() => {
     const ids = new Set();
@@ -337,6 +378,8 @@ const FullGraphInner = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
+          onNodeDoubleClick={handleNodeDoubleClick}
+          onNodeContextMenu={handleNodeContextMenu}
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
           nodeTypes={nodeTypes}
@@ -500,46 +543,13 @@ const FullGraphInner = () => {
             </Panel>
           )}
 
-          {/* Legend - Conditional */}
+          {/* Interactive Legend - Conditional */}
           {showUI && (
             <Panel position="bottom-right" className="!mb-4">
-              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
-                <div className="text-xs font-medium text-gray-700 mb-2">Legend</div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div>
-                    <span>Condition</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></div>
-                    <span>Intervention</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></div>
-                    <span>Care Domain</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#6366f1]"></div>
-                    <span>Scripture</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]"></div>
-                    <span>EGW Reference</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
-                    <span>Recipe</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div>
-                    <span>Evidence</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#64748b]"></div>
-                    <span>Reference</span>
-                  </div>
-                </div>
-              </div>
+              <InteractiveLegend
+                hiddenTypes={hiddenTypes}
+                onToggleType={handleToggleType}
+              />
             </Panel>
           )}
         </ReactFlow>
@@ -550,6 +560,18 @@ const FullGraphInner = () => {
             node={selectedNode}
             onClose={handleCloseDetails}
             onNavigate={handleNavigateToEntity}
+          />
+        )}
+
+        {/* Context Menu */}
+        {contextMenu && (
+          <NodeContextMenu
+            node={contextMenu.node}
+            position={contextMenu.position}
+            onClose={handleCloseContextMenu}
+            onViewDetails={(node) => setSelectedNode(node)}
+            onNavigate={handleNavigateToEntity}
+            onFocus={handleFocusNode}
           />
         )}
       </div>

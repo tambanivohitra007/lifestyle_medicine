@@ -36,7 +36,7 @@ const GroupNode = memo(({ data, selected, dragging }) => {
   return (
     <div
       className={`
-        rounded-2xl border-2 transition-all duration-300 cursor-move relative
+        group rounded-2xl border-2 transition-all duration-300 cursor-move relative
         ${selected || dragging ? 'shadow-xl border-solid' : 'shadow-sm border-dashed'}
       `}
       style={{
@@ -85,6 +85,15 @@ const GroupNode = memo(({ data, selected, dragging }) => {
           style={{ color: color }}
         >
           Click header to expand
+        </div>
+      )}
+
+      {/* Double-click hint (shown on hover when not collapsed) */}
+      {!collapsed && (
+        <div
+          className="absolute bottom-2 left-0 right-0 text-center text-[9px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+        >
+          Double-click to zoom
         </div>
       )}
     </div>
