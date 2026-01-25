@@ -172,7 +172,7 @@ const KnowledgeGraphInner = ({
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center h-full bg-gray-50 ${className}`}>
+      <div className={`flex items-center justify-center h-full w-full overflow-hidden bg-gray-50 ${className}`}>
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-2" />
           <p className="text-sm text-gray-600">Loading knowledge graph...</p>
@@ -183,7 +183,7 @@ const KnowledgeGraphInner = ({
 
   if (error) {
     return (
-      <div className={`flex items-center justify-center h-full bg-gray-50 ${className}`}>
+      <div className={`flex items-center justify-center h-full w-full overflow-hidden bg-gray-50 ${className}`}>
         <div className="text-center text-red-600">
           <p className="font-medium">Error loading graph</p>
           <p className="text-sm">{error}</p>
@@ -208,7 +208,7 @@ const KnowledgeGraphInner = ({
   }));
 
   return (
-    <div className={`h-full ${className}`}>
+    <div className={`h-full w-full overflow-hidden ${className}`}>
       <ReactFlow
         nodes={displayNodes}
         edges={edges}

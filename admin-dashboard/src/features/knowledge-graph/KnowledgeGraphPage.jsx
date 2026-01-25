@@ -72,18 +72,15 @@ const KnowledgeGraphPage = () => {
   );
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col">
-      {/* Graph Container - Full Space */}
-      <div className="flex-1 bg-gray-50">
-        <KnowledgeGraph
-          centerType={type}
-          centerId={id}
-          initialDepth={parseInt(searchParams.get('depth') || '2')}
-          onNodeClick={handleNodeClick}
-          className="h-full"
-          backButton={backButton}
-        />
-      </div>
+    <div className="h-screen overflow-hidden">
+      <KnowledgeGraph
+        centerType={type}
+        centerId={id}
+        initialDepth={parseInt(searchParams.get('depth') || '2')}
+        onNodeClick={handleNodeClick}
+        className="h-full w-full"
+        backButton={backButton}
+      />
     </div>
   );
 };

@@ -172,12 +172,10 @@ const FullGraphInner = () => {
 
   if (loading && allNodes.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-2" />
-            <p className="text-sm text-gray-600">Loading full knowledge graph...</p>
-          </div>
+      <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-2" />
+          <p className="text-sm text-gray-600">Loading full knowledge graph...</p>
         </div>
       </div>
     );
@@ -185,27 +183,24 @@ const FullGraphInner = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center text-red-600">
-            <p className="font-medium">Error loading graph</p>
-            <p className="text-sm">{error}</p>
-            <button
-              onClick={() => fetchGraphData(1)}
-              className="mt-2 px-3 py-1 text-sm bg-red-100 hover:bg-red-200 rounded-md transition-colors"
-            >
-              Retry
-            </button>
-          </div>
+      <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
+        <div className="text-center text-red-600">
+          <p className="font-medium">Error loading graph</p>
+          <p className="text-sm">{error}</p>
+          <button
+            onClick={() => fetchGraphData(1)}
+            className="mt-2 px-3 py-1 text-sm bg-red-100 hover:bg-red-200 rounded-md transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
-      {/* Graph - Full Screen */}
-      <div className="flex-1 relative">
+    <div className="h-screen overflow-hidden bg-gray-50">
+      <div className="h-full w-full">
         <ReactFlow
           nodes={displayNodes}
           edges={edges}

@@ -111,7 +111,25 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
 
-          {/* Protected Routes */}
+          {/* Full-screen Knowledge Graph Routes (outside Layout) */}
+          <Route
+            path="/knowledge-graph"
+            element={
+              <ProtectedRoute>
+                <FullGraphPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/knowledge-graph/:type/:id"
+            element={
+              <ProtectedRoute>
+                <KnowledgeGraphPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Routes with Layout */}
           <Route
             path="/"
             element={
@@ -197,10 +215,6 @@ function App() {
 
             {/* Bible Explorer - All authenticated users */}
             <Route path="bible" element={<BibleExplorer />} />
-
-            {/* Knowledge Graph - All authenticated users */}
-            <Route path="knowledge-graph" element={<FullGraphPage />} />
-            <Route path="knowledge-graph/:type/:id" element={<KnowledgeGraphPage />} />
 
             {/* Forbidden page */}
             <Route path="forbidden" element={<Forbidden />} />
