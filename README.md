@@ -80,21 +80,37 @@ Pre-configured lifestyle medicine care domains:
 - Store Bible verses and Ellen White quotes
 - Categorize by theme
 - Link to relevant conditions for spiritual guidance
+- **Bible Explorer deep linking** - Click any scripture reference to open the full chapter in the Bible Explorer
 
-### 6. Recipe Management
+### 6. Bible Explorer
+Comprehensive Bible study tool integrated into the platform:
+- **Health Themes**: Pre-curated scripture collections organized by health topics (healing, body temple, diet, rest, peace, trust, strength, temperance)
+- **Verse Lookup**: Quick reference lookup by book, chapter, and verse
+- **Full Bible Search**: Search across the entire Bible or health-themed verses only
+- **Browse Mode**: Navigate through all 66 books with chapter selection
+- **Multiple Translations**: Support for various Bible translations (KJV default)
+- **Verse of the Day**: Daily scripture with health themes
+- **Deep Linking**: Direct navigation via URL parameters (`/bible?book=John&chapter=3`)
+- **Quick Actions**: Copy verses to clipboard, save to scriptures database
+- **Words of Jesus**: Red-letter highlighting in chapter view
+
+### 7. Recipe Management
 - Create therapeutic recipes with ingredients and instructions
 - Track prep time, cook time, and servings
 - Add dietary tags (vegan, gluten-free, etc.)
 - Link to conditions for culinary medicine support
 
-### 7. Treatment Guide Workflow
-Visual progress tracker that guides users through creating complete treatment protocols:
+### 8. Treatment Guide Workflow
+Elegant visual progress tracker that guides users through creating complete treatment protocols:
+- **Circular progress ring** with color-coded completion status (green/amber/red)
+- **Collapsible design** - collapsed by default for a clean interface
+- **Quick stats header** showing counts for sections, interventions, scriptures, and recipes
 - Step-by-step checklist for required sections
-- Care domain coverage visualization
-- Completion percentage tracking
+- Care domain coverage grid with completion badges
 - Quick action links to add missing content
+- Smooth expand/collapse animations
 
-### 8. Global Search
+### 9. Global Search
 Search across all content types:
 - Conditions
 - Interventions
@@ -102,22 +118,22 @@ Search across all content types:
 - Recipes
 - Evidence entries
 
-### 9. Data Import/Export
+### 10. Data Import/Export
 - **Import**: Bulk import conditions and interventions from CSV/Excel files
 - **Export**: Generate PDF treatment guides for individual conditions or summary reports
 
-### 10. Media Management
+### 11. Media Management
 - Upload images and documents to interventions
 - Drag-and-drop file upload
 - Image gallery with captions
 - Document downloads
 
-### 11. Content Tagging
+### 12. Content Tagging
 - Create and manage content tags
 - Tag interventions, recipes, and scriptures
 - Filter content by tags
 
-### 12. AI Content Generator
+### 13. AI Content Generator
 - Generate complete condition content using AI (Google Gemini integration)
 - Auto-generates structured sections: risk factors, physiology, complications, solutions
 - AI-powered Scripture suggestions for health topics
@@ -127,7 +143,7 @@ Search across all content types:
 - Progress tracking during generation
 - Error handling with retry capability
 
-### 13. Analytics Dashboard
+### 14. Analytics Dashboard
 - **Overview Cards**: Real-time counts with weekly trends
 - **Category Distribution**: Pie chart of conditions by category
 - **Domain Distribution**: Bar chart of interventions by care domain
@@ -137,7 +153,7 @@ Search across all content types:
 - **Content Completeness**: Scores for intervention completeness
 - **Export Reports**: Download analytics as PDF
 
-### 14. Notification System
+### 15. Notification System
 - Real-time notifications for async operations
 - AI content generation completion alerts
 - Import success/failure notifications
@@ -145,7 +161,7 @@ Search across all content types:
 - Persistent notification history (localStorage)
 - Quick links to relevant pages from notifications
 
-### 15. Knowledge Graph Visualization
+### 16. Knowledge Graph Visualization
 Interactive node-based visualization of relationships between entities using React Flow:
 
 **Features:**
@@ -166,7 +182,7 @@ Interactive node-based visualization of relationships between entities using Rea
 - Sidebar: "Knowledge Graph" link for full explorer
 - Detail pages: "View Graph" button on condition and intervention detail pages
 
-### 16. Mobile-First Design (Capacitor-Ready)
+### 17. Mobile-First Design (Capacitor-Ready)
 - **Native App-Like Experience**: Optimized for Capacitor hybrid app builds
 - **Fixed App Bar**: Branded header with dynamic page titles and back navigation
 - **Bottom Navigation**: Quick access to Home, Conditions, Interventions, Search
