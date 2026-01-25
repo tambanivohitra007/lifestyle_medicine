@@ -131,7 +131,9 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
 
     // Relationship management endpoints
     Route::post('conditions/{condition}/interventions/{intervention}', [ConditionController::class, 'attachIntervention']);
+    Route::put('conditions/{condition}/interventions/{intervention}', [ConditionController::class, 'updateIntervention']);
     Route::delete('conditions/{condition}/interventions/{intervention}', [ConditionController::class, 'detachIntervention']);
+    Route::post('conditions/{condition}/interventions/reorder', [ConditionController::class, 'reorderInterventions']);
     Route::post('conditions/{condition}/scriptures/{scripture}', [ConditionController::class, 'attachScripture']);
     Route::delete('conditions/{condition}/scriptures/{scripture}', [ConditionController::class, 'detachScripture']);
     Route::post('conditions/{condition}/recipes/{recipe}', [ConditionController::class, 'attachRecipe']);

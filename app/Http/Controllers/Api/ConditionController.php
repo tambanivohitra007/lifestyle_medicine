@@ -155,6 +155,41 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Intervention detached successfully']);
     }
 
+    public function updateIntervention(Request $request, Condition $condition, Intervention $intervention): Response
+    {
+        $validated = $request->validate([
+            'strength_of_evidence' => 'sometimes|required|in:high,moderate,emerging,insufficient',
+            'recommendation_level' => 'sometimes|required|in:core,adjunct,optional',
+            'clinical_notes' => 'nullable|string',
+            'order_index' => 'nullable|integer|min:0',
+        ]);
+
+        $condition->interventions()->updateExistingPivot($intervention->id, $validated);
+
+        return response()->json([
+            'message' => 'Intervention mapping updated successfully',
+            'data' => $condition->interventions()
+                ->where('intervention_id', $intervention->id)
+                ->withPivot(['strength_of_evidence', 'recommendation_level', 'clinical_notes', 'order_index'])
+                ->first()
+                ->pivot
+        ]);
+    }
+
+    public function reorderInterventions(Request $request, Condition $condition): Response
+    {
+        $validated = $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer|exists:interventions,id',
+        ]);
+
+        foreach ($validated['order'] as $index => $interventionId) {
+            $condition->interventions()->updateExistingPivot($interventionId, ['order_index' => $index]);
+        }
+
+        return response()->json(['message' => 'Interventions reordered successfully']);
+    }
+
     public function attachScripture(Condition $condition, Scripture $scripture): Response
     {
         $condition->scriptures()->attach($scripture->id);

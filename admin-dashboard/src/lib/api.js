@@ -103,6 +103,10 @@ export const apiEndpoints = {
   // Relationships
   attachConditionIntervention: (conditionId, interventionId) =>
     `/admin/conditions/${conditionId}/interventions/${interventionId}`,
+  updateConditionIntervention: (conditionId, interventionId) =>
+    `/admin/conditions/${conditionId}/interventions/${interventionId}`,
+  reorderConditionInterventions: (conditionId) =>
+    `/admin/conditions/${conditionId}/interventions/reorder`,
   attachConditionScripture: (conditionId, scriptureId) =>
     `/admin/conditions/${conditionId}/scriptures/${scriptureId}`,
   attachConditionRecipe: (conditionId, recipeId) =>

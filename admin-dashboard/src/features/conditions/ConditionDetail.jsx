@@ -20,6 +20,11 @@ import ConditionWorkflowGuide from '../../components/shared/ConditionWorkflowGui
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AuditInfo from '../../components/shared/AuditInfo';
 import { useAuth } from '../../contexts/AuthContext';
+import {
+  QuickAttachModal,
+  EditInterventionMapping,
+  SortableInterventionList,
+} from '../../components/relationships';
 
 const SECTION_TYPES = {
   risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
@@ -58,6 +63,10 @@ const ConditionDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
   const [workflowExpanded, setWorkflowExpanded] = useState(true);
+
+  // Modal states
+  const [attachModalType, setAttachModalType] = useState(null);
+  const [editingIntervention, setEditingIntervention] = useState(null);
 
   useEffect(() => {
     fetchConditionData();
@@ -175,6 +184,48 @@ const ConditionDetail = () => {
       console.error('Error detaching EGW reference:', error);
       toast.error('Failed to remove EGW reference');
     }
+  };
+
+  // Handle reordering interventions via drag-and-drop
+  const handleReorderInterventions = async (newOrder) => {
+    const previousOrder = [...interventions];
+    setInterventions(newOrder);
+
+    try {
+      await api.post(apiEndpoints.reorderConditionInterventions(id), {
+        order: newOrder.map((i) => i.id),
+      });
+    } catch (error) {
+      console.error('Error reordering interventions:', error);
+      toast.error('Failed to reorder interventions');
+      setInterventions(previousOrder);
+    }
+  };
+
+  // Handle attachment from QuickAttachModal
+  const handleAttachFromModal = (item, mappingData) => {
+    if (attachModalType === 'interventions') {
+      setInterventions((prev) => [...prev, { ...item, pivot: mappingData }]);
+    } else if (attachModalType === 'scriptures') {
+      setScriptures((prev) => [...prev, item]);
+    } else if (attachModalType === 'recipes') {
+      setRecipes((prev) => [...prev, item]);
+    } else if (attachModalType === 'egw-references') {
+      setEgwReferences((prev) => [...prev, item]);
+    }
+    setAttachModalType(null);
+  };
+
+  // Handle intervention mapping update
+  const handleUpdateInterventionMapping = (updatedMapping) => {
+    setInterventions((prev) =>
+      prev.map((i) =>
+        i.id === editingIntervention.id
+          ? { ...i, pivot: { ...i.pivot, ...updatedMapping } }
+          : i
+      )
+    );
+    setEditingIntervention(null);
   };
 
   if (loading) {
@@ -400,92 +451,23 @@ const ConditionDetail = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Linked Interventions</h2>
               {canEdit && (
-                <Link
-                  to={`/conditions/${id}/interventions/attach`}
+                <button
+                  onClick={() => setAttachModalType('interventions')}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
                   Attach Intervention
-                </Link>
+                </button>
               )}
             </div>
 
-            {interventions.length === 0 ? (
-              <div className="card text-center py-8">
-                <Stethoscope className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600">No interventions linked yet</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {interventions.map((intervention) => (
-                  <div
-                    key={intervention.id}
-                    className="card"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
-                            {intervention.name}
-                          </h3>
-                          {intervention.pivot?.strength_of_evidence && (
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                EVIDENCE_STRENGTH[intervention.pivot.strength_of_evidence]?.color
-                              }`}
-                            >
-                              {EVIDENCE_STRENGTH[intervention.pivot.strength_of_evidence]?.label}
-                            </span>
-                          )}
-                          {intervention.pivot?.recommendation_level && (
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                RECOMMENDATION_LEVEL[intervention.pivot.recommendation_level]?.color
-                              }`}
-                            >
-                              {RECOMMENDATION_LEVEL[intervention.pivot.recommendation_level]?.label}
-                            </span>
-                          )}
-                        </div>
-                        {intervention.care_domain && (
-                          <p className="text-xs sm:text-sm text-gray-500 mb-1">
-                            Domain: {intervention.care_domain.name}
-                          </p>
-                        )}
-                        {intervention.description && (
-                          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
-                            {intervention.description}
-                          </p>
-                        )}
-                        {intervention.pivot?.clinical_notes && (
-                          <p className="text-xs sm:text-sm text-gray-500 mt-2 italic">
-                            Note: {intervention.pivot.clinical_notes}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 self-end sm:self-start">
-                        <Link
-                          to={`/interventions/${intervention.id}`}
-                          className="action-btn"
-                          title="View Intervention"
-                        >
-                          <ChevronRight className="w-5 h-5 text-gray-400" />
-                        </Link>
-                        {canEdit && (
-                          <button
-                            onClick={() => handleDetachIntervention(intervention.id, intervention.name)}
-                            className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title="Remove from Condition"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <SortableInterventionList
+              interventions={interventions}
+              onReorder={handleReorderInterventions}
+              onEdit={(intervention) => setEditingIntervention(intervention)}
+              onDetach={(intervention) => handleDetachIntervention(intervention.id, intervention.name)}
+              canEdit={canEdit}
+            />
           </div>
         )}
 
@@ -495,13 +477,13 @@ const ConditionDetail = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Linked Scriptures</h2>
               {canEdit && (
-                <Link
-                  to={`/conditions/${id}/scriptures/attach`}
+                <button
+                  onClick={() => setAttachModalType('scriptures')}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
                   Attach Scripture
-                </Link>
+                </button>
               )}
             </div>
 
@@ -547,13 +529,13 @@ const ConditionDetail = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Ellen G. White Writings</h2>
               {canEdit && (
-                <Link
-                  to={`/conditions/${id}/egw-references/attach`}
+                <button
+                  onClick={() => setAttachModalType('egw-references')}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
                   Attach EGW Reference
-                </Link>
+                </button>
               )}
             </div>
 
@@ -604,13 +586,13 @@ const ConditionDetail = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Linked Recipes</h2>
               {canEdit && (
-                <Link
-                  to={`/conditions/${id}/recipes/attach`}
+                <button
+                  onClick={() => setAttachModalType('recipes')}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
                   Attach Recipe
-                </Link>
+                </button>
               )}
             </div>
 
@@ -659,6 +641,37 @@ const ConditionDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Quick Attach Modal */}
+      <QuickAttachModal
+        isOpen={!!attachModalType}
+        onClose={() => setAttachModalType(null)}
+        entityType={attachModalType}
+        conditionId={id}
+        excludeIds={
+          attachModalType === 'interventions'
+            ? interventions.map((i) => i.id)
+            : attachModalType === 'scriptures'
+            ? scriptures.map((s) => s.id)
+            : attachModalType === 'recipes'
+            ? recipes.map((r) => r.id)
+            : attachModalType === 'egw-references'
+            ? egwReferences.map((e) => e.id)
+            : []
+        }
+        onAttach={handleAttachFromModal}
+        showMappingForm={attachModalType === 'interventions'}
+      />
+
+      {/* Edit Intervention Mapping Modal */}
+      <EditInterventionMapping
+        isOpen={!!editingIntervention}
+        onClose={() => setEditingIntervention(null)}
+        conditionId={id}
+        intervention={editingIntervention}
+        currentMapping={editingIntervention?.pivot}
+        onSave={handleUpdateInterventionMapping}
+      />
     </div>
   );
 };
