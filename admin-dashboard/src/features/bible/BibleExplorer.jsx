@@ -887,72 +887,156 @@ const BibleExplorer = () => {
 
         {/* Browse Tab */}
         {activeTab === 'browse' && (
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-6">
             {!selectedBook ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-8">
+                {/* Section Header */}
+                <div className="text-center">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Browse the Bible</h2>
+                  <p className="text-sm text-gray-500">Select a book to start reading</p>
+                </div>
+
                 {/* Old Testament */}
-                <div className="card">
-                  <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
-                    <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
-                    Old Testament
-                    <span className="text-xs text-gray-400 font-normal">({books.old_testament.length} books)</span>
-                  </h3>
-                  <div className="grid grid-cols-3 sm:grid-cols-3 gap-1.5 sm:gap-2">
-                    {books.old_testament.map((book) => (
+                <div className="relative">
+                  {/* Section Header */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                        <BookOpen className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900">Old Testament</h3>
+                        <p className="text-xs text-gray-500">{books.old_testament.length} books</p>
+                      </div>
+                    </div>
+                    <div className="flex-1 h-px bg-gradient-to-r from-amber-200 to-transparent" />
+                  </div>
+
+                  {/* Books Grid */}
+                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                    {books.old_testament.map((book, index) => (
                       <button
                         key={book.id}
                         onClick={() => setSelectedBook(book)}
-                        className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-left bg-amber-50 hover:bg-amber-100 active:bg-amber-200 rounded-lg transition-colors border border-amber-200 truncate"
+                        className="group relative bg-white hover:bg-amber-50 border border-gray-200 hover:border-amber-300 rounded-xl p-2 sm:p-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
                       >
-                        {book.name}
+                        <div className="text-[10px] sm:text-xs text-amber-600/60 font-medium mb-0.5">
+                          {String(index + 1).padStart(2, '0')}
+                        </div>
+                        <div className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-amber-700 truncate">
+                          {book.name.replace(/^\d\s/, '').substring(0, 8)}
+                        </div>
+                        <div className="text-[9px] sm:text-[10px] text-gray-400 mt-0.5">
+                          {book.chapters} ch
+                        </div>
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="relative py-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-gray-50 px-4 text-xs text-gray-400 uppercase tracking-wider">Testament Divide</span>
                   </div>
                 </div>
 
                 {/* New Testament */}
-                <div className="card">
-                  <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
-                    <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                    New Testament
-                    <span className="text-xs text-gray-400 font-normal">({books.new_testament.length} books)</span>
-                  </h3>
-                  <div className="grid grid-cols-3 sm:grid-cols-3 gap-1.5 sm:gap-2">
-                    {books.new_testament.map((book) => (
+                <div className="relative">
+                  {/* Section Header */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <BookOpen className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900">New Testament</h3>
+                        <p className="text-xs text-gray-500">{books.new_testament.length} books</p>
+                      </div>
+                    </div>
+                    <div className="flex-1 h-px bg-gradient-to-r from-blue-200 to-transparent" />
+                  </div>
+
+                  {/* Books Grid */}
+                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                    {books.new_testament.map((book, index) => (
                       <button
                         key={book.id}
                         onClick={() => setSelectedBook(book)}
-                        className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-left bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-lg transition-colors border border-blue-200 truncate"
+                        className="group relative bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-xl p-2 sm:p-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
                       >
-                        {book.name}
+                        <div className="text-[10px] sm:text-xs text-blue-600/60 font-medium mb-0.5">
+                          {String(index + 1).padStart(2, '0')}
+                        </div>
+                        <div className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-blue-700 truncate">
+                          {book.name.replace(/^\d\s/, '').substring(0, 8)}
+                        </div>
+                        <div className="text-[9px] sm:text-[10px] text-gray-400 mt-0.5">
+                          {book.chapters} ch
+                        </div>
                       </button>
                     ))}
                   </div>
                 </div>
+
+                {/* Quick Stats */}
+                <div className="flex justify-center gap-8 pt-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">66</div>
+                    <div className="text-xs text-gray-500">Books</div>
+                  </div>
+                  <div className="w-px bg-gray-200" />
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">1,189</div>
+                    <div className="text-xs text-gray-500">Chapters</div>
+                  </div>
+                  <div className="w-px bg-gray-200" />
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">31,102</div>
+                    <div className="text-xs text-gray-500">Verses</div>
+                  </div>
+                </div>
               </div>
             ) : !selectedChapter ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <button
-                    onClick={() => setSelectedBook(null)}
-                    className="text-xs sm:text-sm text-primary-600 hover:text-primary-700 active:text-primary-800 flex items-center gap-1 bg-primary-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full"
-                  >
-                    <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180" />
-                    Back
-                  </button>
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{selectedBook.name}</h2>
+              <div className="space-y-6">
+                {/* Book Header */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-8">
+                  {/* Decorative elements */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16" />
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12" />
+
+                  <div className="relative">
+                    <button
+                      onClick={() => setSelectedBook(null)}
+                      className="flex items-center gap-1.5 text-white/70 hover:text-white text-sm mb-4 transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4 rotate-180" />
+                      All Books
+                    </button>
+
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">{selectedBook.name}</h2>
+                    <p className="text-white/60 text-sm">
+                      {selectedBook.chapters} chapters
+                    </p>
+                  </div>
                 </div>
 
-                <div className="card">
-                  <h3 className="font-medium text-gray-700 mb-3 sm:mb-4 text-sm sm:text-base">Select Chapter</h3>
-                  <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-1.5 sm:gap-2">
+                {/* Chapter Grid */}
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-4 text-sm sm:text-base">Select a Chapter</h3>
+                  <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
                     {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map((chapter) => (
                       <button
                         key={chapter}
                         onClick={() => handleChapterSelect(chapter)}
-                        className="px-2 sm:px-3 py-2 sm:py-2 text-xs sm:text-sm bg-gray-100 hover:bg-primary-100 active:bg-primary-200 hover:text-primary-700 rounded-lg transition-colors font-medium"
+                        className="group relative aspect-square flex items-center justify-center bg-white border border-gray-200 hover:border-primary-400 hover:bg-primary-50 rounded-xl transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
                       >
-                        {chapter}
+                        <span className="text-sm sm:text-base font-semibold text-gray-600 group-hover:text-primary-700">
+                          {chapter}
+                        </span>
                       </button>
                     ))}
                   </div>
