@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+
+// Export API_BASE_URL for components that need direct URL access (e.g., file downloads)
+export const getApiBaseUrl = () => API_BASE_URL.replace('/api/v1', '');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

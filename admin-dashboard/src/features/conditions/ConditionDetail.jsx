@@ -14,7 +14,7 @@ import {
   Eye,
   Download,
 } from 'lucide-react';
-import api, { apiEndpoints } from '../../lib/api';
+import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../lib/swal';
 import ConditionWorkflowGuide from '../../components/shared/ConditionWorkflowGuide';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
@@ -237,7 +237,7 @@ const ConditionDetail = () => {
             <span className="sm:hidden">Preview</span>
           </Link>
           <a
-            href={`http://localhost:8000/api/v1/export/conditions/${id}/pdf`}
+            href={`${getApiBaseUrl()}/api/v1/export/conditions/${id}/pdf`}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"

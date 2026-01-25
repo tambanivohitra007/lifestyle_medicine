@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, ShieldAlert, Edit, Trash2, Eye, Download } from 'lucide-react';
-import api, { apiEndpoints } from '../../lib/api';
+import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
 import SortableHeader from '../../components/ui/SortableHeader';
@@ -95,7 +95,7 @@ const Conditions = () => {
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <a
-            href="http://localhost:8000/api/v1/export/conditions/summary/pdf"
+            href={`${getApiBaseUrl()}/api/v1/export/conditions/summary/pdf`}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-outline flex items-center justify-center gap-2"
