@@ -26,15 +26,15 @@ use Illuminate\Support\Facades\Route;
 
 // Authentication routes
 Route::prefix('v1')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
     Route::put('/profile', [AuthController::class, 'updateProfile'])->middleware('auth:sanctum');
     Route::put('/password', [AuthController::class, 'updatePassword'])->middleware('auth:sanctum');
 });
 
-// Public API routes (read-only)
-Route::prefix('v1')->group(function () {
+// Public API routes (read-only) - rate limited to 60 requests/minute
+Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
     // Global Search
     Route::get('/search', [SearchController::class, 'search']);
@@ -92,14 +92,16 @@ Route::prefix('v1')->group(function () {
     // Content Tags
     Route::apiResource('content-tags', ContentTagController::class)->only(['index', 'show']);
 
-    // PDF Exports (public)
-    Route::get('export/conditions/{condition}/pdf', [ExportController::class, 'conditionPdf']);
-    Route::get('export/conditions/summary/pdf', [ExportController::class, 'conditionsSummaryPdf']);
-    Route::get('export/recipes/{recipe}/pdf', [ExportController::class, 'recipePdf']);
+    // PDF Exports (public) - rate limited to 10 requests/minute
+    Route::middleware('throttle:export')->group(function () {
+        Route::get('export/conditions/{condition}/pdf', [ExportController::class, 'conditionPdf']);
+        Route::get('export/conditions/summary/pdf', [ExportController::class, 'conditionsSummaryPdf']);
+        Route::get('export/recipes/{recipe}/pdf', [ExportController::class, 'recipePdf']);
 
-    // CSV Exports (public)
-    Route::get('export/evidence/csv', [ExportController::class, 'evidenceCsv']);
-    Route::get('export/references/csv', [ExportController::class, 'referencesCsv']);
+        // CSV Exports (public)
+        Route::get('export/evidence/csv', [ExportController::class, 'evidenceCsv']);
+        Route::get('export/references/csv', [ExportController::class, 'referencesCsv']);
+    });
 });
 
 // Admin API routes - Content Management (admin and editor roles)
@@ -148,9 +150,11 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
     Route::post('conditions/{condition}/egw-references/{egwReference}', [ConditionController::class, 'attachEgwReference']);
     Route::delete('conditions/{condition}/egw-references/{egwReference}', [ConditionController::class, 'detachEgwReference']);
 
-    // AI Suggestions (for content editors)
-    Route::post('ai/suggest-scriptures', [AiSuggestionController::class, 'suggestScriptures']);
-    Route::post('ai/suggest-egw-references', [AiSuggestionController::class, 'suggestEgwReferences']);
+    // AI Suggestions (for content editors) - rate limited to 10 requests/minute
+    Route::middleware('throttle:ai')->group(function () {
+        Route::post('ai/suggest-scriptures', [AiSuggestionController::class, 'suggestScriptures']);
+        Route::post('ai/suggest-egw-references', [AiSuggestionController::class, 'suggestEgwReferences']);
+    });
 });
 
 // Admin API routes - Admin Only (user management, import, AI generator, analytics)
@@ -166,11 +170,13 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin'])->group(fun
     Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive']);
     Route::post('users/{id}/restore', [UserController::class, 'restore']);
 
-    // AI Content Generator (admin only)
-    Route::get('ai/status', [AiContentController::class, 'status']);
-    Route::post('ai/generate-draft', [AiContentController::class, 'generateDraft']);
-    Route::post('ai/structure-content', [AiContentController::class, 'structureContent']);
-    Route::post('ai/import-content', [AiContentController::class, 'importContent']);
+    // AI Content Generator (admin only) - rate limited to 10 requests/minute
+    Route::middleware('throttle:ai')->group(function () {
+        Route::get('ai/status', [AiContentController::class, 'status']);
+        Route::post('ai/generate-draft', [AiContentController::class, 'generateDraft']);
+        Route::post('ai/structure-content', [AiContentController::class, 'structureContent']);
+        Route::post('ai/import-content', [AiContentController::class, 'importContent']);
+    });
 
     // Analytics (admin only)
     Route::prefix('analytics')->group(function () {

@@ -19,11 +19,14 @@ class GeminiService
         if ($this->apiKey) {
             $httpClient = null;
 
-            // For local development on Windows, disable SSL verification
-            // Remove this in production or configure proper CA bundle
-            if (config('app.env') === 'local' && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // SSL verification can be disabled via explicit environment variable
+            // ONLY use this for local development when you cannot configure CA bundle
+            // NEVER disable in production - set GEMINI_VERIFY_SSL=true in production .env
+            $verifySsl = config('services.gemini.verify_ssl', true);
+
+            if (!$verifySsl && config('app.env') === 'local') {
                 $httpClient = new GuzzleClient([
-                    'verify' => false, // Disable SSL verification for local Windows development
+                    'verify' => false,
                 ]);
             }
 

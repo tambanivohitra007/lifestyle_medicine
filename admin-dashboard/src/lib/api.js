@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from './swal';
 
 // Use environment variable for API URL, fallback to localhost for development
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
@@ -12,6 +13,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  timeout: 30000, // 30 second timeout
 });
 
 // Add auth token to requests
@@ -23,14 +25,71 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 responses
+// Global error handler for API responses
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token');
-      window.location.href = '/login';
+    // Handle network errors (no response)
+    if (!error.response) {
+      if (error.code === 'ECONNABORTED') {
+        toast.error('Request timed out. Please try again.');
+      } else if (error.message === 'Network Error') {
+        toast.error('Network error. Please check your connection.');
+      }
+      return Promise.reject(error);
     }
+
+    const { status, data } = error.response;
+
+    switch (status) {
+      case 401:
+        // Unauthorized - clear auth and redirect to login
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+        // Only redirect if not already on login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+        break;
+
+      case 403:
+        // Forbidden - user doesn't have permission
+        toast.error(data?.message || 'You do not have permission to perform this action.');
+        break;
+
+      case 404:
+        // Not found - don't show generic toast, let component handle it
+        break;
+
+      case 422:
+        // Validation error - show first error message
+        if (data?.errors) {
+          const firstError = Object.values(data.errors)[0];
+          toast.error(Array.isArray(firstError) ? firstError[0] : firstError);
+        } else if (data?.message) {
+          toast.error(data.message);
+        }
+        break;
+
+      case 429:
+        // Rate limited
+        toast.warning('Too many requests. Please wait a moment and try again.');
+        break;
+
+      case 500:
+      case 502:
+      case 503:
+        // Server errors
+        toast.error('Server error. Please try again later.');
+        break;
+
+      default:
+        // Other errors - show message if available
+        if (data?.message) {
+          toast.error(data.message);
+        }
+    }
+
     return Promise.reject(error);
   }
 );

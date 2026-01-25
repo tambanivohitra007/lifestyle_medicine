@@ -1,8 +1,17 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import DOMPurify from 'dompurify';
+
+// Configure DOMPurify to allow safe HTML tags only
+const ALLOWED_TAGS = [
+  'p', 'br', 'b', 'i', 'u', 'strong', 'em', 'a', 'ul', 'ol', 'li',
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre', 'span'
+];
+const ALLOWED_ATTR = ['href', 'target', 'rel', 'class'];
 
 /**
  * Safely displays HTML content with optional truncation and "Read More" functionality
+ * Uses DOMPurify to sanitize HTML and prevent XSS attacks
  *
  * @param {string} content - HTML content to display
  * @param {number} maxLines - Maximum number of lines before truncation (default: 3)
@@ -17,6 +26,16 @@ const RichTextPreview = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Sanitize HTML content to prevent XSS attacks
+  const sanitizedContent = useMemo(() => {
+    if (!content) return '';
+    return DOMPurify.sanitize(content, {
+      ALLOWED_TAGS,
+      ALLOWED_ATTR,
+      ALLOW_DATA_ATTR: false,
+    });
+  }, [content]);
+
   if (!content) return null;
 
   // Strip HTML tags for plain text measurement
@@ -26,7 +45,7 @@ const RichTextPreview = ({
     return tmp.textContent || tmp.innerText || '';
   };
 
-  const plainText = stripHtml(content);
+  const plainText = stripHtml(sanitizedContent);
   const isLongContent = plainText.length > 150 || (plainText.match(/\n/g) || []).length > maxLines;
 
   // Base styles for prose rendering (similar to Tailwind's prose)
@@ -53,7 +72,7 @@ const RichTextPreview = ({
     <div className={className}>
       <div
         className={`${proseStyles} ${truncationStyle} ${isExpanded ? '' : 'overflow-hidden'}`}
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
 
       {allowExpand && isLongContent && (

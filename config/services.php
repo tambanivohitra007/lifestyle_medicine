@@ -37,6 +37,9 @@ return [
 
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
+        // SSL verification - set to false ONLY for local development if you have certificate issues
+        // MUST be true in production
+        'verify_ssl' => env('GEMINI_VERIFY_SSL', true),
     ],
 
     'bible_api' => [

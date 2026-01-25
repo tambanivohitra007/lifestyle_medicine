@@ -33,7 +33,9 @@
       "Bash(find:*)",
       "Bash(echo:*)",
       "Bash(del C:UsersrindraProjectslifestyle_medicinetest_bible_api.php)",
-      "WebFetch(domain:familyandlifestylemedicine.org)"
+      "WebFetch(domain:familyandlifestylemedicine.org)",
+      "Bash(grep:*)",
+      "Bash(git check-ignore:*)"
     ]
   }
 }
