@@ -8,8 +8,9 @@ import ReactFlow, {
   Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Loader2, Layout, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { Loader2, Layout, Maximize2 } from 'lucide-react';
 import { nodeTypes } from './nodes';
+import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
 import api from '../../lib/api';
 
@@ -122,11 +123,16 @@ const KnowledgeGraph = ({
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.1}
         maxZoom={2}
         attributionPosition="bottom-left"
+        defaultEdgeOptions={{
+          type: 'default',
+          animated: false,
+        }}
       >
         <Background color="#e5e7eb" gap={16} />
         <Controls showInteractive={false} />

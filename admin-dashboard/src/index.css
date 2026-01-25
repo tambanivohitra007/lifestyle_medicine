@@ -228,3 +228,39 @@
     @apply border-gray-400;
   }
 }
+
+/* Knowledge Graph Edge Animations */
+@keyframes dash-flow {
+  0% {
+    stroke-dashoffset: 20;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-dash {
+  animation: dash-flow 1s linear infinite;
+}
+
+/* React Flow custom styles */
+.react-flow__edge-path {
+  transition: stroke-width 0.2s ease;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 3px;
+}
+
+.react-flow__node {
+  transition: transform 0.2s ease;
+}
+
+.react-flow__node:hover {
+  z-index: 10;
+}
+
+/* Edge label hover effect */
+.react-flow__edgelabel-renderer > div:hover {
+  z-index: 1000 !important;
+}

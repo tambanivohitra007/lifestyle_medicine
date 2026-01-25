@@ -478,12 +478,8 @@ class KnowledgeGraphController extends Controller
             'id' => "edge-cond-int-{$condition->id}-{$intervention->id}",
             'source' => "condition-{$condition->id}",
             'target' => "intervention-{$intervention->id}",
-            'type' => 'default',
+            'type' => 'condition-intervention', // Custom edge type with metadata display
             'animated' => $strength === 'high',
-            'style' => [
-                'stroke' => self::EVIDENCE_COLORS[$strength] ?? self::EVIDENCE_COLORS['emerging'],
-                'strokeWidth' => $recommendation === 'core' ? 3 : ($recommendation === 'adjunct' ? 2 : 1),
-            ],
             'data' => [
                 'strengthOfEvidence' => $strength,
                 'recommendationLevel' => $recommendation,
