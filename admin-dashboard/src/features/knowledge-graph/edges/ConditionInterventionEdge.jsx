@@ -2,8 +2,7 @@ import { memo, useState } from 'react';
 import {
   BaseEdge,
   EdgeLabelRenderer,
-  getBezierPath,
-  useReactFlow,
+  getStraightPath,
 } from 'reactflow';
 
 const STRENGTH_CONFIG = {
@@ -45,8 +44,6 @@ const ConditionInterventionEdge = memo(({
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
   data,
   selected,
   markerEnd,
@@ -60,13 +57,11 @@ const ConditionInterventionEdge = memo(({
   const config = STRENGTH_CONFIG[strength] || STRENGTH_CONFIG.emerging;
   const recConfig = RECOMMENDATION_CONFIG[recommendation] || RECOMMENDATION_CONFIG.optional;
 
-  const [edgePath, labelX, labelY] = getBezierPath({
+  const [edgePath, labelX, labelY] = getStraightPath({
     sourceX,
     sourceY,
-    sourcePosition,
     targetX,
     targetY,
-    targetPosition,
   });
 
   return (

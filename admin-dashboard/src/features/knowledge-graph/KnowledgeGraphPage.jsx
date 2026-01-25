@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Network, ArrowLeft, ExternalLink } from 'lucide-react';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import KnowledgeGraph from './KnowledgeGraph';
-import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import api, { apiEndpoints } from '../../lib/api';
 
 const KnowledgeGraphPage = () => {
   const { type, id } = useParams();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [entityName, setEntityName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -63,57 +61,19 @@ const KnowledgeGraphPage = () => {
     }
   };
 
-  // Handle double-click to recenter graph
-  const handleNodeDoubleClick = (node) => {
-    const nodeType = node.type;
-    const entityId = node.data.entityId;
-
-    if (nodeType === 'condition' || nodeType === 'intervention') {
-      navigate(`/knowledge-graph/${nodeType}/${entityId}`);
-    }
-  };
-
-  const breadcrumbItems = [
-    { label: type === 'condition' ? 'Conditions' : 'Interventions', href: `/${type}s` },
-    { label: loading ? '...' : entityName, href: `/${type}s/${id}` },
-    { label: 'Knowledge Graph' },
-  ];
+  const backButton = (
+    <Link
+      to={`/${type}s/${id}`}
+      className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+    >
+      <ArrowLeft className="w-4 h-4" />
+      <span className="hidden sm:inline">Back to {loading ? '...' : entityName}</span>
+    </Link>
+  );
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
-      {/* Header */}
-      <div className="flex-shrink-0 px-4 py-3 bg-white border-b border-gray-200">
-        <Breadcrumbs items={breadcrumbItems} />
-
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg shadow-md">
-              <Network className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">Knowledge Graph</h1>
-              <p className="text-sm text-gray-500">
-                Explore relationships for{' '}
-                <span className="font-medium text-gray-700">
-                  {loading ? '...' : entityName}
-                </span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Link
-              to={`/${type}s/${id}`}
-              className="btn-outline flex items-center gap-2 text-sm"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back to {type}</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Graph Container */}
+      {/* Graph Container - Full Space */}
       <div className="flex-1 bg-gray-50">
         <KnowledgeGraph
           centerType={type}
@@ -121,28 +81,8 @@ const KnowledgeGraphPage = () => {
           initialDepth={parseInt(searchParams.get('depth') || '2')}
           onNodeClick={handleNodeClick}
           className="h-full"
+          backButton={backButton}
         />
-      </div>
-
-      {/* Instructions Footer */}
-      <div className="flex-shrink-0 px-4 py-2 bg-white border-t border-gray-200 text-xs text-gray-500">
-        <div className="flex items-center justify-center gap-4">
-          <span>
-            <strong>Click</strong> node to view details
-          </span>
-          <span>|</span>
-          <span>
-            <strong>Scroll</strong> to zoom
-          </span>
-          <span>|</span>
-          <span>
-            <strong>Drag</strong> to pan
-          </span>
-          <span>|</span>
-          <span>
-            <strong>Drag node</strong> to reposition
-          </span>
-        </div>
       </div>
     </div>
   );

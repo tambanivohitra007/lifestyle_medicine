@@ -11,7 +11,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Link } from 'react-router-dom';
-import { Loader2, Layout, ChevronLeft, ChevronRight, BarChart3, Network } from 'lucide-react';
+import { Loader2, Layout, ChevronLeft, ChevronRight, BarChart3, Eye, EyeOff } from 'lucide-react';
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
@@ -31,6 +31,7 @@ const FullGraphInner = () => {
   const [meta, setMeta] = useState(null);
   const [hiddenTypes, setHiddenTypes] = useState([]);
   const [highlightedNodeId, setHighlightedNodeId] = useState(null);
+  const [showUI, setShowUI] = useState(true);
   const { fitView, setCenter } = useReactFlow();
 
   const limit = 50;
@@ -202,30 +203,9 @@ const FullGraphInner = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
-            </Link>
-            <div className="flex items-center gap-2">
-              <Network className="w-5 h-5 text-primary-600" />
-              <h1 className="text-lg font-semibold text-gray-900">Knowledge Graph Explorer</h1>
-            </div>
-          </div>
-          <div className="text-sm text-gray-500">
-            Full database visualization
-          </div>
-        </div>
-      </div>
-
-      {/* Graph */}
-      <div className="flex-1" style={{ height: 'calc(100vh - 64px)' }}>
+    <div className="h-screen bg-gray-50 flex flex-col">
+      {/* Graph - Full Screen */}
+      <div className="flex-1 relative">
         <ReactFlow
           nodes={displayNodes}
           edges={edges}
@@ -238,156 +218,189 @@ const FullGraphInner = () => {
           minZoom={0.05}
           maxZoom={2}
           attributionPosition="bottom-left"
+          defaultEdgeOptions={{
+            type: 'straight',
+            animated: false,
+          }}
         >
           <Background color="#e5e7eb" gap={16} />
           <Controls showInteractive={false} />
-          <MiniMap
-            nodeColor={nodeColor}
-            nodeStrokeWidth={3}
-            zoomable
-            pannable
-            className="!bg-white !border !border-gray-200 !rounded-lg !shadow-md"
-          />
+          {showUI && (
+            <MiniMap
+              nodeColor={nodeColor}
+              nodeStrokeWidth={3}
+              zoomable
+              pannable
+              className="!bg-white !border !border-gray-200 !rounded-lg !shadow-md"
+            />
+          )}
 
-          {/* Search and Filter Panel */}
+          {/* Back Button and UI Toggle - Always visible */}
           <Panel position="top-left" className="flex flex-col gap-2">
-            <SearchBar
-              nodes={allNodes}
-              onSelectNode={handleSelectNode}
-              onClearSearch={handleClearSearch}
-            />
-            <FilterPanel
-              hiddenTypes={hiddenTypes}
-              onToggleType={handleToggleType}
-              onShowAll={handleShowAll}
-              onHideAll={handleHideAll}
-            />
-          </Panel>
-
-          {/* Control Panel */}
-          <Panel position="top-right" className="flex flex-col gap-2">
-            {/* Layout Selector */}
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
-              <div className="flex items-center gap-2 mb-2">
-                <Layout className="w-4 h-4 text-gray-500" />
-                <span className="text-xs font-medium text-gray-700">Layout</span>
-              </div>
-              <select
-                value={layoutType}
-                onChange={(e) => handleLayoutChange(e.target.value)}
-                className="text-xs w-full px-2 py-1 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+            <div className="flex items-center gap-2">
+              <Link
+                to="/"
+                className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                {layoutOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                <ChevronLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Back to Dashboard</span>
+              </Link>
+              <button
+                onClick={() => setShowUI(!showUI)}
+                className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                title={showUI ? 'Hide UI (show only graph)' : 'Show UI'}
+              >
+                {showUI ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                <span className="hidden sm:inline">{showUI ? 'Hide UI' : 'Show UI'}</span>
+              </button>
             </div>
 
-            {/* Stats */}
-            {meta && (
-              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
+            {/* Search and Filter Panel - Conditional */}
+            {showUI && (
+              <>
+                <SearchBar
+                  nodes={allNodes}
+                  onSelectNode={handleSelectNode}
+                  onClearSearch={handleClearSearch}
+                />
+                <FilterPanel
+                  hiddenTypes={hiddenTypes}
+                  onToggleType={handleToggleType}
+                  onShowAll={handleShowAll}
+                  onHideAll={handleHideAll}
+                />
+              </>
+            )}
+          </Panel>
+
+          {/* Control Panel - Conditional */}
+          {showUI && (
+            <Panel position="top-right" className="flex flex-col gap-2">
+              {/* Layout Selector */}
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
                 <div className="flex items-center gap-2 mb-2">
-                  <BarChart3 className="w-4 h-4 text-gray-500" />
-                  <span className="text-xs font-medium text-gray-700">Statistics</span>
+                  <Layout className="w-4 h-4 text-gray-500" />
+                  <span className="text-xs font-medium text-gray-700">Layout</span>
                 </div>
-                <div className="space-y-1 text-xs text-gray-600">
-                  <div className="flex justify-between">
-                    <span>Visible Nodes:</span>
-                    <span className="font-medium">{nodes.length}</span>
+                <select
+                  value={layoutType}
+                  onChange={(e) => handleLayoutChange(e.target.value)}
+                  className="text-xs w-full px-2 py-1 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+                >
+                  {layoutOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Stats */}
+              {meta && (
+                <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <BarChart3 className="w-4 h-4 text-gray-500" />
+                    <span className="text-xs font-medium text-gray-700">Statistics</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Visible Edges:</span>
-                    <span className="font-medium">{edges.length}</span>
-                  </div>
-                  <div className="border-t border-gray-100 pt-1 mt-1">
-                    <div className="flex justify-between text-gray-400">
-                      <span>Total in DB:</span>
-                      <span>{meta.totalNodes}</span>
+                  <div className="space-y-1 text-xs text-gray-600">
+                    <div className="flex justify-between">
+                      <span>Visible Nodes:</span>
+                      <span className="font-medium">{nodes.length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Visible Edges:</span>
+                      <span className="font-medium">{edges.length}</span>
+                    </div>
+                    <div className="border-t border-gray-100 pt-1 mt-1">
+                      <div className="flex justify-between text-gray-400">
+                        <span>Total in DB:</span>
+                        <span>{meta.totalNodes}</span>
+                      </div>
                     </div>
                   </div>
+                  {meta.stats && (
+                    <div className="mt-2 pt-2 border-t border-gray-100 space-y-0.5 text-[10px]">
+                      {Object.entries(meta.stats).map(([type, count]) => (
+                        count > 0 && (
+                          <div key={type} className="flex justify-between text-gray-500">
+                            <span className="capitalize">{type.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                            <span>{count}</span>
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  )}
                 </div>
-                {meta.stats && (
-                  <div className="mt-2 pt-2 border-t border-gray-100 space-y-0.5 text-[10px]">
-                    {Object.entries(meta.stats).map(([type, count]) => (
-                      count > 0 && (
-                        <div key={type} className="flex justify-between text-gray-500">
-                          <span className="capitalize">{type.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                          <span>{count}</span>
-                        </div>
-                      )
-                    ))}
+              )}
+
+              {/* Export */}
+              <ExportPanel graphTitle="full-knowledge-graph" />
+
+              {/* Keyboard Shortcuts */}
+              <KeyboardShortcutsHelp />
+
+              {/* Pagination */}
+              {meta?.hasMore && (
+                <button
+                  onClick={loadMore}
+                  disabled={loading}
+                  className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs font-medium text-primary-600 hover:bg-primary-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Load More</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              )}
+            </Panel>
+          )}
+
+          {/* Legend - Conditional */}
+          {showUI && (
+            <Panel position="bottom-right" className="!mb-4">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
+                <div className="text-xs font-medium text-gray-700 mb-2">Legend</div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div>
+                    <span>Condition</span>
                   </div>
-                )}
-              </div>
-            )}
-
-            {/* Export */}
-            <ExportPanel graphTitle="full-knowledge-graph" />
-
-            {/* Keyboard Shortcuts */}
-            <KeyboardShortcutsHelp />
-
-            {/* Pagination */}
-            {meta?.hasMore && (
-              <button
-                onClick={loadMore}
-                disabled={loading}
-                className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs font-medium text-primary-600 hover:bg-primary-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <span>Load More</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-            )}
-          </Panel>
-
-          {/* Legend */}
-          <Panel position="bottom-right" className="!mb-4">
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
-              <div className="text-xs font-medium text-gray-700 mb-2">Legend</div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div>
-                  <span>Condition</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></div>
-                  <span>Intervention</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></div>
-                  <span>Care Domain</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#6366f1]"></div>
-                  <span>Scripture</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]"></div>
-                  <span>EGW Reference</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
-                  <span>Recipe</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div>
-                  <span>Evidence</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#64748b]"></div>
-                  <span>Reference</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></div>
+                    <span>Intervention</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></div>
+                    <span>Care Domain</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#6366f1]"></div>
+                    <span>Scripture</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]"></div>
+                    <span>EGW Reference</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
+                    <span>Recipe</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div>
+                    <span>Evidence</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#64748b]"></div>
+                    <span>Reference</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Panel>
+            </Panel>
+          )}
         </ReactFlow>
       </div>
     </div>

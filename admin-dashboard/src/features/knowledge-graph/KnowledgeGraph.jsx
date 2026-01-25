@@ -10,7 +10,7 @@ import ReactFlow, {
   Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Loader2, Layout, Maximize2 } from 'lucide-react';
+import { Loader2, Layout, Maximize2, Eye, EyeOff } from 'lucide-react';
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
@@ -24,6 +24,7 @@ const KnowledgeGraphInner = ({
   initialDepth = 2,
   onNodeClick,
   className = '',
+  backButton = null,
 }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -36,6 +37,7 @@ const KnowledgeGraphInner = ({
   const [meta, setMeta] = useState(null);
   const [hiddenTypes, setHiddenTypes] = useState([]);
   const [highlightedNodeId, setHighlightedNodeId] = useState(null);
+  const [showUI, setShowUI] = useState(true);
   const { fitView, setCenter } = useReactFlow();
 
   // Fetch graph data
@@ -221,132 +223,155 @@ const KnowledgeGraphInner = ({
         maxZoom={2}
         attributionPosition="bottom-left"
         defaultEdgeOptions={{
-          type: 'default',
+          type: 'straight',
           animated: false,
         }}
       >
         <Background color="#e5e7eb" gap={16} />
         <Controls showInteractive={false} />
-        <MiniMap
-          nodeColor={nodeColor}
-          nodeStrokeWidth={3}
-          zoomable
-          pannable
-          className="!bg-white !border !border-gray-200 !rounded-lg !shadow-md"
-        />
+        {showUI && (
+          <MiniMap
+            nodeColor={nodeColor}
+            nodeStrokeWidth={3}
+            zoomable
+            pannable
+            className="!bg-white !border !border-gray-200 !rounded-lg !shadow-md"
+          />
+        )}
 
-        {/* Search and Filter Panel */}
+        {/* Back Button and UI Toggle - Always visible */}
         <Panel position="top-left" className="flex flex-col gap-2">
-          <SearchBar
-            nodes={allNodes}
-            onSelectNode={handleSelectNode}
-            onClearSearch={handleClearSearch}
-          />
-          <FilterPanel
-            hiddenTypes={hiddenTypes}
-            onToggleType={handleToggleType}
-            onShowAll={handleShowAll}
-            onHideAll={handleHideAll}
-          />
-        </Panel>
-
-        {/* Control Panel */}
-        <Panel position="top-right" className="flex flex-col gap-2">
-          {/* Layout Selector */}
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
-            <div className="flex items-center gap-2 mb-2">
-              <Layout className="w-4 h-4 text-gray-500" />
-              <span className="text-xs font-medium text-gray-700">Layout</span>
-            </div>
-            <select
-              value={layoutType}
-              onChange={(e) => handleLayoutChange(e.target.value)}
-              className="text-xs w-full px-2 py-1 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+          <div className="flex items-center gap-2">
+            {backButton}
+            <button
+              onClick={() => setShowUI(!showUI)}
+              className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              title={showUI ? 'Hide UI (show only graph)' : 'Show UI'}
             >
-              {layoutOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+              {showUI ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              <span className="hidden sm:inline">{showUI ? 'Hide UI' : 'Show UI'}</span>
+            </button>
           </div>
 
-          {/* Depth Selector */}
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
-            <div className="flex items-center gap-2 mb-2">
-              <Maximize2 className="w-4 h-4 text-gray-500" />
-              <span className="text-xs font-medium text-gray-700">Depth: {depth}</span>
-            </div>
-            <input
-              type="range"
-              min="1"
-              max="3"
-              value={depth}
-              onChange={(e) => setDepth(parseInt(e.target.value))}
-              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            />
-            <div className="flex justify-between text-[10px] text-gray-400 mt-1">
-              <span>1</span>
-              <span>2</span>
-              <span>3</span>
-            </div>
-          </div>
-
-          {/* Stats */}
-          {meta && (
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600">
-              <div>Nodes: {nodes.length}{nodes.length !== meta.totalNodes ? ` / ${meta.totalNodes}` : ''}</div>
-              <div>Edges: {edges.length}{edges.length !== meta.totalEdges ? ` / ${meta.totalEdges}` : ''}</div>
-            </div>
+          {/* Search and Filter Panel - Conditional */}
+          {showUI && (
+            <>
+              <SearchBar
+                nodes={allNodes}
+                onSelectNode={handleSelectNode}
+                onClearSearch={handleClearSearch}
+              />
+              <FilterPanel
+                hiddenTypes={hiddenTypes}
+                onToggleType={handleToggleType}
+                onShowAll={handleShowAll}
+                onHideAll={handleHideAll}
+              />
+            </>
           )}
-
-          {/* Export */}
-          <ExportPanel graphTitle={`${centerType}-${centerId}`} />
-
-          {/* Keyboard Shortcuts */}
-          <KeyboardShortcutsHelp />
         </Panel>
 
-        {/* Legend */}
-        <Panel position="bottom-right" className="!mb-4">
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
-            <div className="text-xs font-medium text-gray-700 mb-2">Legend</div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div>
-                <span>Condition</span>
+        {/* Control Panel - Conditional */}
+        {showUI && (
+          <Panel position="top-right" className="flex flex-col gap-2">
+            {/* Layout Selector */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
+              <div className="flex items-center gap-2 mb-2">
+                <Layout className="w-4 h-4 text-gray-500" />
+                <span className="text-xs font-medium text-gray-700">Layout</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></div>
-                <span>Intervention</span>
+              <select
+                value={layoutType}
+                onChange={(e) => handleLayoutChange(e.target.value)}
+                className="text-xs w-full px-2 py-1 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+              >
+                {layoutOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Depth Selector */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
+              <div className="flex items-center gap-2 mb-2">
+                <Maximize2 className="w-4 h-4 text-gray-500" />
+                <span className="text-xs font-medium text-gray-700">Depth: {depth}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></div>
-                <span>Care Domain</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#6366f1]"></div>
-                <span>Scripture</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]"></div>
-                <span>EGW Reference</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
-                <span>Recipe</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div>
-                <span>Evidence</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#64748b]"></div>
-                <span>Reference</span>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                value={depth}
+                onChange={(e) => setDepth(parseInt(e.target.value))}
+                className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+                <span>1</span>
+                <span>2</span>
+                <span>3</span>
               </div>
             </div>
-          </div>
-        </Panel>
+
+            {/* Stats */}
+            {meta && (
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600">
+                <div>Nodes: {nodes.length}{nodes.length !== meta.totalNodes ? ` / ${meta.totalNodes}` : ''}</div>
+                <div>Edges: {edges.length}{edges.length !== meta.totalEdges ? ` / ${meta.totalEdges}` : ''}</div>
+              </div>
+            )}
+
+            {/* Export */}
+            <ExportPanel graphTitle={`${centerType}-${centerId}`} />
+
+            {/* Keyboard Shortcuts */}
+            <KeyboardShortcutsHelp />
+          </Panel>
+        )}
+
+        {/* Legend - Conditional */}
+        {showUI && (
+          <Panel position="bottom-right" className="!mb-4">
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
+              <div className="text-xs font-medium text-gray-700 mb-2">Legend</div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div>
+                  <span>Condition</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></div>
+                  <span>Intervention</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></div>
+                  <span>Care Domain</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#6366f1]"></div>
+                  <span>Scripture</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]"></div>
+                  <span>EGW Reference</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
+                  <span>Recipe</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div>
+                  <span>Evidence</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#64748b]"></div>
+                  <span>Reference</span>
+                </div>
+              </div>
+            </div>
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   );

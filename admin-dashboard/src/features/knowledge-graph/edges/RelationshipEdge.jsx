@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { BaseEdge, getBezierPath } from 'reactflow';
+import { BaseEdge, getStraightPath } from 'reactflow';
 
 /**
  * Generic styled edge for non-intervention relationships.
@@ -11,20 +11,15 @@ const RelationshipEdge = memo(({
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
-  data,
   selected,
   markerEnd,
   style,
 }) => {
-  const [edgePath] = getBezierPath({
+  const [edgePath] = getStraightPath({
     sourceX,
     sourceY,
-    sourcePosition,
     targetX,
     targetY,
-    targetPosition,
   });
 
   // Merge default style with passed style
