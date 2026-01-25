@@ -142,14 +142,27 @@ Search across all content types:
 - Persistent notification history (localStorage)
 - Quick links to relevant pages from notifications
 
-### 15. Mobile Responsive
-- Fully responsive admin dashboard
-- Touch-friendly interface
-- Collapsible sidebar navigation
-- Adaptive view modes (grid/list/table) with mobile-optimized layouts
-- Card-based table alternatives on small screens
-- Back button navigation for sub-level pages
-- Compact controls and touch targets for mobile
+### 15. Mobile-First Design (Capacitor-Ready)
+- **Native App-Like Experience**: Optimized for Capacitor hybrid app builds
+- **Fixed App Bar**: Branded header with dynamic page titles and back navigation
+- **Bottom Navigation**: Quick access to Home, Conditions, Interventions, Search
+- **Elegant "More" Menu**: Bottom sheet with organized grid sections
+  - User profile card with role badge
+  - Categorized navigation (Main, Content, Resources, Administration)
+  - Gradient icon buttons with smooth animations
+  - Horizontal scroll for resource sections
+- **Touch-Optimized**:
+  - Touch-manipulation CSS for 300ms tap delay removal
+  - Active states with scale animations
+  - Safe area support for iOS notch devices
+- **Adaptive Layouts**:
+  - View mode toggle (grid/list/table) per content type
+  - Card-based table alternatives on small screens
+  - Responsive typography and spacing
+- **Seamless Navigation**:
+  - Back button always accessible via fixed header
+  - Route-aware page titles and subtitles
+  - Smooth transitions between pages
 
 ## Installation
 
@@ -228,6 +241,38 @@ App\Models\User::create([
     'password' => bcrypt('password'),
 ]);
 ```
+
+### Mobile App Build (Capacitor)
+
+The admin dashboard is designed to work as a native mobile app using Capacitor.
+
+```bash
+cd admin-dashboard
+
+# Install Capacitor
+npm install @capacitor/core @capacitor/cli
+npx cap init "Lifestyle Medicine" "com.example.lifestylemedicine"
+
+# Add platforms
+npm install @capacitor/android @capacitor/ios
+npx cap add android
+npx cap add ios
+
+# Build and sync
+npm run build
+npx cap sync
+
+# Open in native IDE
+npx cap open android  # Opens Android Studio
+npx cap open ios      # Opens Xcode
+```
+
+**Mobile Features:**
+- Fixed app bar with back navigation
+- Bottom navigation bar
+- Safe area support for notched devices
+- Touch-optimized interactions
+- Native-like page transitions
 
 ## API Documentation
 
@@ -430,9 +475,10 @@ lifestyle_medicine/
 └── admin-dashboard/            # React frontend
     ├── src/
     │   ├── components/
-    │   │   ├── layout/         # Header, Sidebar, NotificationDropdown
+    │   │   ├── layout/         # Layout, Header, Sidebar, BottomNav, Footer
     │   │   ├── shared/         # Breadcrumbs, AuditInfo, RichTextPreview
-    │   │   └── ui/             # ViewModeToggle, SortableHeader
+    │   │   ├── relationships/  # QuickAttachModal, EditInterventionMapping
+    │   │   └── ui/             # Modal, ViewModeToggle, SortableHeader
     │   ├── contexts/
     │   │   ├── AuthContext.jsx
     │   │   └── NotificationContext.jsx
