@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { useReactFlow, getRectOfNodes } from 'reactflow';
+import { useReactFlow, getNodesBounds, getViewportForBounds } from 'reactflow';
 import { toPng } from 'html-to-image';
 
 /**
@@ -12,7 +12,9 @@ import { toPng } from 'html-to-image';
  * - Ctrl+- / Cmd+-: Zoom out
  * - Escape: Clear selection
  * - F: Fit view
- * - R: Reset to radial layout (if provided)
+ * - R: Radial layout
+ * - H: Hierarchical layout
+ * - C: Cluster layout
  */
 export function useKeyboardShortcuts({
   onLayoutChange,
@@ -22,37 +24,36 @@ export function useKeyboardShortcuts({
   const { fitView, zoomIn, zoomOut, setNodes, getNodes } = useReactFlow();
 
   const handleExport = useCallback(async () => {
-    const flowElement = document.querySelector('.react-flow');
-    if (!flowElement) return;
-
     try {
       const nodes = getNodes();
       if (nodes.length === 0) return;
 
-      const nodesBounds = getRectOfNodes(nodes);
-      const padding = 50;
-      const width = nodesBounds.width + padding * 2;
-      const height = nodesBounds.height + padding * 2;
+      const viewportElement = document.querySelector('.react-flow__viewport');
+      if (!viewportElement) return;
 
-      const dataUrl = await toPng(flowElement, {
+      const nodesBounds = getNodesBounds(nodes);
+      const padding = 100;
+      const imageWidth = nodesBounds.width + padding * 2;
+      const imageHeight = nodesBounds.height + padding * 2;
+
+      const viewport = getViewportForBounds(
+        nodesBounds,
+        imageWidth,
+        imageHeight,
+        0.5,
+        2,
+        padding
+      );
+
+      const dataUrl = await toPng(viewportElement, {
         backgroundColor: '#f9fafb',
-        width,
-        height,
+        width: imageWidth,
+        height: imageHeight,
         pixelRatio: 2,
         style: {
-          width: `${width}px`,
-          height: `${height}px`,
-          transform: `translate(${-nodesBounds.x + padding}px, ${-nodesBounds.y + padding}px)`,
-        },
-        filter: (node) => {
-          if (node.classList) {
-            return (
-              !node.classList.contains('react-flow__minimap') &&
-              !node.classList.contains('react-flow__controls') &&
-              !node.classList.contains('react-flow__panel')
-            );
-          }
-          return true;
+          width: `${imageWidth}px`,
+          height: `${imageHeight}px`,
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
         },
       });
 
@@ -72,6 +73,7 @@ export function useKeyboardShortcuts({
 
   const handleKeyDown = useCallback((event) => {
     const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+    const isInputFocused = event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA';
 
     // Ctrl+S: Save as PNG
     if (isCtrlOrCmd && event.key === 's') {
@@ -101,26 +103,29 @@ export function useKeyboardShortcuts({
       return;
     }
 
+    // Skip single-key shortcuts if input is focused
+    if (isInputFocused) return;
+
     // F: Fit view (without modifier)
-    if (event.key === 'f' && !isCtrlOrCmd && event.target.tagName !== 'INPUT') {
+    if (event.key === 'f' && !isCtrlOrCmd) {
       fitView({ padding: 0.2, duration: 500 });
       return;
     }
 
     // R: Radial layout (without modifier)
-    if (event.key === 'r' && !isCtrlOrCmd && event.target.tagName !== 'INPUT') {
+    if (event.key === 'r' && !isCtrlOrCmd) {
       if (onLayoutChange) onLayoutChange('radial');
       return;
     }
 
     // H: Hierarchical layout (without modifier)
-    if (event.key === 'h' && !isCtrlOrCmd && event.target.tagName !== 'INPUT') {
+    if (event.key === 'h' && !isCtrlOrCmd) {
       if (onLayoutChange) onLayoutChange('dagre-tb');
       return;
     }
 
     // C: Cluster layout (without modifier)
-    if (event.key === 'c' && !isCtrlOrCmd && event.target.tagName !== 'INPUT') {
+    if (event.key === 'c' && !isCtrlOrCmd) {
       if (onLayoutChange) onLayoutChange('cluster');
       return;
     }

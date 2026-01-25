@@ -1,70 +1,75 @@
 import { useState, useCallback } from 'react';
-import { useReactFlow, getRectOfNodes } from 'reactflow';
+import { useReactFlow, getNodesBounds, getViewportForBounds } from 'reactflow';
 import { Download, Image, FileCode, Copy, Check, Share2 } from 'lucide-react';
 import { toPng, toSvg } from 'html-to-image';
 
 const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
-  const { getNodes, getViewport } = useReactFlow();
+  const { getNodes } = useReactFlow();
   const [exporting, setExporting] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const downloadImage = useCallback(async (type = 'png') => {
-    const flowElement = document.querySelector('.react-flow');
-    if (!flowElement) return;
-
     setExporting(true);
 
     try {
       const nodes = getNodes();
       if (nodes.length === 0) {
         alert('No nodes to export');
+        setExporting(false);
         return;
       }
 
-      // Get the bounds of all nodes
-      const nodesBounds = getRectOfNodes(nodes);
+      // Get the viewport element that contains the actual graph
+      const viewportElement = document.querySelector('.react-flow__viewport');
+      if (!viewportElement) {
+        alert('Could not find graph viewport');
+        setExporting(false);
+        return;
+      }
+
+      // Calculate bounds of all nodes
+      const nodesBounds = getNodesBounds(nodes);
 
       // Add padding
-      const padding = 50;
-      const width = nodesBounds.width + padding * 2;
-      const height = nodesBounds.height + padding * 2;
+      const padding = 100;
+      const imageWidth = nodesBounds.width + padding * 2;
+      const imageHeight = nodesBounds.height + padding * 2;
+
+      // Get the viewport transform needed to show all nodes
+      const viewport = getViewportForBounds(
+        nodesBounds,
+        imageWidth,
+        imageHeight,
+        0.5,  // minZoom
+        2,    // maxZoom
+        padding
+      );
 
       const options = {
         backgroundColor: '#f9fafb',
-        width,
-        height,
+        width: imageWidth,
+        height: imageHeight,
         style: {
-          width: `${width}px`,
-          height: `${height}px`,
-          transform: `translate(${-nodesBounds.x + padding}px, ${-nodesBounds.y + padding}px)`,
-        },
-        filter: (node) => {
-          // Filter out minimap and controls
-          if (node.classList) {
-            return (
-              !node.classList.contains('react-flow__minimap') &&
-              !node.classList.contains('react-flow__controls') &&
-              !node.classList.contains('react-flow__panel')
-            );
-          }
-          return true;
+          width: `${imageWidth}px`,
+          height: `${imageHeight}px`,
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
         },
       };
 
-      let dataUrl;
       const timestamp = new Date().toISOString().slice(0, 10);
       const filename = `${graphTitle.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`;
 
+      let dataUrl;
       if (type === 'svg') {
-        dataUrl = await toSvg(flowElement, options);
+        dataUrl = await toSvg(viewportElement, options);
         downloadFile(dataUrl, `${filename}.svg`);
       } else {
-        dataUrl = await toPng(flowElement, { ...options, pixelRatio: 2 });
+        dataUrl = await toPng(viewportElement, { ...options, pixelRatio: 2 });
         downloadFile(dataUrl, `${filename}.png`);
       }
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Failed to export image. Please try again.');
+      alert('Failed to export image: ' + error.message);
     } finally {
       setExporting(false);
     }
