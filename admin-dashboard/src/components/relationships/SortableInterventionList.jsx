@@ -5,6 +5,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -49,16 +50,17 @@ const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) =
     <div
       ref={setNodeRef}
       style={style}
-      className={`card group ${isDragging ? 'shadow-lg ring-2 ring-primary-300 bg-primary-50' : ''}`}
+      className={`card group ${isDragging ? 'shadow-lg ring-2 ring-primary-300 bg-primary-50 z-10' : ''}`}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-2 sm:gap-3">
         {/* Drag Handle */}
         {canEdit && (
           <button
             {...attributes}
             {...listeners}
-            className="mt-1 p-1 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 touch-none"
+            className="mt-0.5 p-2 -ml-1 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md touch-none select-none"
             title="Drag to reorder"
+            aria-label="Drag to reorder"
           >
             <GripVertical className="w-5 h-5" />
           </button>
@@ -66,13 +68,13 @@ const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) =
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
             <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
               {intervention.name}
             </h3>
             {intervention.pivot?.strength_of_evidence && (
               <span
-                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium ${
                   EVIDENCE_STRENGTH[intervention.pivot.strength_of_evidence]?.color
                 }`}
               >
@@ -81,7 +83,7 @@ const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) =
             )}
             {intervention.pivot?.recommendation_level && (
               <span
-                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium ${
                   RECOMMENDATION_LEVEL[intervention.pivot.recommendation_level]?.color
                 }`}
               >
@@ -100,17 +102,17 @@ const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) =
             </p>
           )}
           {intervention.pivot?.clinical_notes && (
-            <p className="text-xs sm:text-sm text-gray-500 mt-2 italic">
+            <p className="text-xs sm:text-sm text-gray-500 mt-2 italic line-clamp-2">
               Note: {intervention.pivot.clinical_notes}
             </p>
           )}
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0 -mr-1">
           <Link
             to={`/interventions/${intervention.id}`}
-            className="action-btn"
+            className="action-btn p-2 touch-manipulation"
             title="View Intervention"
           >
             <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -119,14 +121,14 @@ const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) =
             <>
               <button
                 onClick={() => onEdit(intervention)}
-                className="action-btn"
+                className="action-btn p-2 touch-manipulation"
                 title="Edit Relationship"
               >
                 <Edit className="w-4 h-4 text-gray-600" />
               </button>
               <button
                 onClick={() => onDetach(intervention)}
-                className="action-btn hover:bg-red-50 active:bg-red-100"
+                className="action-btn p-2 hover:bg-red-50 active:bg-red-100 touch-manipulation"
                 title="Remove from Condition"
               >
                 <Trash2 className="w-4 h-4 text-red-500" />
@@ -152,6 +154,12 @@ const SortableInterventionList = ({
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {

@@ -73,17 +73,17 @@ const EditInterventionMapping = ({
       title="Edit Intervention Relationship"
       size="lg"
     >
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Intervention Info */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold text-gray-900">{intervention.name}</h3>
+        <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{intervention.name}</h3>
           {intervention.care_domain && (
             <span className="inline-block mt-1 px-2 py-0.5 bg-secondary-100 text-secondary-700 text-xs rounded-full">
               {intervention.care_domain.name}
             </span>
           )}
           {intervention.description && (
-            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+            <p className="text-xs sm:text-sm text-gray-600 mt-2 line-clamp-2">
               {intervention.description}
             </p>
           )}
@@ -91,23 +91,23 @@ const EditInterventionMapping = ({
 
         {/* Strength of Evidence */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
             Strength of Evidence
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {EVIDENCE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, strength_of_evidence: opt.value }))}
-                className={`p-3 rounded-lg border-2 text-left transition-all ${
+                className={`p-2.5 sm:p-3 rounded-lg border-2 text-left transition-all touch-manipulation ${
                   formData.strength_of_evidence === opt.value
                     ? `${opt.color} border-current`
-                    : 'bg-white border-gray-200 hover:border-gray-300'
+                    : 'bg-white border-gray-200 hover:border-gray-300 active:bg-gray-50'
                 }`}
               >
-                <div className="font-medium text-sm">{opt.label}</div>
-                <div className="text-xs opacity-75 mt-0.5">{opt.description}</div>
+                <div className="font-medium text-xs sm:text-sm">{opt.label}</div>
+                <div className="text-xs opacity-75 mt-0.5 hidden sm:block">{opt.description}</div>
               </button>
             ))}
           </div>
@@ -115,7 +115,7 @@ const EditInterventionMapping = ({
 
         {/* Recommendation Level */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
             Recommendation Level
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -124,14 +124,14 @@ const EditInterventionMapping = ({
                 key={opt.value}
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, recommendation_level: opt.value }))}
-                className={`p-3 rounded-lg border-2 text-left transition-all ${
+                className={`p-2.5 sm:p-3 rounded-lg border-2 text-left transition-all touch-manipulation ${
                   formData.recommendation_level === opt.value
                     ? `${opt.color} border-current`
-                    : 'bg-white border-gray-200 hover:border-gray-300'
+                    : 'bg-white border-gray-200 hover:border-gray-300 active:bg-gray-50'
                 }`}
               >
-                <div className="font-medium text-sm">{opt.label}</div>
-                <div className="text-xs opacity-75 mt-0.5">{opt.description}</div>
+                <div className="font-medium text-xs sm:text-sm">{opt.label}</div>
+                <div className="text-xs opacity-75 mt-0.5 hidden sm:block">{opt.description}</div>
               </button>
             ))}
           </div>
@@ -139,7 +139,7 @@ const EditInterventionMapping = ({
 
         {/* Clinical Notes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
             Clinical Notes
           </label>
           <textarea
@@ -147,18 +147,18 @@ const EditInterventionMapping = ({
             onChange={(e) => setFormData(prev => ({ ...prev, clinical_notes: e.target.value }))}
             placeholder="Add specific notes about applying this intervention for this condition..."
             rows={3}
-            className="input w-full"
+            className="input w-full text-sm"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1 hidden sm:block">
             These notes provide context-specific guidance for this intervention-condition pairing.
           </p>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-2 border-t border-gray-100 -mx-4 sm:mx-0 px-4 sm:px-0 pb-2 sm:pb-0">
           <button
             onClick={onClose}
-            className="btn-outline"
+            className="btn-outline w-full sm:w-auto justify-center touch-manipulation"
             disabled={saving}
           >
             Cancel
@@ -166,17 +166,17 @@ const EditInterventionMapping = ({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto touch-manipulation"
           >
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Saving...
+                <span>Saving...</span>
               </>
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                Save Changes
+                <span>Save Changes</span>
               </>
             )}
           </button>

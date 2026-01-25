@@ -260,35 +260,35 @@ const QuickAttachModal = ({
               <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
             </div>
           ) : items.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <Icon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p>No items found</p>
-              {searchQuery && <p className="text-sm mt-1">Try a different search term</p>}
+            <div className="text-center py-8 sm:py-12 text-gray-500">
+              <Icon className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 text-gray-300" />
+              <p className="text-sm sm:text-base">No items found</p>
+              {searchQuery && <p className="text-xs sm:text-sm mt-1">Try a different search term</p>}
             </div>
           ) : (
-            <div className="max-h-64 overflow-y-auto divide-y divide-gray-100">
+            <div className="max-h-48 sm:max-h-64 overflow-y-auto divide-y divide-gray-100 overscroll-contain">
               {items.map((item) => {
                 const isSelected = selectedItem?.id === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleSelect(item)}
-                    className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
+                    className={`w-full text-left px-3 sm:px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation ${
                       isSelected ? 'bg-primary-50 border-l-4 border-primary-500' : ''
                     }`}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 sm:gap-3">
                       <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                         isSelected ? 'bg-primary-500 border-primary-500' : 'border-gray-300'
                       }`}>
                         {isSelected && <Check className="w-3 h-3 text-white" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-900 text-sm sm:text-base">
                           {item[config.displayField]}
                         </div>
                         {item[config.descriptionField] && (
-                          <p className="text-sm text-gray-500 line-clamp-2 mt-0.5">
+                          <p className="text-xs sm:text-sm text-gray-500 line-clamp-2 mt-0.5">
                             {item[config.descriptionField]}
                           </p>
                         )}
@@ -321,24 +321,24 @@ const QuickAttachModal = ({
 
         {/* Mapping Form (for interventions) */}
         {showMappingForm && selectedItem && entityType === 'interventions' && (
-          <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
-            <h4 className="font-medium text-gray-900">Relationship Details</h4>
+          <div className="border rounded-lg p-3 sm:p-4 bg-gray-50 space-y-3 sm:space-y-4">
+            <h4 className="font-medium text-gray-900 text-sm sm:text-base">Relationship Details</h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-1">
                   Strength of Evidence
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {EVIDENCE_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
                       onClick={() => setMappingData(prev => ({ ...prev, strength_of_evidence: opt.value }))}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-2.5 sm:px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                         mappingData.strength_of_evidence === opt.value
                           ? `${opt.color} ring-2 ring-offset-1 ring-current`
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
                       }`}
                     >
                       {opt.label}
@@ -348,19 +348,19 @@ const QuickAttachModal = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-1">
                   Recommendation Level
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {RECOMMENDATION_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
                       onClick={() => setMappingData(prev => ({ ...prev, recommendation_level: opt.value }))}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-2.5 sm:px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                         mappingData.recommendation_level === opt.value
                           ? `${opt.color} ring-2 ring-offset-1 ring-current`
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
                       }`}
                     >
                       {opt.label}
@@ -371,7 +371,7 @@ const QuickAttachModal = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Clinical Notes (Optional)
               </label>
               <textarea
@@ -379,17 +379,17 @@ const QuickAttachModal = ({
                 onChange={(e) => setMappingData(prev => ({ ...prev, clinical_notes: e.target.value }))}
                 placeholder="Add specific notes about this intervention for this condition..."
                 rows={2}
-                className="input w-full"
+                className="input w-full text-sm"
               />
             </div>
           </div>
         )}
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 pt-2">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-2 border-t sm:border-t-0 border-gray-100 -mx-4 sm:mx-0 px-4 sm:px-0 pb-2 sm:pb-0">
           <button
             onClick={handleClose}
-            className="btn-outline"
+            className="btn-outline w-full sm:w-auto justify-center touch-manipulation"
             disabled={attaching}
           >
             Cancel
@@ -397,17 +397,19 @@ const QuickAttachModal = ({
           <button
             onClick={handleAttach}
             disabled={!selectedItem || attaching}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto touch-manipulation"
           >
             {attaching ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Attaching...
+                <span>Attaching...</span>
               </>
             ) : (
               <>
                 <Check className="w-4 h-4" />
-                Attach {selectedItem ? `"${selectedItem[config.displayField]}"` : ''}
+                <span className="truncate max-w-[200px]">
+                  {selectedItem ? `Attach "${selectedItem[config.displayField]}"` : 'Select an item'}
+                </span>
               </>
             )}
           </button>
