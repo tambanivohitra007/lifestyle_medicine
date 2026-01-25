@@ -116,12 +116,17 @@ class AiContentService
     {
         $results = [
             'condition' => null,
+            'condition_existed' => false,
             'condition_sections' => [],
             'interventions' => [],
+            'interventions_reused' => 0,
             'evidence_entries' => [],
             'scriptures' => [],
+            'scriptures_reused' => 0,
             'egw_references' => [],
+            'egw_references_reused' => 0,
             'recipes' => [],
+            'recipes_reused' => 0,
             'content_tags' => [],
             'errors' => [],
         ];
@@ -134,15 +139,31 @@ class AiContentService
         DB::beginTransaction();
 
         try {
-            // 1. Create condition
+            // 1. Create or find condition (case-insensitive match by name)
             if (isset($structured['condition'])) {
-                $condition = Condition::create([
-                    'name' => $structured['condition']['name'],
-                    'category' => $structured['condition']['category'] ?? null,
-                    'summary' => $structured['condition']['summary'] ?? null,
-                ]);
-                $results['condition'] = $condition->id;
-                Log::info('AI Content Import - Condition created: ' . $condition->id);
+                $conditionName = $structured['condition']['name'];
+                $existingCondition = Condition::whereRaw('LOWER(name) = ?', [strtolower($conditionName)])->first();
+
+                if ($existingCondition) {
+                    // Update existing condition with new data
+                    $existingCondition->update([
+                        'category' => $structured['condition']['category'] ?? $existingCondition->category,
+                        'summary' => $structured['condition']['summary'] ?? $existingCondition->summary,
+                    ]);
+                    $condition = $existingCondition;
+                    $results['condition'] = $condition->id;
+                    $results['condition_existed'] = true;
+                    Log::info('AI Content Import - Using existing condition: ' . $condition->id);
+                } else {
+                    $condition = Condition::create([
+                        'name' => $conditionName,
+                        'category' => $structured['condition']['category'] ?? null,
+                        'summary' => $structured['condition']['summary'] ?? null,
+                    ]);
+                    $results['condition'] = $condition->id;
+                    $results['condition_existed'] = false;
+                    Log::info('AI Content Import - Condition created: ' . $condition->id);
+                }
             }
 
             if (!$results['condition']) {
@@ -194,16 +215,23 @@ class AiContentService
                     }
 
                     // Create or find intervention
-                    $intervention = Intervention::firstOrCreate(
-                        [
+                    $existingIntervention = Intervention::where('care_domain_id', $careDomain->id)
+                        ->whereRaw('LOWER(name) = ?', [strtolower($intData['name'])])
+                        ->first();
+
+                    if ($existingIntervention) {
+                        $intervention = $existingIntervention;
+                        $results['interventions_reused']++;
+                        Log::info('AI Content Import - Using existing intervention: ' . $intervention->name);
+                    } else {
+                        $intervention = Intervention::create([
                             'care_domain_id' => $careDomain->id,
                             'name' => $intData['name'],
-                        ],
-                        [
                             'description' => $intData['description'] ?? null,
                             'mechanism' => $intData['mechanism'] ?? null,
-                        ]
-                    );
+                        ]);
+                        Log::info('AI Content Import - Intervention created: ' . $intervention->name);
+                    }
 
                     $interventionMap[$intData['name']] = $intervention->id;
                     $results['interventions'][] = $intervention->id;
@@ -261,17 +289,27 @@ class AiContentService
                 }
             }
 
-            // 6. Create scriptures and link to condition
+            // 6. Create or find scriptures and link to condition
+            // Match by reference (case-insensitive)
             if (isset($structured['scriptures'])) {
                 $condition = Condition::find($results['condition']);
                 foreach ($structured['scriptures'] as $scrData) {
-                    $scripture = Scripture::firstOrCreate(
-                        ['reference' => $scrData['reference']],
-                        [
+                    // Try to find existing scripture by reference (case-insensitive)
+                    $existingScripture = Scripture::whereRaw('LOWER(reference) = ?', [strtolower($scrData['reference'])])->first();
+
+                    if ($existingScripture) {
+                        $scripture = $existingScripture;
+                        $results['scriptures_reused']++;
+                        Log::info('AI Content Import - Using existing scripture: ' . $scripture->reference);
+                    } else {
+                        $scripture = Scripture::create([
+                            'reference' => $scrData['reference'],
                             'text' => $scrData['text'],
                             'theme' => $scrData['theme'] ?? null,
-                        ]
-                    );
+                        ]);
+                        Log::info('AI Content Import - Scripture created: ' . $scripture->reference);
+                    }
+
                     $results['scriptures'][] = $scripture->id;
 
                     if (!$condition->scriptures()->where('scripture_id', $scripture->id)->exists()) {
@@ -280,29 +318,56 @@ class AiContentService
                 }
             }
 
-            // 7. Create EGW references and link to condition
+            // 7. Create or find EGW references and link to condition
+            // Match by book + page_start + first 100 chars of quote (case-insensitive)
             if (isset($structured['egw_references'])) {
                 $condition = Condition::find($results['condition']);
                 foreach ($structured['egw_references'] as $egwData) {
-                    $egw = EgwReference::create([
-                        'book' => $egwData['book'],
-                        'book_abbreviation' => $egwData['book_abbreviation'] ?? null,
-                        'chapter' => $egwData['chapter'] ?? null,
-                        'page_start' => $egwData['page_start'] ?? null,
-                        'page_end' => $egwData['page_end'] ?? null,
-                        'paragraph' => $egwData['paragraph'] ?? null,
-                        'quote' => $egwData['quote'],
-                        'topic' => $egwData['topic'] ?? null,
-                        'context' => $egwData['context'] ?? null,
-                    ]);
+                    $quotePrefix = substr($egwData['quote'] ?? '', 0, 100);
+
+                    // Try to find existing EGW reference
+                    $existingEgw = EgwReference::whereRaw('LOWER(book) = ?', [strtolower($egwData['book'])])
+                        ->where(function ($query) use ($egwData, $quotePrefix) {
+                            // Match by page if available, otherwise by quote prefix
+                            if (!empty($egwData['page_start'])) {
+                                $query->where('page_start', $egwData['page_start']);
+                            } else {
+                                $query->whereRaw('LOWER(SUBSTRING(quote, 1, 100)) = ?', [strtolower($quotePrefix)]);
+                            }
+                        })
+                        ->first();
+
+                    if ($existingEgw) {
+                        $egw = $existingEgw;
+                        $results['egw_references_reused']++;
+                        Log::info('AI Content Import - Using existing EGW reference: ' . $egw->id);
+                    } else {
+                        $egw = EgwReference::create([
+                            'book' => $egwData['book'],
+                            'book_abbreviation' => $egwData['book_abbreviation'] ?? null,
+                            'chapter' => $egwData['chapter'] ?? null,
+                            'page_start' => $egwData['page_start'] ?? null,
+                            'page_end' => $egwData['page_end'] ?? null,
+                            'paragraph' => $egwData['paragraph'] ?? null,
+                            'quote' => $egwData['quote'],
+                            'topic' => $egwData['topic'] ?? null,
+                            'context' => $egwData['context'] ?? null,
+                        ]);
+                        Log::info('AI Content Import - EGW reference created: ' . $egw->id);
+                    }
+
                     $results['egw_references'][] = $egw->id;
 
-                    $condition->egwReferences()->attach($egw->id);
+                    // Only attach if not already linked
+                    if (!$condition->egwReferences()->where('egw_reference_id', $egw->id)->exists()) {
+                        $condition->egwReferences()->attach($egw->id);
+                    }
                 }
             }
 
-            // 8. Create recipes and link to condition
+            // 8. Create or find recipes and link to condition
             // All AI-generated recipes must be vegetarian
+            // Match by title (case-insensitive)
             if (isset($structured['recipes']) && !empty($structured['recipes'])) {
                 $condition = Condition::find($results['condition']);
                 foreach ($structured['recipes'] as $recData) {
@@ -312,19 +377,39 @@ class AiContentService
                         $dietaryTags[] = 'vegetarian';
                     }
 
-                    $recipe = Recipe::create([
-                        'title' => $recData['title'],
-                        'description' => $recData['description'] ?? null,
-                        'dietary_tags' => $dietaryTags,
-                        'ingredients' => $recData['ingredients'] ?? null,
-                        'instructions' => $recData['instructions'] ?? null,
-                        'servings' => $recData['servings'] ?? null,
-                        'prep_time_minutes' => $recData['prep_time_minutes'] ?? null,
-                        'cook_time_minutes' => $recData['cook_time_minutes'] ?? null,
-                    ]);
+                    // Try to find existing recipe by title (case-insensitive)
+                    $existingRecipe = Recipe::whereRaw('LOWER(title) = ?', [strtolower($recData['title'])])->first();
+
+                    if ($existingRecipe) {
+                        $recipe = $existingRecipe;
+                        $results['recipes_reused']++;
+                        // Merge dietary tags if the existing recipe doesn't have vegetarian
+                        $existingTags = $existingRecipe->dietary_tags ?? [];
+                        if (is_array($existingTags) && !in_array('vegetarian', array_map('strtolower', $existingTags))) {
+                            $existingTags[] = 'vegetarian';
+                            $existingRecipe->update(['dietary_tags' => $existingTags]);
+                        }
+                        Log::info('AI Content Import - Using existing recipe: ' . $recipe->id);
+                    } else {
+                        $recipe = Recipe::create([
+                            'title' => $recData['title'],
+                            'description' => $recData['description'] ?? null,
+                            'dietary_tags' => $dietaryTags,
+                            'ingredients' => $recData['ingredients'] ?? null,
+                            'instructions' => $recData['instructions'] ?? null,
+                            'servings' => $recData['servings'] ?? null,
+                            'prep_time_minutes' => $recData['prep_time_minutes'] ?? null,
+                            'cook_time_minutes' => $recData['cook_time_minutes'] ?? null,
+                        ]);
+                        Log::info('AI Content Import - Recipe created: ' . $recipe->id);
+                    }
+
                     $results['recipes'][] = $recipe->id;
 
-                    $condition->recipes()->attach($recipe->id);
+                    // Only attach if not already linked
+                    if (!$condition->recipes()->where('recipe_id', $recipe->id)->exists()) {
+                        $condition->recipes()->attach($recipe->id);
+                    }
                 }
             }
 
