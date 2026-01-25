@@ -55,7 +55,6 @@ const Layout = () => {
         }`}
       >
         <Header
-          onMenuClick={() => setSidebarOpen(true)}
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={toggleCollapse}
         />
