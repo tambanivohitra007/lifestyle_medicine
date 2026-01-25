@@ -118,6 +118,7 @@ export const apiEndpoints = {
   // Export
   exportConditionPdf: (id) => `/export/conditions/${id}/pdf`,
   exportConditionsSummaryPdf: '/export/conditions/summary/pdf',
+  exportRecipePdf: (id) => `/export/recipes/${id}/pdf`,
 
   // User Management
   users: '/admin/users',

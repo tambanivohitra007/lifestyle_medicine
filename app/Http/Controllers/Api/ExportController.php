@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Condition;
+use App\Models\Recipe;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 
@@ -45,5 +46,25 @@ class ExportController extends Controller
         ]);
 
         return $pdf->download('conditions_summary.pdf');
+    }
+
+    /**
+     * Export a recipe as a formatted PDF recipe card.
+     */
+    public function recipePdf(Recipe $recipe): Response
+    {
+        $recipe->load([
+            'conditions',
+            'interventions.careDomain',
+            'tags',
+        ]);
+
+        $pdf = Pdf::loadView('exports.recipe', [
+            'recipe' => $recipe,
+        ]);
+
+        $filename = str_replace(' ', '_', strtolower($recipe->title)) . '_recipe.pdf';
+
+        return $pdf->download($filename);
     }
 }

@@ -7,15 +7,18 @@ import {
   Clock,
   Users,
   AlertCircle,
+  Download,
 } from 'lucide-react';
-import api, { apiEndpoints } from '../../lib/api';
+import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AuditInfo from '../../components/shared/AuditInfo';
+import { useAuth } from '../../contexts/AuthContext';
 
 const RecipeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -87,9 +90,9 @@ const RecipeDetail = () => {
       />
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{recipe.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{recipe.title}</h1>
           {recipe.dietary_tags && recipe.dietary_tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {recipe.dietary_tags.map((tag, idx) => (
@@ -103,21 +106,35 @@ const RecipeDetail = () => {
             </div>
           )}
         </div>
-        <div className="flex gap-2">
-          <Link
-            to={`/recipes/${id}/edit`}
-            className="btn-outline flex items-center gap-2"
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={`${getApiBaseUrl()}/api/v1${apiEndpoints.exportRecipePdf(id)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-initial"
           >
-            <Edit className="w-4 h-4" />
-            Edit
-          </Link>
-          <button
-            onClick={handleDelete}
-            className="btn-outline text-red-600 border-red-200 hover:bg-red-50 flex items-center gap-2"
-          >
-            <Trash2 className="w-4 h-4" />
-            Delete
-          </button>
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Download PDF</span>
+            <span className="sm:hidden">PDF</span>
+          </a>
+          {canEdit && (
+            <>
+              <Link
+                to={`/recipes/${id}/edit`}
+                className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+              >
+                <Edit className="w-4 h-4" />
+                Edit
+              </Link>
+              <button
+                onClick={handleDelete}
+                className="btn-outline text-red-600 border-red-200 hover:bg-red-50 active:bg-red-100 flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Delete</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -183,7 +200,18 @@ const RecipeDetail = () => {
               {recipe.ingredients.map((ingredient, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary-500 mt-2 flex-shrink-0" />
-                  <span className="text-gray-700">{ingredient}</span>
+                  <span className="text-gray-700">
+                    {typeof ingredient === 'object' ? (
+                      <>
+                        {ingredient.amount && (
+                          <span className="font-medium">{ingredient.amount} </span>
+                        )}
+                        {ingredient.item}
+                      </>
+                    ) : (
+                      ingredient
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>

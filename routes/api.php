@@ -89,6 +89,7 @@ Route::prefix('v1')->group(function () {
     // PDF Exports (public)
     Route::get('export/conditions/{condition}/pdf', [ExportController::class, 'conditionPdf']);
     Route::get('export/conditions/summary/pdf', [ExportController::class, 'conditionsSummaryPdf']);
+    Route::get('export/recipes/{recipe}/pdf', [ExportController::class, 'recipePdf']);
 });
 
 // Admin API routes - Content Management (admin and editor roles)
