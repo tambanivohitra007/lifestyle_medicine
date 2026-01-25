@@ -37,11 +37,20 @@ const RecipeForm = () => {
       setLoading(true);
       const response = await api.get(`${apiEndpoints.recipes}/${id}`);
       const recipe = response.data.data;
+
+      // Normalize ingredients - convert objects to strings
+      const normalizedIngredients = (recipe.ingredients || []).map((ing) => {
+        if (typeof ing === 'object' && ing !== null) {
+          return ing.amount ? `${ing.amount} ${ing.item || ''}`.trim() : (ing.item || '');
+        }
+        return ing;
+      });
+
       setFormData({
         title: recipe.title || '',
         description: recipe.description || '',
         dietary_tags: recipe.dietary_tags || [],
-        ingredients: recipe.ingredients || [],
+        ingredients: normalizedIngredients,
         instructions: recipe.instructions || '',
         servings: recipe.servings || '',
         prep_time_minutes: recipe.prep_time_minutes || '',
