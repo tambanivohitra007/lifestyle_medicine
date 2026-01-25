@@ -23,7 +23,7 @@ This platform enables healthcare practitioners and health educators to create, m
 - **MySQL/SQLite** - Database
 - **Laravel DomPDF** - PDF generation
 - **Maatwebsite Excel** - CSV/Excel import
-- **OpenAI PHP Client** - AI content generation
+- **Gemini API PHP Client** - AI content generation
 
 ### Frontend (Admin Dashboard)
 - **React 19** - UI framework
@@ -115,8 +115,10 @@ Search across all content types:
 - Filter content by tags
 
 ### 12. AI Content Generator
-- Generate complete condition content using AI (OpenAI GPT integration)
+- Generate complete condition content using AI (Google Gemini integration)
 - Auto-generates structured sections: risk factors, physiology, complications, solutions
+- AI-powered Scripture suggestions for health topics
+- AI-powered Ellen G. White reference suggestions
 - Preview generated content before importing
 - Markdown to rich text conversion
 - Progress tracking during generation
@@ -181,8 +183,8 @@ php artisan key:generate
 # DB_USERNAME=root
 # DB_PASSWORD=
 
-# Configure OpenAI for AI Content Generator (optional)
-# OPENAI_API_KEY=your-api-key-here
+# Configure Gemini for AI Content Generator (optional)
+# GEMINI_API_KEY=your-api-key-here
 
 # Run migrations
 php artisan migrate
@@ -416,7 +418,7 @@ lifestyle_medicine/
 │   │   └── Resources/          # API resources
 │   ├── Imports/                # Excel/CSV import classes
 │   ├── Services/               # Business logic services
-│   │   └── OpenAiService.php   # AI content generation
+│   │   └── GeminiService.php   # AI content generation
 │   └── Models/                 # Eloquent models
 ├── database/
 │   ├── migrations/             # Database migrations
@@ -496,7 +498,7 @@ lifestyle_medicine/
 6. Click "Import to Database" to create the condition with all sections
 7. Edit and refine the content as needed
 
-**Note:** Requires OpenAI API key configured in `.env` file.
+**Note:** Requires Gemini API key configured in `.env` file (`GEMINI_API_KEY`).
 
 ### Bulk Import
 
