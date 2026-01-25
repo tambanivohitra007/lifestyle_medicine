@@ -54,7 +54,7 @@ const Login = () => {
             backgroundImage: `url('https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=1200&q=80')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-900/95 via-primary-800/90 to-secondary-900/95" />
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-950/95 via-slate-900/90 to-slate-950/95" />
 
         {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -80,7 +80,7 @@ const Login = () => {
             <div>
               <h1 className="text-4xl xl:text-5xl font-bold leading-tight mb-6">
                 Transforming Health<br />
-                <span className="text-primary-300">Through Lifestyle</span>
+                <span className="text-rose-300">Through Lifestyle</span>
               </h1>
               <p className="text-xl text-white/80 max-w-md">
                 Evidence-based medicine combined with whole-person care for lasting wellness.
@@ -104,7 +104,7 @@ const Login = () => {
               {pillars.map(({ icon: Icon, label }) => (
                 <div key={label} className="text-center">
                   <div className="w-12 h-12 mx-auto mb-2 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20">
-                    <Icon className="w-6 h-6 text-primary-300" />
+                    <Icon className="w-6 h-6 text-rose-300" />
                   </div>
                   <span className="text-xs text-white/70">{label}</span>
                 </div>
@@ -125,8 +125,8 @@ const Login = () => {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl shadow-lg shadow-primary-600/30 mb-4">
-              <img src="/lifestyle.png" alt="Logo" className="w-16 h-16 object-contain" />
+            <div className="inline-flex items-center justify-center w-24 h-24 mb-4">
+              <img src="/lifestyle.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Lifestyle Medicine</h1>
             <p className="text-gray-500 text-sm mt-1">Knowledge Platform</p>
@@ -157,7 +157,7 @@ const Login = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 text-gray-900 placeholder-gray-400"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-400 transition-all duration-200 text-gray-900 placeholder-gray-400"
                   placeholder="you@example.com"
                   autoComplete="email"
                   required
@@ -178,7 +178,7 @@ const Login = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 text-gray-900 placeholder-gray-400"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-400 transition-all duration-200 text-gray-900 placeholder-gray-400"
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   required
@@ -200,7 +200,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg shadow-primary-600/30 hover:shadow-primary-600/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg shadow-rose-600/25 hover:shadow-rose-600/35 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
