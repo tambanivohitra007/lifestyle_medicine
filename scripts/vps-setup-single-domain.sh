@@ -485,11 +485,11 @@ print_success "Nginx configured"
 #===============================================================================
 print_header "Step 13: Configuring PHP-FPM"
 
-if grep -q "user = $DEPLOY_USER" /etc/php/8.2/fpm/pool.d/www.conf 2>/dev/null; then
+if grep -q "user = $DEPLOY_USER" /etc/php/8.2/fpm/pool.d/default.conf 2>/dev/null; then
     print_warning "PHP-FPM already configured for $DEPLOY_USER - skipping"
 else
-    sed -i "s/user = www-data/user = $DEPLOY_USER/g" /etc/php/8.2/fpm/pool.d/www.conf
-    sed -i "s/listen.owner = www-data/listen.owner = $DEPLOY_USER/g" /etc/php/8.2/fpm/pool.d/www.conf
+    sed -i "s/user = www-data/user = $DEPLOY_USER/g" /etc/php/8.2/fpm/pool.d/default.conf
+    sed -i "s/listen.owner = www-data/listen.owner = $DEPLOY_USER/g" /etc/php/8.2/fpm/pool.d/default.conf
     systemctl restart php8.2-fpm
     print_success "PHP-FPM configured"
 fi
@@ -497,22 +497,22 @@ fi
 #===============================================================================
 # STEP 14: Install SSL Certificate
 #===============================================================================
-print_header "Step 14: Installing SSL Certificate"
+# print_header "Step 14: Installing SSL Certificate"
 
-if [ -d "/etc/letsencrypt/live/$DOMAIN" ]; then
-    print_warning "SSL certificate already exists for $DOMAIN - skipping"
-else
-    certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m $ADMIN_EMAIL --redirect
-    print_success "SSL certificate installed"
-fi
+# if [ -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+#     print_warning "SSL certificate already exists for $DOMAIN - skipping"
+# else
+#     certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m $ADMIN_EMAIL --redirect
+#     print_success "SSL certificate installed"
+# fi
 
-# Add cron job only if not already present
-if crontab -l 2>/dev/null | grep -q "certbot renew"; then
-    print_warning "SSL auto-renewal cron already exists - skipping"
-else
-    (crontab -l 2>/dev/null; echo "0 12 * * * /usr/bin/certbot renew --quiet") | crontab -
-    print_success "SSL auto-renewal configured"
-fi
+# # Add cron job only if not already present
+# if crontab -l 2>/dev/null | grep -q "certbot renew"; then
+#     print_warning "SSL auto-renewal cron already exists - skipping"
+# else
+#     (crontab -l 2>/dev/null; echo "0 12 * * * /usr/bin/certbot renew --quiet") | crontab -
+#     print_success "SSL auto-renewal configured"
+# fi
 
 #===============================================================================
 # STEP 15: Create Deploy Script
