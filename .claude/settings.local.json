@@ -42,7 +42,9 @@
       "Bash(do if [ -d \"$dir\" ])",
       "Bash(then basename \"$dir\")",
       "Bash(fi)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
