@@ -37,7 +37,12 @@
       "Bash(grep:*)",
       "Bash(git check-ignore:*)",
       "Bash(where:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(for dir in \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\\\\admin-dashboard\\\\src\\\\features\"/*)",
+      "Bash(do if [ -d \"$dir\" ])",
+      "Bash(then basename \"$dir\")",
+      "Bash(fi)",
+      "Bash(git mv:*)"
     ]
   }
 }
