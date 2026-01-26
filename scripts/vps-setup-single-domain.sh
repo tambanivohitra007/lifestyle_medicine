@@ -485,12 +485,12 @@ print_success "Nginx configured"
 #===============================================================================
 print_header "Step 13: Configuring PHP-FPM"
 
-if grep -q "user = $DEPLOY_USER" /etc/php/8.2/fpm/pool.d/default.conf 2>/dev/null; then
+if grep -q "user = $DEPLOY_USER" /etc/php/8.3/fpm/pool.d/default.conf 2>/dev/null; then
     print_warning "PHP-FPM already configured for $DEPLOY_USER - skipping"
 else
-    sed -i "s/user = www-data/user = $DEPLOY_USER/g" /etc/php/8.2/fpm/pool.d/default.conf
-    sed -i "s/listen.owner = www-data/listen.owner = $DEPLOY_USER/g" /etc/php/8.2/fpm/pool.d/default.conf
-    systemctl restart php8.2-fpm
+    sed -i "s/user = www-data/user = $DEPLOY_USER/g" /etc/php/8.3/fpm/pool.d/default.conf
+    sed -i "s/listen.owner = www-data/listen.owner = $DEPLOY_USER/g" /etc/php/8.3/fpm/pool.d/default.conf
+    systemctl restart php8.3-fpm
     print_success "PHP-FPM configured"
 fi
 
