@@ -1,15 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search, Layers, Edit, Trash2, Stethoscope } from 'lucide-react';
+import { Plus, Search, Layers, Edit, Trash2, Stethoscope, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import { useAuth } from '../../contexts/AuthContext';
+import SlideOver from '../../components/shared/SlideOver';
 
 const CareDomains = () => {
   const { canEdit } = useAuth();
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({ name: '' });
+  const [formLoading, setFormLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchCareDomains();
@@ -41,6 +49,85 @@ const CareDomains = () => {
     }
   };
 
+  const openCreateModal = () => {
+    setEditingId(null);
+    setFormData({ name: '' });
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = async (id) => {
+    setEditingId(id);
+    setErrors({});
+    setIsModalOpen(true);
+    setFormLoading(true);
+
+    try {
+      const response = await api.get(`${apiEndpoints.careDomains}/${id}`);
+      const domain = response.data.data;
+      setFormData({ name: domain.name || '' });
+    } catch (error) {
+      console.error('Error fetching care domain:', error);
+      toast.error('Failed to load care domain');
+      setIsModalOpen(false);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData({ name: '' });
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setSaving(true);
+      if (editingId) {
+        await api.put(`${apiEndpoints.careDomainsAdmin}/${editingId}`, formData);
+        toast.success('Care domain updated');
+      } else {
+        await api.post(apiEndpoints.careDomainsAdmin, formData);
+        toast.success('Care domain created');
+      }
+      closeModal();
+      fetchCareDomains();
+    } catch (error) {
+      console.error('Error saving care domain:', error);
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to save care domain');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
   const filteredDomains = careDomains.filter((domain) =>
     domain.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -56,10 +143,13 @@ const CareDomains = () => {
           </p>
         </div>
         {canEdit && (
-          <Link to="/care-domains/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={openCreateModal}
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
             <Plus className="w-5 h-5" />
             Add Care Domain
-          </Link>
+          </button>
         )}
       </div>
 
@@ -94,10 +184,13 @@ const CareDomains = () => {
               : 'Get started by creating your first care domain.'}
           </p>
           {!searchTerm && canEdit && (
-            <Link to="/care-domains/new" className="btn-primary inline-flex items-center gap-2">
+            <button
+              onClick={openCreateModal}
+              className="btn-primary inline-flex items-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               Add Care Domain
-            </Link>
+            </button>
           )}
         </div>
       ) : (
@@ -113,13 +206,13 @@ const CareDomains = () => {
                 </div>
                 {canEdit && (
                   <div className="flex gap-1">
-                    <Link
-                      to={`/care-domains/${domain.id}/edit`}
+                    <button
+                      onClick={() => openEditModal(domain.id)}
                       className="action-btn"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4 text-gray-600" />
-                    </Link>
+                    </button>
                     <button
                       onClick={() => handleDelete(domain.id, domain.name)}
                       className="action-btn hover:bg-red-50 active:bg-red-100"
@@ -145,6 +238,68 @@ const CareDomains = () => {
           ))}
         </div>
       )}
+
+      {/* SlideOver Modal for Create/Edit */}
+      <SlideOver
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingId ? 'Edit Care Domain' : 'New Care Domain'}
+        subtitle={editingId ? 'Update the care domain details' : 'Create a new care domain to categorize interventions'}
+        size="sm"
+      >
+        {formLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name */}
+            <div>
+              <label htmlFor="name" className="label">
+                Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`input-field ${errors.name ? 'border-red-500' : ''}`}
+                placeholder="e.g., Nutrition, Exercise, Hydrotherapy"
+                autoFocus
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.name) ? errors.name[0] : errors.name}
+                </p>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5" />
+                )}
+                {saving ? 'Saving...' : 'Save Care Domain'}
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="btn-outline w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </SlideOver>
     </div>
   );
 };

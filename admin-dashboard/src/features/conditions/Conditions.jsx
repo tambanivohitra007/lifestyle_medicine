@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, ShieldAlert, Edit, Trash2, Eye, Download } from 'lucide-react';
+import { Plus, Search, ShieldAlert, Edit, Trash2, Eye, Download, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -11,6 +11,7 @@ import ConditionTable from './components/ConditionTable';
 import ConditionList from './components/ConditionList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
 import { useAuth } from '../../contexts/AuthContext';
+import SlideOver from '../../components/shared/SlideOver';
 
 const Conditions = () => {
   const { canEdit } = useAuth();
@@ -25,6 +26,14 @@ const Conditions = () => {
   const [viewMode, setViewMode] = useState(() => {
     return localStorage.getItem('conditions_view_mode') || 'grid';
   });
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({ name: '', category: '', summary: '' });
+  const [formLoading, setFormLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setCurrentPage(1);
@@ -83,6 +92,88 @@ const Conditions = () => {
     }
   };
 
+  // Modal functions
+  const openCreateModal = () => {
+    setEditingId(null);
+    setFormData({ name: '', category: '', summary: '' });
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = async (id) => {
+    setEditingId(id);
+    setErrors({});
+    setIsModalOpen(true);
+    setFormLoading(true);
+
+    try {
+      const response = await api.get(`${apiEndpoints.conditions}/${id}`);
+      const condition = response.data.data;
+      setFormData({
+        name: condition.name || '',
+        category: condition.category || '',
+        summary: condition.summary || '',
+      });
+    } catch (error) {
+      console.error('Error fetching condition:', error);
+      toast.error('Failed to load condition');
+      setIsModalOpen(false);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData({ name: '', category: '', summary: '' });
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setSaving(true);
+      if (editingId) {
+        await api.put(`${apiEndpoints.conditionsAdmin}/${editingId}`, formData);
+        toast.success('Condition updated');
+      } else {
+        await api.post(apiEndpoints.conditionsAdmin, formData);
+        toast.success('Condition created');
+      }
+      closeModal();
+      fetchConditions();
+    } catch (error) {
+      console.error('Error saving condition:', error);
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        toast.error('Failed to save condition');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
   const categories = [...new Set(conditions.map((c) => c.category).filter(Boolean))];
 
   return (
@@ -106,10 +197,13 @@ const Conditions = () => {
             Export Summary
           </a>
           {canEdit && (
-            <Link to="/conditions/new" className="btn-primary flex items-center justify-center gap-2">
+            <button
+              onClick={openCreateModal}
+              className="btn-primary flex items-center justify-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               Add Condition
-            </Link>
+            </button>
           )}
         </div>
       </div>
@@ -247,10 +341,15 @@ const Conditions = () => {
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Get started by creating your first medical condition.
           </p>
-          <Link to="/conditions/new" className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Add Condition
-          </Link>
+          {canEdit && (
+            <button
+              onClick={openCreateModal}
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add Condition
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -276,13 +375,13 @@ const Conditions = () => {
                       </Link>
                       {canEdit && (
                         <>
-                          <Link
-                            to={`/conditions/${condition.id}/edit`}
+                          <button
+                            onClick={() => openEditModal(condition.id)}
                             className="action-btn"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4 text-gray-600" />
-                          </Link>
+                          </button>
                           <button
                             onClick={() => handleDelete(condition.id, condition.name)}
                             className="action-btn hover:bg-red-50 active:bg-red-100"
@@ -326,12 +425,12 @@ const Conditions = () => {
 
           {/* List View */}
           {viewMode === 'list' && (
-            <ConditionList conditions={conditions} onDelete={handleDelete} canEdit={canEdit} />
+            <ConditionList conditions={conditions} onDelete={handleDelete} onEdit={openEditModal} canEdit={canEdit} />
           )}
 
           {/* Table View */}
           {viewMode === 'table' && (
-            <ConditionTable conditions={conditions} onDelete={handleDelete} canEdit={canEdit} />
+            <ConditionTable conditions={conditions} onDelete={handleDelete} onEdit={openEditModal} canEdit={canEdit} />
           )}
 
           {/* Pagination */}
@@ -344,6 +443,110 @@ const Conditions = () => {
           />
         </>
       )}
+
+      {/* SlideOver Modal for Create/Edit */}
+      <SlideOver
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingId ? 'Edit Condition' : 'New Condition'}
+        subtitle={editingId ? 'Update the condition details' : 'Create a new medical condition'}
+        size="md"
+      >
+        {formLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name */}
+            <div>
+              <label htmlFor="name" className="label">
+                Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`input-field ${errors.name ? 'border-red-500' : ''}`}
+                placeholder="e.g., Type 2 Diabetes"
+                autoFocus
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.name) ? errors.name[0] : errors.name}
+                </p>
+              )}
+            </div>
+
+            {/* Category */}
+            <div>
+              <label htmlFor="category" className="label">
+                Category
+              </label>
+              <input
+                type="text"
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className={`input-field ${errors.category ? 'border-red-500' : ''}`}
+                placeholder="e.g., Metabolic, Cardiovascular, Mental Health"
+              />
+              {errors.category && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.category) ? errors.category[0] : errors.category}
+                </p>
+              )}
+            </div>
+
+            {/* Summary */}
+            <div>
+              <label htmlFor="summary" className="label">
+                Summary
+              </label>
+              <textarea
+                id="summary"
+                name="summary"
+                value={formData.summary}
+                onChange={handleChange}
+                rows={5}
+                className={`input-field resize-y ${errors.summary ? 'border-red-500' : ''}`}
+                placeholder="A brief description of the condition..."
+              />
+              {errors.summary && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.summary) ? errors.summary[0] : errors.summary}
+                </p>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5" />
+                )}
+                {saving ? 'Saving...' : 'Save Condition'}
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="btn-outline w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </SlideOver>
     </div>
   );
 };

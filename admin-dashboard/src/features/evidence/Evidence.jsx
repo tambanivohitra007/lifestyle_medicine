@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, FileText, Edit, Trash2, Stethoscope, Download } from 'lucide-react';
+import { Plus, Search, FileText, Edit, Trash2, Stethoscope, Download, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
 import { useAuth } from '../../contexts/AuthContext';
+import SlideOver from '../../components/shared/SlideOver';
 
 const QUALITY_RATING = {
   A: { label: 'A - High', color: 'bg-green-100 text-green-700' },
@@ -22,6 +23,22 @@ const STUDY_TYPE = {
   expert_opinion: 'Expert Opinion',
 };
 
+const STUDY_TYPES = [
+  { value: 'rct', label: 'Randomized Controlled Trial' },
+  { value: 'meta_analysis', label: 'Meta-Analysis' },
+  { value: 'systematic_review', label: 'Systematic Review' },
+  { value: 'observational', label: 'Observational Study' },
+  { value: 'case_series', label: 'Case Series' },
+  { value: 'expert_opinion', label: 'Expert Opinion' },
+];
+
+const QUALITY_RATINGS = [
+  { value: 'A', label: 'A - High Quality' },
+  { value: 'B', label: 'B - Good Quality' },
+  { value: 'C', label: 'C - Moderate Quality' },
+  { value: 'D', label: 'D - Low Quality' },
+];
+
 const Evidence = () => {
   const { canEdit } = useAuth();
   const [entries, setEntries] = useState([]);
@@ -32,6 +49,22 @@ const Evidence = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
 
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    intervention_id: '',
+    study_type: '',
+    population: '',
+    quality_rating: '',
+    summary: '',
+    notes: '',
+  });
+  const [interventions, setInterventions] = useState([]);
+  const [formLoading, setFormLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, studyTypeFilter, qualityFilter]);
@@ -39,6 +72,19 @@ const Evidence = () => {
   useEffect(() => {
     fetchEntries();
   }, [searchTerm, studyTypeFilter, qualityFilter, currentPage]);
+
+  useEffect(() => {
+    fetchInterventions();
+  }, []);
+
+  const fetchInterventions = async () => {
+    try {
+      const response = await api.get(apiEndpoints.interventions);
+      setInterventions(response.data.data);
+    } catch (error) {
+      console.error('Error fetching interventions:', error);
+    }
+  };
 
   const fetchEntries = async () => {
     try {
@@ -76,6 +122,105 @@ const Evidence = () => {
     }
   };
 
+  // Modal functions
+  const openCreateModal = () => {
+    setEditingId(null);
+    setFormData({
+      intervention_id: '',
+      study_type: '',
+      population: '',
+      quality_rating: '',
+      summary: '',
+      notes: '',
+    });
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = async (id) => {
+    setEditingId(id);
+    setErrors({});
+    setIsModalOpen(true);
+    setFormLoading(true);
+
+    try {
+      const response = await api.get(`${apiEndpoints.evidenceEntries}/${id}`);
+      const evidence = response.data.data;
+      setFormData({
+        intervention_id: evidence.intervention_id || '',
+        study_type: evidence.study_type || '',
+        population: evidence.population || '',
+        quality_rating: evidence.quality_rating || '',
+        summary: evidence.summary || '',
+        notes: evidence.notes || '',
+      });
+    } catch (error) {
+      console.error('Error fetching evidence:', error);
+      toast.error('Failed to load evidence');
+      setIsModalOpen(false);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData({
+      intervention_id: '',
+      study_type: '',
+      population: '',
+      quality_rating: '',
+      summary: '',
+      notes: '',
+    });
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.intervention_id) {
+      newErrors.intervention_id = 'Intervention is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setSaving(true);
+      if (editingId) {
+        await api.put(`${apiEndpoints.evidenceEntriesAdmin}/${editingId}`, formData);
+        toast.success('Evidence updated');
+      } else {
+        await api.post(apiEndpoints.evidenceEntriesAdmin, formData);
+        toast.success('Evidence created');
+      }
+      closeModal();
+      fetchEntries();
+    } catch (error) {
+      console.error('Error saving evidence:', error);
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        toast.error('Failed to save evidence');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -95,10 +240,13 @@ const Evidence = () => {
             Export CSV
           </a>
           {canEdit && (
-            <Link to="/evidence/new" className="btn-primary flex items-center justify-center gap-2">
+            <button
+              onClick={openCreateModal}
+              className="btn-primary flex items-center justify-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               Add Evidence
-            </Link>
+            </button>
           )}
         </div>
       </div>
@@ -159,10 +307,13 @@ const Evidence = () => {
             Get started by adding evidence for interventions.
           </p>
           {canEdit && (
-            <Link to="/evidence/new" className="btn-primary inline-flex items-center gap-2">
+            <button
+              onClick={openCreateModal}
+              className="btn-primary inline-flex items-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               Add Evidence
-            </Link>
+            </button>
           )}
         </div>
       ) : (
@@ -223,13 +374,13 @@ const Evidence = () => {
 
                   {canEdit && (
                     <div className="flex gap-1 self-end sm:self-start">
-                      <Link
-                        to={`/evidence/${entry.id}/edit`}
+                      <button
+                        onClick={() => openEditModal(entry.id)}
                         className="action-btn"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
+                      </button>
                       <button
                         onClick={() => handleDelete(entry.id, entry.summary)}
                         className="action-btn hover:bg-red-50 active:bg-red-100"
@@ -252,6 +403,163 @@ const Evidence = () => {
           />
         </>
       )}
+
+      {/* SlideOver Modal for Create/Edit */}
+      <SlideOver
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingId ? 'Edit Evidence' : 'New Evidence Entry'}
+        subtitle={editingId ? 'Update the evidence details' : 'Add new evidence for an intervention'}
+        size="lg"
+      >
+        {formLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Intervention */}
+            <div>
+              <label htmlFor="intervention_id" className="label">
+                Intervention <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="intervention_id"
+                name="intervention_id"
+                value={formData.intervention_id}
+                onChange={handleChange}
+                className={`input-field ${errors.intervention_id ? 'border-red-500' : ''}`}
+              >
+                <option value="">Select an intervention</option>
+                {interventions.map((intervention) => (
+                  <option key={intervention.id} value={intervention.id}>
+                    {intervention.name}
+                    {intervention.care_domain && ` (${intervention.care_domain.name})`}
+                  </option>
+                ))}
+              </select>
+              {errors.intervention_id && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.intervention_id) ? errors.intervention_id[0] : errors.intervention_id}
+                </p>
+              )}
+            </div>
+
+            {/* Study Type & Quality Rating */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="study_type" className="label">
+                  Study Type
+                </label>
+                <select
+                  id="study_type"
+                  name="study_type"
+                  value={formData.study_type}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  <option value="">Select type</option>
+                  {STUDY_TYPES.map(({ value, label }) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="quality_rating" className="label">
+                  Quality Rating
+                </label>
+                <select
+                  id="quality_rating"
+                  name="quality_rating"
+                  value={formData.quality_rating}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  <option value="">Select rating</option>
+                  {QUALITY_RATINGS.map(({ value, label }) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Population */}
+            <div>
+              <label htmlFor="population" className="label">
+                Study Population
+              </label>
+              <input
+                type="text"
+                id="population"
+                name="population"
+                value={formData.population}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., Adults with Type 2 Diabetes"
+              />
+            </div>
+
+            {/* Summary */}
+            <div>
+              <label htmlFor="summary" className="label">
+                Summary
+              </label>
+              <textarea
+                id="summary"
+                name="summary"
+                value={formData.summary}
+                onChange={handleChange}
+                rows={4}
+                className="input-field resize-y"
+                placeholder="Key findings and conclusions..."
+              />
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label htmlFor="notes" className="label">
+                Notes
+              </label>
+              <textarea
+                id="notes"
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                rows={3}
+                className="input-field resize-y"
+                placeholder="Additional notes or comments..."
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5" />
+                )}
+                {saving ? 'Saving...' : 'Save Evidence'}
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="btn-outline w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </SlideOver>
     </div>
   );
 };

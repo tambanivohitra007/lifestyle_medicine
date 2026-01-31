@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search, Users as UsersIcon, Edit, Trash2, RotateCcw, UserCheck, UserX, Shield, PenTool, Eye } from 'lucide-react';
+import { Plus, Search, Users as UsersIcon, Edit, Trash2, RotateCcw, UserCheck, UserX, Shield, PenTool, Eye, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Swal from 'sweetalert2';
+import SlideOver from '../../components/shared/SlideOver';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -12,6 +12,21 @@ const Users = () => {
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [pagination, setPagination] = useState({});
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+    role: 'viewer',
+    is_active: true,
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchUsers();
@@ -144,6 +159,139 @@ const Users = () => {
     );
   };
 
+  // Modal functions
+  const openCreateModal = () => {
+    setEditingId(null);
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
+      role: 'viewer',
+      is_active: true,
+    });
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = async (id) => {
+    setEditingId(id);
+    setErrors({});
+    setIsModalOpen(true);
+    setFormLoading(true);
+
+    try {
+      const response = await api.get(`${apiEndpoints.users}/${id}`);
+      const user = response.data.data;
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        password: '',
+        password_confirmation: '',
+        role: user.role || 'viewer',
+        is_active: user.is_active ?? true,
+      });
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      toast.error('Failed to load user');
+      setIsModalOpen(false);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
+      role: 'viewer',
+      is_active: true,
+    });
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
+
+    if (!editingId && !formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password && formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+
+    if (formData.password && formData.password !== formData.password_confirmation) {
+      newErrors.password_confirmation = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setSaving(true);
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        is_active: formData.is_active,
+      };
+
+      if (formData.password) {
+        payload.password = formData.password;
+      }
+
+      if (editingId) {
+        await api.put(`${apiEndpoints.users}/${editingId}`, payload);
+        toast.success('User updated');
+      } else {
+        await api.post(apiEndpoints.users, payload);
+        toast.success('User created');
+      }
+      closeModal();
+      fetchUsers();
+    } catch (error) {
+      console.error('Error saving user:', error);
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to save user');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
   const filteredUsers = users;
 
   return (
@@ -156,10 +304,13 @@ const Users = () => {
             Manage user accounts and permissions
           </p>
         </div>
-        <Link to="/users/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+        <button
+          onClick={openCreateModal}
+          className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+        >
           <Plus className="w-5 h-5" />
           Add User
-        </Link>
+        </button>
       </div>
 
       {/* Filters */}
@@ -219,10 +370,13 @@ const Users = () => {
               : 'Get started by creating a new user'}
           </p>
           {!searchTerm && !roleFilter && !statusFilter && (
-            <Link to="/users/new" className="btn-primary inline-flex items-center gap-2">
+            <button
+              onClick={openCreateModal}
+              className="btn-primary inline-flex items-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               Add User
-            </Link>
+            </button>
           )}
         </div>
       ) : (
@@ -290,13 +444,13 @@ const Users = () => {
                           </button>
                         ) : (
                           <>
-                            <Link
-                              to={`/users/${user.id}/edit`}
+                            <button
+                              onClick={() => openEditModal(user.id)}
                               className="action-btn"
                               title="Edit"
                             >
                               <Edit className="w-4 h-4 text-gray-600" />
-                            </Link>
+                            </button>
                             <button
                               onClick={() => handleToggleActive(user)}
                               className={`action-btn ${user.is_active ? 'hover:bg-yellow-50' : 'hover:bg-green-50'}`}
@@ -351,6 +505,196 @@ const Users = () => {
           )}
         </div>
       )}
+
+      {/* SlideOver Modal for Create/Edit */}
+      <SlideOver
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingId ? 'Edit User' : 'New User'}
+        subtitle={editingId ? 'Update user information and permissions' : 'Create a new user account'}
+        size="lg"
+      >
+        {formLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name */}
+            <div>
+              <label htmlFor="name" className="label">
+                Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`input-field ${errors.name ? 'border-red-500' : ''}`}
+                placeholder="Enter full name"
+                autoFocus
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.name) ? errors.name[0] : errors.name}
+                </p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="label">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`input-field ${errors.email ? 'border-red-500' : ''}`}
+                placeholder="Enter email address"
+              />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.email) ? errors.email[0] : errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="password" className="label">
+                  Password {!editingId && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`input-field ${errors.password ? 'border-red-500' : ''}`}
+                  placeholder={editingId ? 'Leave blank to keep current' : 'Enter password'}
+                />
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {Array.isArray(errors.password) ? errors.password[0] : errors.password}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="password_confirmation" className="label">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  id="password_confirmation"
+                  name="password_confirmation"
+                  value={formData.password_confirmation}
+                  onChange={handleChange}
+                  className={`input-field ${errors.password_confirmation ? 'border-red-500' : ''}`}
+                  placeholder="Confirm password"
+                />
+                {errors.password_confirmation && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {Array.isArray(errors.password_confirmation) ? errors.password_confirmation[0] : errors.password_confirmation}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Role */}
+            <div>
+              <label className="label">
+                Role <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { value: 'admin', label: 'Admin', icon: Shield, description: 'Full access to all features', color: 'purple' },
+                  { value: 'editor', label: 'Editor', icon: PenTool, description: 'Can create and edit content', color: 'blue' },
+                  { value: 'viewer', label: 'Viewer', icon: Eye, description: 'Read-only access', color: 'gray' },
+                ].map((role) => (
+                  <label
+                    key={role.value}
+                    className={`
+                      relative flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all
+                      ${formData.role === role.value
+                        ? `border-${role.color}-500 bg-${role.color}-50`
+                        : 'border-gray-200 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    <input
+                      type="radio"
+                      name="role"
+                      value={role.value}
+                      checked={formData.role === role.value}
+                      onChange={handleChange}
+                      className="sr-only"
+                    />
+                    <role.icon className={`w-5 h-5 mt-0.5 ${
+                      formData.role === role.value ? `text-${role.color}-600` : 'text-gray-400'
+                    }`} />
+                    <div>
+                      <p className={`font-medium ${
+                        formData.role === role.value ? `text-${role.color}-900` : 'text-gray-900'
+                      }`}>
+                        {role.label}
+                      </p>
+                      <p className="text-sm text-gray-500">{role.description}</p>
+                    </div>
+                    {formData.role === role.value && (
+                      <div className={`absolute top-2 right-2 w-2 h-2 rounded-full bg-${role.color}-500`} />
+                    )}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Active Status */}
+            <div>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="is_active"
+                  checked={formData.is_active}
+                  onChange={handleChange}
+                  className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                />
+                <div>
+                  <span className="font-medium text-gray-900">Active Account</span>
+                  <p className="text-sm text-gray-500">Inactive users cannot log in</p>
+                </div>
+              </label>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5" />
+                )}
+                {saving ? 'Saving...' : editingId ? 'Update User' : 'Create User'}
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="btn-outline w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </SlideOver>
     </div>
   );
 };

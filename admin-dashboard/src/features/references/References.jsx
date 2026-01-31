@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search, BookMarked, Edit, Trash2, ExternalLink, Download } from 'lucide-react';
+import { Plus, Search, BookMarked, Edit, Trash2, ExternalLink, Download, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
 import { useAuth } from '../../contexts/AuthContext';
+import SlideOver from '../../components/shared/SlideOver';
 
 const References = () => {
   const { canEdit } = useAuth();
@@ -14,6 +14,20 @@ const References = () => {
   const [yearFilter, setYearFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    citation: '',
+    doi: '',
+    pmid: '',
+    url: '',
+    year: '',
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setCurrentPage(1);
@@ -58,6 +72,107 @@ const References = () => {
     }
   };
 
+  // Modal functions
+  const openCreateModal = () => {
+    setEditingId(null);
+    setFormData({
+      citation: '',
+      doi: '',
+      pmid: '',
+      url: '',
+      year: '',
+    });
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = async (id) => {
+    setEditingId(id);
+    setErrors({});
+    setIsModalOpen(true);
+    setFormLoading(true);
+
+    try {
+      const response = await api.get(`${apiEndpoints.references}/${id}`);
+      const reference = response.data.data;
+      setFormData({
+        citation: reference.citation || '',
+        doi: reference.doi || '',
+        pmid: reference.pmid || '',
+        url: reference.url || '',
+        year: reference.year || '',
+      });
+    } catch (error) {
+      console.error('Error fetching reference:', error);
+      toast.error('Failed to load reference');
+      setIsModalOpen(false);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData({
+      citation: '',
+      doi: '',
+      pmid: '',
+      url: '',
+      year: '',
+    });
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.citation.trim()) {
+      newErrors.citation = 'Citation is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setSaving(true);
+      const payload = {
+        ...formData,
+        year: formData.year ? parseInt(formData.year) : null,
+      };
+
+      if (editingId) {
+        await api.put(`${apiEndpoints.referencesAdmin}/${editingId}`, payload);
+        toast.success('Reference updated');
+      } else {
+        await api.post(apiEndpoints.referencesAdmin, payload);
+        toast.success('Reference created');
+      }
+      closeModal();
+      fetchReferences();
+    } catch (error) {
+      console.error('Error saving reference:', error);
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        toast.error('Failed to save reference');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
   const years = [...new Set(references.map((r) => r.year).filter(Boolean))].sort((a, b) => b - a);
 
   return (
@@ -79,10 +194,13 @@ const References = () => {
             Export CSV
           </a>
           {canEdit && (
-            <Link to="/references/new" className="btn-primary flex items-center justify-center gap-2">
+            <button
+              onClick={openCreateModal}
+              className="btn-primary flex items-center justify-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               Add Reference
-            </Link>
+            </button>
           )}
         </div>
       </div>
@@ -129,10 +247,15 @@ const References = () => {
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Get started by adding scientific references.
           </p>
-          <Link to="/references/new" className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Add Reference
-          </Link>
+          {canEdit && (
+            <button
+              onClick={openCreateModal}
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add Reference
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -194,13 +317,13 @@ const References = () => {
 
                   {canEdit && (
                     <div className="flex gap-1 self-end sm:self-start">
-                      <Link
-                        to={`/references/${reference.id}/edit`}
+                      <button
+                        onClick={() => openEditModal(reference.id)}
                         className="action-btn"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
+                      </button>
                       <button
                         onClick={() => handleDelete(reference.id, reference.citation)}
                         className="action-btn hover:bg-red-50 active:bg-red-100"
@@ -223,6 +346,134 @@ const References = () => {
           />
         </>
       )}
+
+      {/* SlideOver Modal for Create/Edit */}
+      <SlideOver
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingId ? 'Edit Reference' : 'New Reference'}
+        subtitle={editingId ? 'Update the reference details' : 'Add a new scientific reference'}
+        size="md"
+      >
+        {formLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Citation */}
+            <div>
+              <label htmlFor="citation" className="label">
+                Citation <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                id="citation"
+                name="citation"
+                value={formData.citation}
+                onChange={handleChange}
+                rows={3}
+                className={`input-field resize-y ${errors.citation ? 'border-red-500' : ''}`}
+                placeholder="Full citation text (e.g., Author A, Author B. Title. Journal. Year;Volume:Pages)"
+                autoFocus
+              />
+              {errors.citation && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.citation) ? errors.citation[0] : errors.citation}
+                </p>
+              )}
+            </div>
+
+            {/* Year */}
+            <div>
+              <label htmlFor="year" className="label">
+                Year
+              </label>
+              <input
+                type="number"
+                id="year"
+                name="year"
+                value={formData.year}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., 2023"
+                min="1900"
+                max={new Date().getFullYear()}
+              />
+            </div>
+
+            {/* DOI */}
+            <div>
+              <label htmlFor="doi" className="label">
+                DOI
+              </label>
+              <input
+                type="text"
+                id="doi"
+                name="doi"
+                value={formData.doi}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., 10.1000/xyz123"
+              />
+            </div>
+
+            {/* PMID */}
+            <div>
+              <label htmlFor="pmid" className="label">
+                PubMed ID (PMID)
+              </label>
+              <input
+                type="text"
+                id="pmid"
+                name="pmid"
+                value={formData.pmid}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., 12345678"
+              />
+            </div>
+
+            {/* URL */}
+            <div>
+              <label htmlFor="url" className="label">
+                URL
+              </label>
+              <input
+                type="url"
+                id="url"
+                name="url"
+                value={formData.url}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="https://..."
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5" />
+                )}
+                {saving ? 'Saving...' : 'Save Reference'}
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="btn-outline w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </SlideOver>
     </div>
   );
 };

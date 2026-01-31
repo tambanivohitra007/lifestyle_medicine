@@ -11,7 +11,7 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {function} onDelete - Callback for delete action
  * @param {boolean} canEdit - Whether user has edit permissions
  */
-const ConditionTable = ({ conditions, onDelete, canEdit }) => {
+const ConditionTable = ({ conditions, onDelete, onEdit, canEdit }) => {
   return (
     <>
       {/* Mobile Card Layout */}
@@ -39,13 +39,13 @@ const ConditionTable = ({ conditions, onDelete, canEdit }) => {
                 </Link>
                 {canEdit && (
                   <>
-                    <Link
-                      to={`/conditions/${condition.id}/edit`}
+                    <button
+                      onClick={() => onEdit(condition.id)}
                       className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
-                    </Link>
+                    </button>
                     <button
                       onClick={() => onDelete(condition.id, condition.name)}
                       className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation"
@@ -141,13 +141,13 @@ const ConditionTable = ({ conditions, onDelete, canEdit }) => {
                       </Link>
                       {canEdit && (
                         <>
-                          <Link
-                            to={`/conditions/${condition.id}/edit`}
+                          <button
+                            onClick={() => onEdit(condition.id)}
                             className="text-gray-600 hover:text-primary-600 transition-colors"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4" />
-                          </Link>
+                          </button>
                           <button
                             onClick={() => onDelete(condition.id, condition.name)}
                             className="text-gray-600 hover:text-red-600 transition-colors"

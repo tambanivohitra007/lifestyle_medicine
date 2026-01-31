@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search, BookOpen, Edit, Trash2, Tag } from 'lucide-react';
+import { Plus, Search, BookOpen, Edit, Trash2, Tag, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
 import { SkeletonList } from '../../components/skeleton';
 import { useAuth } from '../../contexts/AuthContext';
+import SlideOver from '../../components/shared/SlideOver';
 
 const Scriptures = () => {
   const { canEdit } = useAuth();
@@ -17,6 +17,14 @@ const Scriptures = () => {
   const [tagFilter, setTagFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({ reference: '', text: '', theme: '' });
+  const [formLoading, setFormLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchContentTags();
@@ -75,6 +83,91 @@ const Scriptures = () => {
     }
   };
 
+  // Modal functions
+  const openCreateModal = () => {
+    setEditingId(null);
+    setFormData({ reference: '', text: '', theme: '' });
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = async (id) => {
+    setEditingId(id);
+    setErrors({});
+    setIsModalOpen(true);
+    setFormLoading(true);
+
+    try {
+      const response = await api.get(`${apiEndpoints.scriptures}/${id}`);
+      const scripture = response.data.data;
+      setFormData({
+        reference: scripture.reference || '',
+        text: scripture.text || '',
+        theme: scripture.theme || '',
+      });
+    } catch (error) {
+      console.error('Error fetching scripture:', error);
+      toast.error('Failed to load scripture');
+      setIsModalOpen(false);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData({ reference: '', text: '', theme: '' });
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.reference.trim()) {
+      newErrors.reference = 'Reference is required';
+    }
+    if (!formData.text.trim()) {
+      newErrors.text = 'Text is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setSaving(true);
+      if (editingId) {
+        await api.put(`${apiEndpoints.scripturesAdmin}/${editingId}`, formData);
+        toast.success('Scripture updated');
+      } else {
+        await api.post(apiEndpoints.scripturesAdmin, formData);
+        toast.success('Scripture created');
+      }
+      closeModal();
+      fetchScriptures();
+    } catch (error) {
+      console.error('Error saving scripture:', error);
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        toast.error('Failed to save scripture');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
   const themes = [...new Set(scriptures.map((s) => s.theme).filter(Boolean))];
 
   return (
@@ -88,10 +181,13 @@ const Scriptures = () => {
           </p>
         </div>
         {canEdit && (
-          <Link to="/scriptures/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={openCreateModal}
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
             <Plus className="w-5 h-5" />
             Add Scripture
-          </Link>
+          </button>
         )}
       </div>
 
@@ -147,10 +243,15 @@ const Scriptures = () => {
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Get started by adding scripture references.
           </p>
-          <Link to="/scriptures/new" className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Add Scripture
-          </Link>
+          {canEdit && (
+            <button
+              onClick={openCreateModal}
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add Scripture
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -166,13 +267,13 @@ const Scriptures = () => {
                   </div>
                   {canEdit && (
                     <div className="flex gap-1">
-                      <Link
-                        to={`/scriptures/${scripture.id}/edit`}
+                      <button
+                        onClick={() => openEditModal(scripture.id)}
                         className="action-btn"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
+                      </button>
                       <button
                         onClick={() => handleDelete(scripture.id, scripture.reference)}
                         className="action-btn hover:bg-red-50 active:bg-red-100"
@@ -226,6 +327,105 @@ const Scriptures = () => {
           />
         </>
       )}
+
+      {/* SlideOver Modal for Create/Edit */}
+      <SlideOver
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingId ? 'Edit Scripture' : 'New Scripture'}
+        subtitle={editingId ? 'Update the scripture details' : 'Add a new scripture reference'}
+        size="md"
+      >
+        {formLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Reference */}
+            <div>
+              <label htmlFor="reference" className="label">
+                Reference <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="reference"
+                name="reference"
+                value={formData.reference}
+                onChange={handleChange}
+                className={`input-field ${errors.reference ? 'border-red-500' : ''}`}
+                placeholder="e.g., John 3:16, Psalm 23:1-6"
+                autoFocus
+              />
+              {errors.reference && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.reference) ? errors.reference[0] : errors.reference}
+                </p>
+              )}
+            </div>
+
+            {/* Text */}
+            <div>
+              <label htmlFor="text" className="label">
+                Text <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                id="text"
+                name="text"
+                value={formData.text}
+                onChange={handleChange}
+                rows={5}
+                className={`input-field resize-y ${errors.text ? 'border-red-500' : ''}`}
+                placeholder="Enter the scripture text..."
+              />
+              {errors.text && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.text) ? errors.text[0] : errors.text}
+                </p>
+              )}
+            </div>
+
+            {/* Theme */}
+            <div>
+              <label htmlFor="theme" className="label">
+                Theme
+              </label>
+              <input
+                type="text"
+                id="theme"
+                name="theme"
+                value={formData.theme}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., Healing, Peace, Faith"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5" />
+                )}
+                {saving ? 'Saving...' : 'Save Scripture'}
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="btn-outline w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </SlideOver>
     </div>
   );
 };

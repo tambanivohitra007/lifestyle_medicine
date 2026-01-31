@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Stethoscope, Edit, Trash2, Eye, Layers, Tag } from 'lucide-react';
+import { Plus, Search, Stethoscope, Edit, Trash2, Eye, Layers, Tag, Save, Loader2, Image } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -10,6 +10,8 @@ import InterventionTable from './components/InterventionTable';
 import InterventionList from './components/InterventionList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
 import { useAuth } from '../../contexts/AuthContext';
+import SlideOver from '../../components/shared/SlideOver';
+import MediaUploader from '../../components/shared/MediaUploader';
 
 const Interventions = () => {
   const { canEdit } = useAuth();
@@ -25,6 +27,20 @@ const Interventions = () => {
   const [viewMode, setViewMode] = useState(() => {
     return localStorage.getItem('interventions_view_mode') || 'grid';
   });
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    care_domain_id: '',
+    name: '',
+    description: '',
+    mechanism: '',
+  });
+  const [media, setMedia] = useState([]);
+  const [formLoading, setFormLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchData();
@@ -92,6 +108,97 @@ const Interventions = () => {
     localStorage.setItem('interventions_view_mode', mode);
   };
 
+  // Modal functions
+  const openCreateModal = () => {
+    setEditingId(null);
+    setFormData({ care_domain_id: '', name: '', description: '', mechanism: '' });
+    setMedia([]);
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = async (id) => {
+    setEditingId(id);
+    setErrors({});
+    setIsModalOpen(true);
+    setFormLoading(true);
+
+    try {
+      const response = await api.get(`${apiEndpoints.interventions}/${id}`);
+      const intervention = response.data.data;
+      setFormData({
+        care_domain_id: intervention.care_domain_id || '',
+        name: intervention.name || '',
+        description: intervention.description || '',
+        mechanism: intervention.mechanism || '',
+      });
+      setMedia(intervention.media || []);
+    } catch (error) {
+      console.error('Error fetching intervention:', error);
+      toast.error('Failed to load intervention');
+      setIsModalOpen(false);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData({ care_domain_id: '', name: '', description: '', mechanism: '' });
+    setMedia([]);
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+    if (!formData.care_domain_id) {
+      newErrors.care_domain_id = 'Care domain is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setSaving(true);
+      if (editingId) {
+        await api.put(`${apiEndpoints.interventionsAdmin}/${editingId}`, formData);
+        toast.success('Intervention updated');
+      } else {
+        await api.post(apiEndpoints.interventionsAdmin, formData);
+        toast.success('Intervention created');
+      }
+      closeModal();
+      fetchInterventions();
+    } catch (error) {
+      console.error('Error saving intervention:', error);
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to save intervention');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -103,10 +210,13 @@ const Interventions = () => {
           </p>
         </div>
         {canEdit && (
-          <Link to="/interventions/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={openCreateModal}
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
             <Plus className="w-5 h-5" />
             Add Intervention
-          </Link>
+          </button>
         )}
       </div>
 
@@ -180,10 +290,13 @@ const Interventions = () => {
             Get started by creating your first intervention.
           </p>
           {canEdit && (
-            <Link to="/interventions/new" className="btn-primary inline-flex items-center gap-2">
+            <button
+              onClick={openCreateModal}
+              className="btn-primary inline-flex items-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               Add Intervention
-            </Link>
+            </button>
           )}
         </div>
       ) : (
@@ -210,13 +323,13 @@ const Interventions = () => {
                       </Link>
                       {canEdit && (
                         <>
-                          <Link
-                            to={`/interventions/${intervention.id}/edit`}
+                          <button
+                            onClick={() => openEditModal(intervention.id)}
                             className="action-btn"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4 text-gray-600" />
-                          </Link>
+                          </button>
                           <button
                             onClick={() => handleDelete(intervention.id, intervention.name)}
                             className="action-btn hover:bg-red-50 active:bg-red-100"
@@ -280,12 +393,12 @@ const Interventions = () => {
 
           {/* List View */}
           {viewMode === 'list' && (
-            <InterventionList interventions={interventions} onDelete={handleDelete} canEdit={canEdit} />
+            <InterventionList interventions={interventions} onDelete={handleDelete} onEdit={openEditModal} canEdit={canEdit} />
           )}
 
           {/* Table View */}
           {viewMode === 'table' && (
-            <InterventionTable interventions={interventions} onDelete={handleDelete} canEdit={canEdit} />
+            <InterventionTable interventions={interventions} onDelete={handleDelete} onEdit={openEditModal} canEdit={canEdit} />
           )}
 
           {/* Pagination */}
@@ -298,6 +411,153 @@ const Interventions = () => {
           />
         </>
       )}
+
+      {/* SlideOver Modal for Create/Edit */}
+      <SlideOver
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingId ? 'Edit Intervention' : 'New Intervention'}
+        subtitle={editingId ? 'Update the intervention details' : 'Create a new lifestyle intervention'}
+        size="lg"
+      >
+        {formLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Care Domain */}
+            <div>
+              <label htmlFor="care_domain_id" className="label">
+                Care Domain <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="care_domain_id"
+                name="care_domain_id"
+                value={formData.care_domain_id}
+                onChange={handleChange}
+                className={`input-field ${errors.care_domain_id ? 'border-red-500' : ''}`}
+              >
+                <option value="">Select a care domain</option>
+                {careDomains.map((domain) => (
+                  <option key={domain.id} value={domain.id}>
+                    {domain.name}
+                  </option>
+                ))}
+              </select>
+              {errors.care_domain_id && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.care_domain_id) ? errors.care_domain_id[0] : errors.care_domain_id}
+                </p>
+              )}
+            </div>
+
+            {/* Name */}
+            <div>
+              <label htmlFor="name" className="label">
+                Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`input-field ${errors.name ? 'border-red-500' : ''}`}
+                placeholder="e.g., Plant-Based Diet, HIIT Training"
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.name) ? errors.name[0] : errors.name}
+                </p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="label">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={4}
+                className={`input-field ${errors.description ? 'border-red-500' : ''}`}
+                placeholder="A brief description of the intervention..."
+              />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.description) ? errors.description[0] : errors.description}
+                </p>
+              )}
+            </div>
+
+            {/* Mechanism */}
+            <div>
+              <label htmlFor="mechanism" className="label">
+                Mechanism of Action
+              </label>
+              <textarea
+                id="mechanism"
+                name="mechanism"
+                value={formData.mechanism}
+                onChange={handleChange}
+                rows={4}
+                className={`input-field ${errors.mechanism ? 'border-red-500' : ''}`}
+                placeholder="How does this intervention work? What is the physiological mechanism?"
+              />
+              {errors.mechanism && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.mechanism) ? errors.mechanism[0] : errors.mechanism}
+                </p>
+              )}
+            </div>
+
+            {/* Media - Only show when editing */}
+            {editingId && (
+              <div className="pt-6 border-t border-gray-200">
+                <label className="label flex items-center gap-2">
+                  <Image className="w-4 h-4" />
+                  Media Files
+                </label>
+                <p className="text-sm text-gray-500 mb-4">
+                  Upload images and documents related to this intervention
+                </p>
+                <MediaUploader
+                  interventionId={editingId}
+                  media={media}
+                  onMediaChange={setMedia}
+                />
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5" />
+                )}
+                {saving ? 'Saving...' : 'Save Intervention'}
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="btn-outline w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </SlideOver>
     </div>
   );
 };

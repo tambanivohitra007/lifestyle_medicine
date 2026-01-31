@@ -10,7 +10,7 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {function} onDelete - Callback for delete action
  * @param {boolean} canEdit - Whether user has edit permissions
  */
-const ConditionList = ({ conditions, onDelete, canEdit }) => {
+const ConditionList = ({ conditions, onDelete, onEdit, canEdit }) => {
   return (
     <div className="space-y-3">
       {conditions.map((condition) => (
@@ -54,13 +54,13 @@ const ConditionList = ({ conditions, onDelete, canEdit }) => {
                   </Link>
                   {canEdit && (
                     <>
-                      <Link
-                        to={`/conditions/${condition.id}/edit`}
+                      <button
+                        onClick={() => onEdit(condition.id)}
                         className="action-btn p-2 touch-manipulation"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
-                      </Link>
+                      </button>
                       <button
                         onClick={() => onDelete(condition.id, condition.name)}
                         className="action-btn p-2 touch-manipulation hover:bg-red-50 active:bg-red-100"
