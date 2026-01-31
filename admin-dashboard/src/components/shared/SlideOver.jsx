@@ -36,7 +36,7 @@ const SlideOver = ({ isOpen, onClose, title, subtitle, children, size = 'md' }) 
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300 ${
+        className={`fixed -inset-10 bg-black/50 backdrop-blur-sm z-[60] transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -45,7 +45,7 @@ const SlideOver = ({ isOpen, onClose, title, subtitle, children, size = 'md' }) 
 
       {/* Slide-over panel */}
       <div
-        className={`fixed top-0 right-0 z-50 w-full ${sizeClasses[size]} bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col bottom-16 lg:bottom-0 ${
+        className={`fixed -top-10 right-0 z-[60] w-full ${sizeClasses[size]} bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col bottom-16 lg:bottom-0 pt-10 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
