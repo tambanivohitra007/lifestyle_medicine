@@ -1,18 +1,16 @@
 # Deployment Scripts
 
-Scripts to deploy the Lifestyle Medicine application to a Hostinger VPS.
-
-## Quick Start (rindra.org with HestiaCP)
-
-For HestiaCP deployment, see **[DEPLOY_HESTIA.md](./DEPLOY_HESTIA.md)**
+Scripts to deploy the Lifestyle Medicine application to Hostinger VPS with HestiaCP.
 
 **Domains:**
 - API: https://api.rindra.org
 - Dashboard: https://lifestyle.rindra.org
 
+See **[DEPLOY_HESTIA.md](./DEPLOY_HESTIA.md)** for detailed instructions.
+
 ---
 
-## Deployment Workflow (HestiaCP)
+## Quick Start
 
 ### Initial Setup (One Time)
 
@@ -33,102 +31,59 @@ For HestiaCP deployment, see **[DEPLOY_HESTIA.md](./DEPLOY_HESTIA.md)**
 
 ### Deploying Updates
 
-**Option 1: Remote deploy from Windows**
+**From Windows:**
 ```cmd
-scripts\remote-deploy-hestia.bat YOUR_VPS_IP           # Deploy everything
+scripts\remote-deploy-hestia.bat YOUR_VPS_IP
 scripts\remote-deploy-hestia.bat YOUR_VPS_IP api       # API only
 scripts\remote-deploy-hestia.bat YOUR_VPS_IP frontend  # Frontend only
 ```
 
-**Option 2: SSH and deploy**
+**From VPS:**
 ```bash
 ssh root@YOUR_VPS_IP
 cd /home/rindra/web/lifestyle-medicine
-./scripts/deploy-hestia.sh           # Deploy everything
-./scripts/deploy-hestia.sh api       # API only
-./scripts/deploy-hestia.sh frontend  # Frontend only
+./scripts/deploy-hestia.sh
 ```
 
 ---
 
 ## Scripts Reference
 
-| Script | Platform | Purpose |
-|--------|----------|---------|
-| **HestiaCP Scripts (Recommended)** | | |
-| `setup-hestia.sh` | VPS | Initial setup for HestiaCP |
-| `deploy-hestia.sh` | VPS | Deploy script for HestiaCP |
-| `remote-deploy-hestia.bat` | Windows | Trigger HestiaCP deploy via SSH |
-| **Generic Setup Scripts** | | |
-| `vps-setup-rindra.sh` | VPS | Setup for bare VPS (no control panel) |
-| `vps-setup.sh` | VPS | Generic two-domain setup |
-| `vps-setup-single-domain.sh` | VPS | Single domain setup |
-| **Generic Deploy Scripts** | | |
-| `deploy.sh` | VPS | Deploy script for bare VPS |
-| `remote-deploy.bat` | Windows | Trigger remote deploy via SSH |
-| `remote-deploy.ps1` | Windows (PS) | Trigger remote deploy via SSH |
-| **Legacy Scripts** | | |
-| `build-and-upload.bat` | Windows | Build locally & upload React |
-| `build-and-upload.ps1` | Windows (PS) | Build locally & upload React |
-| `build-and-upload.sh` | Mac/Linux | Build locally & upload React |
-| **Utility Scripts** | | |
-| `create-admin.sh` | VPS | Create admin user |
-| `sync-database-to-vps.bat` | Windows | Sync local DB to VPS |
-| `export-database.bat` | Windows | Export local database |
+| Script | Purpose |
+|--------|---------|
+| `setup-hestia.sh` | Initial VPS setup for HestiaCP |
+| `deploy-hestia.sh` | Deploy API and/or frontend |
+| `remote-deploy-hestia.bat` | Trigger deploy from Windows via SSH |
+| `create-admin.sh` | Create admin user in database |
+| `sync-database-to-vps.bat` | Sync local database to VPS |
+| `export-database.bat` | Export local database |
 
 ---
 
 ## What deploy-hestia.sh Does
 
-### Full Deploy (`./scripts/deploy-hestia.sh`)
-1. `git pull` in ~/web/lifestyle-medicine
-2. **API:**
-   - Composer install
-   - Rsync files to ~/web/api.rindra.org/public_html/
-   - Run migrations
-   - Clear and rebuild Laravel caches
-3. **Frontend:**
-   - npm ci & build in admin-dashboard
-   - Copy dist/* to ~/web/lifestyle.rindra.org/public_html/
-
-### API Only (`./scripts/deploy-hestia.sh api`)
-- Composer install, rsync, migrate, cache
-
-### Frontend Only (`./scripts/deploy-hestia.sh frontend`)
-- npm install, build, copy to public_html
+1. `git pull` in `/home/rindra/web/lifestyle-medicine`
+2. **API:** composer install, rsync to `api.rindra.org/public_html/`, migrate, cache
+3. **Frontend:** npm build, copy to `lifestyle.rindra.org/public_html/`
 
 ---
 
 ## Troubleshooting
 
-### SSH Connection Issues
+### Permission Issues
 ```bash
-# Test SSH connection
-ssh deploy@YOUR_VPS_IP
-
-# If using SSH key, ensure it's loaded
-ssh-add ~/.ssh/id_rsa
+chown -R rindra:rindra /home/rindra/web/api.rindra.org/public_html
+chmod -R 775 /home/rindra/web/api.rindra.org/public_html/storage
 ```
 
-### Permission Denied
+### Database Connection Error
 ```bash
-# On VPS, fix permissions
-sudo chown -R deploy:www-data /var/www/lifestyle-medicine
-sudo chmod -R 775 /var/www/lifestyle-medicine/storage
+cat /home/rindra/web/api.rindra.org/public_html/.env | grep DB_
+php artisan config:clear
 ```
 
-### Build Fails
+### Clear All Caches
 ```bash
-# Clear npm cache and retry
-cd admin-dashboard
-rm -rf node_modules package-lock.json
-npm install
-npm run build
-```
-
-### SSL Certificate Issues
-```bash
-# On VPS, renew certificates
-sudo certbot renew --force-renewal
-sudo systemctl reload nginx
+cd /home/rindra/web/api.rindra.org/public_html
+php artisan optimize:clear
 ```
