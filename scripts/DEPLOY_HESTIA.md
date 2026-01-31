@@ -56,19 +56,17 @@ location / {
 
 ## Initial Setup
 
-### 1. SSH as root
+### 1. SSH as root and clone the repository
 ```bash
 ssh root@YOUR_VPS_IP
+cd /home/rindra/web
+git clone YOUR_REPO_URL lifestyle-medicine
 ```
 
-### 2. Upload and run setup script
+### 2. Run setup script from inside the repo
 ```bash
-# From your local machine
-scp scripts/setup-hestia.sh root@YOUR_VPS_IP:~/
-
-# On VPS
-chmod +x setup-hestia.sh
-./setup-hestia.sh
+cd lifestyle-medicine
+./scripts/setup-hestia.sh
 ```
 
 ### 3. Create Admin User

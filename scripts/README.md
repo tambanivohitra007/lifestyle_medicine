@@ -22,12 +22,13 @@ For HestiaCP deployment, see **[DEPLOY_HESTIA.md](./DEPLOY_HESTIA.md)**
    - Enable SSL for both domains
    - Create database
 
-2. **Run Setup Script:**
+2. **Clone repo and run setup:**
    ```bash
-   scp scripts/setup-hestia.sh root@YOUR_VPS_IP:~/
    ssh root@YOUR_VPS_IP
-   chmod +x setup-hestia.sh
-   ./setup-hestia.sh
+   cd /home/rindra/web
+   git clone YOUR_REPO_URL lifestyle-medicine
+   cd lifestyle-medicine
+   ./scripts/setup-hestia.sh
    ```
 
 ### Deploying Updates

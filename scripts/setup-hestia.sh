@@ -89,25 +89,38 @@ print_success "Both domains found in HestiaCP"
 
 # Prompt for configuration
 echo ""
-read -p "Git Repository URL: " GIT_REPO
 read -p "Database Name (created in HestiaCP): " DB_NAME
 read -p "Database User (created in HestiaCP): " DB_USER
 read -sp "Database Password: " DB_PASSWORD
 echo
 
 #===============================================================================
-# STEP 1: Clone Repository
+# STEP 1: Verify Repository
 #===============================================================================
-print_header "Step 1: Cloning Repository"
+print_header "Step 1: Verifying Repository"
 
-if [ -d "$REPO_DIR/.git" ]; then
-    print_warning "Repository already exists - pulling latest"
-    cd "$REPO_DIR"
-    git pull origin main
+# Detect if we're running from within the repo
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$SCRIPT_DIR/../artisan" ]; then
+    # Script is running from within the repo
+    REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+    print_success "Running from repository at $REPO_DIR"
+elif [ -d "$REPO_DIR/.git" ]; then
+    print_success "Repository found at $REPO_DIR"
 else
-    git clone "$GIT_REPO" "$REPO_DIR"
+    print_error "Repository not found!"
+    echo ""
+    echo "Please clone the repository first:"
+    echo "  cd $WEB_DIR"
+    echo "  git clone YOUR_REPO_URL lifestyle-medicine"
+    echo "  cd lifestyle-medicine"
+    echo "  ./scripts/setup-hestia.sh"
+    exit 1
 fi
-print_success "Repository ready at $REPO_DIR"
+
+cd "$REPO_DIR"
+git pull origin main
+print_success "Repository up to date"
 
 #===============================================================================
 # STEP 2: Install Composer Dependencies
