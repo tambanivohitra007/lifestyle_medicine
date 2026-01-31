@@ -151,7 +151,7 @@ const ConditionSectionForm = () => {
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="card max-w-2xl">
+      <form onSubmit={handleSubmit} className="card max-w-2xl mx-auto">
         <div className="space-y-5 sm:space-y-6">
           {/* Section Type */}
           <div>
