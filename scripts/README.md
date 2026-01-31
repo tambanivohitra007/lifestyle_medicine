@@ -42,9 +42,10 @@ scripts\remote-deploy-hestia.bat YOUR_VPS_IP frontend  # Frontend only
 **Option 2: SSH and deploy**
 ```bash
 ssh rindra@YOUR_VPS_IP
-./deploy.sh           # Deploy everything
-./deploy.sh api       # API only
-./deploy.sh frontend  # Frontend only
+cd ~/web/lifestyle-medicine
+./scripts/deploy-hestia.sh           # Deploy everything
+./scripts/deploy-hestia.sh api       # API only
+./scripts/deploy-hestia.sh frontend  # Frontend only
 ```
 
 ---
@@ -76,10 +77,10 @@ ssh rindra@YOUR_VPS_IP
 
 ---
 
-## What deploy.sh Does (HestiaCP)
+## What deploy-hestia.sh Does
 
-### Full Deploy (`./deploy.sh`)
-1. `git pull` in ~/lifestyle-medicine
+### Full Deploy (`./scripts/deploy-hestia.sh`)
+1. `git pull` in ~/web/lifestyle-medicine
 2. **API:**
    - Composer install
    - Rsync files to ~/web/api.rindra.org/public_html/
@@ -89,10 +90,10 @@ ssh rindra@YOUR_VPS_IP
    - npm ci & build in admin-dashboard
    - Copy dist/* to ~/web/lifestyle.rindra.org/public_html/
 
-### API Only (`./deploy.sh api`)
+### API Only (`./scripts/deploy-hestia.sh api`)
 - Composer install, rsync, migrate, cache
 
-### Frontend Only (`./deploy.sh frontend`)
+### Frontend Only (`./scripts/deploy-hestia.sh frontend`)
 - npm install, build, copy to public_html
 
 ---

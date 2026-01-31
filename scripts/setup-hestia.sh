@@ -40,11 +40,12 @@ print_info() { echo -e "${BLUE}→ $1${NC}"; }
 # CONFIGURATION
 #===============================================================================
 HESTIA_USER="rindra"
-REPO_DIR="/home/$HESTIA_USER/lifestyle-medicine"
+WEB_DIR="/home/$HESTIA_USER/web"
+REPO_DIR="$WEB_DIR/lifestyle-medicine"
 API_DOMAIN="api.rindra.org"
 ADMIN_DOMAIN="lifestyle.rindra.org"
-API_PUBLIC="/home/$HESTIA_USER/web/$API_DOMAIN/public_html"
-ADMIN_PUBLIC="/home/$HESTIA_USER/web/$ADMIN_DOMAIN/public_html"
+API_PUBLIC="$WEB_DIR/$API_DOMAIN/public_html"
+ADMIN_PUBLIC="$WEB_DIR/$ADMIN_DOMAIN/public_html"
 
 print_header "Lifestyle Medicine - HestiaCP Setup"
 
@@ -56,8 +57,8 @@ if [ "$(whoami)" != "$HESTIA_USER" ]; then
 fi
 
 # Check HestiaCP directories exist
-if [ ! -d "/home/$HESTIA_USER/web" ]; then
-    print_error "HestiaCP web directory not found"
+if [ ! -d "$WEB_DIR" ]; then
+    print_error "HestiaCP web directory not found at $WEB_DIR"
     echo "Make sure HestiaCP is properly set up for user $HESTIA_USER"
     exit 1
 fi
@@ -212,15 +213,13 @@ else
 fi
 
 #===============================================================================
-# STEP 6: Create Deploy Script
+# STEP 6: Make Deploy Script Executable
 #===============================================================================
-print_header "Step 6: Creating Deploy Script"
+print_header "Step 6: Setting Up Deploy Script"
 
-# Copy deploy script to home directory
-cp "$REPO_DIR/scripts/deploy-hestia.sh" "/home/$HESTIA_USER/deploy.sh"
-chmod +x "/home/$HESTIA_USER/deploy.sh"
+chmod +x "$REPO_DIR/scripts/deploy-hestia.sh"
 
-print_success "Deploy script created at ~/deploy.sh"
+print_success "Deploy script ready at $REPO_DIR/scripts/deploy-hestia.sh"
 
 #===============================================================================
 # COMPLETE
@@ -251,8 +250,9 @@ echo "   # Add GEMINI_API_KEY and BIBLE_API_KEY"
 echo "   cd $API_PUBLIC && php artisan config:cache"
 echo
 echo -e "${YELLOW}Future Deployments:${NC}"
-echo "   cd ~ && ./deploy.sh           # Deploy both"
-echo "   cd ~ && ./deploy.sh api       # API only"
-echo "   cd ~ && ./deploy.sh frontend  # Frontend only"
+echo "   cd $REPO_DIR"
+echo "   ./scripts/deploy-hestia.sh           # Deploy both"
+echo "   ./scripts/deploy-hestia.sh api       # API only"
+echo "   ./scripts/deploy-hestia.sh frontend  # Frontend only"
 echo
 echo -e "${GREEN}Done!${NC}"

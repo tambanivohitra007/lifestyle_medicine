@@ -24,7 +24,7 @@ print_warning() { echo -e "${YELLOW}⚠ $1${NC}"; }
 print_error() { echo -e "${RED}✗ $1${NC}"; }
 
 # Configuration - Edit these if needed
-APP_DIR="/var/www/lifestyle-medicine"
+APP_DIR="/home/rindra/web/lifestyle.rindra.org/lifestyle-medicine"
 API_DOMAIN="api.rindra.org"
 ADMIN_DOMAIN="lifestyle.rindra.org"
 

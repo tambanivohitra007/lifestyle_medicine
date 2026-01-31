@@ -10,14 +10,12 @@ This guide is for deploying on a Hostinger VPS with **HestiaCP** control panel.
 
 **Directory Structure:**
 ```
-/home/rindra/
-├── lifestyle-medicine/        # Git repository (source)
-├── web/
-│   ├── api.rindra.org/
-│   │   └── public_html/       # Laravel API
-│   └── lifestyle.rindra.org/
-│       └── public_html/       # React Dashboard
-└── deploy.sh                  # Deploy script
+/home/rindra/web/
+├── lifestyle-medicine/           # Git repository (source)
+├── api.rindra.org/
+│   └── public_html/              # Laravel API
+└── lifestyle.rindra.org/
+    └── public_html/              # React Dashboard
 ```
 
 ---
@@ -111,17 +109,18 @@ scripts\remote-deploy-hestia.bat YOUR_VPS_IP frontend  :: Frontend only
 ### From VPS (SSH)
 ```bash
 ssh rindra@YOUR_VPS_IP
-./deploy.sh           # Deploy both
-./deploy.sh api       # API only
-./deploy.sh frontend  # Frontend only
+cd ~/web/lifestyle-medicine
+./scripts/deploy-hestia.sh           # Deploy both
+./scripts/deploy-hestia.sh api       # API only
+./scripts/deploy-hestia.sh frontend  # Frontend only
 ```
 
 ---
 
 ## What Deploy Does
 
-### Full Deploy (`./deploy.sh`)
-1. `git pull` in ~/lifestyle-medicine
+### Full Deploy (`./scripts/deploy-hestia.sh`)
+1. `git pull` in ~/web/lifestyle-medicine
 2. **API:**
    - composer install
    - rsync files to ~/web/api.rindra.org/public_html/
@@ -131,10 +130,10 @@ ssh rindra@YOUR_VPS_IP
    - npm ci & build
    - Copy dist/* to ~/web/lifestyle.rindra.org/public_html/
 
-### API Only (`./deploy.sh api`)
+### API Only (`./scripts/deploy-hestia.sh api`)
 - Composer install, sync, migrate, cache
 
-### Frontend Only (`./deploy.sh frontend`)
+### Frontend Only (`./scripts/deploy-hestia.sh frontend`)
 - npm install, build, copy to public_html
 
 ---
@@ -144,9 +143,10 @@ ssh rindra@YOUR_VPS_IP
 | Task | Command |
 |------|---------|
 | SSH to VPS | `ssh rindra@YOUR_VPS_IP` |
-| Deploy all | `./deploy.sh` |
-| Deploy API | `./deploy.sh api` |
-| Deploy frontend | `./deploy.sh frontend` |
+| Go to repo | `cd ~/web/lifestyle-medicine` |
+| Deploy all | `./scripts/deploy-hestia.sh` |
+| Deploy API | `./scripts/deploy-hestia.sh api` |
+| Deploy frontend | `./scripts/deploy-hestia.sh frontend` |
 | View Laravel logs | `tail -f ~/web/api.rindra.org/public_html/storage/logs/laravel.log` |
 | Clear caches | `cd ~/web/api.rindra.org/public_html && php artisan optimize:clear` |
 | Tinker | `cd ~/web/api.rindra.org/public_html && php artisan tinker` |
@@ -180,7 +180,7 @@ mysql -u YOUR_DB_USER -p YOUR_DB_NAME
 ls -la ~/web/lifestyle.rindra.org/public_html/
 
 # Rebuild if needed
-cd ~/lifestyle-medicine/admin-dashboard
+cd ~/web/lifestyle-medicine/admin-dashboard
 npm run build
 cp -r dist/* ~/web/lifestyle.rindra.org/public_html/
 ```

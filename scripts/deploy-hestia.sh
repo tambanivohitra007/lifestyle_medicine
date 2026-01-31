@@ -4,14 +4,17 @@
 # Run this on your VPS after git pull to update the application
 #
 # HestiaCP Structure:
-#   - API:       /home/rindra/web/api.rindra.org/public_html/
-#   - Dashboard: /home/rindra/web/lifestyle.rindra.org/public_html/
-#   - Repo:      /home/rindra/lifestyle-medicine/
+#   /home/rindra/web/
+#   ├── lifestyle-medicine/              # Git repository
+#   ├── api.rindra.org/
+#   │   └── public_html/                 # Laravel API
+#   └── lifestyle.rindra.org/
+#       └── public_html/                 # React Dashboard
 #
 # Usage:
-#   ./deploy-hestia.sh          # Deploy both API and frontend
-#   ./deploy-hestia.sh api      # Deploy API only
-#   ./deploy-hestia.sh frontend # Deploy frontend only
+#   ./deploy.sh          # Deploy both API and frontend
+#   ./deploy.sh api      # Deploy API only
+#   ./deploy.sh frontend # Deploy frontend only
 #===============================================================================
 
 set -e
@@ -29,14 +32,15 @@ print_warning() { echo -e "${YELLOW}⚠ $1${NC}"; }
 print_error() { echo -e "${RED}✗ $1${NC}"; }
 
 #===============================================================================
-# CONFIGURATION - Edit these if your setup differs
+# CONFIGURATION
 #===============================================================================
 HESTIA_USER="rindra"
-REPO_DIR="/home/$HESTIA_USER/lifestyle-medicine"
+WEB_DIR="/home/$HESTIA_USER/web"
+REPO_DIR="$WEB_DIR/lifestyle-medicine"
 API_DOMAIN="api.rindra.org"
 ADMIN_DOMAIN="lifestyle.rindra.org"
-API_PUBLIC="/home/$HESTIA_USER/web/$API_DOMAIN/public_html"
-ADMIN_PUBLIC="/home/$HESTIA_USER/web/$ADMIN_DOMAIN/public_html"
+API_PUBLIC="$WEB_DIR/$API_DOMAIN/public_html"
+ADMIN_PUBLIC="$WEB_DIR/$ADMIN_DOMAIN/public_html"
 
 # Determine what to deploy
 DEPLOY_TARGET=${1:-all}

@@ -37,10 +37,10 @@ echo.
 
 if "%TARGET%"=="" (
     echo Deploying: API + Frontend
-    ssh %VPS_USER%@%VPS_IP% "cd ~ && ./deploy.sh"
+    ssh %VPS_USER%@%VPS_IP% "cd ~/web/lifestyle-medicine && ./scripts/deploy-hestia.sh"
 ) else (
     echo Deploying: %TARGET%
-    ssh %VPS_USER%@%VPS_IP% "cd ~ && ./deploy.sh %TARGET%"
+    ssh %VPS_USER%@%VPS_IP% "cd ~/web/lifestyle-medicine && ./scripts/deploy-hestia.sh %TARGET%"
 )
 
 if errorlevel 1 (
