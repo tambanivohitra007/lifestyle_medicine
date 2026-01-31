@@ -1,7 +1,9 @@
-import { User, Settings, PanelLeftClose, PanelLeft, HeartPulse, ChevronLeft } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { User, Settings, PanelLeftClose, PanelLeft, HeartPulse, ChevronLeft, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import NotificationDropdown from './NotificationDropdown';
+import { confirmLogout } from '../../lib/swal';
 
 // Page title mapping
 const getPageTitle = (pathname) => {
@@ -74,15 +76,37 @@ const getPageTitle = (pathname) => {
 };
 
 const Header = ({ isCollapsed, onToggleCollapse }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const isHomePage = location.pathname === '/';
   const pageInfo = getPageTitle(location.pathname);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleLogout = async () => {
+    setProfileDropdownOpen(false);
+    const confirmed = await confirmLogout();
+    if (confirmed) {
+      logout();
+      navigate('/login');
+    }
   };
 
   return (
@@ -173,9 +197,9 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
             <NotificationDropdown />
 
             {/* User Menu */}
-            <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-              <Link
-                to="/profile"
+            <div className="relative pl-4 border-l border-gray-200" ref={dropdownRef}>
+              <button
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                 className="flex items-center gap-3 p-1 -m-1 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
               >
                 <div className="text-right">
@@ -189,14 +213,30 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
                 <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
                   <User className="w-5 h-5 text-primary-600" />
                 </div>
-              </Link>
-              <Link
-                to="/profile"
-                className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
-                title="Profile Settings"
-              >
-                <Settings className="w-5 h-5 text-gray-600" />
-              </Link>
+                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {profileDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+                  <Link
+                    to="/profile"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </Link>
+                  <div className="border-t border-gray-100" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
