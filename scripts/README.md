@@ -24,8 +24,8 @@ For HestiaCP deployment, see **[DEPLOY_HESTIA.md](./DEPLOY_HESTIA.md)**
 
 2. **Run Setup Script:**
    ```bash
-   scp scripts/setup-hestia.sh rindra@YOUR_VPS_IP:~/
-   ssh rindra@YOUR_VPS_IP
+   scp scripts/setup-hestia.sh root@YOUR_VPS_IP:~/
+   ssh root@YOUR_VPS_IP
    chmod +x setup-hestia.sh
    ./setup-hestia.sh
    ```
@@ -41,8 +41,8 @@ scripts\remote-deploy-hestia.bat YOUR_VPS_IP frontend  # Frontend only
 
 **Option 2: SSH and deploy**
 ```bash
-ssh rindra@YOUR_VPS_IP
-cd ~/web/lifestyle-medicine
+ssh root@YOUR_VPS_IP
+cd /home/rindra/web/lifestyle-medicine
 ./scripts/deploy-hestia.sh           # Deploy everything
 ./scripts/deploy-hestia.sh api       # API only
 ./scripts/deploy-hestia.sh frontend  # Frontend only

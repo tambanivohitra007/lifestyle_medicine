@@ -56,15 +56,15 @@ location / {
 
 ## Initial Setup
 
-### 1. SSH as your HestiaCP user
+### 1. SSH as root
 ```bash
-ssh rindra@YOUR_VPS_IP
+ssh root@YOUR_VPS_IP
 ```
 
 ### 2. Upload and run setup script
 ```bash
 # From your local machine
-scp scripts/setup-hestia.sh rindra@YOUR_VPS_IP:~/
+scp scripts/setup-hestia.sh root@YOUR_VPS_IP:~/
 
 # On VPS
 chmod +x setup-hestia.sh
@@ -108,8 +108,8 @@ scripts\remote-deploy-hestia.bat YOUR_VPS_IP frontend  :: Frontend only
 
 ### From VPS (SSH)
 ```bash
-ssh rindra@YOUR_VPS_IP
-cd ~/web/lifestyle-medicine
+ssh root@YOUR_VPS_IP
+cd /home/rindra/web/lifestyle-medicine
 ./scripts/deploy-hestia.sh           # Deploy both
 ./scripts/deploy-hestia.sh api       # API only
 ./scripts/deploy-hestia.sh frontend  # Frontend only
@@ -142,14 +142,14 @@ cd ~/web/lifestyle-medicine
 
 | Task | Command |
 |------|---------|
-| SSH to VPS | `ssh rindra@YOUR_VPS_IP` |
-| Go to repo | `cd ~/web/lifestyle-medicine` |
+| SSH to VPS | `ssh root@YOUR_VPS_IP` |
+| Go to repo | `cd /home/rindra/web/lifestyle-medicine` |
 | Deploy all | `./scripts/deploy-hestia.sh` |
 | Deploy API | `./scripts/deploy-hestia.sh api` |
 | Deploy frontend | `./scripts/deploy-hestia.sh frontend` |
-| View Laravel logs | `tail -f ~/web/api.rindra.org/public_html/storage/logs/laravel.log` |
-| Clear caches | `cd ~/web/api.rindra.org/public_html && php artisan optimize:clear` |
-| Tinker | `cd ~/web/api.rindra.org/public_html && php artisan tinker` |
+| View Laravel logs | `tail -f /home/rindra/web/api.rindra.org/public_html/storage/logs/laravel.log` |
+| Clear caches | `cd /home/rindra/web/api.rindra.org/public_html && php artisan optimize:clear` |
+| Tinker | `cd /home/rindra/web/api.rindra.org/public_html && php artisan tinker` |
 
 ---
 

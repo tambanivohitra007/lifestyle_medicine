@@ -42,6 +42,10 @@ ADMIN_DOMAIN="lifestyle.rindra.org"
 API_PUBLIC="$WEB_DIR/$API_DOMAIN/public_html"
 ADMIN_PUBLIC="$WEB_DIR/$ADMIN_DOMAIN/public_html"
 
+# Web server user (for permissions)
+WEB_USER="$HESTIA_USER"
+WEB_GROUP="$HESTIA_USER"
+
 # Determine what to deploy
 DEPLOY_TARGET=${1:-all}
 
@@ -114,8 +118,9 @@ deploy_api() {
     php artisan event:cache
     print_success "Laravel optimized"
 
-    # Fix permissions
+    # Fix permissions (set ownership to HestiaCP user)
     print_info "Setting permissions..."
+    chown -R $WEB_USER:$WEB_GROUP "$API_PUBLIC"
     chmod -R 755 "$API_PUBLIC"
     chmod -R 775 "$API_PUBLIC/storage"
     chmod -R 775 "$API_PUBLIC/bootstrap/cache"
@@ -159,7 +164,8 @@ deploy_frontend() {
     rm -rf "$ADMIN_PUBLIC"/*
     cp -r dist/* "$ADMIN_PUBLIC/"
 
-    # Fix permissions
+    # Fix permissions (set ownership to HestiaCP user)
+    chown -R $WEB_USER:$WEB_GROUP "$ADMIN_PUBLIC"
     chmod -R 755 "$ADMIN_PUBLIC"
 
     print_success "Frontend deployment complete!"

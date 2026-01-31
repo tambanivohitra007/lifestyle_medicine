@@ -47,12 +47,16 @@ ADMIN_DOMAIN="lifestyle.rindra.org"
 API_PUBLIC="$WEB_DIR/$API_DOMAIN/public_html"
 ADMIN_PUBLIC="$WEB_DIR/$ADMIN_DOMAIN/public_html"
 
+# Web server user (for permissions)
+WEB_USER="$HESTIA_USER"
+WEB_GROUP="$HESTIA_USER"
+
 print_header "Lifestyle Medicine - HestiaCP Setup"
 
-# Check we're running as the correct user
-if [ "$(whoami)" != "$HESTIA_USER" ]; then
-    print_error "Please run as user '$HESTIA_USER', not $(whoami)"
-    echo "Use: su - $HESTIA_USER"
+# Check we're running as root
+if [ "$EUID" -ne 0 ]; then
+    print_error "Please run as root"
+    echo "Use: sudo ./setup-hestia.sh"
     exit 1
 fi
 
@@ -170,7 +174,8 @@ php artisan route:cache
 php artisan view:cache
 php artisan event:cache
 
-# Set permissions
+# Set permissions (ownership to HestiaCP user)
+chown -R $WEB_USER:$WEB_GROUP "$API_PUBLIC"
 chmod -R 755 "$API_PUBLIC"
 chmod -R 775 "$API_PUBLIC/storage"
 chmod -R 775 "$API_PUBLIC/bootstrap/cache"
@@ -207,6 +212,7 @@ else
     # Deploy to admin public directory
     rm -rf "$ADMIN_PUBLIC"/*
     cp -r dist/* "$ADMIN_PUBLIC/"
+    chown -R $WEB_USER:$WEB_GROUP "$ADMIN_PUBLIC"
     chmod -R 755 "$ADMIN_PUBLIC"
 
     print_success "Frontend deployed"

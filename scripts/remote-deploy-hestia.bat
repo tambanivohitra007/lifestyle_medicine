@@ -26,7 +26,7 @@ if "%~1"=="" (
 
 set VPS_IP=%~1
 set TARGET=%~2
-set VPS_USER=rindra
+set VPS_USER=root
 
 echo.
 echo ========================================
@@ -37,10 +37,10 @@ echo.
 
 if "%TARGET%"=="" (
     echo Deploying: API + Frontend
-    ssh %VPS_USER%@%VPS_IP% "cd ~/web/lifestyle-medicine && ./scripts/deploy-hestia.sh"
+    ssh %VPS_USER%@%VPS_IP% "cd /home/rindra/web/lifestyle-medicine && ./scripts/deploy-hestia.sh"
 ) else (
     echo Deploying: %TARGET%
-    ssh %VPS_USER%@%VPS_IP% "cd ~/web/lifestyle-medicine && ./scripts/deploy-hestia.sh %TARGET%"
+    ssh %VPS_USER%@%VPS_IP% "cd /home/rindra/web/lifestyle-medicine && ./scripts/deploy-hestia.sh %TARGET%"
 )
 
 if errorlevel 1 (
