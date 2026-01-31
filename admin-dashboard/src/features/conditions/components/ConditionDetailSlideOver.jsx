@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../../lib/swal';
+import { sanitizeHtml } from '../../../lib/sanitize';
 import SlideOver from '../../../components/shared/SlideOver';
 import AuditInfo from '../../../components/shared/AuditInfo';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -355,7 +356,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                           {section.body && (
                             <div
                               className="text-gray-600 prose prose-sm max-w-none text-xs line-clamp-3"
-                              dangerouslySetInnerHTML={{ __html: section.body }}
+                              dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.body) }}
                             />
                           )}
                         </div>

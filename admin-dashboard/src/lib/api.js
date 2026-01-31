@@ -1,8 +1,21 @@
 import axios from 'axios';
 import { toast } from './swal';
 
-// Use environment variable for API URL, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+// Validate required environment variables in production
+const validateEnvVars = () => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+  if (import.meta.env.PROD && !apiUrl) {
+    throw new Error(
+      'VITE_API_BASE_URL environment variable is required in production. ' +
+      'Please set it in your .env file or deployment configuration.'
+    );
+  }
+
+  return apiUrl || 'http://localhost:8000/api/v1';
+};
+
+const API_BASE_URL = validateEnvVars();
 
 // Export API_BASE_URL for components that need direct URL access (e.g., file downloads)
 export const getApiBaseUrl = () => API_BASE_URL.replace('/api/v1', '');

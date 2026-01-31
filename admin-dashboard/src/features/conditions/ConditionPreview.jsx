@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Printer, Edit, FileText } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
+import { sanitizeHtml } from '../../lib/sanitize';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const SECTION_ORDER = [
@@ -187,7 +188,7 @@ const ConditionPreview = () => {
             {section.body && (
               <div
                 className="prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: section.body }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.body) }}
               />
             )}
             <div className="divider" />

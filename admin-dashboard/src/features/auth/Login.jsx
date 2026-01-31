@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Lock, Mail, Leaf, Heart, Activity, Shield } from 'lucide-react';
+import { Lock, Mail, Leaf, Heart, Activity, Shield, Clock } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 
 const Login = () => {
@@ -9,8 +9,19 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sessionExpired, setSessionExpired] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Check for session expired parameter
+  useEffect(() => {
+    if (searchParams.get('session') === 'expired') {
+      setSessionExpired(true);
+      // Clean up the URL
+      window.history.replaceState({}, '', '/login');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -186,6 +197,14 @@ const Login = () => {
               </div>
             </div>
 
+            {/* Session Expired Message */}
+            {sessionExpired && (
+              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl text-sm">
+                <Clock className="w-5 h-5 flex-shrink-0" />
+                <span>Your session has expired due to inactivity. Please sign in again.</span>
+              </div>
+            )}
+
             {/* Error Message */}
             {error && (
               <div className="flex items-center gap-3 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm">
@@ -215,20 +234,6 @@ const Login = () => {
               )}
             </button>
           </form>
-
-          {/* Demo Mode Notice - Only shown in development */}
-          {import.meta.env.DEV && (
-            <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-              <p className="text-xs font-medium text-amber-800 mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                Development Mode
-              </p>
-              <div className="text-xs text-amber-700 space-y-1">
-                <p><span className="font-medium">Email:</span> admin@example.com</p>
-                <p><span className="font-medium">Password:</span> password</p>
-              </div>
-            </div>
-          )}
 
           {/* Footer */}
           <p className="text-center text-xs text-gray-400 mt-8">

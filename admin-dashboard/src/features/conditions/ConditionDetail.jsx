@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../lib/swal';
+import { sanitizeHtml } from '../../lib/sanitize';
 import ConditionWorkflowGuide from '../../components/shared/ConditionWorkflowGuide';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AuditInfo from '../../components/shared/AuditInfo';
@@ -476,7 +477,7 @@ const ConditionDetail = () => {
                       {section.body && (
                         <div
                           className="text-gray-600 prose prose-sm max-w-none text-sm sm:text-base overflow-x-auto break-words"
-                          dangerouslySetInnerHTML={{ __html: section.body }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.body) }}
                         />
                       )}
                     </div>
