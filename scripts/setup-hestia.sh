@@ -138,21 +138,26 @@ print_header "Step 3: Configuring Environment"
 
 cp .env.example .env
 
-# Update .env file
+# Update .env file - App settings
 sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
 sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
 sed -i "s|APP_URL=http://localhost:8000|APP_URL=https://$API_DOMAIN|g" .env
-sed -i "s|APP_URL=http://localhost|APP_URL=https://$API_DOMAIN|g" .env
+
+# Database: Change from SQLite to MySQL
 sed -i "s|DB_CONNECTION=sqlite|DB_CONNECTION=mysql|g" .env
-sed -i "s|DB_DATABASE=laravel|DB_DATABASE=$DB_NAME|g" .env
-sed -i "s|DB_DATABASE=lifestyle_medicine|DB_DATABASE=$DB_NAME|g" .env
-sed -i "s|# DB_HOST=127.0.0.1|DB_HOST=localhost|g" .env
-sed -i "s|# DB_PORT=3306|DB_PORT=3306|g" .env
-sed -i "s|# DB_USERNAME=root|DB_USERNAME=$DB_USER|g" .env
-sed -i "s|# DB_USERNAME=|DB_USERNAME=$DB_USER|g" .env
-sed -i "s|DB_USERNAME=root|DB_USERNAME=$DB_USER|g" .env
-sed -i "s|# DB_PASSWORD=|DB_PASSWORD=$DB_PASSWORD|g" .env
-sed -i "s|DB_PASSWORD=$|DB_PASSWORD=$DB_PASSWORD|g" .env
+
+# Remove the commented MySQL lines and add fresh ones
+sed -i '/# DB_CONNECTION=mysql/d' .env
+sed -i '/# DB_HOST=/d' .env
+sed -i '/# DB_PORT=/d' .env
+sed -i '/# DB_DATABASE=/d' .env
+sed -i '/# DB_USERNAME=/d' .env
+sed -i '/# DB_PASSWORD=/d' .env
+
+# Add database config after DB_CONNECTION line
+sed -i "/^DB_CONNECTION=mysql/a DB_HOST=localhost\nDB_PORT=3306\nDB_DATABASE=$DB_NAME\nDB_USERNAME=$DB_USER\nDB_PASSWORD=$DB_PASSWORD" .env
+
+# CORS and Sanctum
 sed -i "s|CORS_ALLOWED_ORIGINS=http://localhost:5173|CORS_ALLOWED_ORIGINS=https://$ADMIN_DOMAIN|g" .env
 sed -i "s|SANCTUM_STATEFUL_DOMAINS=localhost,localhost:5173,127.0.0.1,127.0.0.1:8000|SANCTUM_STATEFUL_DOMAINS=$ADMIN_DOMAIN|g" .env
 
