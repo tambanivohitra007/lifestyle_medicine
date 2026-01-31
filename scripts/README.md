@@ -2,78 +2,49 @@
 
 Scripts to deploy the Lifestyle Medicine application to a Hostinger VPS.
 
-## Quick Start
+## Quick Start (rindra.org with HestiaCP)
 
-### Step 1: Initial VPS Setup (Run Once)
+For HestiaCP deployment, see **[DEPLOY_HESTIA.md](./DEPLOY_HESTIA.md)**
 
-Upload `vps-setup.sh` to your VPS and run it:
+**Domains:**
+- API: https://api.rindra.org
+- Dashboard: https://lifestyle.rindra.org
 
-```bash
-# On your local machine
-scp scripts/vps-setup.sh root@YOUR_VPS_IP:~/
+---
 
-# On your VPS
-ssh root@YOUR_VPS_IP
-chmod +x vps-setup.sh
-./vps-setup.sh
-```
+## Deployment Workflow (HestiaCP)
 
-The script will prompt you for:
-- API domain (e.g., `api.yourdomain.com`)
-- Admin domain (e.g., `admin.yourdomain.com`)
-- Database credentials
-- Git repository URL
-- Email for SSL certificates
+### Initial Setup (One Time)
 
-### Step 2: Build and Upload React Frontend
+1. **Configure HestiaCP Panel:**
+   - Create user `rindra`
+   - Add domains: `api.rindra.org`, `lifestyle.rindra.org`
+   - Enable SSL for both domains
+   - Create database
 
-**Windows (Command Prompt):**
+2. **Run Setup Script:**
+   ```bash
+   scp scripts/setup-hestia.sh rindra@YOUR_VPS_IP:~/
+   ssh rindra@YOUR_VPS_IP
+   chmod +x setup-hestia.sh
+   ./setup-hestia.sh
+   ```
+
+### Deploying Updates
+
+**Option 1: Remote deploy from Windows**
 ```cmd
-cd scripts
-build-and-upload.bat YOUR_VPS_IP api.yourdomain.com
+scripts\remote-deploy-hestia.bat YOUR_VPS_IP           # Deploy everything
+scripts\remote-deploy-hestia.bat YOUR_VPS_IP api       # API only
+scripts\remote-deploy-hestia.bat YOUR_VPS_IP frontend  # Frontend only
 ```
 
-**Windows (PowerShell):**
-```powershell
-cd scripts
-.\build-and-upload.ps1 -VpsIp "YOUR_VPS_IP" -ApiDomain "api.yourdomain.com"
-```
-
-**Mac/Linux:**
+**Option 2: SSH and deploy**
 ```bash
-cd scripts
-chmod +x build-and-upload.sh
-./build-and-upload.sh YOUR_VPS_IP api.yourdomain.com
-```
-
-### Step 3: Create Admin User
-
-SSH into your VPS and run:
-
-```bash
-cd /var/www/lifestyle-medicine/scripts
-chmod +x create-admin.sh
-./create-admin.sh
-```
-
-### Step 4: Update API Keys
-
-Edit the `.env` file on your VPS:
-
-```bash
-nano /var/www/lifestyle-medicine/.env
-```
-
-Add your API keys:
-```
-GEMINI_API_KEY=your_gemini_api_key
-BIBLE_API_KEY=your_bible_api_key
-```
-
-Then clear the config cache:
-```bash
-cd /var/www/lifestyle-medicine
-php artisan config:cache
+ssh rindra@YOUR_VPS_IP
+./deploy.sh           # Deploy everything
+./deploy.sh api       # API only
+./deploy.sh frontend  # Frontend only
 ```
 
 ---
@@ -82,29 +53,47 @@ php artisan config:cache
 
 | Script | Platform | Purpose |
 |--------|----------|---------|
-| `vps-setup.sh` | VPS (Ubuntu) | Initial server setup |
-| `build-and-upload.bat` | Windows | Build & upload React |
-| `build-and-upload.ps1` | Windows (PS) | Build & upload React |
-| `build-and-upload.sh` | Mac/Linux | Build & upload React |
+| **HestiaCP Scripts (Recommended)** | | |
+| `setup-hestia.sh` | VPS | Initial setup for HestiaCP |
+| `deploy-hestia.sh` | VPS | Deploy script for HestiaCP |
+| `remote-deploy-hestia.bat` | Windows | Trigger HestiaCP deploy via SSH |
+| **Generic Setup Scripts** | | |
+| `vps-setup-rindra.sh` | VPS | Setup for bare VPS (no control panel) |
+| `vps-setup.sh` | VPS | Generic two-domain setup |
+| `vps-setup-single-domain.sh` | VPS | Single domain setup |
+| **Generic Deploy Scripts** | | |
+| `deploy.sh` | VPS | Deploy script for bare VPS |
+| `remote-deploy.bat` | Windows | Trigger remote deploy via SSH |
+| `remote-deploy.ps1` | Windows (PS) | Trigger remote deploy via SSH |
+| **Legacy Scripts** | | |
+| `build-and-upload.bat` | Windows | Build locally & upload React |
+| `build-and-upload.ps1` | Windows (PS) | Build locally & upload React |
+| `build-and-upload.sh` | Mac/Linux | Build locally & upload React |
+| **Utility Scripts** | | |
 | `create-admin.sh` | VPS | Create admin user |
+| `sync-database-to-vps.bat` | Windows | Sync local DB to VPS |
+| `export-database.bat` | Windows | Export local database |
 
 ---
 
-## Deployment Updates
+## What deploy.sh Does (HestiaCP)
 
-After the initial setup, use the deploy script on your VPS:
+### Full Deploy (`./deploy.sh`)
+1. `git pull` in ~/lifestyle-medicine
+2. **API:**
+   - Composer install
+   - Rsync files to ~/web/api.rindra.org/public_html/
+   - Run migrations
+   - Clear and rebuild Laravel caches
+3. **Frontend:**
+   - npm ci & build in admin-dashboard
+   - Copy dist/* to ~/web/lifestyle.rindra.org/public_html/
 
-```bash
-cd /var/www/lifestyle-medicine
-./deploy.sh
-```
+### API Only (`./deploy.sh api`)
+- Composer install, rsync, migrate, cache
 
-This will:
-- Pull latest code from Git
-- Install Composer dependencies
-- Run migrations
-- Clear and rebuild caches
-- Restart PHP-FPM
+### Frontend Only (`./deploy.sh frontend`)
+- npm install, build, copy to public_html
 
 ---
 
