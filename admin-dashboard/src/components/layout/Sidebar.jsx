@@ -1,5 +1,6 @@
+import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { X, LogOut, User, Shield, ChevronRight } from 'lucide-react';
+import { LogOut, User, Shield, ChevronDown } from 'lucide-react';
 import {
   LayoutDashboard,
   HeartPulse,
@@ -26,6 +27,19 @@ import { confirmLogout } from '../../lib/swal';
 const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
   const { user, logout, hasRole } = useAuth();
   const navigate = useNavigate();
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     const confirmed = await confirmLogout();
@@ -131,12 +145,6 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         { to: '/tags', icon: Tag, label: 'Content Tags', roles: [ROLES.ADMIN] },
         { to: '/import', icon: Upload, label: 'Import Data', roles: [ROLES.ADMIN] },
         { to: '/ai-generator', icon: Sparkles, label: 'AI Generator', roles: [ROLES.ADMIN] },
-      ],
-    },
-    {
-      title: 'Account',
-      items: [
-        { to: '/profile', icon: Settings, label: 'Settings' },
       ],
     },
   ];
@@ -375,52 +383,67 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         </nav>
 
         {/* User Info & Logout - fixed at bottom */}
-        <div className={`border-t border-secondary-800 p-4 ${isCollapsed ? 'p-2' : ''}`}>
-          {/* User Info */}
-          <NavLink
-            to="/profile"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 text-gray-300 hover:bg-secondary-800 hover:text-white ${
-              isCollapsed ? 'justify-center px-0' : ''
-            }`}
-            title={isCollapsed ? user?.name || 'Profile' : undefined}
-          >
-            <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 text-white" />
-            </div>
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
-                  {user?.name || 'User'}
-                </p>
-                <div className="flex items-center gap-1.5">
-                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                    user?.role === 'admin'
-                      ? 'bg-purple-500/20 text-purple-300'
-                      : user?.role === 'editor'
-                      ? 'bg-blue-500/20 text-blue-300'
-                      : 'bg-gray-500/20 text-gray-300'
-                  }`}>
-                    {user?.role === 'admin' && <Shield className="w-2.5 h-2.5" />}
-                    {roleLabels[user?.role] || 'User'}
-                  </span>
-                </div>
+        <div className={`border-t border-secondary-800 p-4 ${isCollapsed ? 'p-2' : ''}`} ref={dropdownRef}>
+          <div className="relative">
+            {/* Profile Button - Toggles Dropdown */}
+            <button
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 text-gray-300 hover:bg-secondary-800 hover:text-white ${
+                isCollapsed ? 'justify-center px-0' : ''
+              }`}
+              title={isCollapsed ? user?.name || 'Profile' : undefined}
+            >
+              <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4 text-white" />
+              </div>
+              {!isCollapsed && (
+                <>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-medium text-white truncate">
+                      {user?.name || 'User'}
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                        user?.role === 'admin'
+                          ? 'bg-purple-500/20 text-purple-300'
+                          : user?.role === 'editor'
+                          ? 'bg-blue-500/20 text-blue-300'
+                          : 'bg-gray-500/20 text-gray-300'
+                      }`}>
+                        {user?.role === 'admin' && <Shield className="w-2.5 h-2.5" />}
+                        {roleLabels[user?.role] || 'User'}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                </>
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {profileDropdownOpen && (
+              <div className={`absolute bottom-full mb-2 ${isCollapsed ? 'left-full ml-2' : 'left-0 right-0'} bg-secondary-800 rounded-lg shadow-lg overflow-hidden min-w-[160px]`}>
+                <NavLink
+                  to="/profile"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-secondary-700 hover:text-white transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                  Settings
+                </NavLink>
+                <button
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-red-600/20 hover:text-red-400 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
               </div>
             )}
-          </NavLink>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 mt-2 rounded-lg transition-colors duration-200 text-gray-300 hover:bg-red-600/20 hover:text-red-400 ${
-              isCollapsed ? 'justify-center px-0' : ''
-            }`}
-            title={isCollapsed ? 'Sign Out' : undefined}
-          >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
-            {!isCollapsed && (
-              <span className="font-medium text-sm">Sign Out</span>
-            )}
-          </button>
+          </div>
         </div>
       </aside>
     </>
