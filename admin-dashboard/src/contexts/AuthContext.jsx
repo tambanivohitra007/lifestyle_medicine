@@ -27,9 +27,15 @@ export const AuthProvider = ({ children }) => {
     const storedToken = localStorage.getItem('auth_token');
     const storedUser = localStorage.getItem('user');
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    if (storedToken && storedUser && storedUser !== 'undefined') {
+      try {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+      } catch {
+        // Invalid JSON in localStorage, clear it
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+      }
     }
     setLoading(false);
   }, []);
