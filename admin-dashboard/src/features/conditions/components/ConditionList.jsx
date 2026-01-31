@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, HeartPulse } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
@@ -10,7 +9,7 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {function} onDelete - Callback for delete action
  * @param {boolean} canEdit - Whether user has edit permissions
  */
-const ConditionList = ({ conditions, onDelete, onEdit, canEdit }) => {
+const ConditionList = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
   return (
     <div className="space-y-3">
       {conditions.map((condition) => (
@@ -45,13 +44,13 @@ const ConditionList = ({ conditions, onDelete, onEdit, canEdit }) => {
 
                 {/* Actions */}
                 <div className="flex gap-0.5 sm:gap-1 flex-shrink-0 -mr-1">
-                  <Link
-                    to={`/conditions/${condition.id}`}
+                  <button
+                    onClick={() => onView(condition.id)}
                     className="action-btn p-2 touch-manipulation"
                     title="View Details"
                   >
                     <Eye className="w-4 h-4 text-gray-600" />
-                  </Link>
+                  </button>
                   {canEdit && (
                     <>
                       <button

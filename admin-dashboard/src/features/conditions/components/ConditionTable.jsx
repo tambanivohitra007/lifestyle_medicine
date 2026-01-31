@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
@@ -11,7 +10,7 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {function} onDelete - Callback for delete action
  * @param {boolean} canEdit - Whether user has edit permissions
  */
-const ConditionTable = ({ conditions, onDelete, onEdit, canEdit }) => {
+const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
   return (
     <>
       {/* Mobile Card Layout */}
@@ -30,13 +29,13 @@ const ConditionTable = ({ conditions, onDelete, onEdit, canEdit }) => {
                 )}
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1">
-                <Link
-                  to={`/conditions/${condition.id}`}
+                <button
+                  onClick={() => onView(condition.id)}
                   className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
                   title="View"
                 >
                   <Eye className="w-4 h-4" />
-                </Link>
+                </button>
                 {canEdit && (
                   <>
                     <button
@@ -132,13 +131,13 @@ const ConditionTable = ({ conditions, onDelete, onEdit, canEdit }) => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
-                      <Link
-                        to={`/conditions/${condition.id}`}
+                      <button
+                        onClick={() => onView(condition.id)}
                         className="text-gray-600 hover:text-primary-600 transition-colors"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4" />
-                      </Link>
+                      </button>
                       {canEdit && (
                         <>
                           <button

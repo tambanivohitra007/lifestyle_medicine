@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Plus, Search, ShieldAlert, Edit, Trash2, Eye, Download, Save, Loader2 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
@@ -12,6 +11,7 @@ import ConditionList from './components/ConditionList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
 import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
+import ConditionDetailSlideOver from './components/ConditionDetailSlideOver';
 
 const Conditions = () => {
   const { canEdit } = useAuth();
@@ -27,13 +27,17 @@ const Conditions = () => {
     return localStorage.getItem('conditions_view_mode') || 'grid';
   });
 
-  // Modal state
+  // Modal state for edit form
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ name: '', category: '', summary: '' });
   const [formLoading, setFormLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Detail slide-over state
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [viewingConditionId, setViewingConditionId] = useState(null);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -85,11 +89,23 @@ const Conditions = () => {
     try {
       await api.delete(`${apiEndpoints.conditionsAdmin}/${id}`);
       toast.success('Condition deleted');
+      setIsDetailOpen(false);
       fetchConditions();
     } catch (error) {
       console.error('Error deleting condition:', error);
       toast.error('Failed to delete condition');
     }
+  };
+
+  // Detail slide-over functions
+  const openDetailSlideOver = (id) => {
+    setViewingConditionId(id);
+    setIsDetailOpen(true);
+  };
+
+  const closeDetailSlideOver = () => {
+    setIsDetailOpen(false);
+    setViewingConditionId(null);
   };
 
   // Modal functions
@@ -366,13 +382,13 @@ const Conditions = () => {
                       <ShieldAlert className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
                     </div>
                     <div className="flex gap-1">
-                      <Link
-                        to={`/conditions/${condition.id}`}
+                      <button
+                        onClick={() => openDetailSlideOver(condition.id)}
                         className="action-btn"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
-                      </Link>
+                      </button>
                       {canEdit && (
                         <>
                           <button
@@ -411,12 +427,12 @@ const Conditions = () => {
                   />
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <Link
-                      to={`/conditions/${condition.id}`}
+                    <button
+                      onClick={() => openDetailSlideOver(condition.id)}
                       className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
                     >
                       View Details →
-                    </Link>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -425,12 +441,12 @@ const Conditions = () => {
 
           {/* List View */}
           {viewMode === 'list' && (
-            <ConditionList conditions={conditions} onDelete={handleDelete} onEdit={openEditModal} canEdit={canEdit} />
+            <ConditionList conditions={conditions} onDelete={handleDelete} onEdit={openEditModal} onView={openDetailSlideOver} canEdit={canEdit} />
           )}
 
           {/* Table View */}
           {viewMode === 'table' && (
-            <ConditionTable conditions={conditions} onDelete={handleDelete} onEdit={openEditModal} canEdit={canEdit} />
+            <ConditionTable conditions={conditions} onDelete={handleDelete} onEdit={openEditModal} onView={openDetailSlideOver} canEdit={canEdit} />
           )}
 
           {/* Pagination */}
@@ -547,6 +563,15 @@ const Conditions = () => {
           </form>
         )}
       </SlideOver>
+
+      {/* Detail SlideOver */}
+      <ConditionDetailSlideOver
+        isOpen={isDetailOpen}
+        onClose={closeDetailSlideOver}
+        conditionId={viewingConditionId}
+        onEdit={openEditModal}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };
