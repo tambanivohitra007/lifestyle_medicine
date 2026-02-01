@@ -31,6 +31,7 @@ import {
 } from '../../components/relationships';
 import InfographicGenerator from '../ai-generator/components/InfographicGenerator';
 import MediaUploader from '../../components/shared/MediaUploader';
+import ConditionPreviewModal from './ConditionPreviewModal';
 
 const SECTION_TYPES = {
   risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
@@ -112,6 +113,7 @@ const ConditionDetail = () => {
   // Modal states
   const [attachModalType, setAttachModalType] = useState(null);
   const [editingIntervention, setEditingIntervention] = useState(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   useEffect(() => {
     fetchConditionData();
@@ -326,14 +328,14 @@ const ConditionDetail = () => {
           )}
         </div>
         <div className="grid grid-cols-2 sm:flex gap-2 flex-shrink-0">
-          <Link
-            to={`/conditions/${id}/preview`}
+          <button
+            onClick={() => setShowPreviewModal(true)}
             className="btn-primary flex items-center justify-center gap-2 text-sm touch-manipulation"
           >
             <Eye className="w-4 h-4" />
             <span className="hidden sm:inline">Preview</span>
             <span className="sm:hidden">Preview</span>
-          </Link>
+          </button>
           <Link
             to={`/knowledge-graph/condition/${id}`}
             className="btn-outline flex items-center justify-center gap-2 text-sm touch-manipulation"
@@ -882,6 +884,13 @@ const ConditionDetail = () => {
         intervention={editingIntervention}
         currentMapping={editingIntervention?.pivot}
         onSave={handleUpdateInterventionMapping}
+      />
+
+      {/* Condition Preview Modal */}
+      <ConditionPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        conditionId={id}
       />
     </div>
   );
