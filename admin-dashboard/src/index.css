@@ -227,6 +227,14 @@
   .treatment-guide .divider {
     @apply border-gray-400;
   }
+
+  /* Inline images in print */
+  .treatment-guide .prose img {
+    max-width: 100%;
+    height: auto;
+    page-break-inside: avoid;
+    margin: 1rem 0;
+  }
 }
 
 /* Knowledge Graph Edge Animations */

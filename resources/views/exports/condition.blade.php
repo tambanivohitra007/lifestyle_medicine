@@ -251,6 +251,20 @@
         .type-additional_factors { background: #f3e8ff; color: #7c3aed; }
         .type-scripture { background: #e0e7ff; color: #4338ca; }
         .type-research_ideas { background: #ccfbf1; color: #0f766e; }
+
+        /* Inline images in section content */
+        .card-content img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: block;
+        }
+        .card-content img.inline {
+            display: inline;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>

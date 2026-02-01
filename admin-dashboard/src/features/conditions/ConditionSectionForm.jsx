@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams, Link, useSearchParams } from 'react-router-dom';
 import { Save, Loader2 } from 'lucide-react';
-import api, { apiEndpoints } from '../../lib/api';
+import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import RichTextEditor from '../../components/editor/RichTextEditor';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
@@ -75,6 +75,34 @@ const ConditionSectionForm = () => {
       setLoading(false);
     }
   };
+
+  // Handle image upload for the rich text editor
+  const handleImageUpload = useCallback(async (file) => {
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      formDataUpload.append('type', 'image');
+      formDataUpload.append('alt_text', file.name);
+
+      const response = await api.post(
+        apiEndpoints.conditionMediaAdmin(conditionId),
+        formDataUpload,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      // Return the full URL of the uploaded image
+      const mediaData = response.data.data;
+      return mediaData.url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image');
+      return null;
+    }
+  }, [conditionId]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -209,7 +237,11 @@ const ConditionSectionForm = () => {
                 setFormData((prev) => ({ ...prev, body: html }))
               }
               placeholder="Start writing the section content..."
+              onImageUpload={handleImageUpload}
             />
+            <p className="mt-1 text-xs text-gray-500">
+              Click the image icon in the toolbar to insert images
+            </p>
           </div>
 
           {/* Order Index */}

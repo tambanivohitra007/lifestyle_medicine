@@ -267,7 +267,7 @@ return [
          *
          * @var bool
          */
-        'enable_remote' => false,
+        'enable_remote' => true,
 
         /**
          * List of allowed remote hosts
@@ -279,9 +279,12 @@ return [
          *
          * Leave to NULL to allow any remote host.
          *
+         * Note: We allow our own host (via APP_URL) for loading images stored in
+         * the application's storage. External hosts are not allowed.
+         *
          * @var array|null
          */
-        'allowed_remote_hosts' => null,
+        'allowed_remote_hosts' => env('DOMPDF_ALLOWED_HOSTS') ? explode(',', env('DOMPDF_ALLOWED_HOSTS')) : null,
 
         /**
          * A ratio applied to the fonts height to be more like browsers' line height

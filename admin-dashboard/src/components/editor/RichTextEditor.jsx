@@ -1,9 +1,11 @@
+import { useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
+import Image from '@tiptap/extension-image';
 import {
   Bold,
   Italic,
@@ -23,6 +25,8 @@ import {
   Undo,
   Redo,
   Code,
+  ImageIcon,
+  Loader2,
 } from 'lucide-react';
 
 const MenuButton = ({ onClick, isActive, disabled, children, title }) => (
@@ -45,8 +49,10 @@ const Divider = () => (
   <div className="w-px h-6 bg-gray-300 mx-0.5 sm:mx-1 hidden sm:block" />
 );
 
-const MenuBar = ({ editor }) => {
+const MenuBar = ({ editor, onImageUpload, isUploading }) => {
   if (!editor) return null;
+
+  const fileInputRef = useRef(null);
 
   const setLink = () => {
     const previousUrl = editor.getAttributes('link').href;
@@ -60,6 +66,30 @@ const MenuBar = ({ editor }) => {
     }
 
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+  };
+
+  const handleImageClick = () => {
+    if (onImageUpload) {
+      fileInputRef.current?.click();
+    } else {
+      // Fallback to URL prompt if no upload handler provided
+      const url = window.prompt('Image URL');
+      if (url) {
+        editor.chain().focus().setImage({ src: url }).run();
+      }
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (file && onImageUpload) {
+      const url = await onImageUpload(file);
+      if (url) {
+        editor.chain().focus().setImage({ src: url }).run();
+      }
+    }
+    // Reset the input so the same file can be selected again
+    e.target.value = '';
   };
 
   return (
@@ -213,11 +243,47 @@ const MenuBar = ({ editor }) => {
       >
         <Unlink className="w-4 h-4" />
       </MenuButton>
+
+      <Divider />
+
+      {/* Image */}
+      <MenuButton
+        onClick={handleImageClick}
+        disabled={isUploading}
+        title="Insert Image"
+      >
+        {isUploading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <ImageIcon className="w-4 h-4" />
+        )}
+      </MenuButton>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/gif,image/webp"
+        onChange={handleFileChange}
+        className="hidden"
+      />
     </div>
   );
 };
 
-const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...' }) => {
+const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...', onImageUpload }) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUpload = onImageUpload
+    ? async (file) => {
+        setIsUploading(true);
+        try {
+          const url = await onImageUpload(file);
+          return url;
+        } finally {
+          setIsUploading(false);
+        }
+      }
+    : null;
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -238,6 +304,11 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...' })
       Placeholder.configure({
         placeholder,
       }),
+      Image.configure({
+        HTMLAttributes: {
+          class: 'max-w-full h-auto rounded-lg my-4',
+        },
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -253,7 +324,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...' })
 
   return (
     <div className="border border-gray-300 rounded-lg overflow-hidden focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500">
-      <MenuBar editor={editor} />
+      <MenuBar editor={editor} onImageUpload={handleImageUpload} isUploading={isUploading} />
       <EditorContent editor={editor} />
     </div>
   );

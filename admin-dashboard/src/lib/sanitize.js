@@ -4,10 +4,14 @@ import DOMPurify from 'dompurify';
 const ALLOWED_TAGS = [
   'p', 'br', 'b', 'i', 'u', 'strong', 'em', 'a', 'ul', 'ol', 'li',
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre', 'span',
-  'table', 'thead', 'tbody', 'tr', 'th', 'td', 'div', 'hr', 'sup', 'sub'
+  'table', 'thead', 'tbody', 'tr', 'th', 'td', 'div', 'hr', 'sup', 'sub',
+  'img' // Allow images for inline content
 ];
 
-const ALLOWED_ATTR = ['href', 'target', 'rel', 'class', 'id'];
+const ALLOWED_ATTR = [
+  'href', 'target', 'rel', 'class', 'id',
+  'src', 'alt', 'width', 'height', 'style' // Image attributes
+];
 
 /**
  * Sanitize HTML content to prevent XSS attacks
