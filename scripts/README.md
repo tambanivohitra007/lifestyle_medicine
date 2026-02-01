@@ -12,35 +12,33 @@ See **[DEPLOY_HESTIA.md](./DEPLOY_HESTIA.md)** for detailed instructions.
 
 ## Quick Start
 
-### Initial Setup (One Time)
+### Prerequisites (in HestiaCP Panel)
 
-1. **Configure HestiaCP Panel:**
-   - Create user `rindra`
-   - Add domains: `api.rindra.org`, `lifestyle.rindra.org`
-   - Enable SSL for both domains
-   - Create database
+1. Create user `rindra`
+2. Add domain `api.rindra.org` with PHP 8.4
+3. Add domain `lifestyle.rindra.org`
+4. Enable SSL for both domains
+5. Create database
 
-2. **Clone repo and run setup:**
-   ```bash
-   ssh root@YOUR_VPS_IP
-   cd /home/rindra/web
-   git clone YOUR_REPO_URL lifestyle-medicine
-   cd lifestyle-medicine
-   ./scripts/setup-hestia.sh
-   ```
+### Initial Setup
+
+```bash
+ssh root@YOUR_VPS_IP
+cd /home/rindra/web
+git clone YOUR_REPO_URL lifestyle-medicine
+cd lifestyle-medicine
+./scripts/setup-hestia.sh
+```
 
 ### Deploying Updates
 
 **From Windows:**
 ```cmd
 scripts\remote-deploy-hestia.bat YOUR_VPS_IP
-scripts\remote-deploy-hestia.bat YOUR_VPS_IP api       # API only
-scripts\remote-deploy-hestia.bat YOUR_VPS_IP frontend  # Frontend only
 ```
 
 **From VPS:**
 ```bash
-ssh root@YOUR_VPS_IP
 cd /home/rindra/web/lifestyle-medicine
 ./scripts/deploy-hestia.sh
 ```
@@ -54,17 +52,38 @@ cd /home/rindra/web/lifestyle-medicine
 | `setup-hestia.sh` | Initial VPS setup for HestiaCP |
 | `deploy-hestia.sh` | Deploy API and/or frontend |
 | `remote-deploy-hestia.bat` | Trigger deploy from Windows via SSH |
-| `create-admin.sh` | Create admin user in database |
+| `create-admin.sh` | Create admin user |
 | `sync-database-to-vps.bat` | Sync local database to VPS |
 | `export-database.bat` | Export local database |
 
 ---
 
+## Directory Structure on VPS
+
+```
+/home/rindra/web/
+├── lifestyle-medicine/              # Git repository
+├── api.rindra.org/
+│   ├── app/                         # Laravel application
+│   └── public_html/                 # Web root (points to app/)
+└── lifestyle.rindra.org/
+    └── public_html/                 # React build
+```
+
+---
+
 ## What deploy-hestia.sh Does
 
-1. `git pull` in `/home/rindra/web/lifestyle-medicine`
-2. **API:** composer install, rsync to `api.rindra.org/public_html/`, migrate, cache
-3. **Frontend:** npm build, copy to `lifestyle.rindra.org/public_html/`
+1. `git pull` latest code
+2. **API:**
+   - Composer install
+   - Rsync to `api.rindra.org/app/`
+   - Update `index.php` paths
+   - Run migrations
+   - Cache config/routes
+3. **Frontend:**
+   - npm install & build
+   - Copy to `lifestyle.rindra.org/public_html/`
 
 ---
 
@@ -72,18 +91,19 @@ cd /home/rindra/web/lifestyle-medicine
 
 ### Permission Issues
 ```bash
-chown -R rindra:rindra /home/rindra/web/api.rindra.org/public_html
-chmod -R 775 /home/rindra/web/api.rindra.org/public_html/storage
+chown -R rindra:www-data /home/rindra/web/api.rindra.org
+chmod -R 775 /home/rindra/web/api.rindra.org/app/storage
 ```
 
-### Database Connection Error
+### open_basedir Error
 ```bash
-cat /home/rindra/web/api.rindra.org/public_html/.env | grep DB_
-php artisan config:clear
+nano /etc/php/8.4/fpm/pool.d/api.rindra.org.conf
+# Add /home/rindra/web/api.rindra.org/app to open_basedir
+systemctl restart php8.4-fpm
 ```
 
-### Clear All Caches
+### Check Logs
 ```bash
-cd /home/rindra/web/api.rindra.org/public_html
-php artisan optimize:clear
+tail -50 /home/rindra/web/api.rindra.org/app/storage/logs/laravel.log
+tail -50 /var/log/apache2/domains/api.rindra.org.error.log
 ```

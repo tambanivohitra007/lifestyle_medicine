@@ -1,20 +1,21 @@
 #!/bin/bash
 #===============================================================================
 # Lifestyle Medicine - HestiaCP Deployment Script
-# Run this on your VPS after git pull to update the application
+# Run this after git pull to update the application
 #
-# HestiaCP Structure:
+# Structure:
 #   /home/rindra/web/
 #   ├── lifestyle-medicine/              # Git repository
 #   ├── api.rindra.org/
-#   │   └── public_html/                 # Laravel API
+#   │   ├── app/                         # Laravel application
+#   │   └── public_html/                 # Laravel's public folder
 #   └── lifestyle.rindra.org/
-#       └── public_html/                 # React Dashboard
+#       └── public_html/                 # React build
 #
 # Usage:
-#   ./deploy.sh          # Deploy both API and frontend
-#   ./deploy.sh api      # Deploy API only
-#   ./deploy.sh frontend # Deploy frontend only
+#   ./scripts/deploy-hestia.sh          # Deploy both API and frontend
+#   ./scripts/deploy-hestia.sh api      # Deploy API only
+#   ./scripts/deploy-hestia.sh frontend # Deploy frontend only
 #===============================================================================
 
 set -e
@@ -39,12 +40,15 @@ WEB_DIR="/home/$HESTIA_USER/web"
 REPO_DIR="$WEB_DIR/lifestyle-medicine"
 API_DOMAIN="api.rindra.org"
 ADMIN_DOMAIN="lifestyle.rindra.org"
-API_PUBLIC="$WEB_DIR/$API_DOMAIN/public_html"
-ADMIN_PUBLIC="$WEB_DIR/$ADMIN_DOMAIN/public_html"
+API_DIR="$WEB_DIR/$API_DOMAIN"
+ADMIN_DIR="$WEB_DIR/$ADMIN_DOMAIN"
+API_PUBLIC="$API_DIR/public_html"
+ADMIN_PUBLIC="$ADMIN_DIR/public_html"
+API_APP="$API_DIR/app"
 
 # Web server user (for permissions)
 WEB_USER="$HESTIA_USER"
-WEB_GROUP="$HESTIA_USER"
+WEB_GROUP="www-data"
 
 # Determine what to deploy
 DEPLOY_TARGET=${1:-all}
@@ -56,12 +60,15 @@ echo -e "${BLUE}  (HestiaCP)${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
-# Check if repo directory exists
-if [ ! -d "$REPO_DIR" ]; then
+# Detect repo directory
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$SCRIPT_DIR/../artisan" ]; then
+    REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+fi
+
+# Check if repo exists
+if [ ! -d "$REPO_DIR/.git" ]; then
     print_error "Repository not found at $REPO_DIR"
-    echo "Please clone the repository first:"
-    echo "  cd /home/$HESTIA_USER"
-    echo "  git clone YOUR_REPO_URL lifestyle-medicine"
     exit 1
 fi
 
@@ -86,24 +93,30 @@ deploy_api() {
     composer install --optimize-autoloader --no-dev --no-interaction
     print_success "Composer dependencies installed"
 
-    # Sync Laravel files to API public_html (excluding admin-dashboard)
-    print_info "Syncing files to $API_PUBLIC..."
-
-    # Use rsync to sync files, excluding node_modules and admin-dashboard build
+    # Sync Laravel files to app directory
+    print_info "Syncing files to $API_APP..."
     rsync -av --delete \
         --exclude='admin-dashboard/node_modules' \
         --exclude='admin-dashboard/dist' \
         --exclude='.git' \
-        --exclude='scripts' \
-        "$REPO_DIR/" "$API_PUBLIC/"
+        "$REPO_DIR/" "$API_APP/"
 
-    cd "$API_PUBLIC"
+    # Update public_html with Laravel's public folder
+    print_info "Updating public_html..."
+    rsync -av --delete "$API_APP/public/" "$API_PUBLIC/"
 
-    # Create storage link if not exists
-    if [ ! -L "$API_PUBLIC/public/storage" ]; then
-        print_info "Creating storage link..."
-        php artisan storage:link
-    fi
+    # Ensure index.php has correct paths
+    sed -i "s|require __DIR__.'/../vendor/autoload.php'|require __DIR__.'/../app/vendor/autoload.php'|g" "$API_PUBLIC/index.php"
+    sed -i "s|require_once __DIR__.'/../bootstrap/app.php'|require_once __DIR__.'/../app/bootstrap/app.php'|g" "$API_PUBLIC/index.php"
+
+    # Create storage directories if missing
+    mkdir -p "$API_APP/storage/logs"
+    mkdir -p "$API_APP/storage/framework/cache"
+    mkdir -p "$API_APP/storage/framework/sessions"
+    mkdir -p "$API_APP/storage/framework/views"
+    mkdir -p "$API_APP/bootstrap/cache"
+
+    cd "$API_APP"
 
     # Run migrations
     print_info "Running database migrations..."
@@ -118,12 +131,12 @@ deploy_api() {
     php artisan event:cache
     print_success "Laravel optimized"
 
-    # Fix permissions (set ownership to HestiaCP user)
+    # Fix permissions
     print_info "Setting permissions..."
-    chown -R $WEB_USER:$WEB_GROUP "$API_PUBLIC"
-    chmod -R 755 "$API_PUBLIC"
-    chmod -R 775 "$API_PUBLIC/storage"
-    chmod -R 775 "$API_PUBLIC/bootstrap/cache"
+    chown -R $WEB_USER:$WEB_GROUP "$API_DIR"
+    chmod -R 755 "$API_DIR"
+    chmod -R 775 "$API_APP/storage"
+    chmod -R 775 "$API_APP/bootstrap/cache"
 
     print_success "API deployment complete!"
 }
@@ -159,12 +172,12 @@ deploy_frontend() {
     npm run build
     print_success "Build completed"
 
-    # Clear and copy build to public directory
+    # Deploy to admin public directory
     print_info "Deploying build to $ADMIN_PUBLIC..."
     rm -rf "$ADMIN_PUBLIC"/*
     cp -r dist/* "$ADMIN_PUBLIC/"
 
-    # Fix permissions (set ownership to HestiaCP user)
+    # Fix permissions
     chown -R $WEB_USER:$WEB_GROUP "$ADMIN_PUBLIC"
     chmod -R 755 "$ADMIN_PUBLIC"
 

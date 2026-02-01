@@ -2,18 +2,18 @@
 #===============================================================================
 # Lifestyle Medicine - HestiaCP Initial Setup Script
 #
-# Prerequisites:
-#   1. HestiaCP installed on your VPS
-#   2. User 'rindra' created in HestiaCP
-#   3. Domains added in HestiaCP:
-#      - api.rindra.org (for Laravel API)
-#      - lifestyle.rindra.org (for React Dashboard)
-#   4. SSL enabled for both domains (via HestiaCP Let's Encrypt)
-#   5. Database created in HestiaCP
+# Prerequisites (do these in HestiaCP panel FIRST):
+#   1. Create user 'rindra'
+#   2. Add domain 'api.rindra.org' with PHP 8.4
+#   3. Add domain 'lifestyle.rindra.org'
+#   4. Enable SSL for both domains
+#   5. Create database (e.g., rindra_lifestyle_medicine)
 #
-# Run as the HestiaCP user (rindra), not root:
-#   chmod +x setup-hestia.sh
-#   ./setup-hestia.sh
+# Then clone repo and run this script:
+#   cd /home/rindra/web
+#   git clone YOUR_REPO_URL lifestyle-medicine
+#   cd lifestyle-medicine
+#   ./scripts/setup-hestia.sh
 #===============================================================================
 
 set -e
@@ -44,26 +44,31 @@ WEB_DIR="/home/$HESTIA_USER/web"
 REPO_DIR="$WEB_DIR/lifestyle-medicine"
 API_DOMAIN="api.rindra.org"
 ADMIN_DOMAIN="lifestyle.rindra.org"
-API_PUBLIC="$WEB_DIR/$API_DOMAIN/public_html"
-ADMIN_PUBLIC="$WEB_DIR/$ADMIN_DOMAIN/public_html"
+API_DIR="$WEB_DIR/$API_DOMAIN"
+ADMIN_DIR="$WEB_DIR/$ADMIN_DOMAIN"
+API_PUBLIC="$API_DIR/public_html"
+ADMIN_PUBLIC="$ADMIN_DIR/public_html"
+API_APP="$API_DIR/app"
 
 # Web server user (for permissions)
 WEB_USER="$HESTIA_USER"
-WEB_GROUP="$HESTIA_USER"
+WEB_GROUP="www-data"
+
+# PHP version
+PHP_VERSION="8.4"
 
 print_header "Lifestyle Medicine - HestiaCP Setup"
 
 # Check we're running as root
 if [ "$EUID" -ne 0 ]; then
     print_error "Please run as root"
-    echo "Use: sudo ./setup-hestia.sh"
+    echo "Use: sudo ./scripts/setup-hestia.sh"
     exit 1
 fi
 
 # Check HestiaCP directories exist
 if [ ! -d "$WEB_DIR" ]; then
     print_error "HestiaCP web directory not found at $WEB_DIR"
-    echo "Make sure HestiaCP is properly set up for user $HESTIA_USER"
     exit 1
 fi
 
@@ -73,13 +78,13 @@ echo "  - Dashboard: https://$ADMIN_DOMAIN"
 echo ""
 
 # Check domains exist in HestiaCP
-if [ ! -d "$API_PUBLIC" ]; then
+if [ ! -d "$API_DIR" ]; then
     print_error "Domain $API_DOMAIN not found in HestiaCP"
     echo "Please add the domain in HestiaCP panel first"
     exit 1
 fi
 
-if [ ! -d "$ADMIN_PUBLIC" ]; then
+if [ ! -d "$ADMIN_DIR" ]; then
     print_error "Domain $ADMIN_DOMAIN not found in HestiaCP"
     echo "Please add the domain in HestiaCP panel first"
     exit 1
@@ -87,22 +92,13 @@ fi
 
 print_success "Both domains found in HestiaCP"
 
-# Prompt for configuration
-echo ""
-read -p "Database Name (created in HestiaCP): " DB_NAME
-read -p "Database User (created in HestiaCP): " DB_USER
-read -sp "Database Password: " DB_PASSWORD
-echo
-
 #===============================================================================
 # STEP 1: Verify Repository
 #===============================================================================
 print_header "Step 1: Verifying Repository"
 
-# Detect if we're running from within the repo
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -f "$SCRIPT_DIR/../artisan" ]; then
-    # Script is running from within the repo
     REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
     print_success "Running from repository at $REPO_DIR"
 elif [ -d "$REPO_DIR/.git" ]; then
@@ -123,18 +119,28 @@ git pull origin main
 print_success "Repository up to date"
 
 #===============================================================================
-# STEP 2: Install Composer Dependencies
+# STEP 2: Prompt for Configuration
 #===============================================================================
-print_header "Step 2: Installing Composer Dependencies"
+print_header "Step 2: Database Configuration"
+
+read -p "Database Name (created in HestiaCP): " DB_NAME
+read -p "Database User (created in HestiaCP): " DB_USER
+read -sp "Database Password: " DB_PASSWORD
+echo
+
+#===============================================================================
+# STEP 3: Install Composer Dependencies
+#===============================================================================
+print_header "Step 3: Installing Composer Dependencies"
 
 cd "$REPO_DIR"
 composer install --optimize-autoloader --no-dev
 print_success "Composer dependencies installed"
 
 #===============================================================================
-# STEP 3: Configure Environment
+# STEP 4: Configure Environment
 #===============================================================================
-print_header "Step 3: Configuring Environment"
+print_header "Step 4: Configuring Environment"
 
 cp .env.example .env
 
@@ -146,7 +152,7 @@ sed -i "s|APP_URL=http://localhost:8000|APP_URL=https://$API_DOMAIN|g" .env
 # Database: Change from SQLite to MySQL
 sed -i "s|DB_CONNECTION=sqlite|DB_CONNECTION=mysql|g" .env
 
-# Remove the commented MySQL lines and add fresh ones
+# Remove commented MySQL lines and add fresh ones
 sed -i '/# DB_CONNECTION=mysql/d' .env
 sed -i '/# DB_HOST=/d' .env
 sed -i '/# DB_PORT=/d' .env
@@ -165,45 +171,81 @@ php artisan key:generate
 print_success "Environment configured"
 
 #===============================================================================
-# STEP 4: Deploy API
+# STEP 5: Deploy API (Laravel)
 #===============================================================================
-print_header "Step 4: Deploying API"
+print_header "Step 5: Deploying API"
 
-# Sync Laravel files to API directory
-print_info "Syncing Laravel files to $API_PUBLIC..."
+# Create app directory and move Laravel there
+print_info "Setting up Laravel structure..."
+mkdir -p "$API_APP"
+
+# Copy Laravel files to app directory (excluding public folder contents)
 rsync -av --delete \
     --exclude='admin-dashboard/node_modules' \
     --exclude='admin-dashboard/dist' \
     --exclude='.git' \
-    --exclude='scripts' \
-    "$REPO_DIR/" "$API_PUBLIC/"
+    "$REPO_DIR/" "$API_APP/"
 
-cd "$API_PUBLIC"
+# Remove existing public_html and recreate with Laravel's public folder
+rm -rf "$API_PUBLIC"
+cp -r "$API_APP/public" "$API_PUBLIC"
 
-# Create storage link
+# Update index.php to point to ../app/
+print_info "Updating index.php paths..."
+sed -i "s|require __DIR__.'/../vendor/autoload.php'|require __DIR__.'/../app/vendor/autoload.php'|g" "$API_PUBLIC/index.php"
+sed -i "s|require_once __DIR__.'/../bootstrap/app.php'|require_once __DIR__.'/../app/bootstrap/app.php'|g" "$API_PUBLIC/index.php"
+
+# Create storage directories
+mkdir -p "$API_APP/storage/logs"
+mkdir -p "$API_APP/storage/framework/cache"
+mkdir -p "$API_APP/storage/framework/sessions"
+mkdir -p "$API_APP/storage/framework/views"
+mkdir -p "$API_APP/bootstrap/cache"
+
+# Set permissions
+chown -R $WEB_USER:$WEB_GROUP "$API_DIR"
+chmod -R 755 "$API_DIR"
+chmod -R 775 "$API_APP/storage"
+chmod -R 775 "$API_APP/bootstrap/cache"
+
+# Run Laravel setup
+cd "$API_APP"
 php artisan storage:link 2>/dev/null || true
-
-# Run migrations
 php artisan migrate --force
-
-# Optimize
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
-php artisan event:cache
-
-# Set permissions (ownership to HestiaCP user)
-chown -R $WEB_USER:$WEB_GROUP "$API_PUBLIC"
-chmod -R 755 "$API_PUBLIC"
-chmod -R 775 "$API_PUBLIC/storage"
-chmod -R 775 "$API_PUBLIC/bootstrap/cache"
 
 print_success "API deployed"
 
 #===============================================================================
-# STEP 5: Build and Deploy Frontend
+# STEP 6: Update PHP-FPM open_basedir
 #===============================================================================
-print_header "Step 5: Building Frontend"
+print_header "Step 6: Configuring PHP-FPM"
+
+PHP_FPM_CONF="/etc/php/$PHP_VERSION/fpm/pool.d/$API_DOMAIN.conf"
+
+if [ -f "$PHP_FPM_CONF" ]; then
+    # Check if app directory is already in open_basedir
+    if grep -q "$API_APP" "$PHP_FPM_CONF"; then
+        print_warning "open_basedir already includes app directory"
+    else
+        # Add app directory to open_basedir
+        sed -i "s|php_admin_value\[open_basedir\] = |php_admin_value[open_basedir] = $API_APP:|g" "$PHP_FPM_CONF"
+        print_success "Added $API_APP to open_basedir"
+    fi
+
+    systemctl restart php$PHP_VERSION-fpm
+    print_success "PHP-FPM restarted"
+else
+    print_warning "PHP-FPM config not found at $PHP_FPM_CONF"
+    echo "You may need to manually add $API_APP to open_basedir"
+fi
+
+#===============================================================================
+# STEP 7: Build and Deploy Frontend
+#===============================================================================
+print_header "Step 7: Building Frontend"
 
 cd "$REPO_DIR/admin-dashboard"
 
@@ -214,14 +256,9 @@ echo "VITE_API_BASE_URL=https://$API_DOMAIN/api/v1" > .env.production
 if ! command -v node &> /dev/null; then
     print_warning "Node.js not found!"
     echo ""
-    echo "To install Node.js on the server, run as root:"
+    echo "Install Node.js:"
     echo "  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -"
     echo "  apt install -y nodejs"
-    echo ""
-    echo "Or build locally and upload:"
-    echo "  cd admin-dashboard"
-    echo "  npm run build"
-    echo "  scp -r dist/* $HESTIA_USER@YOUR_VPS:$ADMIN_PUBLIC/"
     echo ""
 else
     npm ci --prefer-offline --no-audit
@@ -237,13 +274,24 @@ else
 fi
 
 #===============================================================================
-# STEP 6: Make Deploy Script Executable
+# STEP 8: Configure SPA Routing for Frontend
 #===============================================================================
-print_header "Step 6: Setting Up Deploy Script"
+print_header "Step 8: Configuring SPA Routing"
+
+NGINX_SPA_CONF="/home/$HESTIA_USER/conf/web/$ADMIN_DOMAIN/nginx.ssl.conf_spa"
+
+echo 'error_page 404 /index.html;' > "$NGINX_SPA_CONF"
+
+nginx -t && systemctl restart nginx
+print_success "SPA routing configured"
+
+#===============================================================================
+# STEP 9: Make Deploy Script Executable
+#===============================================================================
+print_header "Step 9: Setting Up Deploy Script"
 
 chmod +x "$REPO_DIR/scripts/deploy-hestia.sh"
-
-print_success "Deploy script ready at $REPO_DIR/scripts/deploy-hestia.sh"
+print_success "Deploy script ready"
 
 #===============================================================================
 # COMPLETE
@@ -257,21 +305,15 @@ echo
 echo -e "API:       ${BLUE}https://$API_DOMAIN${NC}"
 echo -e "Dashboard: ${BLUE}https://$ADMIN_DOMAIN${NC}"
 echo
-echo -e "${YELLOW}HestiaCP Configuration:${NC}"
-echo "Make sure in HestiaCP panel:"
-echo "  1. PHP version is set to 8.2+ for $API_DOMAIN"
-echo "  2. SSL is enabled for both domains"
-echo "  3. Nginx template allows Laravel routing"
-echo
 echo -e "${YELLOW}Next Steps:${NC}"
 echo "1. Create admin user:"
-echo "   cd $API_PUBLIC && php artisan tinker"
+echo "   cd $API_APP && php artisan tinker"
 echo "   User::create(['name'=>'Admin','email'=>'your@email.com','password'=>Hash::make('password'),'role'=>'admin','is_active'=>true]);"
 echo
 echo "2. Update API keys:"
-echo "   nano $API_PUBLIC/.env"
+echo "   nano $API_APP/.env"
 echo "   # Add GEMINI_API_KEY and BIBLE_API_KEY"
-echo "   cd $API_PUBLIC && php artisan config:cache"
+echo "   cd $API_APP && php artisan config:cache"
 echo
 echo -e "${YELLOW}Future Deployments:${NC}"
 echo "   cd $REPO_DIR"
