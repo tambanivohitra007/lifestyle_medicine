@@ -265,6 +265,26 @@
             margin: 0 5px;
             vertical-align: middle;
         }
+
+        /* Infographic styling */
+        .infographic-container {
+            text-align: center;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+        .infographic-container img {
+            max-width: 100%;
+            max-height: 400px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .infographic-caption {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 8px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -285,6 +305,17 @@
             <div class="summary">{{ strip_tags($condition->summary) }}</div>
         @endif
     </div>
+
+    {{-- Overview Infographic - appears after header --}}
+    @if(isset($infographicsByType) && $infographicsByType->has('overview'))
+        @php $overviewInfographic = $infographicsByType->get('overview'); @endphp
+        <div class="infographic-container">
+            <img src="{{ storage_path('app/public/' . $overviewInfographic->path) }}" alt="{{ $overviewInfographic->alt_text }}">
+            @if($overviewInfographic->caption)
+                <div class="infographic-caption">{{ $overviewInfographic->caption }}</div>
+            @endif
+        </div>
+    @endif
 
     @php
         $sectionTypes = [
@@ -309,6 +340,28 @@
                         <div class="card-content">{!! $section->body !!}</div>
                     </div>
                 @endforeach
+
+                {{-- Risk Factors Infographic - appears after risk_factors section --}}
+                @if($type === 'risk_factors' && isset($infographicsByType) && $infographicsByType->has('risk_factors'))
+                    @php $riskInfographic = $infographicsByType->get('risk_factors'); @endphp
+                    <div class="infographic-container">
+                        <img src="{{ storage_path('app/public/' . $riskInfographic->path) }}" alt="{{ $riskInfographic->alt_text }}">
+                        @if($riskInfographic->caption)
+                            <div class="infographic-caption">{{ $riskInfographic->caption }}</div>
+                        @endif
+                    </div>
+                @endif
+
+                {{-- Lifestyle Solutions Infographic - appears after solutions section --}}
+                @if($type === 'solutions' && isset($infographicsByType) && $infographicsByType->has('lifestyle_solutions'))
+                    @php $solutionsInfographic = $infographicsByType->get('lifestyle_solutions'); @endphp
+                    <div class="infographic-container">
+                        <img src="{{ storage_path('app/public/' . $solutionsInfographic->path) }}" alt="{{ $solutionsInfographic->alt_text }}">
+                        @if($solutionsInfographic->caption)
+                            <div class="infographic-caption">{{ $solutionsInfographic->caption }}</div>
+                        @endif
+                    </div>
+                @endif
             </div>
         @endif
     @endforeach
@@ -383,6 +436,17 @@
                     </div>
                 @endforeach
             @endforeach
+
+            {{-- Lifestyle Solutions Infographic - show after interventions if no solutions section exists --}}
+            @if(!$groupedSections->has('solutions') && isset($infographicsByType) && $infographicsByType->has('lifestyle_solutions'))
+                @php $solutionsInfographic = $infographicsByType->get('lifestyle_solutions'); @endphp
+                <div class="infographic-container">
+                    <img src="{{ storage_path('app/public/' . $solutionsInfographic->path) }}" alt="{{ $solutionsInfographic->alt_text }}">
+                    @if($solutionsInfographic->caption)
+                        <div class="infographic-caption">{{ $solutionsInfographic->caption }}</div>
+                    @endif
+                </div>
+            @endif
         </div>
     @endif
 

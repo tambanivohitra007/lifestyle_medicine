@@ -24,10 +24,28 @@ class ExportController extends Controller
             'interventions.evidenceEntries.references',
             'scriptures',
             'recipes',
+            'infographics', // Load infographics (media where type='infographic')
         ]);
+
+        // Organize infographics by type for easy access in template
+        $infographicsByType = $condition->infographics->keyBy(function ($media) {
+            // Extract type from alt_text (e.g., "Overview infographic" -> "overview")
+            $altText = strtolower($media->alt_text ?? '');
+            if (str_contains($altText, 'overview')) {
+                return 'overview';
+            }
+            if (str_contains($altText, 'risk factor')) {
+                return 'risk_factors';
+            }
+            if (str_contains($altText, 'lifestyle solution')) {
+                return 'lifestyle_solutions';
+            }
+            return 'other';
+        });
 
         $pdf = Pdf::loadView('exports.condition', [
             'condition' => $condition,
+            'infographicsByType' => $infographicsByType,
         ]);
 
         $filename = str_replace(' ', '_', strtolower($condition->name)) . '_guide.pdf';

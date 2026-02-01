@@ -235,6 +235,19 @@
     page-break-inside: avoid;
     margin: 1rem 0;
   }
+
+  /* Infographics in print */
+  .treatment-guide .infographic-container {
+    page-break-inside: avoid;
+    margin: 1.5rem 0;
+  }
+
+  .treatment-guide .infographic-container img {
+    max-width: 100%;
+    max-height: 450px;
+    height: auto;
+    box-shadow: none;
+  }
 }
 
 /* Knowledge Graph Edge Animations */

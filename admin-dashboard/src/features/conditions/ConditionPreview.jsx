@@ -36,6 +36,19 @@ const RECOMMENDATION_LABELS = {
   optional: 'Optional',
 };
 
+// Map infographic types to their matching section types
+const INFOGRAPHIC_SECTION_MAP = {
+  overview: null, // Appears after summary, not tied to a section
+  risk_factors: 'risk_factors',
+  lifestyle_solutions: 'solutions',
+};
+
+const INFOGRAPHIC_LABELS = {
+  overview: 'Condition Overview',
+  risk_factors: 'Risk Factors',
+  lifestyle_solutions: 'Lifestyle Solutions',
+};
+
 const ConditionPreview = () => {
   const { id } = useParams();
   const [condition, setCondition] = useState(null);
@@ -43,6 +56,7 @@ const ConditionPreview = () => {
   const [interventions, setInterventions] = useState([]);
   const [scriptures, setScriptures] = useState([]);
   const [recipes, setRecipes] = useState([]);
+  const [infographics, setInfographics] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,13 +66,14 @@ const ConditionPreview = () => {
   const fetchAllData = async () => {
     try {
       setLoading(true);
-      const [conditionRes, sectionsRes, interventionsRes, scripturesRes, recipesRes] =
+      const [conditionRes, sectionsRes, interventionsRes, scripturesRes, recipesRes, infographicsRes] =
         await Promise.all([
           api.get(`${apiEndpoints.conditions}/${id}`),
           api.get(apiEndpoints.conditionSections(id)),
           api.get(apiEndpoints.conditionInterventions(id)),
           api.get(apiEndpoints.conditionScriptures(id)),
           api.get(apiEndpoints.conditionRecipes(id)),
+          api.get(apiEndpoints.conditionInfographics(id)).catch(() => ({ data: { data: [] } })),
         ]);
 
       setCondition(conditionRes.data.data);
@@ -66,11 +81,42 @@ const ConditionPreview = () => {
       setInterventions(interventionsRes.data.data || []);
       setScriptures(scripturesRes.data.data || []);
       setRecipes(recipesRes.data.data || []);
+      setInfographics(infographicsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper to get infographic by type (from alt_text which contains the type)
+  const getInfographicByType = (type) => {
+    return infographics.find((img) =>
+      img.alt_text?.toLowerCase().includes(type.replace('_', ' ')) ||
+      img.caption?.toLowerCase().includes(type.replace('_', ' '))
+    );
+  };
+
+  // Infographic component for consistent rendering
+  const InfographicImage = ({ type }) => {
+    const infographic = getInfographicByType(type);
+    if (!infographic) return null;
+
+    return (
+      <div className="my-4 sm:my-6 text-center infographic-container">
+        <img
+          src={infographic.url}
+          alt={infographic.alt_text || `${INFOGRAPHIC_LABELS[type]} infographic`}
+          className="max-w-full h-auto mx-auto rounded-lg shadow-md"
+          style={{ maxHeight: '500px' }}
+        />
+        {infographic.caption && (
+          <p className="text-xs sm:text-sm text-gray-500 mt-2 italic">
+            {infographic.caption}
+          </p>
+        )}
+      </div>
+    );
   };
 
   const handlePrint = () => {
@@ -175,25 +221,42 @@ const ConditionPreview = () => {
             <p className="text-gray-700 text-base sm:text-lg leading-relaxed">
               {condition.summary}
             </p>
+            {/* Overview Infographic - appears after summary */}
+            <InfographicImage type="overview" />
             <div className="divider" />
           </div>
         )}
 
         {/* Sections */}
-        {sortedSections.map((section) => (
-          <div key={section.id} className="section">
-            <h2>
-              {section.title || SECTION_TITLES[section.section_type] || section.section_type}
-            </h2>
-            {section.body && (
-              <div
-                className="prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.body) }}
-              />
-            )}
-            <div className="divider" />
-          </div>
-        ))}
+        {sortedSections.map((section, index) => {
+          // Check if this is the last section of its type (for infographic placement)
+          const isLastOfType = !sortedSections.slice(index + 1).some(
+            (s) => s.section_type === section.section_type
+          );
+
+          return (
+            <div key={section.id} className="section">
+              <h2>
+                {section.title || SECTION_TITLES[section.section_type] || section.section_type}
+              </h2>
+              {section.body && (
+                <div
+                  className="prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.body) }}
+                />
+              )}
+              {/* Risk Factors Infographic - appears after risk_factors section */}
+              {isLastOfType && section.section_type === 'risk_factors' && (
+                <InfographicImage type="risk_factors" />
+              )}
+              {/* Lifestyle Solutions Infographic - appears after solutions section */}
+              {isLastOfType && section.section_type === 'solutions' && (
+                <InfographicImage type="lifestyle_solutions" />
+              )}
+              <div className="divider" />
+            </div>
+          );
+        })}
 
         {/* Interventions by Care Domain */}
         {Object.keys(interventionsByDomain).length > 0 && (
@@ -248,6 +311,10 @@ const ConditionPreview = () => {
                 ))}
               </div>
             ))}
+            {/* Lifestyle Solutions Infographic - show here if no solutions section exists */}
+            {!sortedSections.some((s) => s.section_type === 'solutions') && (
+              <InfographicImage type="lifestyle_solutions" />
+            )}
             <div className="divider" />
           </div>
         )}
