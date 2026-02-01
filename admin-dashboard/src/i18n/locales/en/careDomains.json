@@ -45,7 +45,9 @@
   "empty": {
     "title": "No care domains found",
     "description": "Get started by creating your first care domain",
-    "action": "Add Care Domain"
+    "action": "Add Care Domain",
+    "noAvailable": "No care domains available.",
+    "createFirst": "Create one first"
   },
   "toast": {
     "created": "Care domain created successfully",

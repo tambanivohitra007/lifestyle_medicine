@@ -197,6 +197,7 @@
   },
   "time": {
     "justNow": "Just now",
+    "recently": "recently",
     "minutesAgo": "{{count}} minute(s) ago",
     "hoursAgo": "{{count}} hour(s) ago",
     "daysAgo": "{{count}} day(s) ago",
@@ -215,6 +216,7 @@
   "audit": {
     "createdBy": "Created by",
     "updatedBy": "Last updated by",
+    "updatedAt": "Updated",
     "on": "on",
     "at": "at"
   },

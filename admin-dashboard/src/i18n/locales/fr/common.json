@@ -197,6 +197,7 @@
   },
   "time": {
     "justNow": "À l'instant",
+    "recently": "récemment",
     "minutesAgo": "Il y a {{count}} minute(s)",
     "hoursAgo": "Il y a {{count}} heure(s)",
     "daysAgo": "Il y a {{count}} jour(s)",
@@ -215,6 +216,7 @@
   "audit": {
     "createdBy": "Créé par",
     "updatedBy": "Dernière mise à jour par",
+    "updatedAt": "Mis à jour",
     "on": "le",
     "at": "à"
   },

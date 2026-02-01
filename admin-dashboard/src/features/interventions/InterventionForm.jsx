@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Save, Loader2, Image } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import MediaUploader from '../../components/shared/MediaUploader';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const InterventionForm = () => {
+  const { t } = useTranslation(['interventions', 'common', 'careDomains']);
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -58,7 +60,7 @@ const InterventionForm = () => {
       setMedia(intervention.media || []);
     } catch (error) {
       console.error('Error fetching intervention:', error);
-      toast.error('Failed to load intervention');
+      toast.error(t('interventions:toast.loadError'));
       navigate('/interventions');
     } finally {
       setLoading(false);
@@ -68,10 +70,10 @@ const InterventionForm = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('common:validation.required', { field: t('common:labels.name') });
     }
     if (!formData.care_domain_id) {
-      newErrors.care_domain_id = 'Care domain is required';
+      newErrors.care_domain_id = t('common:validation.required', { field: t('careDomains:singular') });
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -96,7 +98,7 @@ const InterventionForm = () => {
       } else if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error('Failed to save intervention');
+        toast.error(t('interventions:toast.saveFailed'));
       }
     } finally {
       setSaving(false);
@@ -124,20 +126,20 @@ const InterventionForm = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Interventions', href: '/interventions' },
-          { label: isEditing ? 'Edit Intervention' : 'New Intervention' },
+          { label: t('interventions:title'), href: '/interventions' },
+          { label: isEditing ? t('interventions:form.editTitle') : t('interventions:form.createTitle') },
         ]}
       />
 
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {isEditing ? 'Edit Intervention' : 'New Intervention'}
+          {isEditing ? t('interventions:form.editTitle') : t('interventions:form.createTitle')}
         </h1>
         <p className="text-gray-600 mt-1">
           {isEditing
-            ? 'Update the intervention details below'
-            : 'Create a new lifestyle intervention'}
+            ? t('interventions:form.editSubtitle')
+            : t('interventions:form.newSubtitle')}
         </p>
       </div>
 
@@ -147,7 +149,7 @@ const InterventionForm = () => {
           {/* Care Domain */}
           <div>
             <label htmlFor="care_domain_id" className="label">
-              Care Domain <span className="text-red-500">*</span>
+              {t('interventions:form.domain')} <span className="text-red-500">*</span>
             </label>
             <select
               id="care_domain_id"
@@ -156,7 +158,7 @@ const InterventionForm = () => {
               onChange={handleChange}
               className={`input-field ${errors.care_domain_id ? 'border-red-500' : ''}`}
             >
-              <option value="">Select a care domain</option>
+              <option value="">{t('interventions:form.selectDomain')}</option>
               {careDomains.map((domain) => (
                 <option key={domain.id} value={domain.id}>
                   {domain.name}
@@ -170,9 +172,9 @@ const InterventionForm = () => {
             )}
             {careDomains.length === 0 && (
               <p className="mt-1 text-sm text-yellow-600">
-                No care domains available.{' '}
+                {t('careDomains:empty.noAvailable')}{' '}
                 <Link to="/care-domains/new" className="underline">
-                  Create one first
+                  {t('careDomains:empty.createFirst')}
                 </Link>
               </p>
             )}
@@ -181,7 +183,7 @@ const InterventionForm = () => {
           {/* Name */}
           <div>
             <label htmlFor="name" className="label">
-              Name <span className="text-red-500">*</span>
+              {t('interventions:form.name')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -190,7 +192,7 @@ const InterventionForm = () => {
               value={formData.name}
               onChange={handleChange}
               className={`input-field ${errors.name ? 'border-red-500' : ''}`}
-              placeholder="e.g., Plant-Based Diet, HIIT Training"
+              placeholder={t('interventions:form.namePlaceholder')}
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-500">
@@ -202,7 +204,7 @@ const InterventionForm = () => {
           {/* Description */}
           <div>
             <label htmlFor="description" className="label">
-              Description
+              {t('interventions:form.description')}
             </label>
             <textarea
               id="description"
@@ -211,7 +213,7 @@ const InterventionForm = () => {
               onChange={handleChange}
               rows={4}
               className={`input-field ${errors.description ? 'border-red-500' : ''}`}
-              placeholder="A brief description of the intervention..."
+              placeholder={t('interventions:form.descriptionPlaceholder')}
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-500">
@@ -223,7 +225,7 @@ const InterventionForm = () => {
           {/* Mechanism */}
           <div>
             <label htmlFor="mechanism" className="label">
-              Mechanism of Action
+              {t('interventions:form.mechanism')}
             </label>
             <textarea
               id="mechanism"
@@ -232,7 +234,7 @@ const InterventionForm = () => {
               onChange={handleChange}
               rows={4}
               className={`input-field ${errors.mechanism ? 'border-red-500' : ''}`}
-              placeholder="How does this intervention work? What is the physiological mechanism?"
+              placeholder={t('interventions:form.mechanismPlaceholder')}
             />
             {errors.mechanism && (
               <p className="mt-1 text-sm text-red-500">
@@ -246,10 +248,10 @@ const InterventionForm = () => {
             <div className="pt-6 border-t border-gray-200">
               <label className="label flex items-center gap-2">
                 <Image className="w-4 h-4" />
-                Media Files
+                {t('common:labels.media')}
               </label>
               <p className="text-sm text-gray-500 mb-4">
-                Upload images and documents related to this intervention
+                {t('interventions:form.mediaDescription')}
               </p>
               <MediaUploader
                 interventionId={id}
@@ -271,10 +273,10 @@ const InterventionForm = () => {
               ) : (
                 <Save className="w-5 h-5" />
               )}
-              {saving ? 'Saving...' : 'Save Intervention'}
+              {saving ? t('common:buttons.saving') : t('common:buttons.save')}
             </button>
             <Link to="/interventions" className="btn-outline">
-              Cancel
+              {t('common:buttons.cancel')}
             </Link>
           </div>
         </div>

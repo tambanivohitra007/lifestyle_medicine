@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Network,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
@@ -20,22 +21,23 @@ import AuditInfo from '../../components/shared/AuditInfo';
 import { useAuth } from '../../contexts/AuthContext';
 
 const QUALITY_RATING = {
-  A: { label: 'A - High', color: 'bg-green-100 text-green-700' },
-  B: { label: 'B - Good', color: 'bg-blue-100 text-blue-700' },
-  C: { label: 'C - Moderate', color: 'bg-yellow-100 text-yellow-700' },
-  D: { label: 'D - Low', color: 'bg-red-100 text-red-700' },
+  A: { labelKey: 'evidence:quality.high', color: 'bg-green-100 text-green-700' },
+  B: { labelKey: 'evidence:quality.good', color: 'bg-blue-100 text-blue-700' },
+  C: { labelKey: 'evidence:quality.moderate', color: 'bg-yellow-100 text-yellow-700' },
+  D: { labelKey: 'evidence:quality.low', color: 'bg-red-100 text-red-700' },
 };
 
-const STUDY_TYPE = {
-  rct: 'Randomized Controlled Trial',
-  meta_analysis: 'Meta-Analysis',
-  systematic_review: 'Systematic Review',
-  observational: 'Observational Study',
-  case_series: 'Case Series',
-  expert_opinion: 'Expert Opinion',
+const STUDY_TYPE_KEYS = {
+  rct: 'evidence:studyTypes.rct',
+  meta_analysis: 'evidence:studyTypes.metaAnalysis',
+  systematic_review: 'evidence:studyTypes.systematicReview',
+  observational: 'evidence:studyTypes.observational',
+  case_series: 'evidence:studyTypes.caseSeries',
+  expert_opinion: 'evidence:studyTypes.expertOpinion',
 };
 
 const InterventionDetail = () => {
+  const { t } = useTranslation(['interventions', 'evidence', 'conditions', 'common']);
   const { id } = useParams();
   const navigate = useNavigate();
   const [intervention, setIntervention] = useState(null);
@@ -62,7 +64,7 @@ const InterventionDetail = () => {
       setConditions(conditionsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching intervention:', error);
-      toast.error('Failed to load intervention');
+      toast.error(t('interventions:toast.loadError'));
       navigate('/interventions');
     } finally {
       setLoading(false);
@@ -75,11 +77,11 @@ const InterventionDetail = () => {
 
     try {
       await api.delete(`${apiEndpoints.interventionsAdmin}/${id}`);
-      toast.success('Intervention deleted');
+      toast.success(t('interventions:toast.deleted'));
       navigate('/interventions');
     } catch (error) {
       console.error('Error deleting intervention:', error);
-      toast.error('Failed to delete intervention');
+      toast.error(t('interventions:toast.deleteError'));
     }
   };
 
@@ -96,10 +98,10 @@ const InterventionDetail = () => {
       <div className="card text-center py-12">
         <AlertCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Intervention not found
+          {t('interventions:detail.notFound')}
         </h3>
         <Link to="/interventions" className="text-primary-600 hover:text-primary-700">
-          Back to interventions
+          {t('interventions:detail.backToInterventions')}
         </Link>
       </div>
     );
@@ -107,10 +109,10 @@ const InterventionDetail = () => {
 
   const mediaItems = intervention.media || [];
   const tabs = [
-    { id: 'details', label: 'Details', icon: Stethoscope },
-    { id: 'evidence', label: 'Evidence', icon: FileText, count: evidence.length },
-    { id: 'conditions', label: 'Conditions', icon: HeartPulse, count: conditions.length },
-    { id: 'media', label: 'Media', icon: Image, count: mediaItems.length },
+    { id: 'details', labelKey: 'common:labels.details', icon: Stethoscope },
+    { id: 'evidence', labelKey: 'evidence:title', icon: FileText, count: evidence.length },
+    { id: 'conditions', labelKey: 'conditions:title', icon: HeartPulse, count: conditions.length },
+    { id: 'media', labelKey: 'common:labels.media', icon: Image, count: mediaItems.length },
   ];
 
   return (
@@ -118,7 +120,7 @@ const InterventionDetail = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Interventions', href: '/interventions' },
+          { label: t('interventions:title'), href: '/interventions' },
           { label: intervention.name },
         ]}
       />
@@ -142,25 +144,24 @@ const InterventionDetail = () => {
           <Link
             to={`/knowledge-graph/intervention/${id}`}
             className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
-            title="View Knowledge Graph"
+            title={t('interventions:detail.viewGraph')}
           >
             <Network className="w-4 h-4" />
-            <span className="hidden sm:inline">Graph</span>
+            <span className="hidden sm:inline">{t('interventions:detail.graph')}</span>
           </Link>
           <Link
             to={`/interventions/${id}/edit`}
             className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
           >
             <Edit className="w-4 h-4" />
-            Edit
+            {t('common:buttons.edit')}
           </Link>
           <button
             onClick={handleDelete}
             className="btn-outline text-red-600 border-red-200 hover:bg-red-50 active:bg-red-100 flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
           >
             <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Delete</span>
-            <span className="sm:hidden">Delete</span>
+            <span>{t('common:buttons.delete')}</span>
           </button>
         </div>
       </div>
@@ -179,8 +180,8 @@ const InterventionDetail = () => {
               }`}
             >
               <tab.icon className="w-4 sm:w-5 h-4 sm:h-5" />
-              <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              <span className="hidden sm:inline">{t(tab.labelKey)}</span>
+              <span className="sm:hidden">{t(tab.labelKey).split(' ')[0]}</span>
               {tab.count !== undefined && (
                 <span
                   className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs ${
@@ -204,14 +205,14 @@ const InterventionDetail = () => {
           <div className="space-y-4 sm:space-y-6">
             {intervention.description && (
               <div className="card">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Description</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">{t('interventions:detail.description')}</h2>
                 <p className="text-gray-600 whitespace-pre-wrap text-sm sm:text-base">{intervention.description}</p>
               </div>
             )}
 
             {intervention.mechanism && (
               <div className="card">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Mechanism of Action</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">{t('interventions:detail.mechanism')}</h2>
                 <p className="text-gray-600 whitespace-pre-wrap text-sm sm:text-base">{intervention.mechanism}</p>
               </div>
             )}
@@ -222,12 +223,12 @@ const InterventionDetail = () => {
             {!intervention.description && !intervention.mechanism && (
               <div className="card text-center py-6 sm:py-8">
                 <Stethoscope className="w-10 sm:w-12 h-10 sm:h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600 text-sm sm:text-base">No additional details added yet</p>
+                <p className="text-gray-600 text-sm sm:text-base">{t('interventions:detail.noDetails')}</p>
                 <Link
                   to={`/interventions/${id}/edit`}
                   className="text-primary-600 hover:text-primary-700 text-sm mt-2 inline-block touch-manipulation"
                 >
-                  Add details
+                  {t('interventions:detail.addDetails')}
                 </Link>
               </div>
             )}
@@ -240,12 +241,12 @@ const InterventionDetail = () => {
             {evidence.length === 0 ? (
               <div className="card text-center py-6 sm:py-8">
                 <FileText className="w-10 sm:w-12 h-10 sm:h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600 text-sm sm:text-base">No evidence entries linked yet</p>
+                <p className="text-gray-600 text-sm sm:text-base">{t('interventions:detail.noEvidence')}</p>
                 <Link
                   to="/evidence"
                   className="text-primary-600 hover:text-primary-700 text-sm mt-2 inline-block touch-manipulation"
                 >
-                  Manage evidence entries
+                  {t('interventions:detail.manageEvidence')}
                 </Link>
               </div>
             ) : (
@@ -259,12 +260,12 @@ const InterventionDetail = () => {
                             QUALITY_RATING[entry.quality_rating]?.color || 'bg-gray-100 text-gray-700'
                           }`}
                         >
-                          {QUALITY_RATING[entry.quality_rating]?.label || entry.quality_rating}
+                          {QUALITY_RATING[entry.quality_rating]?.labelKey ? t(QUALITY_RATING[entry.quality_rating].labelKey) : entry.quality_rating}
                         </span>
                       )}
                       {entry.study_type && (
                         <span className="text-xs sm:text-sm text-gray-500">
-                          {STUDY_TYPE[entry.study_type] || entry.study_type}
+                          {STUDY_TYPE_KEYS[entry.study_type] ? t(STUDY_TYPE_KEYS[entry.study_type]) : entry.study_type}
                         </span>
                       )}
                     </div>
@@ -275,13 +276,13 @@ const InterventionDetail = () => {
 
                     {entry.population && (
                       <p className="text-xs sm:text-sm text-gray-500">
-                        <span className="font-medium">Population:</span> {entry.population}
+                        <span className="font-medium">{t('evidence:labels.population')}:</span> {entry.population}
                       </p>
                     )}
 
                     {entry.references && entry.references.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-gray-100">
-                        <p className="text-xs font-medium text-gray-500 mb-2">References:</p>
+                        <p className="text-xs font-medium text-gray-500 mb-2">{t('evidence:labels.references')}:</p>
                         <ul className="space-y-1">
                           {entry.references.map((ref) => (
                             <li key={ref.id} className="text-xs sm:text-sm text-gray-600">
@@ -315,12 +316,12 @@ const InterventionDetail = () => {
             {conditions.length === 0 ? (
               <div className="card text-center py-6 sm:py-8">
                 <HeartPulse className="w-10 sm:w-12 h-10 sm:h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600 text-sm sm:text-base">Not linked to any conditions yet</p>
+                <p className="text-gray-600 text-sm sm:text-base">{t('interventions:detail.noConditions')}</p>
                 <Link
                   to="/conditions"
                   className="text-primary-600 hover:text-primary-700 text-sm mt-2 inline-block touch-manipulation"
                 >
-                  Link to conditions
+                  {t('interventions:detail.linkToConditions')}
                 </Link>
               </div>
             ) : (
@@ -353,12 +354,12 @@ const InterventionDetail = () => {
             {mediaItems.length === 0 ? (
               <div className="card text-center py-6 sm:py-8">
                 <Image className="w-10 sm:w-12 h-10 sm:h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600 text-sm sm:text-base">No media files uploaded yet</p>
+                <p className="text-gray-600 text-sm sm:text-base">{t('interventions:detail.noMedia')}</p>
                 <Link
                   to={`/interventions/${id}/edit`}
                   className="text-primary-600 hover:text-primary-700 text-sm mt-2 inline-block touch-manipulation"
                 >
-                  Upload media files
+                  {t('interventions:detail.uploadMedia')}
                 </Link>
               </div>
             ) : (
@@ -366,7 +367,7 @@ const InterventionDetail = () => {
                 {/* Images */}
                 {mediaItems.filter((m) => m.type === 'image').length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-3">Images</h3>
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">{t('common:labels.images')}</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                       {mediaItems
                         .filter((m) => m.type === 'image')
@@ -400,7 +401,7 @@ const InterventionDetail = () => {
                 {/* Documents */}
                 {mediaItems.filter((m) => m.type === 'document').length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-3">Documents</h3>
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">{t('interventions:detail.documents')}</h3>
                     <div className="space-y-2">
                       {mediaItems
                         .filter((m) => m.type === 'document')

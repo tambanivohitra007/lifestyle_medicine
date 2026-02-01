@@ -45,7 +45,9 @@
   "empty": {
     "title": "Aucun domaine de soins trouvé",
     "description": "Commencez par créer votre premier domaine de soins",
-    "action": "Ajouter un domaine de soins"
+    "action": "Ajouter un domaine de soins",
+    "noAvailable": "Aucun domaine de soins disponible.",
+    "createFirst": "Créer un domaine d'abord"
   },
   "toast": {
     "created": "Domaine de soins créé avec succès",

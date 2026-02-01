@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Stethoscope, Edit, Trash2, Eye, Layers, Tag, Save, Loader2, Image } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -14,6 +15,7 @@ import SlideOver from '../../components/shared/SlideOver';
 import MediaUploader from '../../components/shared/MediaUploader';
 
 const Interventions = () => {
+  const { t } = useTranslation(['interventions', 'common', 'careDomains', 'tags']);
   const { canEdit } = useAuth();
   const [interventions, setInterventions] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
@@ -95,11 +97,11 @@ const Interventions = () => {
 
     try {
       await api.delete(`${apiEndpoints.interventionsAdmin}/${id}`);
-      toast.success('Intervention deleted');
+      toast.success(t('interventions:toast.deleted'));
       fetchInterventions();
     } catch (error) {
       console.error('Error deleting intervention:', error);
-      toast.error('Failed to delete intervention');
+      toast.error(t('interventions:toast.deleteError'));
     }
   };
 
@@ -135,7 +137,7 @@ const Interventions = () => {
       setMedia(intervention.media || []);
     } catch (error) {
       console.error('Error fetching intervention:', error);
-      toast.error('Failed to load intervention');
+      toast.error(t('interventions:toast.loadError'));
       setIsModalOpen(false);
     } finally {
       setFormLoading(false);
@@ -153,10 +155,10 @@ const Interventions = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('common:validation.required', { field: t('common:labels.name') });
     }
     if (!formData.care_domain_id) {
-      newErrors.care_domain_id = 'Care domain is required';
+      newErrors.care_domain_id = t('common:validation.required', { field: t('careDomains:singular') });
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -170,10 +172,10 @@ const Interventions = () => {
       setSaving(true);
       if (editingId) {
         await api.put(`${apiEndpoints.interventionsAdmin}/${editingId}`, formData);
-        toast.success('Intervention updated');
+        toast.success(t('interventions:toast.updated'));
       } else {
         await api.post(apiEndpoints.interventionsAdmin, formData);
-        toast.success('Intervention created');
+        toast.success(t('interventions:toast.created'));
       }
       closeModal();
       fetchInterventions();
@@ -184,7 +186,7 @@ const Interventions = () => {
       } else if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error('Failed to save intervention');
+        toast.error(t('interventions:toast.saveFailed'));
       }
     } finally {
       setSaving(false);
@@ -204,9 +206,9 @@ const Interventions = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Interventions</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('interventions:title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage lifestyle interventions and strategies
+            {t('interventions:list.subtitle')}
           </p>
         </div>
         {canEdit && (
@@ -215,7 +217,7 @@ const Interventions = () => {
             className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Plus className="w-5 h-5" />
-            Add Intervention
+            {t('interventions:list.addNew')}
           </button>
         )}
       </div>
@@ -228,7 +230,7 @@ const Interventions = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search interventions..."
+              placeholder={t('interventions:list.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -241,7 +243,7 @@ const Interventions = () => {
             onChange={(e) => setDomainFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Care Domains</option>
+            <option value="">{t('interventions:list.allDomains')}</option>
             {careDomains.map((domain) => (
               <option key={domain.id} value={domain.id}>
                 {domain.name}
@@ -255,7 +257,7 @@ const Interventions = () => {
             onChange={(e) => setTagFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Tags</option>
+            <option value="">{t('tags:list.allTags')}</option>
             {contentTags.map((tag) => (
               <option key={tag.id} value={tag.id}>
                 {tag.name}
@@ -268,7 +270,7 @@ const Interventions = () => {
       {/* View Mode Toggle Bar */}
       <div className="flex items-center justify-between gap-3 bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200">
         <div className="text-xs sm:text-sm text-gray-500">
-          {pagination.total} {pagination.total === 1 ? 'intervention' : 'interventions'}
+          {pagination.total} {pagination.total === 1 ? t('interventions:singular') : t('interventions:plural')}
         </div>
         <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
       </div>
@@ -284,10 +286,10 @@ const Interventions = () => {
         <div className="card text-center py-8 sm:py-12">
           <Stethoscope className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No interventions found
+            {t('interventions:empty.title')}
           </h3>
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Get started by creating your first intervention.
+            {t('interventions:empty.description')}
           </p>
           {canEdit && (
             <button
@@ -295,7 +297,7 @@ const Interventions = () => {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Intervention
+              {t('interventions:empty.action')}
             </button>
           )}
         </div>
@@ -317,7 +319,7 @@ const Interventions = () => {
                       <Link
                         to={`/interventions/${intervention.id}`}
                         className="action-btn"
-                        title="View Details"
+                        title={t('common:buttons.viewDetails')}
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
@@ -326,14 +328,14 @@ const Interventions = () => {
                           <button
                             onClick={() => openEditModal(intervention.id)}
                             className="action-btn"
-                            title="Edit"
+                            title={t('common:buttons.edit')}
                           >
                             <Edit className="w-4 h-4 text-gray-600" />
                           </button>
                           <button
                             onClick={() => handleDelete(intervention.id, intervention.name)}
                             className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title="Delete"
+                            title={t('common:buttons.delete')}
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
@@ -383,7 +385,7 @@ const Interventions = () => {
                       to={`/interventions/${intervention.id}`}
                       className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
                     >
-                      View Details →
+                      {t('common:buttons.viewDetails')} →
                     </Link>
                   </div>
                 </div>
@@ -416,8 +418,8 @@ const Interventions = () => {
       <SlideOver
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingId ? 'Edit Intervention' : 'New Intervention'}
-        subtitle={editingId ? 'Update the intervention details' : 'Create a new lifestyle intervention'}
+        title={editingId ? t('interventions:form.editTitle') : t('interventions:form.createTitle')}
+        subtitle={editingId ? t('interventions:form.editSubtitle') : t('interventions:form.newSubtitle')}
         size="lg"
       >
         {formLoading ? (
@@ -429,7 +431,7 @@ const Interventions = () => {
             {/* Care Domain */}
             <div>
               <label htmlFor="care_domain_id" className="label">
-                Care Domain <span className="text-red-500">*</span>
+                {t('careDomains:singular')} <span className="text-red-500">*</span>
               </label>
               <select
                 id="care_domain_id"
@@ -438,7 +440,7 @@ const Interventions = () => {
                 onChange={handleChange}
                 className={`input-field ${errors.care_domain_id ? 'border-red-500' : ''}`}
               >
-                <option value="">Select a care domain</option>
+                <option value="">{t('interventions:form.selectDomain')}</option>
                 {careDomains.map((domain) => (
                   <option key={domain.id} value={domain.id}>
                     {domain.name}
@@ -455,7 +457,7 @@ const Interventions = () => {
             {/* Name */}
             <div>
               <label htmlFor="name" className="label">
-                Name <span className="text-red-500">*</span>
+                {t('common:labels.name')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -464,7 +466,7 @@ const Interventions = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className={`input-field ${errors.name ? 'border-red-500' : ''}`}
-                placeholder="e.g., Plant-Based Diet, HIIT Training"
+                placeholder={t('interventions:form.namePlaceholder')}
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-500">
@@ -476,7 +478,7 @@ const Interventions = () => {
             {/* Description */}
             <div>
               <label htmlFor="description" className="label">
-                Description
+                {t('common:labels.description')}
               </label>
               <textarea
                 id="description"
@@ -485,7 +487,7 @@ const Interventions = () => {
                 onChange={handleChange}
                 rows={4}
                 className={`input-field ${errors.description ? 'border-red-500' : ''}`}
-                placeholder="A brief description of the intervention..."
+                placeholder={t('interventions:form.descriptionPlaceholder')}
               />
               {errors.description && (
                 <p className="mt-1 text-sm text-red-500">
@@ -497,7 +499,7 @@ const Interventions = () => {
             {/* Mechanism */}
             <div>
               <label htmlFor="mechanism" className="label">
-                Mechanism of Action
+                {t('interventions:form.mechanism')}
               </label>
               <textarea
                 id="mechanism"
@@ -506,7 +508,7 @@ const Interventions = () => {
                 onChange={handleChange}
                 rows={4}
                 className={`input-field ${errors.mechanism ? 'border-red-500' : ''}`}
-                placeholder="How does this intervention work? What is the physiological mechanism?"
+                placeholder={t('interventions:form.mechanismPlaceholder')}
               />
               {errors.mechanism && (
                 <p className="mt-1 text-sm text-red-500">
@@ -520,10 +522,10 @@ const Interventions = () => {
               <div className="pt-6 border-t border-gray-200">
                 <label className="label flex items-center gap-2">
                   <Image className="w-4 h-4" />
-                  Media Files
+                  {t('common:labels.media')}
                 </label>
                 <p className="text-sm text-gray-500 mb-4">
-                  Upload images and documents related to this intervention
+                  {t('interventions:form.mediaDescription')}
                 </p>
                 <MediaUploader
                   interventionId={editingId}
@@ -545,14 +547,14 @@ const Interventions = () => {
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {saving ? 'Saving...' : 'Save Intervention'}
+                {saving ? t('common:buttons.saving') : t('common:buttons.save')}
               </button>
               <button
                 type="button"
                 onClick={closeModal}
                 className="btn-outline w-full sm:w-auto"
               >
-                Cancel
+                {t('common:buttons.cancel')}
               </button>
             </div>
           </form>

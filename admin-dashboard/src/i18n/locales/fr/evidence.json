@@ -72,6 +72,24 @@
     "expertOpinion": "Opinion d'expert",
     "other": "Autre"
   },
+  "quality": {
+    "high": "Haute qualité",
+    "good": "Bonne qualité",
+    "moderate": "Qualité modérée",
+    "low": "Faible qualité"
+  },
+  "studyTypes": {
+    "rct": "ECR",
+    "metaAnalysis": "Méta-analyse",
+    "systematicReview": "Revue systématique",
+    "observational": "Observationnel",
+    "caseSeries": "Série de cas",
+    "expertOpinion": "Opinion d'expert"
+  },
+  "labels": {
+    "population": "Population",
+    "references": "Références"
+  },
   "empty": {
     "title": "Aucune preuve trouvée",
     "description": "Commencez par ajouter votre première preuve",

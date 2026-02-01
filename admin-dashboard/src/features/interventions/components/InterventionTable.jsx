@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, Layers, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
 
 /**
@@ -12,6 +13,8 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {boolean} canEdit - Whether user has edit permissions
  */
 const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
+  const { t } = useTranslation(['interventions', 'careDomains', 'common']);
+
   return (
     <>
       {/* Mobile Card Layout */}
@@ -36,7 +39,7 @@ const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
                 <Link
                   to={`/interventions/${intervention.id}`}
                   className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
-                  title="View"
+                  title={t('common:buttons.view')}
                 >
                   <Eye className="w-4 h-4" />
                 </Link>
@@ -45,14 +48,14 @@ const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
                     <button
                       onClick={() => onEdit(intervention.id)}
                       className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
-                      title="Edit"
+                      title={t('common:buttons.edit')}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onDelete(intervention.id, intervention.name)}
                       className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation"
-                      title="Delete"
+                      title={t('common:buttons.delete')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -86,7 +89,7 @@ const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
               </div>
             )}
             <div className="mt-2 text-xs text-gray-400">
-              Updated {intervention.updated_at
+              {t('common:audit.updatedAt')} {intervention.updated_at
                 ? formatDistanceToNow(new Date(intervention.updated_at), { addSuffix: true })
                 : '-'}
             </div>
@@ -101,22 +104,22 @@ const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
+                  {t('common:labels.name')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Care Domain
+                  {t('careDomains:singular')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tags
+                  {t('common:labels.tags')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
+                  {t('common:labels.description')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Updated
+                  {t('common:labels.updatedAt')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('common:labels.actions')}
                 </th>
               </tr>
             </thead>
@@ -182,7 +185,7 @@ const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
                       <Link
                         to={`/interventions/${intervention.id}`}
                         className="action-btn"
-                        title="View Details"
+                        title={t('common:buttons.viewDetails')}
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
@@ -191,14 +194,14 @@ const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
                           <button
                             onClick={() => onEdit(intervention.id)}
                             className="action-btn"
-                            title="Edit"
+                            title={t('common:buttons.edit')}
                           >
                             <Edit className="w-4 h-4 text-gray-600" />
                           </button>
                           <button
                             onClick={() => onDelete(intervention.id, intervention.name)}
                             className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title="Delete"
+                            title={t('common:buttons.delete')}
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>

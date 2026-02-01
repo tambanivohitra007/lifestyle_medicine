@@ -72,6 +72,24 @@
     "expertOpinion": "Expert Opinion",
     "other": "Other"
   },
+  "quality": {
+    "high": "High Quality",
+    "good": "Good Quality",
+    "moderate": "Moderate Quality",
+    "low": "Low Quality"
+  },
+  "studyTypes": {
+    "rct": "RCT",
+    "metaAnalysis": "Meta-Analysis",
+    "systematicReview": "Systematic Review",
+    "observational": "Observational",
+    "caseSeries": "Case Series",
+    "expertOpinion": "Expert Opinion"
+  },
+  "labels": {
+    "population": "Population",
+    "references": "References"
+  },
   "empty": {
     "title": "No evidence found",
     "description": "Get started by adding your first evidence",

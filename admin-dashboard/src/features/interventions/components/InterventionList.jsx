@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, Stethoscope, Layers, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
 
 /**
@@ -11,6 +12,8 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {boolean} canEdit - Whether user has edit permissions
  */
 const InterventionList = ({ interventions, onDelete, onEdit, canEdit }) => {
+  const { t } = useTranslation(['common']);
+
   return (
     <div className="space-y-3">
       {interventions.map((intervention) => (
@@ -72,7 +75,7 @@ const InterventionList = ({ interventions, onDelete, onEdit, canEdit }) => {
                   <Link
                     to={`/interventions/${intervention.id}`}
                     className="action-btn p-2 touch-manipulation"
-                    title="View Details"
+                    title={t('common:buttons.viewDetails')}
                   >
                     <Eye className="w-4 h-4 text-gray-600" />
                   </Link>
@@ -81,14 +84,14 @@ const InterventionList = ({ interventions, onDelete, onEdit, canEdit }) => {
                       <button
                         onClick={() => onEdit(intervention.id)}
                         className="action-btn p-2 touch-manipulation"
-                        title="Edit"
+                        title={t('common:buttons.edit')}
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
                         onClick={() => onDelete(intervention.id, intervention.name)}
                         className="action-btn p-2 touch-manipulation hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
+                        title={t('common:buttons.delete')}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
@@ -100,9 +103,9 @@ const InterventionList = ({ interventions, onDelete, onEdit, canEdit }) => {
               {/* Footer */}
               <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
                 <span>
-                  Updated {intervention.updated_at
+                  {t('common:audit.updatedAt')} {intervention.updated_at
                     ? formatDistanceToNow(new Date(intervention.updated_at), { addSuffix: true })
-                    : 'recently'}
+                    : t('common:time.recently')}
                 </span>
               </div>
             </div>
