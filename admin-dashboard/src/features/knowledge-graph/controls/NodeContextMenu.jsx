@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef } from 'react';
 import { Eye, ExternalLink, Focus, Copy, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Context menu that appears on right-click of a node.
@@ -13,6 +14,7 @@ const NodeContextMenu = memo(({
   onNavigate,
   onFocus,
 }) => {
+  const { t } = useTranslation(['knowledgeGraph']);
   const menuRef = useRef(null);
 
   // Close menu when clicking outside
@@ -53,7 +55,7 @@ const NodeContextMenu = memo(({
     // View details in side panel (not for groups)
     !isGroupNode && {
       icon: Eye,
-      label: 'View Details',
+      label: t('knowledgeGraph:contextMenu.viewDetails'),
       onClick: () => {
         onViewDetails(node);
         onClose();
@@ -62,7 +64,7 @@ const NodeContextMenu = memo(({
     // Navigate to full page (only for certain types)
     !isGroupNode && hasDetailPage && {
       icon: ExternalLink,
-      label: 'Open Full Page',
+      label: t('knowledgeGraph:contextMenu.openFullPage'),
       onClick: () => {
         onNavigate(node.type, node.data?.entityId);
         onClose();
@@ -71,7 +73,7 @@ const NodeContextMenu = memo(({
     // Focus/zoom on node
     {
       icon: Focus,
-      label: isGroupNode ? 'Zoom to Group' : 'Focus on Node',
+      label: isGroupNode ? t('knowledgeGraph:contextMenu.zoomToGroup') : t('knowledgeGraph:contextMenu.focusOnNode'),
       onClick: () => {
         onFocus(node);
         onClose();
@@ -80,7 +82,7 @@ const NodeContextMenu = memo(({
     // Copy node label
     !isGroupNode && {
       icon: Copy,
-      label: 'Copy Name',
+      label: t('knowledgeGraph:contextMenu.copyName'),
       onClick: handleCopyLabel,
     },
   ].filter(Boolean);
@@ -97,10 +99,10 @@ const NodeContextMenu = memo(({
       {/* Header */}
       <div className="px-3 py-2 border-b border-gray-100">
         <div className="text-[10px] text-gray-400 uppercase tracking-wide">
-          {isGroupNode ? 'Group' : node.type}
+          {isGroupNode ? t('knowledgeGraph:contextMenu.group') : t(`knowledgeGraph:nodes.${node.type}`)}
         </div>
         <div className="text-xs font-medium text-gray-900 truncate max-w-[180px]">
-          {node.data?.label || 'Untitled'}
+          {node.data?.label || t('knowledgeGraph:contextMenu.untitled')}
         </div>
       </div>
 
@@ -120,7 +122,7 @@ const NodeContextMenu = memo(({
 
       {/* Close hint */}
       <div className="px-3 py-1.5 border-t border-gray-100 text-[10px] text-gray-400">
-        Press Esc to close
+        {t('knowledgeGraph:contextMenu.escToClose')}
       </div>
     </div>
   );

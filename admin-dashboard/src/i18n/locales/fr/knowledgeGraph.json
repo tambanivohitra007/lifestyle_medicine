@@ -92,7 +92,8 @@
   },
   "search": {
     "placeholder": "Rechercher des nœuds...",
-    "noResults": "Aucun nœud trouvé"
+    "noResults": "Aucun nœud trouvé",
+    "navigationHint": "↑↓ pour naviguer, Entrée pour sélectionner"
   },
   "stats": {
     "totalNodes": "Total des nœuds",
@@ -103,10 +104,25 @@
     "edges": "Connexions"
   },
   "export": {
-    "title": "Exporter le graphe",
+    "title": "Exporter",
     "asPng": "Exporter en PNG",
     "asSvg": "Exporter en SVG",
-    "asJson": "Exporter en JSON"
+    "asJson": "Exporter en JSON",
+    "downloadPng": "Télécharger PNG",
+    "downloadSvg": "Télécharger SVG",
+    "vector": "vectoriel",
+    "printPdf": "Imprimer / PDF",
+    "copyLink": "Copier le lien",
+    "copied": "Copié !",
+    "tip": "Astuce : Utilisez Ctrl+S pour enregistrer rapidement en PNG",
+    "quality": {
+      "standard": "Standard",
+      "standardDesc": "Idéal pour le partage",
+      "high": "Haute qualité",
+      "highDesc": "Meilleur pour l'impression",
+      "print": "Qualité impression",
+      "printDesc": "Meilleure qualité, fichier plus volumineux"
+    }
   },
   "shortcuts": {
     "title": "Raccourcis",
@@ -119,6 +135,35 @@
     "radialLayout": "Disposition radiale",
     "clusterLayout": "Disposition en cluster",
     "clearSelection": "Effacer la sélection"
+  },
+  "contextMenu": {
+    "viewDetails": "Voir les détails",
+    "openFullPage": "Ouvrir la page complète",
+    "zoomToGroup": "Zoomer sur le groupe",
+    "focusOnNode": "Focus sur le nœud",
+    "copyName": "Copier le nom",
+    "group": "Groupe",
+    "untitled": "Sans titre",
+    "escToClose": "Appuyez sur Échap pour fermer"
+  },
+  "legend": {
+    "title": "Légende",
+    "clickToToggle": "(cliquer pour basculer)",
+    "show": "Afficher {{type}}",
+    "hide": "Masquer {{type}}",
+    "typesHidden": "{{count}} type masqué",
+    "typesHidden_plural": "{{count}} types masqués"
+  },
+  "studyTypes": {
+    "rct": "ECR",
+    "metaAnalysis": "Méta",
+    "systematicReview": "Systématique",
+    "observational": "Observationnel",
+    "caseSeries": "Série de cas",
+    "expertOpinion": "Expert"
+  },
+  "evidence": {
+    "grade": "Grade {{grade}}"
   },
   "empty": {
     "title": "Aucune donnée à afficher",

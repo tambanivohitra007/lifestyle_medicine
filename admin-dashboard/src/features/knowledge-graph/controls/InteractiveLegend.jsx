@@ -1,14 +1,15 @@
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const LEGEND_ITEMS = [
-  { type: 'condition', label: 'Condition', color: '#ef4444' },
-  { type: 'intervention', label: 'Intervention', color: '#f43f5e' },
-  { type: 'careDomain', label: 'Care Domain', color: '#3b82f6' },
-  { type: 'scripture', label: 'Scripture', color: '#6366f1' },
-  { type: 'egwReference', label: 'EGW Reference', color: '#8b5cf6' },
-  { type: 'recipe', label: 'Recipe', color: '#f59e0b' },
-  { type: 'evidenceEntry', label: 'Evidence', color: '#10b981' },
-  { type: 'reference', label: 'Reference', color: '#64748b' },
+const LEGEND_ITEMS_CONFIG = [
+  { type: 'condition', labelKey: 'knowledgeGraph:nodes.condition', color: '#ef4444' },
+  { type: 'intervention', labelKey: 'knowledgeGraph:nodes.intervention', color: '#f43f5e' },
+  { type: 'careDomain', labelKey: 'knowledgeGraph:nodes.careDomain', color: '#3b82f6' },
+  { type: 'scripture', labelKey: 'knowledgeGraph:nodes.scripture', color: '#6366f1' },
+  { type: 'egwReference', labelKey: 'knowledgeGraph:nodes.egwReference', color: '#8b5cf6' },
+  { type: 'recipe', labelKey: 'knowledgeGraph:nodes.recipe', color: '#f59e0b' },
+  { type: 'evidenceEntry', labelKey: 'knowledgeGraph:nodes.evidence', color: '#10b981' },
+  { type: 'reference', labelKey: 'knowledgeGraph:nodes.reference', color: '#64748b' },
 ];
 
 /**
@@ -16,15 +17,18 @@ const LEGEND_ITEMS = [
  * Click on an item to toggle its visibility.
  */
 const InteractiveLegend = memo(({ hiddenTypes = [], onToggleType }) => {
+  const { t } = useTranslation(['knowledgeGraph']);
+
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
       <div className="text-xs font-medium text-gray-700 mb-2">
-        Legend
-        <span className="text-[10px] text-gray-400 font-normal ml-1">(click to toggle)</span>
+        {t('knowledgeGraph:legend.title')}
+        <span className="text-[10px] text-gray-400 font-normal ml-1">{t('knowledgeGraph:legend.clickToToggle')}</span>
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-        {LEGEND_ITEMS.map((item) => {
+        {LEGEND_ITEMS_CONFIG.map((item) => {
           const isHidden = hiddenTypes.includes(item.type);
+          const label = t(item.labelKey);
           return (
             <button
               key={item.type}
@@ -34,7 +38,7 @@ const InteractiveLegend = memo(({ hiddenTypes = [], onToggleType }) => {
                 hover:bg-gray-50
                 ${isHidden ? 'opacity-40' : 'opacity-100'}
               `}
-              title={isHidden ? `Show ${item.label}` : `Hide ${item.label}`}
+              title={isHidden ? t('knowledgeGraph:legend.show', { type: label }) : t('knowledgeGraph:legend.hide', { type: label })}
             >
               <div
                 className={`w-2.5 h-2.5 rounded-full transition-transform ${
@@ -43,7 +47,7 @@ const InteractiveLegend = memo(({ hiddenTypes = [], onToggleType }) => {
                 style={{ backgroundColor: item.color }}
               />
               <span className={isHidden ? 'line-through text-gray-400' : ''}>
-                {item.label}
+                {label}
               </span>
             </button>
           );
@@ -51,7 +55,7 @@ const InteractiveLegend = memo(({ hiddenTypes = [], onToggleType }) => {
       </div>
       {hiddenTypes.length > 0 && (
         <div className="mt-2 pt-2 border-t border-gray-100 text-[10px] text-gray-400 text-center">
-          {hiddenTypes.length} type{hiddenTypes.length > 1 ? 's' : ''} hidden
+          {t('knowledgeGraph:legend.typesHidden', { count: hiddenTypes.length })}
         </div>
       )}
     </div>

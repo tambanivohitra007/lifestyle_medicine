@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { FileCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const QUALITY_COLORS = {
   A: { bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
@@ -9,18 +10,20 @@ const QUALITY_COLORS = {
   D: { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' },
 };
 
-const STUDY_TYPE_SHORT = {
-  rct: 'RCT',
-  meta_analysis: 'Meta',
-  systematic_review: 'Systematic',
-  observational: 'Observational',
-  case_series: 'Case Series',
-  expert_opinion: 'Expert',
+const STUDY_TYPE_KEYS = {
+  rct: 'knowledgeGraph:studyTypes.rct',
+  meta_analysis: 'knowledgeGraph:studyTypes.metaAnalysis',
+  systematic_review: 'knowledgeGraph:studyTypes.systematicReview',
+  observational: 'knowledgeGraph:studyTypes.observational',
+  case_series: 'knowledgeGraph:studyTypes.caseSeries',
+  expert_opinion: 'knowledgeGraph:studyTypes.expertOpinion',
 };
 
 const EvidenceEntryNode = memo(({ data, selected }) => {
+  const { t } = useTranslation(['knowledgeGraph']);
   const quality = QUALITY_COLORS[data.qualityRating] || QUALITY_COLORS.C;
-  const studyType = STUDY_TYPE_SHORT[data.studyType] || data.studyType;
+  const studyTypeKey = STUDY_TYPE_KEYS[data.studyType];
+  const studyType = studyTypeKey ? t(studyTypeKey) : data.studyType;
   const isHighlighted = data.isHighlighted;
 
   return (
@@ -46,7 +49,7 @@ const EvidenceEntryNode = memo(({ data, selected }) => {
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wide mb-0.5">
-            Evidence
+            {t('knowledgeGraph:nodes.evidence')}
           </div>
           <div
             className="font-bold text-sm text-gray-900 leading-tight"
@@ -63,7 +66,7 @@ const EvidenceEntryNode = memo(({ data, selected }) => {
           <div className="flex items-center gap-1.5">
             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${quality.bg} ${quality.text}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${quality.dot}`}></span>
-              Grade {data.qualityRating}
+              {t('knowledgeGraph:evidence.grade', { grade: data.qualityRating })}
             </span>
           </div>
         )}

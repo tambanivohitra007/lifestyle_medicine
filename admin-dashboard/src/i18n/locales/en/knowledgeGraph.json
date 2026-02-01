@@ -92,7 +92,8 @@
   },
   "search": {
     "placeholder": "Search nodes...",
-    "noResults": "No nodes found"
+    "noResults": "No nodes found",
+    "navigationHint": "↑↓ to navigate, Enter to select"
   },
   "stats": {
     "totalNodes": "Total Nodes",
@@ -103,10 +104,25 @@
     "edges": "Edges"
   },
   "export": {
-    "title": "Export Graph",
+    "title": "Export",
     "asPng": "Export as PNG",
     "asSvg": "Export as SVG",
-    "asJson": "Export as JSON"
+    "asJson": "Export as JSON",
+    "downloadPng": "Download PNG",
+    "downloadSvg": "Download SVG",
+    "vector": "vector",
+    "printPdf": "Print / PDF",
+    "copyLink": "Copy Link",
+    "copied": "Copied!",
+    "tip": "Tip: Use Ctrl+S to quick save PNG",
+    "quality": {
+      "standard": "Standard",
+      "standardDesc": "Good for sharing",
+      "high": "High Quality",
+      "highDesc": "Better for printing",
+      "print": "Print Quality",
+      "printDesc": "Best quality, larger file"
+    }
   },
   "shortcuts": {
     "title": "Shortcuts",
@@ -119,6 +135,35 @@
     "radialLayout": "Radial layout",
     "clusterLayout": "Cluster layout",
     "clearSelection": "Clear selection"
+  },
+  "contextMenu": {
+    "viewDetails": "View Details",
+    "openFullPage": "Open Full Page",
+    "zoomToGroup": "Zoom to Group",
+    "focusOnNode": "Focus on Node",
+    "copyName": "Copy Name",
+    "group": "Group",
+    "untitled": "Untitled",
+    "escToClose": "Press Esc to close"
+  },
+  "legend": {
+    "title": "Legend",
+    "clickToToggle": "(click to toggle)",
+    "show": "Show {{type}}",
+    "hide": "Hide {{type}}",
+    "typesHidden": "{{count}} type hidden",
+    "typesHidden_plural": "{{count}} types hidden"
+  },
+  "studyTypes": {
+    "rct": "RCT",
+    "metaAnalysis": "Meta",
+    "systematicReview": "Systematic",
+    "observational": "Observational",
+    "caseSeries": "Case Series",
+    "expertOpinion": "Expert"
+  },
+  "evidence": {
+    "grade": "Grade {{grade}}"
   },
   "empty": {
     "title": "No data to display",

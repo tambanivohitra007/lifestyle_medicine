@@ -12,6 +12,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { Link } from 'react-router-dom';
 import { Loader2, Layout, ChevronLeft, ChevronRight, BarChart3, Eye, EyeOff, RotateCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
@@ -20,6 +21,7 @@ import { useKeyboardShortcuts, useLayoutPersistence } from './hooks';
 import api from '../../lib/api';
 
 const FullGraphInner = () => {
+  const { t } = useTranslation(['knowledgeGraph']);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [allNodes, setAllNodes] = useState([]);
@@ -405,7 +407,7 @@ const FullGraphInner = () => {
       <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Loading full knowledge graph...</p>
+          <p className="text-sm text-gray-600">{t('knowledgeGraph:loading.full')}</p>
         </div>
       </div>
     );
@@ -415,13 +417,13 @@ const FullGraphInner = () => {
     return (
       <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
         <div className="text-center text-red-600">
-          <p className="font-medium">Error loading graph</p>
+          <p className="font-medium">{t('knowledgeGraph:error.title')}</p>
           <p className="text-sm">{error}</p>
           <button
             onClick={() => fetchGraphData(1)}
             className="mt-2 px-3 py-1 text-sm bg-red-100 hover:bg-red-200 rounded-md transition-colors"
           >
-            Retry
+            {t('knowledgeGraph:error.retry')}
           </button>
         </div>
       </div>
@@ -477,15 +479,15 @@ const FullGraphInner = () => {
                 className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Back to Dashboard</span>
+                <span className="hidden sm:inline">{t('knowledgeGraph:controls.backToDashboard')}</span>
               </Link>
               <button
                 onClick={() => setShowUI(!showUI)}
                 className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                title={showUI ? 'Hide UI (show only graph)' : 'Show UI'}
+                title={showUI ? t('knowledgeGraph:controls.hideUITooltip') : t('knowledgeGraph:controls.showUI')}
               >
                 {showUI ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                <span className="hidden sm:inline">{showUI ? 'Hide UI' : 'Show UI'}</span>
+                <span className="hidden sm:inline">{showUI ? t('knowledgeGraph:controls.hideUI') : t('knowledgeGraph:controls.showUI')}</span>
               </button>
             </div>
 
@@ -514,7 +516,7 @@ const FullGraphInner = () => {
               <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
                 <div className="flex items-center gap-2 mb-2">
                   <Layout className="w-4 h-4 text-gray-500" />
-                  <span className="text-xs font-medium text-gray-700">Layout</span>
+                  <span className="text-xs font-medium text-gray-700">{t('knowledgeGraph:controls.layout')}</span>
                 </div>
                 <select
                   value={layoutType}
@@ -536,10 +538,10 @@ const FullGraphInner = () => {
                   fetchGraphData(1);
                 }}
                 className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2"
-                title="Reset to default layout"
+                title={t('knowledgeGraph:controls.resetLayoutTooltip')}
               >
                 <RotateCcw className="w-4 h-4" />
-                <span>Reset Layout</span>
+                <span>{t('knowledgeGraph:controls.resetLayout')}</span>
               </button>
 
               {/* Stats */}
@@ -547,20 +549,20 @@ const FullGraphInner = () => {
                 <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <BarChart3 className="w-4 h-4 text-gray-500" />
-                    <span className="text-xs font-medium text-gray-700">Statistics</span>
+                    <span className="text-xs font-medium text-gray-700">{t('knowledgeGraph:stats.title')}</span>
                   </div>
                   <div className="space-y-1 text-xs text-gray-600">
                     <div className="flex justify-between">
-                      <span>Visible Nodes:</span>
+                      <span>{t('knowledgeGraph:stats.visibleNodes')}:</span>
                       <span className="font-medium">{nodes.length}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Visible Edges:</span>
+                      <span>{t('knowledgeGraph:stats.visibleEdges')}:</span>
                       <span className="font-medium">{edges.length}</span>
                     </div>
                     <div className="border-t border-gray-100 pt-1 mt-1">
                       <div className="flex justify-between text-gray-400">
-                        <span>Total in DB:</span>
+                        <span>{t('knowledgeGraph:stats.totalInDb')}:</span>
                         <span>{meta.totalNodes}</span>
                       </div>
                     </div>
@@ -597,7 +599,7 @@ const FullGraphInner = () => {
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      <span>Load More</span>
+                      <span>{t('knowledgeGraph:controls.loadMore')}</span>
                       <ChevronRight className="w-4 h-4" />
                     </>
                   )}

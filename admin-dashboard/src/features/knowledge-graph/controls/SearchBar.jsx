@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const NODE_TYPE_COLORS = {
   condition: '#ef4444',
@@ -13,6 +14,7 @@ const NODE_TYPE_COLORS = {
 };
 
 const SearchBar = ({ nodes = [], onSelectNode, onClearSearch }) => {
+  const { t } = useTranslation(['knowledgeGraph']);
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -90,17 +92,17 @@ const SearchBar = ({ nodes = [], onSelectNode, onClearSearch }) => {
   };
 
   const getNodeTypeLabel = (type) => {
-    const labels = {
-      condition: 'Condition',
-      intervention: 'Intervention',
-      careDomain: 'Care Domain',
-      scripture: 'Scripture',
-      egwReference: 'EGW Ref',
-      recipe: 'Recipe',
-      evidenceEntry: 'Evidence',
-      reference: 'Reference',
+    const labelKeys = {
+      condition: 'knowledgeGraph:nodes.condition',
+      intervention: 'knowledgeGraph:nodes.intervention',
+      careDomain: 'knowledgeGraph:nodes.careDomain',
+      scripture: 'knowledgeGraph:nodes.scripture',
+      egwReference: 'knowledgeGraph:nodes.egwReference',
+      recipe: 'knowledgeGraph:nodes.recipe',
+      evidenceEntry: 'knowledgeGraph:nodes.evidence',
+      reference: 'knowledgeGraph:nodes.reference',
     };
-    return labels[type] || type;
+    return labelKeys[type] ? t(labelKeys[type]) : type;
   };
 
   return (
@@ -117,7 +119,7 @@ const SearchBar = ({ nodes = [], onSelectNode, onClearSearch }) => {
               setIsOpen(true);
             }}
             onFocus={() => setIsOpen(true)}
-            placeholder="Search nodes..."
+            placeholder={t('knowledgeGraph:search.placeholder')}
             className="w-full pl-8 pr-8 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
           />
           {query && (
@@ -160,7 +162,7 @@ const SearchBar = ({ nodes = [], onSelectNode, onClearSearch }) => {
             ))}
           </ul>
           <div className="px-3 py-1.5 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-400">
-            Use ↑↓ to navigate, Enter to select
+            {t('knowledgeGraph:search.navigationHint')}
           </div>
         </div>
       )}
@@ -168,7 +170,7 @@ const SearchBar = ({ nodes = [], onSelectNode, onClearSearch }) => {
       {/* No results message */}
       {isOpen && query.length >= 2 && filteredNodes.length === 0 && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 p-3 z-50">
-          <p className="text-xs text-gray-500 text-center">No nodes found</p>
+          <p className="text-xs text-gray-500 text-center">{t('knowledgeGraph:search.noResults')}</p>
         </div>
       )}
     </div>

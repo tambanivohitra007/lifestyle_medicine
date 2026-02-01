@@ -2,14 +2,17 @@ import { useState, useCallback } from 'react';
 import { useReactFlow, getNodesBounds, getViewportForBounds } from 'reactflow';
 import { Download, Image, FileCode, Copy, Check, Share2, ChevronDown, Printer, Loader2 } from 'lucide-react';
 import { toPng, toSvg } from 'html-to-image';
+import { useTranslation } from 'react-i18next';
 
-const QUALITY_OPTIONS = [
-  { label: 'Standard (2x)', value: 2, description: 'Good for web sharing' },
-  { label: 'High (4x)', value: 4, description: 'Best for presentations' },
-  { label: 'Print (6x)', value: 6, description: 'Best for printing' },
+const QUALITY_OPTIONS_CONFIG = [
+  { labelKey: 'knowledgeGraph:export.quality.standard', value: 2, descriptionKey: 'knowledgeGraph:export.quality.standardDesc' },
+  { labelKey: 'knowledgeGraph:export.quality.high', value: 4, descriptionKey: 'knowledgeGraph:export.quality.highDesc' },
+  { labelKey: 'knowledgeGraph:export.quality.print', value: 6, descriptionKey: 'knowledgeGraph:export.quality.printDesc' },
 ];
 
-const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
+const ExportPanel = ({ graphTitle }) => {
+  const { t } = useTranslation(['knowledgeGraph']);
+  const translatedTitle = graphTitle || t('knowledgeGraph:title');
   const { getNodes } = useReactFlow();
   const [exporting, setExporting] = useState(false);
   const [exportType, setExportType] = useState(null); // 'png', 'svg', 'print'
@@ -68,7 +71,7 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
       };
 
       const timestamp = new Date().toISOString().slice(0, 10);
-      const filename = `${graphTitle.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`;
+      const filename = `${translatedTitle.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`;
 
       let dataUrl;
       if (type === 'svg') {
@@ -77,7 +80,7 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
       } else if (type === 'print') {
         // Generate high-res PNG and open in new window for printing
         dataUrl = await toPng(viewportElement, { ...options, pixelRatio: 4 });
-        openPrintWindow(dataUrl, graphTitle);
+        openPrintWindow(dataUrl, translatedTitle);
       } else {
         const qualitySuffix = pixelRatio > 2 ? `-${pixelRatio}x` : '';
         dataUrl = await toPng(viewportElement, { ...options, pixelRatio });
@@ -91,7 +94,7 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
       setExportType(null);
       setShowQualityMenu(false);
     }
-  }, [getNodes, graphTitle]);
+  }, [getNodes, translatedTitle]);
 
   const downloadFile = (dataUrl, filename) => {
     const link = document.createElement('a');
@@ -158,7 +161,7 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
       <div className="flex items-center gap-2 mb-3">
         <Download className="w-4 h-4 text-gray-500" />
-        <span className="text-xs font-medium text-gray-700">Export</span>
+        <span className="text-xs font-medium text-gray-700">{t('knowledgeGraph:export.title')}</span>
       </div>
 
       <div className="space-y-2">
@@ -174,21 +177,21 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
             ) : (
               <Image className="w-4 h-4 text-blue-500" />
             )}
-            <span className="flex-1">Download PNG</span>
+            <span className="flex-1">{t('knowledgeGraph:export.downloadPng')}</span>
             <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${showQualityMenu ? 'rotate-180' : ''}`} />
           </button>
 
           {/* Quality dropdown */}
           {showQualityMenu && !exporting && (
             <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 overflow-hidden">
-              {QUALITY_OPTIONS.map((option) => (
+              {QUALITY_OPTIONS_CONFIG.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => downloadImage('png', option.value)}
                   className="w-full flex flex-col items-start px-3 py-2 text-xs hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
                 >
-                  <span className="font-medium text-gray-700">{option.label}</span>
-                  <span className="text-[10px] text-gray-400">{option.description}</span>
+                  <span className="font-medium text-gray-700">{t(option.labelKey)}</span>
+                  <span className="text-[10px] text-gray-400">{t(option.descriptionKey)}</span>
                 </button>
               ))}
             </div>
@@ -206,8 +209,8 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
           ) : (
             <FileCode className="w-4 h-4 text-green-500" />
           )}
-          <span className="flex-1">Download SVG</span>
-          <span className="text-[10px] text-gray-400">vector</span>
+          <span className="flex-1">{t('knowledgeGraph:export.downloadSvg')}</span>
+          <span className="text-[10px] text-gray-400">{t('knowledgeGraph:export.vector')}</span>
         </button>
 
         {/* Print / PDF Export */}
@@ -221,7 +224,7 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
           ) : (
             <Printer className="w-4 h-4 text-orange-500" />
           )}
-          <span className="flex-1">Print / PDF</span>
+          <span className="flex-1">{t('knowledgeGraph:export.printPdf')}</span>
         </button>
 
         {/* Share Link */}
@@ -232,12 +235,12 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
           {copied ? (
             <>
               <Check className="w-4 h-4 text-green-500" />
-              <span className="flex-1 text-green-600">Copied!</span>
+              <span className="flex-1 text-green-600">{t('knowledgeGraph:export.copied')}</span>
             </>
           ) : (
             <>
               <Share2 className="w-4 h-4 text-purple-500" />
-              <span className="flex-1">Copy Link</span>
+              <span className="flex-1">{t('knowledgeGraph:export.copyLink')}</span>
             </>
           )}
         </button>
@@ -245,7 +248,7 @@ const ExportPanel = ({ graphTitle = 'Knowledge Graph' }) => {
 
       <div className="mt-2 pt-2 border-t border-gray-100">
         <p className="text-[10px] text-gray-400">
-          Tip: Use Ctrl+S to quick save PNG
+          {t('knowledgeGraph:export.tip')}
         </p>
       </div>
     </div>
