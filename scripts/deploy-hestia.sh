@@ -105,9 +105,33 @@ deploy_api() {
     print_info "Updating public_html..."
     rsync -av --delete "$API_APP/public/" "$API_PUBLIC/"
 
-    # Ensure index.php has correct paths
-    sed -i "s|require __DIR__.'/../vendor/autoload.php'|require __DIR__.'/../app/vendor/autoload.php'|g" "$API_PUBLIC/index.php"
-    sed -i "s|require_once __DIR__.'/../bootstrap/app.php'|require_once __DIR__.'/../app/bootstrap/app.php'|g" "$API_PUBLIC/index.php"
+    # Fix index.php paths for HestiaCP structure
+    print_info "Fixing index.php paths..."
+    cat > "$API_PUBLIC/index.php" << 'INDEXPHP'
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.'/../app/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// Register the Composer autoloader...
+require __DIR__.'/../app/vendor/autoload.php';
+
+// Bootstrap Laravel and handle the request...
+/** @var Application $app */
+$app = require_once __DIR__.'/../app/bootstrap/app.php';
+
+// Set correct storage path for HestiaCP structure
+$app->useStoragePath(__DIR__.'/../app/storage');
+
+$app->handleRequest(Request::capture());
+INDEXPHP
 
     # Create storage directories if missing
     mkdir -p "$API_APP/storage/logs"
