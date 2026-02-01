@@ -50,11 +50,13 @@ const AiContentGenerator = () => {
       const response = await api.post(apiEndpoints.aiGenerateDraft, {
         condition_name: conditionName,
         context: context,
+      }, {
+        timeout: 180000, // 3 minute timeout for AI draft generation
       });
       setDraft(response.data.draft);
       setPhase(PHASES.DRAFT);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to generate draft');
+      setError(err.response?.data?.error || 'Failed to generate draft. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -68,11 +70,13 @@ const AiContentGenerator = () => {
       const response = await api.post(apiEndpoints.aiStructureContent, {
         condition_name: conditionName,
         approved_draft: approvedDraft,
+      }, {
+        timeout: 300000, // 5 minute timeout for AI structuring (System 2 thinking)
       });
       setStructured(response.data.structured);
       setPhase(PHASES.STRUCTURED);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to structure content');
+      setError(err.response?.data?.error || 'Failed to structure content. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -86,6 +90,8 @@ const AiContentGenerator = () => {
     try {
       const response = await api.post(apiEndpoints.aiImportContent, {
         structured: structured,
+      }, {
+        timeout: 120000, // 2 minute timeout for database import
       });
       setImportResult(response.data);
       setPhase(PHASES.COMPLETE);

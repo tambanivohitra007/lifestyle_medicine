@@ -80,7 +80,7 @@ class AiContentService
         $this->draftModel = config('services.gemini.draft_model', 'gemini-2.0-flash');
 
         // Thinking model for structuring (System 2 - slow, deliberate, accurate)
-        $this->structureModel = config('services.gemini.structure_model', 'gemini-2.5-flash-preview-04-17');
+        $this->structureModel = config('services.gemini.structure_model', 'gemini-2.5-flash');
 
         if ($this->apiKey) {
             $guzzleOptions = [

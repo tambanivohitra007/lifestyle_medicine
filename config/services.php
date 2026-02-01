@@ -43,8 +43,8 @@ return [
         // Fast model for draft generation (System 1 - quick, creative)
         'draft_model' => env('GEMINI_DRAFT_MODEL', 'gemini-2.0-flash'),
         // Thinking model for structuring (System 2 - slow, deliberate, accurate)
-        // Options: gemini-2.5-pro-preview-05-06 (best reasoning), gemini-2.5-flash-preview-04-17 (balanced)
-        'structure_model' => env('GEMINI_STRUCTURE_MODEL', 'gemini-2.5-flash-preview-04-17'),
+        // Options: gemini-2.5-pro (best reasoning), gemini-2.5-flash (balanced, fast thinking)
+        'structure_model' => env('GEMINI_STRUCTURE_MODEL', 'gemini-2.5-flash'),
     ],
 
     'bible_api' => [

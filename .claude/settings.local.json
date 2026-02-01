@@ -44,7 +44,10 @@
       "Bash(fi)",
       "Bash(git mv:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(more:*)",
+      "WebSearch",
+      "Bash(dir \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\\\\bootstrap\\\\cache\")"
     ]
   }
 }
