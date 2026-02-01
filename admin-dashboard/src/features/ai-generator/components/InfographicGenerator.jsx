@@ -84,7 +84,7 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
   // Start polling when generating
   useEffect(() => {
     if (generating && !pollingInterval) {
-      const interval = setInterval(fetchStatus, 3000);
+      const interval = setInterval(fetchStatus, 5000);
       setPollingInterval(interval);
     }
 

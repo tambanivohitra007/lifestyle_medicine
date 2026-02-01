@@ -179,13 +179,15 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin'])->group(fun
         Route::post('ai/structure-content', [AiContentController::class, 'structureContent']);
         Route::post('ai/import-content', [AiContentController::class, 'importContent']);
 
-        // Infographic Generation (admin only)
-        Route::get('infographics/status', [InfographicController::class, 'status']);
+        // Infographic Generation - rate limited actions only
         Route::post('conditions/{condition}/infographics/generate', [InfographicController::class, 'generate']);
-        Route::get('conditions/{condition}/infographics/status', [InfographicController::class, 'getStatus']);
-        Route::get('conditions/{condition}/infographics', [InfographicController::class, 'index']);
         Route::post('infographics/{infographic}/retry', [InfographicController::class, 'retry']);
     });
+
+    // Infographic status endpoints - not rate limited (for polling)
+    Route::get('infographics/status', [InfographicController::class, 'status']);
+    Route::get('conditions/{condition}/infographics/status', [InfographicController::class, 'getStatus']);
+    Route::get('conditions/{condition}/infographics', [InfographicController::class, 'index']);
 
     // Analytics (admin only)
     Route::prefix('analytics')->group(function () {

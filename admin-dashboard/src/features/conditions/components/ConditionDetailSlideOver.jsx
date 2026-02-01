@@ -14,6 +14,8 @@ import {
   Download,
   Network,
   Loader2,
+  Image,
+  ExternalLink,
 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../../lib/swal';
@@ -26,6 +28,7 @@ import {
   EditInterventionMapping,
   SortableInterventionList,
 } from '../../../components/relationships';
+import InfographicGenerator from '../../ai-generator/components/InfographicGenerator';
 
 const SECTION_TYPES = {
   risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
@@ -45,6 +48,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
   const [scriptures, setScriptures] = useState([]);
   const [egwReferences, setEgwReferences] = useState([]);
   const [recipes, setRecipes] = useState([]);
+  const [infographics, setInfographics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
 
@@ -69,6 +73,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
       setScriptures(data.scriptures || []);
       setEgwReferences(data.egw_references || []);
       setRecipes(data.recipes || []);
+      setInfographics(data.infographics || []);
     } catch (error) {
       console.error('Error fetching condition:', error);
       toast.error('Failed to load condition');
@@ -192,6 +197,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
     { id: 'scriptures', label: 'Scriptures', icon: BookOpen, count: scriptures.length },
     { id: 'egw', label: 'EGW', icon: BookMarked, count: egwReferences.length },
     { id: 'recipes', label: 'Recipes', icon: ChefHat, count: recipes.length },
+    { id: 'infographics', label: 'Images', icon: Image, count: infographics.length },
   ];
 
   return (
@@ -212,8 +218,16 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2">
               <Link
-                to={`/conditions/${conditionId}/preview`}
+                to={`/conditions/${conditionId}`}
                 className="btn-primary flex items-center gap-2 text-sm"
+                onClick={onClose}
+              >
+                <ExternalLink className="w-4 h-4" />
+                Full Page
+              </Link>
+              <Link
+                to={`/conditions/${conditionId}/preview`}
+                className="btn-outline flex items-center gap-2 text-sm"
                 onClick={onClose}
               >
                 <Eye className="w-4 h-4" />
@@ -532,6 +546,48 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                         )}
                       </div>
                     ))
+                  )}
+                </div>
+              )}
+
+              {/* Infographics Tab */}
+              {activeTab === 'infographics' && (
+                <div className="space-y-3">
+                  {/* Show existing infographics */}
+                  {infographics.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {infographics.map((media) => (
+                        <a
+                          key={media.id}
+                          href={media.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block"
+                        >
+                          <img
+                            src={media.url}
+                            alt={media.alt_text || 'Infographic'}
+                            className="w-full h-32 object-cover rounded-lg hover:opacity-90 transition-opacity"
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Infographic Generator */}
+                  {canEdit && (
+                    <InfographicGenerator
+                      conditionId={conditionId}
+                      conditionName={condition?.name}
+                      onComplete={fetchConditionData}
+                    />
+                  )}
+
+                  {!canEdit && infographics.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <Image className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No infographics generated yet</p>
+                    </div>
                   )}
                 </div>
               )}
