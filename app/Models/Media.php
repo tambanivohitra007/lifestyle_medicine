@@ -16,6 +16,8 @@ class Media extends Model
     protected $table = 'media';
 
     protected $fillable = [
+        'mediable_type',
+        'mediable_id',
         'filename',
         'original_filename',
         'mime_type',

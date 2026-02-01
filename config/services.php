@@ -57,6 +57,9 @@ return [
         'location' => env('VERTEX_AI_LOCATION', 'us-central1'),
         'credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
         'imagen_model' => env('VERTEX_AI_IMAGEN_MODEL', 'imagen-4.0-fast-generate-001'),
+        // SSL verification - set to false ONLY for local development if you have certificate issues
+        // MUST be true in production
+        'verify_ssl' => env('VERTEX_AI_VERIFY_SSL', true),
     ],
 
 ];

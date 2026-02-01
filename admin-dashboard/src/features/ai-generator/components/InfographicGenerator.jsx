@@ -40,7 +40,8 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
       try {
         const response = await api.get(apiEndpoints.infographicsStatus);
         setConfigured(response.data.configured);
-      } catch {
+      } catch (err) {
+        console.error('Failed to check Imagen status:', err.response?.status, err.message);
         setConfigured(false);
       }
     };

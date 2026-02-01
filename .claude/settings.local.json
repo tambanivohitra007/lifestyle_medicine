@@ -52,7 +52,9 @@
       "Bash(npm run lint)",
       "Bash(npx eslint:*)",
       "Bash(powershell -Command \"New-Item -ItemType Directory -Force -Path ''C:\\\\Users\\\\rindra\\\\credentials''; Copy-Item ''c:\\\\Users\\\\rindra\\\\Downloads\\\\lifestyle-486105-7376626bffe0.json'' ''C:\\\\Users\\\\rindra\\\\credentials\\\\vertex-ai-service-account.json''\")",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(powershell:*)",
+      "Bash(test:*)"
     ]
   }
 }
