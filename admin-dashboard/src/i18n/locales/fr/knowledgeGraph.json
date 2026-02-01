@@ -1,0 +1,80 @@
+{
+  "title": "Graphe de connaissances",
+  "subtitle": "Représentation visuelle des relations de contenu",
+  "controls": {
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "fitView": "Ajuster la vue",
+    "resetView": "Réinitialiser la vue",
+    "fullscreen": "Plein écran",
+    "exitFullscreen": "Quitter le plein écran",
+    "layout": "Disposition",
+    "filter": "Filtrer"
+  },
+  "layout": {
+    "hierarchical": "Hiérarchique",
+    "force": "Force dirigée",
+    "circular": "Circulaire",
+    "grid": "Grille"
+  },
+  "filters": {
+    "title": "Filtrer les nœuds",
+    "showConditions": "Afficher les conditions",
+    "showInterventions": "Afficher les interventions",
+    "showRecipes": "Afficher les recettes",
+    "showEvidence": "Afficher les preuves",
+    "showScriptures": "Afficher les Écritures",
+    "showCareDomains": "Afficher les domaines de soins",
+    "byDomain": "Par domaine",
+    "allDomains": "Tous les domaines"
+  },
+  "nodes": {
+    "condition": "Condition",
+    "intervention": "Intervention",
+    "recipe": "Recette",
+    "evidence": "Preuve",
+    "scripture": "Écriture",
+    "careDomain": "Domaine de soins",
+    "reference": "Référence"
+  },
+  "edges": {
+    "treats": "traite",
+    "relatedTo": "lié à",
+    "supports": "soutient",
+    "references": "référence",
+    "belongsTo": "appartient à",
+    "includes": "inclut"
+  },
+  "details": {
+    "title": "Détails du nœud",
+    "connections": "Connexions",
+    "incomingLinks": "Liens entrants",
+    "outgoingLinks": "Liens sortants",
+    "viewDetails": "Voir les détails complets",
+    "noSelection": "Sélectionnez un nœud pour voir les détails"
+  },
+  "search": {
+    "placeholder": "Rechercher des nœuds...",
+    "noResults": "Aucun nœud trouvé"
+  },
+  "stats": {
+    "totalNodes": "Total des nœuds",
+    "totalEdges": "Total des connexions",
+    "conditions": "Conditions",
+    "interventions": "Interventions"
+  },
+  "export": {
+    "title": "Exporter le graphe",
+    "asPng": "Exporter en PNG",
+    "asSvg": "Exporter en SVG",
+    "asJson": "Exporter en JSON"
+  },
+  "empty": {
+    "title": "Aucune donnée à afficher",
+    "description": "Ajoutez du contenu pour voir le graphe de connaissances"
+  },
+  "loading": {
+    "title": "Chargement du graphe...",
+    "processing": "Traitement des relations..."
+  }
+}

@@ -21,12 +21,15 @@ import {
   Sparkles,
   Network,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, ROLES } from '../../contexts/AuthContext';
 import { confirmLogout } from '../../lib/swal';
+import LanguageSwitcher from '../ui/LanguageSwitcher';
 
 const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
   const { user, logout, hasRole } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation(['navigation', 'common']);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -49,51 +52,47 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
     }
   };
 
-  // Role labels for display
-  const roleLabels = {
-    admin: 'Administrator',
-    editor: 'Editor',
-    viewer: 'Viewer',
-  };
+  // Role labels for display - now using i18n
+  const getRoleLabel = (role) => t(`navigation:user.roles.${role}`, { defaultValue: 'User' });
 
   // Mobile navigation sections with gradients
   const mobileSections = [
     {
-      title: 'Main',
+      titleKey: 'sections.main',
       items: [
-        { to: '/', icon: LayoutDashboard, label: 'Dashboard', gradient: 'from-blue-500 to-blue-600' },
-        { to: '/search', icon: Search, label: 'Search', gradient: 'from-slate-500 to-slate-600' },
-        { to: '/knowledge-graph', icon: Network, label: 'Graph', gradient: 'from-cyan-500 to-teal-600' },
+        { to: '/', icon: LayoutDashboard, labelKey: 'menu.dashboard', gradient: 'from-blue-500 to-blue-600' },
+        { to: '/search', icon: Search, labelKey: 'menu.search', gradient: 'from-slate-500 to-slate-600' },
+        { to: '/knowledge-graph', icon: Network, labelKey: 'menu.graph', gradient: 'from-cyan-500 to-teal-600' },
       ],
     },
     {
-      title: 'Content',
+      titleKey: 'sections.content',
       items: [
-        { to: '/conditions', icon: HeartPulse, label: 'Conditions', gradient: 'from-rose-500 to-red-600' },
-        { to: '/interventions', icon: Activity, label: 'Interventions', gradient: 'from-emerald-500 to-green-600' },
-        { to: '/care-domains', icon: Bookmark, label: 'Care Domains', gradient: 'from-violet-500 to-purple-600' },
+        { to: '/conditions', icon: HeartPulse, labelKey: 'menu.conditions', gradient: 'from-rose-500 to-red-600' },
+        { to: '/interventions', icon: Activity, labelKey: 'menu.interventions', gradient: 'from-emerald-500 to-green-600' },
+        { to: '/care-domains', icon: Bookmark, labelKey: 'menu.careDomains', gradient: 'from-violet-500 to-purple-600' },
       ],
     },
     {
-      title: 'Resources',
+      titleKey: 'sections.resources',
       items: [
-        { to: '/bible', icon: BookOpen, label: 'Bible Explorer', gradient: 'from-indigo-500 to-indigo-600' },
-        { to: '/scriptures', icon: Book, label: 'Scriptures', gradient: 'from-sky-500 to-cyan-600' },
-        { to: '/egw-references', icon: BookMarked, label: 'EGW Writings', gradient: 'from-purple-500 to-violet-600' },
-        { to: '/evidence', icon: TestTube, label: 'Evidence', gradient: 'from-teal-500 to-teal-600' },
-        { to: '/references', icon: Library, label: 'References', gradient: 'from-amber-500 to-orange-600' },
-        { to: '/recipes', icon: ChefHat, label: 'Recipes', gradient: 'from-orange-500 to-red-500' },
+        { to: '/bible', icon: BookOpen, labelKey: 'menu.bible', gradient: 'from-indigo-500 to-indigo-600' },
+        { to: '/scriptures', icon: Book, labelKey: 'menu.scriptures', gradient: 'from-sky-500 to-cyan-600' },
+        { to: '/egw-references', icon: BookMarked, labelKey: 'menu.egwWritings', gradient: 'from-purple-500 to-violet-600' },
+        { to: '/evidence', icon: TestTube, labelKey: 'menu.evidence', gradient: 'from-teal-500 to-teal-600' },
+        { to: '/references', icon: Library, labelKey: 'menu.references', gradient: 'from-amber-500 to-orange-600' },
+        { to: '/recipes', icon: ChefHat, labelKey: 'menu.recipes', gradient: 'from-orange-500 to-red-500' },
       ],
     },
     {
-      title: 'Administration',
+      titleKey: 'sections.administration',
       roles: [ROLES.ADMIN],
       items: [
-        { to: '/analytics', icon: BarChart3, label: 'Analytics', gradient: 'from-cyan-500 to-blue-600', roles: [ROLES.ADMIN] },
-        { to: '/users', icon: Users, label: 'Users', gradient: 'from-pink-500 to-rose-600', roles: [ROLES.ADMIN] },
-        { to: '/tags', icon: Tag, label: 'Tags', gradient: 'from-lime-500 to-green-600', roles: [ROLES.ADMIN] },
-        { to: '/import', icon: Upload, label: 'Import', gradient: 'from-emerald-500 to-teal-600', roles: [ROLES.ADMIN] },
-        { to: '/ai-generator', icon: Sparkles, label: 'AI Generator', gradient: 'from-fuchsia-500 to-pink-600', roles: [ROLES.ADMIN] },
+        { to: '/analytics', icon: BarChart3, labelKey: 'menu.analytics', gradient: 'from-cyan-500 to-blue-600', roles: [ROLES.ADMIN] },
+        { to: '/users', icon: Users, labelKey: 'menu.users', gradient: 'from-pink-500 to-rose-600', roles: [ROLES.ADMIN] },
+        { to: '/tags', icon: Tag, labelKey: 'menu.tags', gradient: 'from-lime-500 to-green-600', roles: [ROLES.ADMIN] },
+        { to: '/import', icon: Upload, labelKey: 'menu.import', gradient: 'from-emerald-500 to-teal-600', roles: [ROLES.ADMIN] },
+        { to: '/ai-generator', icon: Sparkles, labelKey: 'menu.aiGenerator', gradient: 'from-fuchsia-500 to-pink-600', roles: [ROLES.ADMIN] },
       ],
     },
   ];
@@ -110,41 +109,41 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
   // Desktop navigation sections
   const navSections = [
     {
-      title: 'Overview',
+      titleKey: 'sections.overview',
       items: [
-        { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-        { to: '/analytics', icon: BarChart3, label: 'Analytics', roles: [ROLES.ADMIN] },
-        { to: '/search', icon: Search, label: 'Search' },
-        { to: '/knowledge-graph', icon: Network, label: 'Knowledge Graph' },
+        { to: '/', icon: LayoutDashboard, labelKey: 'menu.dashboard' },
+        { to: '/analytics', icon: BarChart3, labelKey: 'menu.analytics', roles: [ROLES.ADMIN] },
+        { to: '/search', icon: Search, labelKey: 'menu.search' },
+        { to: '/knowledge-graph', icon: Network, labelKey: 'menu.knowledgeGraph' },
       ],
     },
     {
-      title: 'Content',
+      titleKey: 'sections.content',
       items: [
-        { to: '/conditions', icon: HeartPulse, label: 'Conditions' },
-        { to: '/interventions', icon: Activity, label: 'Interventions' },
-        { to: '/care-domains', icon: Bookmark, label: 'Care Domains' },
+        { to: '/conditions', icon: HeartPulse, labelKey: 'menu.conditions' },
+        { to: '/interventions', icon: Activity, labelKey: 'menu.interventions' },
+        { to: '/care-domains', icon: Bookmark, labelKey: 'menu.careDomains' },
       ],
     },
     {
-      title: 'Resources',
+      titleKey: 'sections.resources',
       items: [
-        { to: '/bible', icon: BookOpen, label: 'Bible Explorer' },
-        { to: '/evidence', icon: TestTube, label: 'Evidence' },
-        { to: '/references', icon: Library, label: 'References' },
-        { to: '/scriptures', icon: Book, label: 'Scriptures' },
-        { to: '/egw-references', icon: BookMarked, label: 'EGW Writings' },
-        { to: '/recipes', icon: ChefHat, label: 'Recipes' },
+        { to: '/bible', icon: BookOpen, labelKey: 'menu.bible' },
+        { to: '/evidence', icon: TestTube, labelKey: 'menu.evidence' },
+        { to: '/references', icon: Library, labelKey: 'menu.references' },
+        { to: '/scriptures', icon: Book, labelKey: 'menu.scriptures' },
+        { to: '/egw-references', icon: BookMarked, labelKey: 'menu.egwWritings' },
+        { to: '/recipes', icon: ChefHat, labelKey: 'menu.recipes' },
       ],
     },
     {
-      title: 'System',
+      titleKey: 'sections.system',
       roles: [ROLES.ADMIN],
       items: [
-        { to: '/users', icon: Users, label: 'Users', roles: [ROLES.ADMIN] },
-        { to: '/tags', icon: Tag, label: 'Content Tags', roles: [ROLES.ADMIN] },
-        { to: '/import', icon: Upload, label: 'Import Data', roles: [ROLES.ADMIN] },
-        { to: '/ai-generator', icon: Sparkles, label: 'AI Generator', roles: [ROLES.ADMIN] },
+        { to: '/users', icon: Users, labelKey: 'menu.users', roles: [ROLES.ADMIN] },
+        { to: '/tags', icon: Tag, labelKey: 'menu.tags', roles: [ROLES.ADMIN] },
+        { to: '/import', icon: Upload, labelKey: 'menu.import', roles: [ROLES.ADMIN] },
+        { to: '/ai-generator', icon: Sparkles, labelKey: 'menu.aiGenerator', roles: [ROLES.ADMIN] },
       ],
     },
   ];
@@ -202,7 +201,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                       : 'bg-gray-500/30 text-gray-200'
                   }`}>
                     {user?.role === 'admin' && <Shield className="w-2.5 h-2.5" />}
-                    {roleLabels[user?.role] || 'User'}
+                    {getRoleLabel(user?.role)}
                   </span>
                 </div>
               </div>
@@ -220,10 +219,10 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         {/* Scrollable Menu */}
         <div className="overflow-y-auto overscroll-contain px-4 pb-2" style={{ maxHeight: 'calc(90vh - 220px)' }}>
           {filteredMobileSections.map((section, sectionIndex) => (
-            <div key={section.title} className={sectionIndex > 0 ? 'mt-5' : ''}>
+            <div key={section.titleKey} className={sectionIndex > 0 ? 'mt-5' : ''}>
               {/* Section Title */}
               <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-2 px-1">
-                {section.title}
+                {t(`navigation:${section.titleKey}`)}
               </p>
 
               {/* Section Items - Horizontal scroll for Resources, Grid for others */}
@@ -253,7 +252,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                           <span className={`text-[10px] font-medium text-center leading-tight ${
                             isActive ? 'text-primary-700' : 'text-gray-600'
                           }`}>
-                            {item.label}
+                            {t(`navigation:${item.labelKey}`)}
                           </span>
                         </>
                       )}
@@ -286,7 +285,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                           <span className={`text-[10px] font-medium text-center leading-tight ${
                             isActive ? 'text-primary-700' : 'text-gray-600'
                           }`}>
-                            {item.label}
+                            {t(`navigation:${item.labelKey}`)}
                           </span>
                         </>
                       )}
@@ -305,7 +304,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
             className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-medium text-sm shadow-lg shadow-red-200 hover:shadow-xl hover:shadow-red-300 active:scale-[0.98] transition-all duration-200 touch-manipulation"
           >
             <LogOut className="w-5 h-5" />
-            Sign Out
+            {t('navigation:user.signOut')}
           </button>
         </div>
       </div>
@@ -338,12 +337,12 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         {/* Navigation - scrollable */}
         <nav className={`flex-1 overflow-y-auto sidebar-scroll p-4 ${isCollapsed ? 'p-2' : ''}`}>
           {filteredSections.map((section, sectionIndex) => (
-            <div key={section.title} className={sectionIndex > 0 ? 'mt-6' : ''}>
+            <div key={section.titleKey} className={sectionIndex > 0 ? 'mt-6' : ''}>
               {/* Section Title */}
               {!isCollapsed && (
                 <div className="mb-2">
                   <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 px-4">
-                    {section.title}
+                    {t(`navigation:${section.titleKey}`)}
                   </span>
                 </div>
               )}
@@ -359,7 +358,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                     <NavLink
                       to={item.to}
                       end={item.to === '/'}
-                      title={isCollapsed ? item.label : undefined}
+                      title={isCollapsed ? t(`navigation:${item.labelKey}`) : undefined}
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-200 ${
                           isCollapsed ? 'px-0 justify-center' : ''
@@ -372,7 +371,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                     >
                       <item.icon className="w-5 h-5 flex-shrink-0" />
                       {!isCollapsed && (
-                        <span className="font-medium text-sm">{item.label}</span>
+                        <span className="font-medium text-sm">{t(`navigation:${item.labelKey}`)}</span>
                       )}
                     </NavLink>
                   </li>
@@ -411,7 +410,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                           : 'bg-gray-500/20 text-gray-300'
                       }`}>
                         {user?.role === 'admin' && <Shield className="w-2.5 h-2.5" />}
-                        {roleLabels[user?.role] || 'User'}
+                        {getRoleLabel(user?.role)}
                       </span>
                     </div>
                   </div>
@@ -429,8 +428,9 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-secondary-700 hover:text-white transition-colors"
                 >
                   <User className="w-4 h-4" />
-                  Settings
+                  {t('navigation:user.settings')}
                 </NavLink>
+                <LanguageSwitcher variant="sidebar" showLabel={true} />
                 <button
                   onClick={() => {
                     setProfileDropdownOpen(false);
@@ -439,7 +439,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-red-600/20 hover:text-red-400 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  Sign Out
+                  {t('navigation:user.signOut')}
                 </button>
               </div>
             )}

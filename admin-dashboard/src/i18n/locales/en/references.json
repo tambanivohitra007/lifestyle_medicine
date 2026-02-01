@@ -1,0 +1,91 @@
+{
+  "title": "References",
+  "singular": "Reference",
+  "plural": "References",
+  "list": {
+    "title": "References",
+    "subtitle": "Citations and source materials",
+    "addNew": "Add Reference",
+    "searchPlaceholder": "Search references...",
+    "filterByType": "Filter by type",
+    "allTypes": "All types"
+  },
+  "detail": {
+    "title": "Reference Details",
+    "overview": "Overview",
+    "citation": "Citation",
+    "abstract": "Abstract",
+    "source": "Source",
+    "relatedContent": "Related Content",
+    "tags": "Tags"
+  },
+  "form": {
+    "createTitle": "Add Reference",
+    "editTitle": "Edit Reference",
+    "title": "Title",
+    "titlePlaceholder": "Enter reference title",
+    "authors": "Authors",
+    "authorsPlaceholder": "Enter authors",
+    "source": "Source",
+    "sourcePlaceholder": "Journal, book, website, etc.",
+    "year": "Year",
+    "yearPlaceholder": "Publication year",
+    "type": "Reference Type",
+    "selectType": "Select type",
+    "url": "URL",
+    "urlPlaceholder": "Link to source",
+    "doi": "DOI",
+    "doiPlaceholder": "Digital Object Identifier",
+    "isbn": "ISBN",
+    "isbnPlaceholder": "ISBN number",
+    "abstract": "Abstract",
+    "abstractPlaceholder": "Enter abstract...",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes...",
+    "tags": "Tags",
+    "selectTags": "Select tags",
+    "status": "Status"
+  },
+  "types": {
+    "journal": "Journal Article",
+    "book": "Book",
+    "bookChapter": "Book Chapter",
+    "website": "Website",
+    "conference": "Conference Paper",
+    "thesis": "Thesis/Dissertation",
+    "report": "Report",
+    "video": "Video",
+    "podcast": "Podcast",
+    "other": "Other"
+  },
+  "search": {
+    "placeholder": "Search quotes..."
+  },
+  "attach": {
+    "linkTo": "Link Ellen G. White references to \"{{name}}\""
+  },
+  "empty": {
+    "title": "No references found",
+    "description": "Get started by adding your first reference",
+    "action": "Add Reference",
+    "noResults": "No EGW references found",
+    "adjustSearch": "Try adjusting your search or",
+    "createNew": "create a new reference"
+  },
+  "toast": {
+    "created": "Reference added successfully",
+    "updated": "Reference updated successfully",
+    "deleted": "Reference deleted successfully",
+    "attached": "EGW reference attached",
+    "removed": "EGW reference removed",
+    "attachFailed": "Failed to attach reference",
+    "removeFailed": "Failed to remove reference",
+    "createError": "Failed to add reference",
+    "updateError": "Failed to update reference",
+    "deleteError": "Failed to delete reference",
+    "loadError": "Failed to load references"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete this reference?"
+  }
+}

@@ -1,4 +1,5 @@
 import Swal from 'sweetalert2';
+import i18n from '../i18n';
 
 // Custom theme colors matching Tailwind config
 const theme = {
@@ -7,6 +8,9 @@ const theme = {
   success: '#16a34a',
   warning: '#d97706',
 };
+
+// Helper to get translations
+const t = (key, options) => i18n.t(key, options);
 
 // Toast notification (auto-dismiss)
 export const toast = {
@@ -74,14 +78,14 @@ export const toast = {
 // Confirm delete dialog
 export const confirmDelete = async (itemName = 'this item') => {
   const result = await Swal.fire({
-    title: 'Delete Confirmation',
-    html: `Are you sure you want to delete <strong>${itemName}</strong>?<br><small class="text-gray-500">This action cannot be undone.</small>`,
+    title: t('common:confirmation.deleteTitle'),
+    html: `${t('common:confirmation.deleteMessage', { item: itemName })}<br><small class="text-gray-500">${t('common:confirmation.deleteWarning')}</small>`,
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: theme.danger,
     cancelButtonColor: '#6b7280',
-    confirmButtonText: 'Yes, delete it',
-    cancelButtonText: 'Cancel',
+    confirmButtonText: t('common:confirmation.yesDelete'),
+    cancelButtonText: t('common:buttons.cancel'),
     reverseButtons: true,
     customClass: {
       popup: 'rounded-2xl',
@@ -94,16 +98,16 @@ export const confirmDelete = async (itemName = 'this item') => {
 };
 
 // Confirm remove/detach dialog
-export const confirmRemove = async (message = 'Remove this item?') => {
+export const confirmRemove = async (message) => {
   const result = await Swal.fire({
-    title: 'Remove Confirmation',
-    text: message,
+    title: t('common:confirmation.removeTitle'),
+    text: message || t('common:messages.confirmRemove'),
     icon: 'question',
     showCancelButton: true,
     confirmButtonColor: theme.warning,
     cancelButtonColor: '#6b7280',
-    confirmButtonText: 'Yes, remove it',
-    cancelButtonText: 'Cancel',
+    confirmButtonText: t('common:confirmation.yesRemove'),
+    cancelButtonText: t('common:buttons.cancel'),
     reverseButtons: true,
     customClass: {
       popup: 'rounded-2xl',
@@ -116,7 +120,7 @@ export const confirmRemove = async (message = 'Remove this item?') => {
 };
 
 // General confirmation dialog
-export const confirm = async (title, message, confirmText = 'Confirm') => {
+export const confirm = async (title, message, confirmText) => {
   const result = await Swal.fire({
     title: title,
     text: message,
@@ -124,8 +128,8 @@ export const confirm = async (title, message, confirmText = 'Confirm') => {
     showCancelButton: true,
     confirmButtonColor: theme.primary,
     cancelButtonColor: '#6b7280',
-    confirmButtonText: confirmText,
-    cancelButtonText: 'Cancel',
+    confirmButtonText: confirmText || t('common:buttons.confirm'),
+    cancelButtonText: t('common:buttons.cancel'),
     reverseButtons: true,
     customClass: {
       popup: 'rounded-2xl',
@@ -138,13 +142,13 @@ export const confirm = async (title, message, confirmText = 'Confirm') => {
 };
 
 // Error alert
-export const showError = (message, title = 'Error') => {
+export const showError = (message, title) => {
   return Swal.fire({
-    title: title,
+    title: title || t('common:labels.status'),
     text: message,
     icon: 'error',
     confirmButtonColor: theme.primary,
-    confirmButtonText: 'OK',
+    confirmButtonText: t('common:buttons.ok'),
     customClass: {
       popup: 'rounded-2xl',
       confirmButton: 'rounded-lg px-4 py-2',
@@ -153,13 +157,13 @@ export const showError = (message, title = 'Error') => {
 };
 
 // Success alert
-export const showSuccess = (message, title = 'Success') => {
+export const showSuccess = (message, title) => {
   return Swal.fire({
-    title: title,
+    title: title || t('common:labels.status'),
     text: message,
     icon: 'success',
     confirmButtonColor: theme.primary,
-    confirmButtonText: 'OK',
+    confirmButtonText: t('common:buttons.ok'),
     timer: 2000,
     timerProgressBar: true,
     customClass: {
@@ -170,9 +174,9 @@ export const showSuccess = (message, title = 'Success') => {
 };
 
 // Loading dialog
-export const showLoading = (message = 'Please wait...') => {
+export const showLoading = (message) => {
   Swal.fire({
-    title: message,
+    title: message || t('common:messages.pleaseWait'),
     allowOutsideClick: false,
     allowEscapeKey: false,
     didOpen: () => {
@@ -192,14 +196,14 @@ export const hideLoading = () => {
 // Confirm logout dialog
 export const confirmLogout = async () => {
   const result = await Swal.fire({
-    title: 'Sign Out',
-    text: 'Are you sure you want to sign out?',
+    title: t('auth:logout.title'),
+    text: t('auth:logout.message'),
     icon: 'question',
     showCancelButton: true,
     confirmButtonColor: theme.danger,
     cancelButtonColor: '#6b7280',
-    confirmButtonText: 'Yes, sign out',
-    cancelButtonText: 'Cancel',
+    confirmButtonText: t('auth:logout.confirmButton'),
+    cancelButtonText: t('common:buttons.cancel'),
     reverseButtons: true,
     customClass: {
       popup: 'rounded-2xl',

@@ -1,26 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Search, Check, Loader2, Stethoscope, Layers } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
-const EVIDENCE_STRENGTH = [
-  { value: 'high', label: 'High' },
-  { value: 'moderate', label: 'Moderate' },
-  { value: 'emerging', label: 'Emerging' },
-  { value: 'insufficient', label: 'Insufficient' },
-];
-
-const RECOMMENDATION_LEVEL = [
-  { value: 'core', label: 'Core' },
-  { value: 'adjunct', label: 'Adjunct' },
-  { value: 'optional', label: 'Optional' },
-];
-
 const AttachIntervention = () => {
+  const { t } = useTranslation(['conditions', 'common', 'interventions']);
   const { id: conditionId } = useParams();
   const navigate = useNavigate();
+
+  const EVIDENCE_STRENGTH = [
+    { value: 'high', labelKey: 'interventions:mapping.evidence.high' },
+    { value: 'moderate', labelKey: 'interventions:mapping.evidence.moderate' },
+    { value: 'emerging', labelKey: 'interventions:mapping.evidence.emerging' },
+    { value: 'insufficient', labelKey: 'interventions:mapping.evidence.insufficient' },
+  ];
+
+  const RECOMMENDATION_LEVEL = [
+    { value: 'core', labelKey: 'interventions:mapping.recommendation.core' },
+    { value: 'adjunct', labelKey: 'interventions:mapping.recommendation.adjunct' },
+    { value: 'optional', labelKey: 'interventions:mapping.recommendation.optional' },
+  ];
 
   const [condition, setCondition] = useState(null);
   const [interventions, setInterventions] = useState([]);
@@ -60,7 +62,7 @@ const AttachIntervention = () => {
       setCareDomains(domainsRes.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load data');
+      toast.error(t('common:messages.error.loadFailed'));
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -89,7 +91,7 @@ const AttachIntervention = () => {
       navigate(`/conditions/${conditionId}`);
     } catch (error) {
       console.error('Error attaching intervention:', error);
-      toast.error('Failed to attach intervention');
+      toast.error(t('conditions:toast.attachFailed'));
     } finally {
       setSaving(false);
     }
@@ -117,18 +119,18 @@ const AttachIntervention = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Conditions', href: '/conditions' },
-          { label: condition?.name || 'Condition', href: `/conditions/${conditionId}` },
-          { label: 'Attach Intervention' },
+          { label: t('conditions:title'), href: '/conditions' },
+          { label: condition?.name || t('conditions:singular'), href: `/conditions/${conditionId}` },
+          { label: t('conditions:attach.intervention') },
         ]}
       />
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Attach Intervention</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('conditions:attach.intervention')}</h1>
         {condition && (
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Link an intervention to: <span className="font-medium">{condition.name}</span>
+            {t('conditions:attach.linkTo')}: <span className="font-medium">{condition.name}</span>
           </p>
         )}
       </div>
@@ -137,7 +139,7 @@ const AttachIntervention = () => {
         {/* Left: Intervention Selection */}
         <div className="space-y-4">
           <div className="card">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Select Intervention</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">{t('conditions:attach.selectIntervention')}</h2>
 
             {/* Filters */}
             <div className="space-y-3 mb-4">
@@ -145,7 +147,7 @@ const AttachIntervention = () => {
                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search interventions..."
+                  placeholder={t('interventions:search.placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="input-field pl-10"
@@ -156,7 +158,7 @@ const AttachIntervention = () => {
                 onChange={(e) => setDomainFilter(e.target.value)}
                 className="input-field"
               >
-                <option value="">All Care Domains</option>
+                <option value="">{t('common:filters.allCareDomains')}</option>
                 {careDomains.map((domain) => (
                   <option key={domain.id} value={domain.id}>
                     {domain.name}
@@ -169,7 +171,7 @@ const AttachIntervention = () => {
             <div className="max-h-64 sm:max-h-96 overflow-y-auto space-y-2 overscroll-contain">
               {filteredInterventions.length === 0 ? (
                 <p className="text-gray-500 text-center py-4 text-sm">
-                  No available interventions found
+                  {t('interventions:empty.noResults')}
                 </p>
               ) : (
                 filteredInterventions.map((intervention) => (
@@ -214,24 +216,24 @@ const AttachIntervention = () => {
         {/* Right: Mapping Configuration */}
         <div className="card">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
-            Configure Mapping
+            {t('conditions:attach.configureMapping')}
           </h2>
 
           {!selectedIntervention ? (
             <p className="text-gray-500 text-center py-6 sm:py-8 text-sm">
-              Select an intervention from the list
+              {t('conditions:attach.selectFromList')}
             </p>
           ) : (
             <div className="space-y-4 sm:space-y-6">
               <div className="p-3 bg-green-50 rounded-lg">
                 <p className="text-sm text-green-700">
-                  Selected: <span className="font-medium">{selectedIntervention.name}</span>
+                  {t('common:labels.selected')}: <span className="font-medium">{selectedIntervention.name}</span>
                 </p>
               </div>
 
               {/* Strength of Evidence */}
               <div>
-                <label className="label">Strength of Evidence</label>
+                <label className="label">{t('interventions:mapping.strengthOfEvidence')}</label>
                 <select
                   value={mappingData.strength_of_evidence}
                   onChange={(e) =>
@@ -242,9 +244,9 @@ const AttachIntervention = () => {
                   }
                   className="input-field"
                 >
-                  {EVIDENCE_STRENGTH.map(({ value, label }) => (
+                  {EVIDENCE_STRENGTH.map(({ value, labelKey }) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(labelKey)}
                     </option>
                   ))}
                 </select>
@@ -252,7 +254,7 @@ const AttachIntervention = () => {
 
               {/* Recommendation Level */}
               <div>
-                <label className="label">Recommendation Level</label>
+                <label className="label">{t('interventions:mapping.recommendationLevel')}</label>
                 <select
                   value={mappingData.recommendation_level}
                   onChange={(e) =>
@@ -263,9 +265,9 @@ const AttachIntervention = () => {
                   }
                   className="input-field"
                 >
-                  {RECOMMENDATION_LEVEL.map(({ value, label }) => (
+                  {RECOMMENDATION_LEVEL.map(({ value, labelKey }) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(labelKey)}
                     </option>
                   ))}
                 </select>
@@ -273,7 +275,7 @@ const AttachIntervention = () => {
 
               {/* Clinical Notes */}
               <div>
-                <label className="label">Clinical Notes</label>
+                <label className="label">{t('interventions:mapping.clinicalNotes')}</label>
                 <textarea
                   value={mappingData.clinical_notes}
                   onChange={(e) =>
@@ -284,13 +286,13 @@ const AttachIntervention = () => {
                   }
                   rows={3}
                   className="input-field text-sm"
-                  placeholder="Specific notes for this condition..."
+                  placeholder={t('interventions:mapping.clinicalNotesPlaceholder')}
                 />
               </div>
 
               {/* Order Index */}
               <div>
-                <label className="label">Display Order</label>
+                <label className="label">{t('common:labels.displayOrder')}</label>
                 <input
                   type="number"
                   value={mappingData.order_index}
@@ -318,10 +320,10 @@ const AttachIntervention = () => {
                   ) : (
                     <Check className="w-5 h-5" />
                   )}
-                  {saving ? 'Attaching...' : 'Attach Intervention'}
+                  {saving ? t('common:buttons.attaching') : t('conditions:attach.intervention')}
                 </button>
                 <Link to={`/conditions/${conditionId}`} className="btn-outline text-center w-full sm:w-auto">
-                  Cancel
+                  {t('common:buttons.cancel')}
                 </Link>
               </div>
             </div>

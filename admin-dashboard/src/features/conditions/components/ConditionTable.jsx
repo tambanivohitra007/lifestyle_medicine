@@ -1,5 +1,6 @@
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
 
 /**
@@ -11,6 +12,8 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {boolean} canEdit - Whether user has edit permissions
  */
 const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
+  const { t } = useTranslation(['conditions', 'common']);
+
   return (
     <>
       {/* Mobile Card Layout */}
@@ -66,7 +69,7 @@ const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
               </div>
             )}
             <div className="mt-2 text-xs text-gray-400">
-              Updated {condition.updated_at
+              {t('common:labels.updatedAt')} {condition.updated_at
                 ? formatDistanceToNow(new Date(condition.updated_at), { addSuffix: true })
                 : '-'}
             </div>
@@ -81,19 +84,19 @@ const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
+                  {t('common:labels.name')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
+                  {t('common:labels.category')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Summary
+                  {t('common:labels.summary')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Updated
+                  {t('common:labels.updatedAt')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('common:labels.actions')}
                 </th>
               </tr>
             </thead>
@@ -120,7 +123,7 @@ const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
                         className="text-sm"
                       />
                       {!condition.summary && (
-                        <span className="text-sm text-gray-400">No summary available</span>
+                        <span className="text-sm text-gray-400">{t('conditions:empty.noSummary')}</span>
                       )}
                     </div>
                   </td>

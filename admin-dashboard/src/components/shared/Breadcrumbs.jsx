@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Breadcrumbs component for navigation hierarchy
@@ -20,6 +21,7 @@ import { ChevronRight, Home, ArrowLeft } from 'lucide-react';
  * ]} />
  */
 const Breadcrumbs = ({ items = [], showBackButton = true, backTo, backLabel }) => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
 
   if (items.length === 0) return null;
@@ -36,7 +38,7 @@ const Breadcrumbs = ({ items = [], showBackButton = true, backTo, backLabel }) =
   };
 
   // Determine back label - use backLabel prop or first item's label
-  const computedBackLabel = backLabel || (items.length > 0 ? items[0].label : 'Back');
+  const computedBackLabel = backLabel || (items.length > 0 ? items[0].label : t('buttons.back'));
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
@@ -47,7 +49,7 @@ const Breadcrumbs = ({ items = [], showBackButton = true, backTo, backLabel }) =
           className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors px-2 py-1.5 -ml-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 sm:px-3 sm:py-1.5"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="sm:hidden">Back</span>
+          <span className="sm:hidden">{t('buttons.back')}</span>
           <span className="hidden sm:inline">{computedBackLabel}</span>
         </button>
       )}

@@ -1,0 +1,93 @@
+{
+  "title": "Importer des données",
+  "subtitle": "Importation en masse de contenu depuis des fichiers",
+  "steps": {
+    "upload": "Téléverser le fichier",
+    "mapping": "Mapper les champs",
+    "preview": "Aperçu des données",
+    "import": "Importer",
+    "complete": "Terminé"
+  },
+  "upload": {
+    "title": "Téléverser le fichier",
+    "description": "Téléversez un fichier CSV ou Excel pour importer des données",
+    "dropzone": "Glissez-déposez un fichier ici ou cliquez pour parcourir",
+    "acceptedFormats": "Formats acceptés: CSV, XLSX, XLS",
+    "maxSize": "Taille maximale du fichier: 10 Mo",
+    "selectFile": "Sélectionner un fichier",
+    "changeFile": "Changer de fichier"
+  },
+  "mapping": {
+    "title": "Mapper les champs",
+    "description": "Associez les colonnes de votre fichier aux champs de la base de données",
+    "sourceColumn": "Colonne source",
+    "targetField": "Champ cible",
+    "skip": "Ignorer cette colonne",
+    "required": "Requis",
+    "optional": "Optionnel",
+    "preview": "Données d'exemple"
+  },
+  "preview": {
+    "title": "Aperçu des données",
+    "description": "Vérifiez les données avant l'importation",
+    "totalRows": "Total des lignes",
+    "validRows": "Lignes valides",
+    "invalidRows": "Lignes invalides",
+    "duplicates": "Doublons",
+    "showErrors": "Afficher les erreurs",
+    "showAll": "Afficher tout"
+  },
+  "options": {
+    "title": "Options d'importation",
+    "skipDuplicates": "Ignorer les doublons",
+    "updateExisting": "Mettre à jour les existants",
+    "createNew": "Créer uniquement les nouveaux",
+    "validateOnly": "Valider uniquement (test)"
+  },
+  "progress": {
+    "title": "Progression de l'importation",
+    "processing": "Traitement...",
+    "imported": "Importés",
+    "skipped": "Ignorés",
+    "failed": "Échoués",
+    "total": "Total"
+  },
+  "complete": {
+    "title": "Importation terminée",
+    "success": "{{count}} enregistrements importés avec succès",
+    "partial": "{{success}} sur {{total}} enregistrements importés",
+    "failed": "Échec de l'importation",
+    "viewResults": "Voir les résultats",
+    "downloadReport": "Télécharger le rapport",
+    "importAnother": "Importer un autre fichier"
+  },
+  "types": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "recipes": "Recettes",
+    "evidence": "Preuves",
+    "references": "Références",
+    "scriptures": "Écritures",
+    "users": "Utilisateurs"
+  },
+  "errors": {
+    "invalidFile": "Format de fichier invalide",
+    "fileTooLarge": "Le fichier est trop volumineux",
+    "emptyFile": "Le fichier est vide",
+    "parseError": "Échec de l'analyse du fichier",
+    "mappingRequired": "Veuillez mapper les champs requis",
+    "validationFailed": "Échec de la validation",
+    "importFailed": "Échec de l'importation"
+  },
+  "toast": {
+    "uploadSuccess": "Fichier téléversé avec succès",
+    "importSuccess": "Importation terminée avec succès",
+    "importError": "Échec de l'importation",
+    "validationError": "Erreurs de validation détectées"
+  },
+  "templates": {
+    "title": "Télécharger les modèles",
+    "description": "Téléchargez des modèles d'exemple pour l'importation",
+    "download": "Télécharger le modèle"
+  }
+}

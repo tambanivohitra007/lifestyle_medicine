@@ -1,0 +1,47 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome back",
+  "overview": "Overview",
+  "quickStats": "Quick Stats",
+  "recentActivity": "Recent Activity",
+  "quickActions": "Quick Actions",
+  "stats": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "recipes": "Recipes",
+    "users": "Users",
+    "evidence": "Evidence",
+    "references": "References",
+    "scriptures": "Scriptures",
+    "egwReferences": "EGW References",
+    "careDomains": "Care Domains",
+    "tags": "Tags",
+    "total": "Total",
+    "thisMonth": "This Month",
+    "thisWeek": "This Week",
+    "today": "Today"
+  },
+  "activity": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View All Activity",
+    "created": "created",
+    "updated": "updated",
+    "deleted": "deleted"
+  },
+  "actions": {
+    "addCondition": "Add Condition",
+    "addIntervention": "Add Intervention",
+    "addRecipe": "Add Recipe",
+    "viewAnalytics": "View Analytics",
+    "manageUsers": "Manage Users",
+    "importData": "Import Data"
+  },
+  "charts": {
+    "contentOverview": "Content Overview",
+    "monthlyGrowth": "Monthly Growth",
+    "contentByDomain": "Content by Domain",
+    "topConditions": "Top Conditions",
+    "topInterventions": "Top Interventions"
+  }
+}

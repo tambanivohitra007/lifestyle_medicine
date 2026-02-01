@@ -1,0 +1,91 @@
+{
+  "title": "Références",
+  "singular": "Référence",
+  "plural": "Références",
+  "list": {
+    "title": "Références",
+    "subtitle": "Citations et sources documentaires",
+    "addNew": "Ajouter une référence",
+    "searchPlaceholder": "Rechercher des références...",
+    "filterByType": "Filtrer par type",
+    "allTypes": "Tous les types"
+  },
+  "detail": {
+    "title": "Détails de la référence",
+    "overview": "Aperçu",
+    "citation": "Citation",
+    "abstract": "Résumé",
+    "source": "Source",
+    "relatedContent": "Contenu connexe",
+    "tags": "Étiquettes"
+  },
+  "form": {
+    "createTitle": "Ajouter une référence",
+    "editTitle": "Modifier la référence",
+    "title": "Titre",
+    "titlePlaceholder": "Entrez le titre de la référence",
+    "authors": "Auteurs",
+    "authorsPlaceholder": "Entrez les auteurs",
+    "source": "Source",
+    "sourcePlaceholder": "Journal, livre, site web, etc.",
+    "year": "Année",
+    "yearPlaceholder": "Année de publication",
+    "type": "Type de référence",
+    "selectType": "Sélectionner le type",
+    "url": "URL",
+    "urlPlaceholder": "Lien vers la source",
+    "doi": "DOI",
+    "doiPlaceholder": "Identifiant d'objet numérique",
+    "isbn": "ISBN",
+    "isbnPlaceholder": "Numéro ISBN",
+    "abstract": "Résumé",
+    "abstractPlaceholder": "Entrez le résumé...",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes additionnelles...",
+    "tags": "Étiquettes",
+    "selectTags": "Sélectionner des étiquettes",
+    "status": "Statut"
+  },
+  "types": {
+    "journal": "Article de journal",
+    "book": "Livre",
+    "bookChapter": "Chapitre de livre",
+    "website": "Site web",
+    "conference": "Communication de conférence",
+    "thesis": "Thèse/Mémoire",
+    "report": "Rapport",
+    "video": "Vidéo",
+    "podcast": "Podcast",
+    "other": "Autre"
+  },
+  "search": {
+    "placeholder": "Rechercher des citations..."
+  },
+  "attach": {
+    "linkTo": "Lier les références Ellen G. White à \"{{name}}\""
+  },
+  "empty": {
+    "title": "Aucune référence trouvée",
+    "description": "Commencez par ajouter votre première référence",
+    "action": "Ajouter une référence",
+    "noResults": "Aucune référence EGW trouvée",
+    "adjustSearch": "Essayez de modifier votre recherche ou",
+    "createNew": "créer une nouvelle référence"
+  },
+  "toast": {
+    "created": "Référence ajoutée avec succès",
+    "updated": "Référence mise à jour avec succès",
+    "deleted": "Référence supprimée avec succès",
+    "attached": "Référence EGW attachée",
+    "removed": "Référence EGW retirée",
+    "attachFailed": "Échec de l'attachement de la référence",
+    "removeFailed": "Échec du retrait de la référence",
+    "createError": "Échec de l'ajout de la référence",
+    "updateError": "Échec de la mise à jour de la référence",
+    "deleteError": "Échec de la suppression de la référence",
+    "loadError": "Échec du chargement des références"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cette référence?"
+  }
+}

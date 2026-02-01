@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Search, Check, Loader2, ChefHat, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const AttachRecipe = () => {
+  const { t } = useTranslation(['conditions', 'common', 'recipes']);
   const { id: conditionId } = useParams();
   const navigate = useNavigate();
 
@@ -35,7 +37,7 @@ const AttachRecipe = () => {
       setLinkedRecipeIds(linkedRes.data.data.map((r) => r.id));
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load data');
+      toast.error(t('common:messages.error.loadFailed'));
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -51,7 +53,7 @@ const AttachRecipe = () => {
       navigate(`/conditions/${conditionId}`);
     } catch (error) {
       console.error('Error attaching recipe:', error);
-      toast.error('Failed to attach recipe');
+      toast.error(t('conditions:toast.attachFailed'));
     } finally {
       setSaving(false);
     }
@@ -78,18 +80,18 @@ const AttachRecipe = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Conditions', href: '/conditions' },
-          { label: condition?.name || 'Condition', href: `/conditions/${conditionId}` },
-          { label: 'Attach Recipe' },
+          { label: t('conditions:title'), href: '/conditions' },
+          { label: condition?.name || t('conditions:singular'), href: `/conditions/${conditionId}` },
+          { label: t('conditions:attach.recipe') },
         ]}
       />
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Attach Recipe</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('conditions:attach.recipe')}</h1>
         {condition && (
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Link a recipe to: <span className="font-medium">{condition.name}</span>
+            {t('conditions:attach.linkTo')}: <span className="font-medium">{condition.name}</span>
           </p>
         )}
       </div>
@@ -100,7 +102,7 @@ const AttachRecipe = () => {
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search recipes..."
+            placeholder={t('recipes:search.placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="input-field pl-10"
@@ -113,10 +115,10 @@ const AttachRecipe = () => {
         <div className="card text-center py-8 sm:py-12">
           <ChefHat className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-            No available recipes
+            {t('recipes:empty.noAvailable')}
           </h3>
           <p className="text-gray-600 text-sm sm:text-base">
-            All recipes are already linked or none match your search.
+            {t('recipes:empty.allLinkedOrNoMatch')}
           </p>
         </div>
       ) : (
@@ -160,9 +162,9 @@ const AttachRecipe = () => {
                 <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                   <Clock className="w-3 h-3" />
                   <span>
-                    {recipe.prep_time_minutes && `Prep: ${recipe.prep_time_minutes}min`}
+                    {recipe.prep_time_minutes && `${t('recipes:time.prep')}: ${recipe.prep_time_minutes}min`}
                     {recipe.prep_time_minutes && recipe.cook_time_minutes && ' | '}
-                    {recipe.cook_time_minutes && `Cook: ${recipe.cook_time_minutes}min`}
+                    {recipe.cook_time_minutes && `${t('recipes:time.cook')}: ${recipe.cook_time_minutes}min`}
                   </span>
                 </div>
               )}
@@ -182,7 +184,7 @@ const AttachRecipe = () => {
         <div className="card fixed sm:sticky bottom-0 left-0 right-0 sm:bottom-4 rounded-none sm:rounded-lg shadow-lg sm:shadow border-t sm:border border-gray-200 z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <p className="text-gray-700 text-sm sm:text-base truncate">
-              Selected: <span className="font-medium">{selectedRecipe.title}</span>
+              {t('common:labels.selected')}: <span className="font-medium">{selectedRecipe.title}</span>
             </p>
             <div className="flex items-center gap-2 sm:gap-4">
               <button
@@ -190,7 +192,7 @@ const AttachRecipe = () => {
                 onClick={() => setSelectedRecipe(null)}
                 className="btn-outline flex-1 sm:flex-initial justify-center touch-manipulation"
               >
-                Clear
+                {t('common:buttons.clear')}
               </button>
               <button
                 type="button"
@@ -203,8 +205,8 @@ const AttachRecipe = () => {
                 ) : (
                   <Check className="w-5 h-5" />
                 )}
-                <span className="hidden sm:inline">{saving ? 'Attaching...' : 'Attach Recipe'}</span>
-                <span className="sm:hidden">{saving ? 'Attaching...' : 'Attach'}</span>
+                <span className="hidden sm:inline">{saving ? t('common:buttons.attaching') : t('conditions:attach.recipe')}</span>
+                <span className="sm:hidden">{saving ? t('common:buttons.attaching') : t('common:buttons.attach')}</span>
               </button>
             </div>
           </div>

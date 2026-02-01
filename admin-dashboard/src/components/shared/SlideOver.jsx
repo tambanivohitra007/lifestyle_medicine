@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const SlideOver = ({ isOpen, onClose, title, subtitle, children, size = 'md' }) => {
+  const { t } = useTranslation('common');
+
   // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
@@ -61,7 +64,7 @@ const SlideOver = ({ isOpen, onClose, title, subtitle, children, size = 'md' }) 
             <button
               onClick={onClose}
               className="p-2 -m-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-              aria-label="Close"
+              aria-label={t('buttons.close')}
             >
               <X className="w-5 h-5" />
             </button>

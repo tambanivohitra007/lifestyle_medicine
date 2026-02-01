@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, ShieldAlert, Edit, Trash2, Eye, Download, Save, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -14,6 +15,7 @@ import SlideOver from '../../components/shared/SlideOver';
 import ConditionDetailSlideOver from './components/ConditionDetailSlideOver';
 
 const Conditions = () => {
+  const { t } = useTranslation(['conditions', 'common']);
   const { canEdit } = useAuth();
   const [conditions, setConditions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,12 +90,12 @@ const Conditions = () => {
 
     try {
       await api.delete(`${apiEndpoints.conditionsAdmin}/${id}`);
-      toast.success('Condition deleted');
+      toast.success(t('conditions:toast.deleted'));
       setIsDetailOpen(false);
       fetchConditions();
     } catch (error) {
       console.error('Error deleting condition:', error);
-      toast.error('Failed to delete condition');
+      toast.error(t('conditions:toast.deleteError'));
     }
   };
 
@@ -132,7 +134,7 @@ const Conditions = () => {
       });
     } catch (error) {
       console.error('Error fetching condition:', error);
-      toast.error('Failed to load condition');
+      toast.error(t('conditions:toast.loadError'));
       setIsModalOpen(false);
     } finally {
       setFormLoading(false);
@@ -149,7 +151,7 @@ const Conditions = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('common:messages.error.requiredField');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -163,10 +165,10 @@ const Conditions = () => {
       setSaving(true);
       if (editingId) {
         await api.put(`${apiEndpoints.conditionsAdmin}/${editingId}`, formData);
-        toast.success('Condition updated');
+        toast.success(t('conditions:toast.updated'));
       } else {
         await api.post(apiEndpoints.conditionsAdmin, formData);
-        toast.success('Condition created');
+        toast.success(t('conditions:toast.created'));
       }
       closeModal();
       fetchConditions();
@@ -175,7 +177,7 @@ const Conditions = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error('Failed to save condition');
+        toast.error(editingId ? t('conditions:toast.updateError') : t('conditions:toast.createError'));
       }
     } finally {
       setSaving(false);
@@ -197,9 +199,9 @@ const Conditions = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Conditions</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('conditions:title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage medical conditions and their interventions
+            {t('conditions:list.subtitle')}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -210,7 +212,7 @@ const Conditions = () => {
             className="btn-outline flex items-center justify-center gap-2"
           >
             <Download className="w-5 h-5" />
-            Export Summary
+            {t('common:buttons.export')}
           </a>
           {canEdit && (
             <button
@@ -218,7 +220,7 @@ const Conditions = () => {
               className="btn-primary flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Condition
+              {t('conditions:list.addNew')}
             </button>
           )}
         </div>
@@ -232,7 +234,7 @@ const Conditions = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search conditions..."
+              placeholder={t('conditions:list.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -245,7 +247,7 @@ const Conditions = () => {
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Categories</option>
+            <option value="">{t('conditions:list.allDomains')}</option>
             {categories.map((category) => (
               <option key={category} value={category}>
                 {category}
@@ -352,10 +354,10 @@ const Conditions = () => {
         <div className="card text-center py-8 sm:py-12">
           <ShieldAlert className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No conditions found
+            {t('conditions:empty.title')}
           </h3>
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Get started by creating your first medical condition.
+            {t('conditions:empty.description')}
           </p>
           {canEdit && (
             <button
@@ -363,7 +365,7 @@ const Conditions = () => {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Condition
+              {t('conditions:empty.action')}
             </button>
           )}
         </div>
@@ -385,7 +387,7 @@ const Conditions = () => {
                       <button
                         onClick={() => openDetailSlideOver(condition.id)}
                         className="action-btn"
-                        title="View Details"
+                        title={t('common:buttons.viewDetails')}
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </button>
@@ -394,14 +396,14 @@ const Conditions = () => {
                           <button
                             onClick={() => openEditModal(condition.id)}
                             className="action-btn"
-                            title="Edit"
+                            title={t('common:buttons.edit')}
                           >
                             <Edit className="w-4 h-4 text-gray-600" />
                           </button>
                           <button
                             onClick={() => handleDelete(condition.id, condition.name)}
                             className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title="Delete"
+                            title={t('common:buttons.delete')}
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
@@ -431,7 +433,7 @@ const Conditions = () => {
                       onClick={() => openDetailSlideOver(condition.id)}
                       className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
                     >
-                      View Details →
+                      {t('common:buttons.viewDetails')} →
                     </button>
                   </div>
                 </div>
@@ -464,8 +466,8 @@ const Conditions = () => {
       <SlideOver
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingId ? 'Edit Condition' : 'New Condition'}
-        subtitle={editingId ? 'Update the condition details' : 'Create a new medical condition'}
+        title={editingId ? t('conditions:form.editTitle') : t('conditions:form.createTitle')}
+        subtitle={editingId ? t('conditions:list.subtitle') : t('conditions:list.subtitle')}
         size="md"
       >
         {formLoading ? (
@@ -477,7 +479,7 @@ const Conditions = () => {
             {/* Name */}
             <div>
               <label htmlFor="name" className="label">
-                Name <span className="text-red-500">*</span>
+                {t('conditions:form.name')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -486,7 +488,7 @@ const Conditions = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className={`input-field ${errors.name ? 'border-red-500' : ''}`}
-                placeholder="e.g., Type 2 Diabetes"
+                placeholder={t('conditions:form.namePlaceholder')}
                 autoFocus
               />
               {errors.name && (
@@ -499,7 +501,7 @@ const Conditions = () => {
             {/* Category */}
             <div>
               <label htmlFor="category" className="label">
-                Category
+                {t('common:labels.category')}
               </label>
               <input
                 type="text"
@@ -508,7 +510,7 @@ const Conditions = () => {
                 value={formData.category}
                 onChange={handleChange}
                 className={`input-field ${errors.category ? 'border-red-500' : ''}`}
-                placeholder="e.g., Metabolic, Cardiovascular, Mental Health"
+                placeholder={t('common:labels.category')}
               />
               {errors.category && (
                 <p className="mt-1 text-sm text-red-500">
@@ -520,7 +522,7 @@ const Conditions = () => {
             {/* Summary */}
             <div>
               <label htmlFor="summary" className="label">
-                Summary
+                {t('conditions:form.summary')}
               </label>
               <textarea
                 id="summary"
@@ -529,7 +531,7 @@ const Conditions = () => {
                 onChange={handleChange}
                 rows={5}
                 className={`input-field resize-y ${errors.summary ? 'border-red-500' : ''}`}
-                placeholder="A brief description of the condition..."
+                placeholder={t('conditions:form.summaryPlaceholder')}
               />
               {errors.summary && (
                 <p className="mt-1 text-sm text-red-500">
@@ -550,14 +552,14 @@ const Conditions = () => {
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {saving ? 'Saving...' : 'Save Condition'}
+                {saving ? t('common:messages.saving') : t('common:buttons.save')}
               </button>
               <button
                 type="button"
                 onClick={closeModal}
                 className="btn-outline w-full sm:w-auto"
               >
-                Cancel
+                {t('common:buttons.cancel')}
               </button>
             </div>
           </form>

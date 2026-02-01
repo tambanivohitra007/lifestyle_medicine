@@ -1,0 +1,47 @@
+{
+  "title": "Tableau de bord",
+  "welcome": "Bienvenue",
+  "overview": "Aperçu",
+  "quickStats": "Statistiques rapides",
+  "recentActivity": "Activité récente",
+  "quickActions": "Actions rapides",
+  "stats": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "recipes": "Recettes",
+    "users": "Utilisateurs",
+    "evidence": "Preuves",
+    "references": "Références",
+    "scriptures": "Écritures",
+    "egwReferences": "Références EGW",
+    "careDomains": "Domaines de soins",
+    "tags": "Étiquettes",
+    "total": "Total",
+    "thisMonth": "Ce mois",
+    "thisWeek": "Cette semaine",
+    "today": "Aujourd'hui"
+  },
+  "activity": {
+    "title": "Activité récente",
+    "noActivity": "Aucune activité récente",
+    "viewAll": "Voir toute l'activité",
+    "created": "créé",
+    "updated": "mis à jour",
+    "deleted": "supprimé"
+  },
+  "actions": {
+    "addCondition": "Ajouter une condition",
+    "addIntervention": "Ajouter une intervention",
+    "addRecipe": "Ajouter une recette",
+    "viewAnalytics": "Voir les analytiques",
+    "manageUsers": "Gérer les utilisateurs",
+    "importData": "Importer des données"
+  },
+  "charts": {
+    "contentOverview": "Aperçu du contenu",
+    "monthlyGrowth": "Croissance mensuelle",
+    "contentByDomain": "Contenu par domaine",
+    "topConditions": "Principales conditions",
+    "topInterventions": "Principales interventions"
+  }
+}

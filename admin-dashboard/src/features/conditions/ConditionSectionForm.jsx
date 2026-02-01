@@ -1,26 +1,28 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams, Link, useSearchParams } from 'react-router-dom';
 import { Save, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import RichTextEditor from '../../components/editor/RichTextEditor';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
-const SECTION_TYPES = [
-  { value: 'risk_factors', label: 'Risk Factors / Causes' },
-  { value: 'physiology', label: 'Physiology' },
-  { value: 'complications', label: 'Complications' },
-  { value: 'solutions', label: 'Lifestyle Solutions' },
-  { value: 'additional_factors', label: 'Additional Factors' },
-  { value: 'scripture', label: 'Scripture / SOP' },
-  { value: 'research_ideas', label: 'Research Ideas' },
-];
-
 const ConditionSectionForm = () => {
+  const { t } = useTranslation(['conditions', 'common']);
   const { id: conditionId, sectionId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const isEditing = Boolean(sectionId);
+
+  const SECTION_TYPES = [
+    { value: 'risk_factors', labelKey: 'conditions:sections.types.riskFactors' },
+    { value: 'physiology', labelKey: 'conditions:sections.types.physiology' },
+    { value: 'complications', labelKey: 'conditions:sections.types.complications' },
+    { value: 'solutions', labelKey: 'conditions:sections.types.solutions' },
+    { value: 'additional_factors', labelKey: 'conditions:sections.types.additionalFactors' },
+    { value: 'scripture', labelKey: 'conditions:sections.types.scripture' },
+    { value: 'research_ideas', labelKey: 'conditions:sections.types.researchIdeas' },
+  ];
 
   // Get pre-selected type from URL query parameter
   const preSelectedType = searchParams.get('type') || '';
@@ -29,7 +31,7 @@ const ConditionSectionForm = () => {
   const [formData, setFormData] = useState({
     condition_id: conditionId,
     section_type: preSelectedType,
-    title: preSelectedType ? SECTION_TYPES.find(t => t.value === preSelectedType)?.label || '' : '',
+    title: preSelectedType ? t(SECTION_TYPES.find(st => st.value === preSelectedType)?.labelKey || '') : '',
     body: '',
     order_index: 0,
   });
@@ -69,7 +71,7 @@ const ConditionSectionForm = () => {
       });
     } catch (error) {
       console.error('Error fetching section:', error);
-      toast.error('Failed to load section');
+      toast.error(t('conditions:sections.toast.loadFailed'));
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -99,7 +101,7 @@ const ConditionSectionForm = () => {
       return mediaData.url;
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error('Failed to upload image');
+      toast.error(t('common:media.uploadError'));
       return null;
     }
   }, [conditionId]);
@@ -107,10 +109,10 @@ const ConditionSectionForm = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.section_type) {
-      newErrors.section_type = 'Section type is required';
+      newErrors.section_type = t('common:validation.required', { field: t('conditions:sections.form.sectionType') });
     }
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('common:validation.required', { field: t('common:labels.title') });
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -133,7 +135,7 @@ const ConditionSectionForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error('Failed to save section');
+        toast.error(t('conditions:sections.toast.saveFailed'));
       }
     } finally {
       setSaving(false);
@@ -161,20 +163,20 @@ const ConditionSectionForm = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Conditions', href: '/conditions' },
-          { label: condition?.name || 'Condition', href: `/conditions/${conditionId}` },
-          { label: isEditing ? 'Edit Section' : 'New Section' },
+          { label: t('conditions:title'), href: '/conditions' },
+          { label: condition?.name || t('conditions:singular'), href: `/conditions/${conditionId}` },
+          { label: isEditing ? t('conditions:sections.form.editTitle') : t('conditions:sections.form.newTitle') },
         ]}
       />
 
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {isEditing ? 'Edit Section' : 'New Section'}
+          {isEditing ? t('conditions:sections.form.editTitle') : t('conditions:sections.form.newTitle')}
         </h1>
         {condition && (
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            For condition: <span className="font-medium">{condition.name}</span>
+            {t('conditions:sections.form.forCondition')}: <span className="font-medium">{condition.name}</span>
           </p>
         )}
       </div>
@@ -184,7 +186,7 @@ const ConditionSectionForm = () => {
           {/* Section Type */}
           <div>
             <label htmlFor="section_type" className="label">
-              Section Type <span className="text-red-500">*</span>
+              {t('conditions:sections.form.sectionType')} <span className="text-red-500">*</span>
             </label>
             <select
               id="section_type"
@@ -193,10 +195,10 @@ const ConditionSectionForm = () => {
               onChange={handleChange}
               className={`input-field ${errors.section_type ? 'border-red-500' : ''}`}
             >
-              <option value="">Select a section type</option>
-              {SECTION_TYPES.map(({ value, label }) => (
+              <option value="">{t('conditions:sections.form.selectSectionType')}</option>
+              {SECTION_TYPES.map(({ value, labelKey }) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(labelKey)}
                 </option>
               ))}
             </select>
@@ -210,7 +212,7 @@ const ConditionSectionForm = () => {
           {/* Title */}
           <div>
             <label htmlFor="title" className="label">
-              Title <span className="text-red-500">*</span>
+              {t('common:labels.title')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -219,7 +221,7 @@ const ConditionSectionForm = () => {
               value={formData.title}
               onChange={handleChange}
               className={`input-field ${errors.title ? 'border-red-500' : ''}`}
-              placeholder="Section title"
+              placeholder={t('conditions:sections.form.titlePlaceholder')}
             />
             {errors.title && (
               <p className="mt-1 text-sm text-red-500">
@@ -230,24 +232,24 @@ const ConditionSectionForm = () => {
 
           {/* Body */}
           <div>
-            <label className="label">Content</label>
+            <label className="label">{t('common:labels.content')}</label>
             <RichTextEditor
               content={formData.body}
               onChange={(html) =>
                 setFormData((prev) => ({ ...prev, body: html }))
               }
-              placeholder="Start writing the section content..."
+              placeholder={t('conditions:sections.form.contentPlaceholder')}
               onImageUpload={handleImageUpload}
             />
             <p className="mt-1 text-xs text-gray-500">
-              Click the image icon in the toolbar to insert images
+              {t('conditions:sections.form.imageHint')}
             </p>
           </div>
 
           {/* Order Index */}
           <div>
             <label htmlFor="order_index" className="label">
-              Display Order
+              {t('common:labels.displayOrder')}
             </label>
             <input
               type="number"
@@ -259,7 +261,7 @@ const ConditionSectionForm = () => {
               min="0"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Lower numbers appear first
+              {t('conditions:sections.form.orderHint')}
             </p>
           </div>
 
@@ -275,10 +277,10 @@ const ConditionSectionForm = () => {
               ) : (
                 <Save className="w-5 h-5" />
               )}
-              {saving ? 'Saving...' : 'Save Section'}
+              {saving ? t('common:buttons.saving') : t('common:buttons.save')}
             </button>
             <Link to={`/conditions/${conditionId}`} className="btn-outline text-center w-full sm:w-auto">
-              Cancel
+              {t('common:buttons.cancel')}
             </Link>
           </div>
         </div>

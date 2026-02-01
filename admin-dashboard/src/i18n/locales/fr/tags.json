@@ -1,0 +1,57 @@
+{
+  "title": "Étiquettes",
+  "singular": "Étiquette",
+  "plural": "Étiquettes",
+  "list": {
+    "title": "Étiquettes de contenu",
+    "subtitle": "Gérer les étiquettes pour l'organisation du contenu",
+    "addNew": "Ajouter une étiquette",
+    "searchPlaceholder": "Rechercher des étiquettes...",
+    "filterByType": "Filtrer par type",
+    "allTypes": "Tous les types"
+  },
+  "detail": {
+    "title": "Détails de l'étiquette",
+    "overview": "Aperçu",
+    "usedIn": "Utilisé dans",
+    "usageCount": "Nombre d'utilisations"
+  },
+  "form": {
+    "createTitle": "Créer une étiquette",
+    "editTitle": "Modifier l'étiquette",
+    "name": "Nom de l'étiquette",
+    "namePlaceholder": "Entrez le nom de l'étiquette",
+    "description": "Description",
+    "descriptionPlaceholder": "Décrivez l'étiquette...",
+    "type": "Type d'étiquette",
+    "selectType": "Sélectionner le type",
+    "color": "Couleur",
+    "selectColor": "Sélectionner une couleur",
+    "status": "Statut"
+  },
+  "types": {
+    "condition": "Condition",
+    "intervention": "Intervention",
+    "recipe": "Recette",
+    "general": "Général",
+    "symptom": "Symptôme",
+    "category": "Catégorie"
+  },
+  "empty": {
+    "title": "Aucune étiquette trouvée",
+    "description": "Commencez par créer votre première étiquette",
+    "action": "Ajouter une étiquette"
+  },
+  "toast": {
+    "created": "Étiquette créée avec succès",
+    "updated": "Étiquette mise à jour avec succès",
+    "deleted": "Étiquette supprimée avec succès",
+    "createError": "Échec de la création de l'étiquette",
+    "updateError": "Échec de la mise à jour de l'étiquette",
+    "deleteError": "Échec de la suppression de l'étiquette",
+    "loadError": "Échec du chargement des étiquettes"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cette étiquette?"
+  }
+}

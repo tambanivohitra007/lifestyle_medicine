@@ -1,0 +1,204 @@
+{
+  "sections": {
+    "main": "Principal",
+    "overview": "Aperçu",
+    "content": "Contenu",
+    "resources": "Ressources",
+    "system": "Système",
+    "administration": "Administration"
+  },
+  "menu": {
+    "dashboard": "Tableau de bord",
+    "analytics": "Analytique",
+    "search": "Recherche",
+    "knowledgeGraph": "Graphe de connaissances",
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "careDomains": "Domaines de soins",
+    "bible": "Explorateur biblique",
+    "evidence": "Preuves",
+    "references": "Références",
+    "scriptures": "Écritures",
+    "egwWritings": "Écrits d'EGW",
+    "recipes": "Recettes",
+    "users": "Utilisateurs",
+    "tags": "Étiquettes de contenu",
+    "import": "Importer des données",
+    "aiGenerator": "Générateur IA",
+    "profile": "Paramètres",
+    "home": "Accueil",
+    "more": "Plus",
+    "graph": "Graphe"
+  },
+  "header": {
+    "title": "Plateforme de connaissances",
+    "subtitle": "Médecine du mode de vie et évangélisation médicale",
+    "expandSidebar": "Développer la barre latérale",
+    "collapseSidebar": "Réduire la barre latérale",
+    "goBack": "Retour"
+  },
+  "pages": {
+    "lifestyleMedicine": {
+      "title": "Médecine du mode de vie",
+      "subtitle": "Plateforme de connaissances"
+    },
+    "conditions": {
+      "title": "Conditions",
+      "subtitle": "Conditions de santé"
+    },
+    "conditionDetails": {
+      "title": "Détails de la condition",
+      "subtitle": "Voir les informations"
+    },
+    "editCondition": {
+      "title": "Modifier la condition",
+      "subtitle": "Modifier les détails"
+    },
+    "attachIntervention": {
+      "title": "Attacher une intervention",
+      "subtitle": "Lier un traitement"
+    },
+    "interventions": {
+      "title": "Interventions",
+      "subtitle": "Options de traitement"
+    },
+    "interventionDetails": {
+      "title": "Détails de l'intervention",
+      "subtitle": "Voir les informations"
+    },
+    "editIntervention": {
+      "title": "Modifier l'intervention",
+      "subtitle": "Modifier les détails"
+    },
+    "careDomains": {
+      "title": "Domaines de soins",
+      "subtitle": "Catégories de mode de vie"
+    },
+    "careDomainDetails": {
+      "title": "Détails du domaine de soins",
+      "subtitle": "Voir la catégorie"
+    },
+    "editCareDomain": {
+      "title": "Modifier le domaine de soins",
+      "subtitle": "Modifier les détails"
+    },
+    "search": {
+      "title": "Recherche",
+      "subtitle": "Trouver du contenu"
+    },
+    "bible": {
+      "title": "Explorateur biblique",
+      "subtitle": "Recherche d'Écritures"
+    },
+    "evidence": {
+      "title": "Preuves",
+      "subtitle": "Recherches et études"
+    },
+    "evidenceDetails": {
+      "title": "Détails de la preuve",
+      "subtitle": "Voir l'étude"
+    },
+    "editEvidence": {
+      "title": "Modifier la preuve",
+      "subtitle": "Modifier les détails"
+    },
+    "references": {
+      "title": "Références",
+      "subtitle": "Citations et sources"
+    },
+    "referenceDetails": {
+      "title": "Détails de la référence",
+      "subtitle": "Voir la citation"
+    },
+    "editReference": {
+      "title": "Modifier la référence",
+      "subtitle": "Modifier les détails"
+    },
+    "scriptures": {
+      "title": "Écritures",
+      "subtitle": "Versets bibliques"
+    },
+    "scriptureDetails": {
+      "title": "Détails de l'Écriture",
+      "subtitle": "Voir le verset"
+    },
+    "editScripture": {
+      "title": "Modifier l'Écriture",
+      "subtitle": "Modifier les détails"
+    },
+    "egwReferences": {
+      "title": "Écrits d'EGW",
+      "subtitle": "Esprit de prophétie"
+    },
+    "egwReferenceDetails": {
+      "title": "Référence EGW",
+      "subtitle": "Voir l'écrit"
+    },
+    "editEgwReference": {
+      "title": "Modifier la référence EGW",
+      "subtitle": "Modifier les détails"
+    },
+    "recipes": {
+      "title": "Recettes",
+      "subtitle": "Repas sains"
+    },
+    "recipeDetails": {
+      "title": "Détails de la recette",
+      "subtitle": "Voir la recette"
+    },
+    "editRecipe": {
+      "title": "Modifier la recette",
+      "subtitle": "Modifier les détails"
+    },
+    "newRecipe": {
+      "title": "Nouvelle recette",
+      "subtitle": "Créer une recette"
+    },
+    "profile": {
+      "title": "Paramètres",
+      "subtitle": "Compte et préférences"
+    },
+    "analytics": {
+      "title": "Analytique",
+      "subtitle": "Statistiques d'utilisation"
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "subtitle": "Gestion des utilisateurs"
+    },
+    "userDetails": {
+      "title": "Détails de l'utilisateur",
+      "subtitle": "Voir l'utilisateur"
+    },
+    "editUser": {
+      "title": "Modifier l'utilisateur",
+      "subtitle": "Modifier l'utilisateur"
+    },
+    "tags": {
+      "title": "Étiquettes de contenu",
+      "subtitle": "Gestion des étiquettes"
+    },
+    "import": {
+      "title": "Importer des données",
+      "subtitle": "Importation en masse"
+    },
+    "aiGenerator": {
+      "title": "Générateur IA",
+      "subtitle": "Génération de contenu"
+    }
+  },
+  "user": {
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "signOut": "Déconnexion",
+    "roles": {
+      "admin": "Administrateur",
+      "editor": "Éditeur",
+      "viewer": "Lecteur"
+    }
+  },
+  "footer": {
+    "copyright": "Family & Lifestyle Medicine",
+    "developedBy": "Développé par"
+  }
+}

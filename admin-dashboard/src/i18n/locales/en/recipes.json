@@ -1,0 +1,97 @@
+{
+  "title": "Recipes",
+  "singular": "Recipe",
+  "plural": "Recipes",
+  "list": {
+    "title": "Recipes",
+    "subtitle": "Healthy meal recipes and cooking guides",
+    "addNew": "Add Recipe",
+    "searchPlaceholder": "Search recipes...",
+    "filterByCategory": "Filter by category",
+    "filterByDifficulty": "Filter by difficulty",
+    "allCategories": "All categories",
+    "allDifficulties": "All difficulties"
+  },
+  "detail": {
+    "title": "Recipe Details",
+    "overview": "Overview",
+    "description": "Description",
+    "ingredients": "Ingredients",
+    "instructions": "Instructions",
+    "nutritionInfo": "Nutrition Information",
+    "servings": "Servings",
+    "prepTime": "Prep Time",
+    "cookTime": "Cook Time",
+    "totalTime": "Total Time",
+    "difficulty": "Difficulty",
+    "tips": "Tips & Notes",
+    "relatedInterventions": "Related Interventions",
+    "tags": "Tags"
+  },
+  "form": {
+    "createTitle": "Create Recipe",
+    "editTitle": "Edit Recipe",
+    "name": "Recipe Name",
+    "namePlaceholder": "Enter recipe name",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the recipe...",
+    "category": "Category",
+    "selectCategory": "Select category",
+    "image": "Featured Image",
+    "ingredients": "Ingredients",
+    "ingredientsPlaceholder": "List ingredients...",
+    "instructions": "Instructions",
+    "instructionsPlaceholder": "Step by step instructions...",
+    "servings": "Number of Servings",
+    "prepTime": "Preparation Time (minutes)",
+    "cookTime": "Cooking Time (minutes)",
+    "difficulty": "Difficulty Level",
+    "tags": "Tags",
+    "selectTags": "Select tags",
+    "status": "Status"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "categories": {
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack",
+    "dessert": "Dessert",
+    "beverage": "Beverage",
+    "soup": "Soup",
+    "salad": "Salad",
+    "side": "Side Dish"
+  },
+  "time": {
+    "minutes": "min",
+    "hours": "hr",
+    "prep": "Prep",
+    "cook": "Cook"
+  },
+  "search": {
+    "placeholder": "Search recipes..."
+  },
+  "empty": {
+    "title": "No recipes found",
+    "description": "Get started by creating your first recipe",
+    "action": "Add Recipe",
+    "noAvailable": "No available recipes",
+    "allLinkedOrNoMatch": "All recipes are already linked or none match your search."
+  },
+  "toast": {
+    "created": "Recipe created successfully",
+    "updated": "Recipe updated successfully",
+    "deleted": "Recipe deleted successfully",
+    "createError": "Failed to create recipe",
+    "updateError": "Failed to update recipe",
+    "deleteError": "Failed to delete recipe",
+    "loadError": "Failed to load recipes"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete this recipe?"
+  }
+}

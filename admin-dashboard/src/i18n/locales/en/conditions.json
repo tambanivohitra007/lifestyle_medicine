@@ -1,0 +1,138 @@
+{
+  "title": "Conditions",
+  "singular": "Condition",
+  "plural": "Conditions",
+  "list": {
+    "title": "Health Conditions",
+    "subtitle": "Manage health conditions and their treatments",
+    "addNew": "Add Condition",
+    "searchPlaceholder": "Search conditions...",
+    "filterByDomain": "Filter by domain",
+    "allDomains": "All domains"
+  },
+  "detail": {
+    "title": "Condition Details",
+    "overview": "Overview",
+    "description": "Description",
+    "interventions": "Interventions",
+    "attachedInterventions": "Attached Interventions",
+    "noInterventions": "No interventions attached",
+    "attachIntervention": "Attach Intervention",
+    "detachIntervention": "Detach Intervention",
+    "relatedConditions": "Related Conditions",
+    "evidence": "Evidence",
+    "scriptures": "Scriptures",
+    "egwReferences": "EGW References",
+    "tags": "Tags"
+  },
+  "form": {
+    "createTitle": "Create Condition",
+    "editTitle": "Edit Condition",
+    "newTitle": "New Condition",
+    "editSubtitle": "Update the condition details below",
+    "newSubtitle": "Create a new medical condition",
+    "name": "Name",
+    "namePlaceholder": "e.g., Type 2 Diabetes",
+    "category": "Category",
+    "categoryPlaceholder": "e.g., Metabolic, Cardiovascular, Mental Health",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the condition...",
+    "summary": "Summary",
+    "summaryPlaceholder": "A brief description of the condition...",
+    "domain": "Care Domain",
+    "selectDomain": "Select a care domain",
+    "selectDomainPlaceholder": "Choose care domain...",
+    "image": "Featured Image",
+    "tags": "Tags",
+    "selectTags": "Select tags",
+    "aliases": "Aliases",
+    "aliasesPlaceholder": "Add alternative names",
+    "icdCode": "ICD Code",
+    "icdCodePlaceholder": "e.g., E11.9",
+    "prevalence": "Prevalence",
+    "symptoms": "Symptoms",
+    "causes": "Causes",
+    "riskFactors": "Risk Factors",
+    "complications": "Complications",
+    "prevention": "Prevention",
+    "status": "Status"
+  },
+  "attach": {
+    "title": "Attach Intervention",
+    "subtitle": "Link an intervention to this condition",
+    "intervention": "Attach Intervention",
+    "scripture": "Attach Scripture",
+    "recipe": "Attach Recipe",
+    "egwReference": "Attach EGW Reference",
+    "selectIntervention": "Select Intervention",
+    "selectFromList": "Select an intervention from the list",
+    "configureMapping": "Configure Mapping",
+    "linkTo": "Link to",
+    "searchPlaceholder": "Search interventions...",
+    "noResults": "No interventions found",
+    "alreadyAttached": "Already attached",
+    "notes": "Notes",
+    "notesPlaceholder": "Add notes about this relationship...",
+    "evidenceLevel": "Evidence Level",
+    "recommendation": "Recommendation Strength"
+  },
+  "empty": {
+    "title": "No conditions found",
+    "description": "Get started by creating your first condition",
+    "action": "Add Condition",
+    "noSummary": "No summary available"
+  },
+  "toast": {
+    "created": "Condition created successfully",
+    "updated": "Condition updated successfully",
+    "deleted": "Condition deleted successfully",
+    "interventionAttached": "Intervention attached successfully",
+    "interventionDetached": "Intervention detached successfully",
+    "createError": "Failed to create condition",
+    "updateError": "Failed to update condition",
+    "deleteError": "Failed to delete condition",
+    "loadError": "Failed to load conditions",
+    "loadFailed": "Failed to load condition",
+    "saveFailed": "Failed to save condition",
+    "attachFailed": "Failed to attach item"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete this condition?",
+    "detach": "Are you sure you want to detach this intervention?"
+  },
+  "preview": {
+    "title": "Condition Preview",
+    "printable": "Printable View",
+    "infographic": "Infographic"
+  },
+  "sections": {
+    "title": "Condition Sections",
+    "types": {
+      "riskFactors": "Risk Factors / Causes",
+      "physiology": "Physiology",
+      "complications": "Complications",
+      "solutions": "Lifestyle Solutions",
+      "additionalFactors": "Additional Factors",
+      "scripture": "Scripture / SOP",
+      "researchIdeas": "Research Ideas"
+    },
+    "form": {
+      "newTitle": "New Section",
+      "editTitle": "Edit Section",
+      "sectionType": "Section Type",
+      "selectSectionType": "Select a section type",
+      "titlePlaceholder": "Section title",
+      "contentPlaceholder": "Start writing the section content...",
+      "imageHint": "Click the image icon in the toolbar to insert images",
+      "orderHint": "Lower numbers appear first",
+      "forCondition": "For condition"
+    },
+    "toast": {
+      "loadFailed": "Failed to load section",
+      "saveFailed": "Failed to save section",
+      "created": "Section created successfully",
+      "updated": "Section updated successfully",
+      "deleted": "Section deleted successfully"
+    }
+  }
+}

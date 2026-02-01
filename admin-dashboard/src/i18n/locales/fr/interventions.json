@@ -1,0 +1,98 @@
+{
+  "title": "Interventions",
+  "singular": "Intervention",
+  "plural": "Interventions",
+  "list": {
+    "title": "Interventions",
+    "subtitle": "Gérer les interventions de mode de vie et les traitements",
+    "addNew": "Ajouter une intervention",
+    "searchPlaceholder": "Rechercher des interventions...",
+    "filterByDomain": "Filtrer par domaine",
+    "filterByType": "Filtrer par type",
+    "allDomains": "Tous les domaines",
+    "allTypes": "Tous les types"
+  },
+  "detail": {
+    "title": "Détails de l'intervention",
+    "overview": "Aperçu",
+    "description": "Description",
+    "howItWorks": "Comment ça fonctionne",
+    "implementation": "Mise en œuvre",
+    "benefits": "Avantages",
+    "precautions": "Précautions",
+    "contraindications": "Contre-indications",
+    "relatedConditions": "Conditions connexes",
+    "evidence": "Preuves",
+    "scriptures": "Écritures",
+    "egwReferences": "Références EGW",
+    "recipes": "Recettes connexes",
+    "tags": "Étiquettes"
+  },
+  "form": {
+    "createTitle": "Créer une intervention",
+    "editTitle": "Modifier l'intervention",
+    "name": "Nom de l'intervention",
+    "namePlaceholder": "Entrez le nom de l'intervention",
+    "description": "Description",
+    "descriptionPlaceholder": "Décrivez l'intervention...",
+    "summary": "Résumé",
+    "summaryPlaceholder": "Bref résumé de l'intervention",
+    "domain": "Domaine de soins",
+    "selectDomain": "Sélectionner un domaine de soins",
+    "type": "Type d'intervention",
+    "selectType": "Sélectionner le type d'intervention",
+    "image": "Image principale",
+    "tags": "Étiquettes",
+    "selectTags": "Sélectionner des étiquettes",
+    "dosage": "Dosage/Fréquence",
+    "duration": "Durée",
+    "evidenceLevel": "Niveau de preuve",
+    "status": "Statut"
+  },
+  "types": {
+    "dietary": "Alimentaire",
+    "exercise": "Exercice",
+    "lifestyle": "Mode de vie",
+    "supplement": "Supplément",
+    "therapy": "Thérapie",
+    "other": "Autre"
+  },
+  "search": {
+    "placeholder": "Rechercher des interventions..."
+  },
+  "empty": {
+    "title": "Aucune intervention trouvée",
+    "description": "Commencez par créer votre première intervention",
+    "action": "Ajouter une intervention",
+    "noResults": "Aucune intervention disponible trouvée"
+  },
+  "mapping": {
+    "strengthOfEvidence": "Force des preuves",
+    "recommendationLevel": "Niveau de recommandation",
+    "clinicalNotes": "Notes cliniques",
+    "clinicalNotesPlaceholder": "Notes spécifiques pour cette condition...",
+    "evidence": {
+      "high": "Élevé",
+      "moderate": "Modéré",
+      "emerging": "Émergent",
+      "insufficient": "Insuffisant"
+    },
+    "recommendation": {
+      "core": "Principal",
+      "adjunct": "Complémentaire",
+      "optional": "Optionnel"
+    }
+  },
+  "toast": {
+    "created": "Intervention créée avec succès",
+    "updated": "Intervention mise à jour avec succès",
+    "deleted": "Intervention supprimée avec succès",
+    "createError": "Échec de la création de l'intervention",
+    "updateError": "Échec de la mise à jour de l'intervention",
+    "deleteError": "Échec de la suppression de l'intervention",
+    "loadError": "Échec du chargement des interventions"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cette intervention?"
+  }
+}

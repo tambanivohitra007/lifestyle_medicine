@@ -1,0 +1,204 @@
+{
+  "sections": {
+    "main": "Main",
+    "overview": "Overview",
+    "content": "Content",
+    "resources": "Resources",
+    "system": "System",
+    "administration": "Administration"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "search": "Search",
+    "knowledgeGraph": "Knowledge Graph",
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "careDomains": "Care Domains",
+    "bible": "Bible Explorer",
+    "evidence": "Evidence",
+    "references": "References",
+    "scriptures": "Scriptures",
+    "egwWritings": "EGW Writings",
+    "recipes": "Recipes",
+    "users": "Users",
+    "tags": "Content Tags",
+    "import": "Import Data",
+    "aiGenerator": "AI Generator",
+    "profile": "Settings",
+    "home": "Home",
+    "more": "More",
+    "graph": "Graph"
+  },
+  "header": {
+    "title": "Knowledge Platform",
+    "subtitle": "Lifestyle Medicine & Gospel Medical Evangelism",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "goBack": "Go back"
+  },
+  "pages": {
+    "lifestyleMedicine": {
+      "title": "Lifestyle Medicine",
+      "subtitle": "Knowledge Platform"
+    },
+    "conditions": {
+      "title": "Conditions",
+      "subtitle": "Health Conditions"
+    },
+    "conditionDetails": {
+      "title": "Condition Details",
+      "subtitle": "View Information"
+    },
+    "editCondition": {
+      "title": "Edit Condition",
+      "subtitle": "Modify Details"
+    },
+    "attachIntervention": {
+      "title": "Attach Intervention",
+      "subtitle": "Link Treatment"
+    },
+    "interventions": {
+      "title": "Interventions",
+      "subtitle": "Treatment Options"
+    },
+    "interventionDetails": {
+      "title": "Intervention Details",
+      "subtitle": "View Information"
+    },
+    "editIntervention": {
+      "title": "Edit Intervention",
+      "subtitle": "Modify Details"
+    },
+    "careDomains": {
+      "title": "Care Domains",
+      "subtitle": "Lifestyle Categories"
+    },
+    "careDomainDetails": {
+      "title": "Care Domain Details",
+      "subtitle": "View Category"
+    },
+    "editCareDomain": {
+      "title": "Edit Care Domain",
+      "subtitle": "Modify Details"
+    },
+    "search": {
+      "title": "Search",
+      "subtitle": "Find Content"
+    },
+    "bible": {
+      "title": "Bible Explorer",
+      "subtitle": "Scripture Search"
+    },
+    "evidence": {
+      "title": "Evidence",
+      "subtitle": "Research & Studies"
+    },
+    "evidenceDetails": {
+      "title": "Evidence Details",
+      "subtitle": "View Study"
+    },
+    "editEvidence": {
+      "title": "Edit Evidence",
+      "subtitle": "Modify Details"
+    },
+    "references": {
+      "title": "References",
+      "subtitle": "Citations & Sources"
+    },
+    "referenceDetails": {
+      "title": "Reference Details",
+      "subtitle": "View Citation"
+    },
+    "editReference": {
+      "title": "Edit Reference",
+      "subtitle": "Modify Details"
+    },
+    "scriptures": {
+      "title": "Scriptures",
+      "subtitle": "Bible Verses"
+    },
+    "scriptureDetails": {
+      "title": "Scripture Details",
+      "subtitle": "View Verse"
+    },
+    "editScripture": {
+      "title": "Edit Scripture",
+      "subtitle": "Modify Details"
+    },
+    "egwReferences": {
+      "title": "EGW Writings",
+      "subtitle": "Spirit of Prophecy"
+    },
+    "egwReferenceDetails": {
+      "title": "EGW Reference",
+      "subtitle": "View Writing"
+    },
+    "editEgwReference": {
+      "title": "Edit EGW Reference",
+      "subtitle": "Modify Details"
+    },
+    "recipes": {
+      "title": "Recipes",
+      "subtitle": "Healthy Meals"
+    },
+    "recipeDetails": {
+      "title": "Recipe Details",
+      "subtitle": "View Recipe"
+    },
+    "editRecipe": {
+      "title": "Edit Recipe",
+      "subtitle": "Modify Details"
+    },
+    "newRecipe": {
+      "title": "New Recipe",
+      "subtitle": "Create Recipe"
+    },
+    "profile": {
+      "title": "Settings",
+      "subtitle": "Account & Preferences"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "Usage Statistics"
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "User Management"
+    },
+    "userDetails": {
+      "title": "User Details",
+      "subtitle": "View User"
+    },
+    "editUser": {
+      "title": "Edit User",
+      "subtitle": "Modify User"
+    },
+    "tags": {
+      "title": "Content Tags",
+      "subtitle": "Tag Management"
+    },
+    "import": {
+      "title": "Import Data",
+      "subtitle": "Bulk Import"
+    },
+    "aiGenerator": {
+      "title": "AI Generator",
+      "subtitle": "Content Generation"
+    }
+  },
+  "user": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "signOut": "Sign Out",
+    "roles": {
+      "admin": "Administrator",
+      "editor": "Editor",
+      "viewer": "Viewer"
+    }
+  },
+  "footer": {
+    "copyright": "Family & Lifestyle Medicine",
+    "developedBy": "Developed by"
+  }
+}

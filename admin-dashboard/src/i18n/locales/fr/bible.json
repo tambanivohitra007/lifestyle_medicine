@@ -1,0 +1,93 @@
+{
+  "title": "Explorateur biblique",
+  "subtitle": "Rechercher et explorer les Écritures",
+  "search": {
+    "placeholder": "Rechercher des versets, sujets ou mots-clés...",
+    "title": "Recherche",
+    "results": "Résultats de recherche",
+    "noResults": "Aucun résultat trouvé",
+    "searchTips": "Conseils de recherche"
+  },
+  "navigation": {
+    "oldTestament": "Ancien Testament",
+    "newTestament": "Nouveau Testament",
+    "books": "Livres",
+    "chapters": "Chapitres",
+    "verses": "Versets",
+    "selectBook": "Sélectionner un livre",
+    "selectChapter": "Sélectionner un chapitre"
+  },
+  "books": {
+    "genesis": "Genèse",
+    "exodus": "Exode",
+    "leviticus": "Lévitique",
+    "numbers": "Nombres",
+    "deuteronomy": "Deutéronome",
+    "matthew": "Matthieu",
+    "mark": "Marc",
+    "luke": "Luc",
+    "john": "Jean",
+    "acts": "Actes",
+    "romans": "Romains",
+    "revelation": "Apocalypse"
+  },
+  "verse": {
+    "reference": "Référence",
+    "text": "Texte",
+    "translation": "Traduction",
+    "context": "Contexte",
+    "crossReferences": "Références croisées",
+    "copyVerse": "Copier le verset",
+    "shareVerse": "Partager le verset",
+    "addToCollection": "Ajouter à la collection"
+  },
+  "translations": {
+    "title": "Traductions",
+    "kjv": "Version King James",
+    "nkjv": "Nouvelle Version King James",
+    "niv": "Nouvelle Version Internationale",
+    "esv": "Version Standard Anglaise",
+    "nasb": "Nouvelle Bible Standard Américaine"
+  },
+  "topics": {
+    "title": "Sujets de santé",
+    "diet": "Alimentation et nutrition",
+    "healing": "Guérison",
+    "rest": "Repos et sabbat",
+    "temperance": "Tempérance",
+    "faith": "Foi et confiance",
+    "peace": "Paix et santé mentale"
+  },
+  "collections": {
+    "title": "Collections",
+    "myCollections": "Mes collections",
+    "createCollection": "Créer une collection",
+    "addToCollection": "Ajouter à la collection",
+    "removeFromCollection": "Retirer de la collection"
+  },
+  "history": {
+    "title": "Historique de lecture",
+    "recentlyRead": "Récemment lus",
+    "clearHistory": "Effacer l'historique"
+  },
+  "bookmarks": {
+    "title": "Signets",
+    "addBookmark": "Ajouter un signet",
+    "removeBookmark": "Supprimer le signet",
+    "noBookmarks": "Aucun signet pour le moment"
+  },
+  "actions": {
+    "read": "Lire",
+    "listen": "Écouter",
+    "copy": "Copier",
+    "share": "Partager",
+    "highlight": "Surligner",
+    "note": "Ajouter une note"
+  },
+  "toast": {
+    "copied": "Verset copié dans le presse-papiers",
+    "bookmarkAdded": "Signet ajouté",
+    "bookmarkRemoved": "Signet supprimé",
+    "addedToCollection": "Ajouté à la collection"
+  }
+}

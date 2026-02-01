@@ -1,0 +1,138 @@
+{
+  "title": "Conditions",
+  "singular": "Condition",
+  "plural": "Conditions",
+  "list": {
+    "title": "Conditions de santé",
+    "subtitle": "Gérer les conditions de santé et leurs traitements",
+    "addNew": "Ajouter une condition",
+    "searchPlaceholder": "Rechercher des conditions...",
+    "filterByDomain": "Filtrer par domaine",
+    "allDomains": "Tous les domaines"
+  },
+  "detail": {
+    "title": "Détails de la condition",
+    "overview": "Aperçu",
+    "description": "Description",
+    "interventions": "Interventions",
+    "attachedInterventions": "Interventions attachées",
+    "noInterventions": "Aucune intervention attachée",
+    "attachIntervention": "Attacher une intervention",
+    "detachIntervention": "Détacher l'intervention",
+    "relatedConditions": "Conditions connexes",
+    "evidence": "Preuves",
+    "scriptures": "Écritures",
+    "egwReferences": "Références EGW",
+    "tags": "Étiquettes"
+  },
+  "form": {
+    "createTitle": "Créer une condition",
+    "editTitle": "Modifier la condition",
+    "newTitle": "Nouvelle condition",
+    "editSubtitle": "Mettre à jour les détails de la condition ci-dessous",
+    "newSubtitle": "Créer une nouvelle condition médicale",
+    "name": "Nom",
+    "namePlaceholder": "ex: Diabète de type 2",
+    "category": "Catégorie",
+    "categoryPlaceholder": "ex: Métabolique, Cardiovasculaire, Santé mentale",
+    "description": "Description",
+    "descriptionPlaceholder": "Décrivez la condition...",
+    "summary": "Résumé",
+    "summaryPlaceholder": "Une brève description de la condition...",
+    "domain": "Domaine de soins",
+    "selectDomain": "Sélectionner un domaine de soins",
+    "selectDomainPlaceholder": "Choisir un domaine de soins...",
+    "image": "Image principale",
+    "tags": "Étiquettes",
+    "selectTags": "Sélectionner des étiquettes",
+    "aliases": "Alias",
+    "aliasesPlaceholder": "Ajouter des noms alternatifs",
+    "icdCode": "Code CIM",
+    "icdCodePlaceholder": "ex: E11.9",
+    "prevalence": "Prévalence",
+    "symptoms": "Symptômes",
+    "causes": "Causes",
+    "riskFactors": "Facteurs de risque",
+    "complications": "Complications",
+    "prevention": "Prévention",
+    "status": "Statut"
+  },
+  "attach": {
+    "title": "Attacher une intervention",
+    "subtitle": "Lier une intervention à cette condition",
+    "intervention": "Attacher une intervention",
+    "scripture": "Attacher une écriture",
+    "recipe": "Attacher une recette",
+    "egwReference": "Attacher une référence EGW",
+    "selectIntervention": "Sélectionner une intervention",
+    "selectFromList": "Sélectionner une intervention dans la liste",
+    "configureMapping": "Configurer le mappage",
+    "linkTo": "Lier à",
+    "searchPlaceholder": "Rechercher des interventions...",
+    "noResults": "Aucune intervention trouvée",
+    "alreadyAttached": "Déjà attachée",
+    "notes": "Notes",
+    "notesPlaceholder": "Ajouter des notes sur cette relation...",
+    "evidenceLevel": "Niveau de preuve",
+    "recommendation": "Force de recommandation"
+  },
+  "empty": {
+    "title": "Aucune condition trouvée",
+    "description": "Commencez par créer votre première condition",
+    "action": "Ajouter une condition",
+    "noSummary": "Aucun résumé disponible"
+  },
+  "toast": {
+    "created": "Condition créée avec succès",
+    "updated": "Condition mise à jour avec succès",
+    "deleted": "Condition supprimée avec succès",
+    "interventionAttached": "Intervention attachée avec succès",
+    "interventionDetached": "Intervention détachée avec succès",
+    "createError": "Échec de la création de la condition",
+    "updateError": "Échec de la mise à jour de la condition",
+    "deleteError": "Échec de la suppression de la condition",
+    "loadError": "Échec du chargement des conditions",
+    "loadFailed": "Échec du chargement de la condition",
+    "saveFailed": "Échec de l'enregistrement de la condition",
+    "attachFailed": "Échec de l'attachement de l'élément"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cette condition?",
+    "detach": "Êtes-vous sûr de vouloir détacher cette intervention?"
+  },
+  "preview": {
+    "title": "Aperçu de la condition",
+    "printable": "Version imprimable",
+    "infographic": "Infographie"
+  },
+  "sections": {
+    "title": "Sections de la condition",
+    "types": {
+      "riskFactors": "Facteurs de risque / Causes",
+      "physiology": "Physiologie",
+      "complications": "Complications",
+      "solutions": "Solutions de mode de vie",
+      "additionalFactors": "Facteurs supplémentaires",
+      "scripture": "Écriture / SOP",
+      "researchIdeas": "Idées de recherche"
+    },
+    "form": {
+      "newTitle": "Nouvelle section",
+      "editTitle": "Modifier la section",
+      "sectionType": "Type de section",
+      "selectSectionType": "Sélectionner un type de section",
+      "titlePlaceholder": "Titre de la section",
+      "contentPlaceholder": "Commencez à écrire le contenu de la section...",
+      "imageHint": "Cliquez sur l'icône d'image dans la barre d'outils pour insérer des images",
+      "orderHint": "Les nombres inférieurs apparaissent en premier",
+      "forCondition": "Pour la condition"
+    },
+    "toast": {
+      "loadFailed": "Échec du chargement de la section",
+      "saveFailed": "Échec de l'enregistrement de la section",
+      "created": "Section créée avec succès",
+      "updated": "Section mise à jour avec succès",
+      "deleted": "Section supprimée avec succès"
+    }
+  }
+}

@@ -1,6 +1,9 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
+  const { t } = useTranslation('common');
+
   if (totalPages <= 1) return null;
 
   const startItem = (currentPage - 1) * itemsPerPage + 1;
@@ -31,9 +34,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
       {/* Item count */}
       <p className="text-sm text-gray-600 order-2 sm:order-1">
-        Showing <span className="font-medium">{startItem}</span> to{' '}
-        <span className="font-medium">{endItem}</span> of{' '}
-        <span className="font-medium">{totalItems}</span> results
+        {t('pagination.showing')} <span className="font-medium">{startItem}</span> {t('pagination.to')}{' '}
+        <span className="font-medium">{endItem}</span> {t('pagination.of')}{' '}
+        <span className="font-medium">{totalItems}</span> {t('pagination.results')}
       </p>
 
       {/* Pagination controls */}
@@ -43,7 +46,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
-          aria-label="Previous page"
+          aria-label={t('pagination.previous')}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -98,7 +101,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
-          aria-label="Next page"
+          aria-label={t('pagination.next')}
         >
           <ChevronRight className="w-5 h-5" />
         </button>

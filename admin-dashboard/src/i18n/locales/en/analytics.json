@@ -1,0 +1,71 @@
+{
+  "title": "Analytics",
+  "subtitle": "Usage statistics and insights",
+  "overview": {
+    "title": "Overview",
+    "totalContent": "Total Content",
+    "totalUsers": "Total Users",
+    "activeUsers": "Active Users",
+    "contentGrowth": "Content Growth"
+  },
+  "content": {
+    "title": "Content Statistics",
+    "byType": "Content by Type",
+    "byDomain": "Content by Domain",
+    "growth": "Content Growth",
+    "mostViewed": "Most Viewed",
+    "recentlyAdded": "Recently Added",
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "recipes": "Recipes",
+    "evidence": "Evidence",
+    "references": "References",
+    "scriptures": "Scriptures"
+  },
+  "users": {
+    "title": "User Statistics",
+    "totalUsers": "Total Users",
+    "activeUsers": "Active Users",
+    "newUsers": "New Users",
+    "byRole": "Users by Role",
+    "activity": "User Activity",
+    "logins": "Login Activity"
+  },
+  "activity": {
+    "title": "Activity Log",
+    "recentActivity": "Recent Activity",
+    "allActivity": "All Activity",
+    "created": "Created",
+    "updated": "Updated",
+    "deleted": "Deleted",
+    "viewed": "Viewed"
+  },
+  "charts": {
+    "contentOverTime": "Content Over Time",
+    "activityOverTime": "Activity Over Time",
+    "contentDistribution": "Content Distribution",
+    "userGrowth": "User Growth",
+    "dailyActivity": "Daily Activity",
+    "weeklyActivity": "Weekly Activity",
+    "monthlyActivity": "Monthly Activity"
+  },
+  "filters": {
+    "dateRange": "Date Range",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "last90Days": "Last 90 Days",
+    "lastYear": "Last Year",
+    "allTime": "All Time",
+    "custom": "Custom Range"
+  },
+  "export": {
+    "title": "Export Data",
+    "csv": "Export as CSV",
+    "pdf": "Export as PDF",
+    "excel": "Export as Excel"
+  },
+  "empty": {
+    "noData": "No analytics data available",
+    "noActivity": "No activity recorded"
+  }
+}

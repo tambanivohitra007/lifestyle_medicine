@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { Lock, Mail, Leaf, Heart, Activity, Shield, Clock } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
+import LanguageSwitcher from '../../components/ui/LanguageSwitcher';
 
 const Login = () => {
+  const { t } = useTranslation('auth');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,7 +43,7 @@ const Login = () => {
       } else if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
-        setError('Invalid credentials. Please try again.');
+        setError(t('errors.invalidCredentials'));
       }
     } finally {
       setLoading(false);
@@ -48,10 +51,10 @@ const Login = () => {
   };
 
   const pillars = [
-    { icon: Leaf, label: 'Nutrition' },
-    { icon: Activity, label: 'Movement' },
-    { icon: Heart, label: 'Wellness' },
-    { icon: Shield, label: 'Prevention' },
+    { icon: Leaf, labelKey: 'branding.pillars.nutrition' },
+    { icon: Activity, labelKey: 'branding.pillars.movement' },
+    { icon: Heart, labelKey: 'branding.pillars.wellness' },
+    { icon: Shield, labelKey: 'branding.pillars.prevention' },
   ];
 
   return (
@@ -80,8 +83,8 @@ const Login = () => {
                 <img src="/lifestyle.png" alt="Logo" className="w-10 h-10 object-contain" />
               </div>
               <div>
-                <h2 className="text-xl font-bold">Lifestyle Medicine</h2>
-                <p className="text-white/70 text-sm">Knowledge Platform</p>
+                <h2 className="text-xl font-bold">{t('branding.title')}</h2>
+                <p className="text-white/70 text-sm">{t('branding.subtitle')}</p>
               </div>
             </div>
           </div>
@@ -90,34 +93,34 @@ const Login = () => {
           <div className="space-y-8">
             <div>
               <h1 className="text-4xl xl:text-5xl font-bold leading-tight mb-6">
-                Transforming Health<br />
-                <span className="text-rose-300">Through Lifestyle</span>
+                {t('branding.tagline')}<br />
+                <span className="text-rose-300">{t('branding.taglineHighlight')}</span>
               </h1>
               <p className="text-xl text-white/80 max-w-md">
-                Evidence-based medicine combined with whole-person care for lasting wellness.
+                {t('branding.description')}
               </p>
             </div>
 
             {/* Core Values */}
             <div className="flex flex-wrap gap-3">
-              {['Affordable', 'Comprehensive', 'Personalized', 'Accessible'].map((value) => (
+              {['affordable', 'comprehensive', 'personalized', 'accessible'].map((valueKey) => (
                 <span
-                  key={value}
+                  key={valueKey}
                   className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium border border-white/20"
                 >
-                  {value}
+                  {t(`branding.values.${valueKey}`)}
                 </span>
               ))}
             </div>
 
             {/* Pillars */}
             <div className="grid grid-cols-4 gap-4 pt-4">
-              {pillars.map(({ icon: Icon, label }) => (
-                <div key={label} className="text-center">
+              {pillars.map(({ icon: Icon, labelKey }) => (
+                <div key={labelKey} className="text-center">
                   <div className="w-12 h-12 mx-auto mb-2 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20">
                     <Icon className="w-6 h-6 text-rose-300" />
                   </div>
-                  <span className="text-xs text-white/70">{label}</span>
+                  <span className="text-xs text-white/70">{t(labelKey)}</span>
                 </div>
               ))}
             </div>
@@ -125,31 +128,36 @@ const Login = () => {
 
           {/* Bottom - Footer */}
           <div className="text-white/50 text-sm">
-            <p>Family & Lifestyle Medicine Lansing</p>
-            <p className="mt-1">Mon-Thu 8:00 AM - 5:00 PM</p>
+            <p>{t('branding.footer.company')}</p>
+            <p className="mt-1">{t('branding.footer.hours')}</p>
           </div>
         </div>
       </div>
 
       {/* Right Panel - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-gray-50 relative">
+        {/* Language Switcher */}
+        <div className="absolute top-4 right-4">
+          <LanguageSwitcher variant="default" />
+        </div>
+
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 mb-4">
               <img src="/lifestyle.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Lifestyle Medicine</h1>
-            <p className="text-gray-500 text-sm mt-1">Knowledge Platform</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t('branding.title')}</h1>
+            <p className="text-gray-500 text-sm mt-1">{t('branding.subtitle')}</p>
           </div>
 
           {/* Welcome Text */}
           <div className="mb-8">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              Welcome back
+              {t('login.title')}
             </h2>
             <p className="text-gray-500">
-              Sign in to access your dashboard
+              {t('login.subtitle')}
             </p>
           </div>
 
@@ -158,7 +166,7 @@ const Login = () => {
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+                {t('login.emailLabel')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -169,7 +177,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-400 transition-all duration-200 text-gray-900 placeholder-gray-400"
-                  placeholder="you@example.com"
+                  placeholder={t('login.emailPlaceholder')}
                   autoComplete="email"
                   required
                 />
@@ -179,7 +187,7 @@ const Login = () => {
             {/* Password Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                {t('login.passwordLabel')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -190,7 +198,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-400 transition-all duration-200 text-gray-900 placeholder-gray-400"
-                  placeholder="Enter your password"
+                  placeholder={t('login.passwordPlaceholder')}
                   autoComplete="current-password"
                   required
                 />
@@ -201,7 +209,7 @@ const Login = () => {
             {sessionExpired && (
               <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl text-sm">
                 <Clock className="w-5 h-5 flex-shrink-0" />
-                <span>Your session has expired due to inactivity. Please sign in again.</span>
+                <span>{t('session.expired')}</span>
               </div>
             )}
 
@@ -227,17 +235,17 @@ const Login = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span>Signing in...</span>
+                  <span>{t('login.signingIn')}</span>
                 </>
               ) : (
-                'Sign In'
+                t('login.submitButton')
               )}
             </button>
           </form>
 
           {/* Footer */}
           <p className="text-center text-xs text-gray-400 mt-8">
-            © {new Date().getFullYear()} Family & Lifestyle Medicine Lansing
+            © {new Date().getFullYear()} {t('branding.footer.company')}
           </p>
         </div>
       </div>

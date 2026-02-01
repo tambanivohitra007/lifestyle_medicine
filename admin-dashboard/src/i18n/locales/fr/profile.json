@@ -1,0 +1,106 @@
+{
+  "title": "Paramètres",
+  "subtitle": "Compte et préférences",
+  "tabs": {
+    "profile": "Profil",
+    "security": "Sécurité",
+    "preferences": "Préférences",
+    "notifications": "Notifications"
+  },
+  "profile": {
+    "title": "Informations du profil",
+    "description": "Mettez à jour vos informations personnelles",
+    "avatar": "Photo de profil",
+    "changeAvatar": "Changer la photo",
+    "removeAvatar": "Supprimer la photo",
+    "name": "Nom complet",
+    "namePlaceholder": "Entrez votre nom",
+    "email": "Adresse courriel",
+    "emailPlaceholder": "Entrez votre courriel",
+    "phone": "Numéro de téléphone",
+    "phonePlaceholder": "Entrez votre numéro de téléphone",
+    "bio": "Biographie",
+    "bioPlaceholder": "Parlez-nous de vous...",
+    "role": "Rôle",
+    "memberSince": "Membre depuis"
+  },
+  "security": {
+    "title": "Paramètres de sécurité",
+    "description": "Gérez votre mot de passe et la sécurité",
+    "changePassword": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "currentPasswordPlaceholder": "Entrez le mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Entrez le nouveau mot de passe",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "confirmPasswordPlaceholder": "Confirmez le nouveau mot de passe",
+    "passwordRequirements": "Exigences du mot de passe",
+    "minLength": "Au moins 8 caractères",
+    "uppercase": "Au moins une lettre majuscule",
+    "lowercase": "Au moins une lettre minuscule",
+    "number": "Au moins un chiffre",
+    "special": "Au moins un caractère spécial",
+    "twoFactor": "Authentification à deux facteurs",
+    "twoFactorDescription": "Ajoutez une couche de sécurité supplémentaire",
+    "enableTwoFactor": "Activer la 2FA",
+    "disableTwoFactor": "Désactiver la 2FA",
+    "sessions": "Sessions actives",
+    "signOutAll": "Déconnecter tous les appareils",
+    "lastLogin": "Dernière connexion"
+  },
+  "preferences": {
+    "title": "Préférences",
+    "description": "Personnalisez votre expérience",
+    "language": "Langue",
+    "selectLanguage": "Sélectionner la langue",
+    "theme": "Thème",
+    "lightTheme": "Clair",
+    "darkTheme": "Sombre",
+    "systemTheme": "Système",
+    "timezone": "Fuseau horaire",
+    "selectTimezone": "Sélectionner le fuseau horaire",
+    "dateFormat": "Format de date",
+    "selectDateFormat": "Sélectionner le format de date"
+  },
+  "notifications": {
+    "title": "Paramètres de notification",
+    "description": "Gérez comment vous recevez les notifications",
+    "email": "Notifications par courriel",
+    "emailDescription": "Recevoir les notifications par courriel",
+    "push": "Notifications push",
+    "pushDescription": "Recevoir les notifications push",
+    "types": {
+      "updates": "Mises à jour de contenu",
+      "updatesDescription": "Quand le contenu que vous suivez est mis à jour",
+      "mentions": "Mentions",
+      "mentionsDescription": "Quand quelqu'un vous mentionne",
+      "system": "Notifications système",
+      "systemDescription": "Annonces système importantes"
+    }
+  },
+  "actions": {
+    "save": "Enregistrer les modifications",
+    "cancel": "Annuler",
+    "updatePassword": "Mettre à jour le mot de passe",
+    "deleteAccount": "Supprimer le compte"
+  },
+  "toast": {
+    "profileUpdated": "Profil mis à jour avec succès",
+    "passwordUpdated": "Mot de passe mis à jour avec succès",
+    "preferencesUpdated": "Préférences mises à jour avec succès",
+    "avatarUpdated": "Photo de profil mise à jour",
+    "avatarRemoved": "Photo de profil supprimée",
+    "updateError": "Échec de la mise à jour",
+    "passwordError": "Échec de la mise à jour du mot de passe"
+  },
+  "errors": {
+    "incorrectPassword": "Le mot de passe actuel est incorrect",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "weakPassword": "Le mot de passe est trop faible"
+  },
+  "language": {
+    "title": "Langue",
+    "english": "Anglais",
+    "french": "Français"
+  }
+}

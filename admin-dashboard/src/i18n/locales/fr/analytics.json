@@ -1,0 +1,71 @@
+{
+  "title": "Analytique",
+  "subtitle": "Statistiques d'utilisation et insights",
+  "overview": {
+    "title": "Aperçu",
+    "totalContent": "Contenu total",
+    "totalUsers": "Total utilisateurs",
+    "activeUsers": "Utilisateurs actifs",
+    "contentGrowth": "Croissance du contenu"
+  },
+  "content": {
+    "title": "Statistiques de contenu",
+    "byType": "Contenu par type",
+    "byDomain": "Contenu par domaine",
+    "growth": "Croissance du contenu",
+    "mostViewed": "Plus consultés",
+    "recentlyAdded": "Récemment ajoutés",
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "recipes": "Recettes",
+    "evidence": "Preuves",
+    "references": "Références",
+    "scriptures": "Écritures"
+  },
+  "users": {
+    "title": "Statistiques des utilisateurs",
+    "totalUsers": "Total utilisateurs",
+    "activeUsers": "Utilisateurs actifs",
+    "newUsers": "Nouveaux utilisateurs",
+    "byRole": "Utilisateurs par rôle",
+    "activity": "Activité des utilisateurs",
+    "logins": "Activité de connexion"
+  },
+  "activity": {
+    "title": "Journal d'activité",
+    "recentActivity": "Activité récente",
+    "allActivity": "Toute l'activité",
+    "created": "Créé",
+    "updated": "Mis à jour",
+    "deleted": "Supprimé",
+    "viewed": "Consulté"
+  },
+  "charts": {
+    "contentOverTime": "Contenu au fil du temps",
+    "activityOverTime": "Activité au fil du temps",
+    "contentDistribution": "Distribution du contenu",
+    "userGrowth": "Croissance des utilisateurs",
+    "dailyActivity": "Activité quotidienne",
+    "weeklyActivity": "Activité hebdomadaire",
+    "monthlyActivity": "Activité mensuelle"
+  },
+  "filters": {
+    "dateRange": "Période",
+    "last7Days": "7 derniers jours",
+    "last30Days": "30 derniers jours",
+    "last90Days": "90 derniers jours",
+    "lastYear": "Dernière année",
+    "allTime": "Tout le temps",
+    "custom": "Personnalisé"
+  },
+  "export": {
+    "title": "Exporter les données",
+    "csv": "Exporter en CSV",
+    "pdf": "Exporter en PDF",
+    "excel": "Exporter en Excel"
+  },
+  "empty": {
+    "noData": "Aucune donnée analytique disponible",
+    "noActivity": "Aucune activité enregistrée"
+  }
+}

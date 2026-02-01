@@ -1,0 +1,92 @@
+{
+  "title": "Evidence",
+  "singular": "Evidence",
+  "plural": "Evidence",
+  "list": {
+    "title": "Evidence",
+    "subtitle": "Research studies and scientific evidence",
+    "addNew": "Add Evidence",
+    "searchPlaceholder": "Search evidence...",
+    "filterByType": "Filter by type",
+    "filterByLevel": "Filter by evidence level",
+    "allTypes": "All types",
+    "allLevels": "All levels"
+  },
+  "detail": {
+    "title": "Evidence Details",
+    "overview": "Overview",
+    "abstract": "Abstract",
+    "findings": "Key Findings",
+    "methodology": "Methodology",
+    "conclusions": "Conclusions",
+    "source": "Source",
+    "relatedConditions": "Related Conditions",
+    "relatedInterventions": "Related Interventions",
+    "tags": "Tags"
+  },
+  "form": {
+    "createTitle": "Add Evidence",
+    "editTitle": "Edit Evidence",
+    "title": "Title",
+    "titlePlaceholder": "Enter evidence title",
+    "abstract": "Abstract",
+    "abstractPlaceholder": "Enter abstract...",
+    "source": "Source",
+    "sourcePlaceholder": "Journal, publication, etc.",
+    "authors": "Authors",
+    "authorsPlaceholder": "Enter authors",
+    "year": "Publication Year",
+    "yearPlaceholder": "e.g., 2024",
+    "doi": "DOI",
+    "doiPlaceholder": "Digital Object Identifier",
+    "url": "URL",
+    "urlPlaceholder": "Link to source",
+    "evidenceLevel": "Evidence Level",
+    "selectLevel": "Select evidence level",
+    "type": "Study Type",
+    "selectType": "Select study type",
+    "tags": "Tags",
+    "selectTags": "Select tags",
+    "status": "Status"
+  },
+  "levels": {
+    "1a": "Level 1a - Systematic Review",
+    "1b": "Level 1b - RCT",
+    "2a": "Level 2a - Cohort Study",
+    "2b": "Level 2b - Case-Control",
+    "3": "Level 3 - Case Series",
+    "4": "Level 4 - Expert Opinion",
+    "high": "High",
+    "moderate": "Moderate",
+    "low": "Low",
+    "veryLow": "Very Low"
+  },
+  "types": {
+    "systematicReview": "Systematic Review",
+    "metaAnalysis": "Meta-Analysis",
+    "rct": "Randomized Controlled Trial",
+    "cohort": "Cohort Study",
+    "caseControl": "Case-Control Study",
+    "caseSeries": "Case Series",
+    "caseReport": "Case Report",
+    "expertOpinion": "Expert Opinion",
+    "other": "Other"
+  },
+  "empty": {
+    "title": "No evidence found",
+    "description": "Get started by adding your first evidence",
+    "action": "Add Evidence"
+  },
+  "toast": {
+    "created": "Evidence added successfully",
+    "updated": "Evidence updated successfully",
+    "deleted": "Evidence deleted successfully",
+    "createError": "Failed to add evidence",
+    "updateError": "Failed to update evidence",
+    "deleteError": "Failed to delete evidence",
+    "loadError": "Failed to load evidence"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete this evidence?"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "title": "Settings",
+  "subtitle": "Account and preferences",
+  "tabs": {
+    "profile": "Profile",
+    "security": "Security",
+    "preferences": "Preferences",
+    "notifications": "Notifications"
+  },
+  "profile": {
+    "title": "Profile Information",
+    "description": "Update your personal information",
+    "avatar": "Profile Photo",
+    "changeAvatar": "Change Photo",
+    "removeAvatar": "Remove Photo",
+    "name": "Full Name",
+    "namePlaceholder": "Enter your name",
+    "email": "Email Address",
+    "emailPlaceholder": "Enter your email",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself...",
+    "role": "Role",
+    "memberSince": "Member Since"
+  },
+  "security": {
+    "title": "Security Settings",
+    "description": "Manage your password and security",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "currentPasswordPlaceholder": "Enter current password",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPassword": "Confirm New Password",
+    "confirmPasswordPlaceholder": "Confirm new password",
+    "passwordRequirements": "Password Requirements",
+    "minLength": "At least 8 characters",
+    "uppercase": "At least one uppercase letter",
+    "lowercase": "At least one lowercase letter",
+    "number": "At least one number",
+    "special": "At least one special character",
+    "twoFactor": "Two-Factor Authentication",
+    "twoFactorDescription": "Add an extra layer of security",
+    "enableTwoFactor": "Enable 2FA",
+    "disableTwoFactor": "Disable 2FA",
+    "sessions": "Active Sessions",
+    "signOutAll": "Sign Out All Devices",
+    "lastLogin": "Last Login"
+  },
+  "preferences": {
+    "title": "Preferences",
+    "description": "Customize your experience",
+    "language": "Language",
+    "selectLanguage": "Select language",
+    "theme": "Theme",
+    "lightTheme": "Light",
+    "darkTheme": "Dark",
+    "systemTheme": "System",
+    "timezone": "Timezone",
+    "selectTimezone": "Select timezone",
+    "dateFormat": "Date Format",
+    "selectDateFormat": "Select date format"
+  },
+  "notifications": {
+    "title": "Notification Settings",
+    "description": "Manage how you receive notifications",
+    "email": "Email Notifications",
+    "emailDescription": "Receive notifications via email",
+    "push": "Push Notifications",
+    "pushDescription": "Receive push notifications",
+    "types": {
+      "updates": "Content Updates",
+      "updatesDescription": "When content you follow is updated",
+      "mentions": "Mentions",
+      "mentionsDescription": "When someone mentions you",
+      "system": "System Notifications",
+      "systemDescription": "Important system announcements"
+    }
+  },
+  "actions": {
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "updatePassword": "Update Password",
+    "deleteAccount": "Delete Account"
+  },
+  "toast": {
+    "profileUpdated": "Profile updated successfully",
+    "passwordUpdated": "Password updated successfully",
+    "preferencesUpdated": "Preferences updated successfully",
+    "avatarUpdated": "Profile photo updated",
+    "avatarRemoved": "Profile photo removed",
+    "updateError": "Failed to update",
+    "passwordError": "Failed to update password"
+  },
+  "errors": {
+    "incorrectPassword": "Current password is incorrect",
+    "passwordMismatch": "Passwords do not match",
+    "weakPassword": "Password is too weak"
+  },
+  "language": {
+    "title": "Language",
+    "english": "English",
+    "french": "French"
+  }
+}

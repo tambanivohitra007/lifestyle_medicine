@@ -1,0 +1,92 @@
+{
+  "title": "Générateur IA",
+  "subtitle": "Génération de contenu par intelligence artificielle",
+  "modes": {
+    "condition": "Générer une condition",
+    "intervention": "Générer une intervention",
+    "recipe": "Générer une recette",
+    "content": "Générer du contenu",
+    "summary": "Générer un résumé",
+    "description": "Générer une description"
+  },
+  "form": {
+    "prompt": "Prompt",
+    "promptPlaceholder": "Décrivez ce que vous voulez générer...",
+    "topic": "Sujet",
+    "topicPlaceholder": "Entrez le sujet...",
+    "style": "Style d'écriture",
+    "selectStyle": "Sélectionner le style",
+    "length": "Longueur du contenu",
+    "selectLength": "Sélectionner la longueur",
+    "language": "Langue",
+    "selectLanguage": "Sélectionner la langue",
+    "additionalContext": "Contexte supplémentaire",
+    "contextPlaceholder": "Ajoutez tout contexte ou exigence supplémentaire..."
+  },
+  "styles": {
+    "professional": "Professionnel",
+    "conversational": "Conversationnel",
+    "academic": "Académique",
+    "simple": "Simple",
+    "detailed": "Détaillé"
+  },
+  "lengths": {
+    "short": "Court",
+    "medium": "Moyen",
+    "long": "Long",
+    "comprehensive": "Complet"
+  },
+  "actions": {
+    "generate": "Générer",
+    "regenerate": "Régénérer",
+    "copy": "Copier",
+    "insert": "Insérer",
+    "save": "Enregistrer",
+    "clear": "Effacer",
+    "useThis": "Utiliser ceci",
+    "editResult": "Modifier le résultat"
+  },
+  "result": {
+    "title": "Contenu généré",
+    "preview": "Aperçu",
+    "raw": "Texte brut",
+    "copied": "Copié dans le presse-papiers"
+  },
+  "status": {
+    "generating": "Génération du contenu...",
+    "processing": "Traitement de votre demande...",
+    "complete": "Génération terminée",
+    "failed": "Échec de la génération"
+  },
+  "history": {
+    "title": "Historique de génération",
+    "recent": "Générations récentes",
+    "noHistory": "Aucun historique de génération",
+    "clearHistory": "Effacer l'historique"
+  },
+  "templates": {
+    "title": "Modèles",
+    "useTemplate": "Utiliser le modèle",
+    "conditionDescription": "Description de condition",
+    "interventionGuide": "Guide d'intervention",
+    "recipeInstructions": "Instructions de recette",
+    "healthTip": "Conseil santé"
+  },
+  "empty": {
+    "title": "Générer du contenu IA",
+    "description": "Utilisez l'IA pour aider à créer du contenu pour les conditions, interventions, et plus"
+  },
+  "toast": {
+    "generated": "Contenu généré avec succès",
+    "copied": "Contenu copié dans le presse-papiers",
+    "saved": "Contenu enregistré avec succès",
+    "generateError": "Échec de la génération du contenu",
+    "apiError": "Service IA indisponible"
+  },
+  "errors": {
+    "emptyPrompt": "Veuillez entrer un prompt",
+    "tooShort": "Le prompt est trop court",
+    "rateLimited": "Trop de requêtes. Veuillez patienter.",
+    "serverError": "Erreur serveur. Veuillez réessayer."
+  }
+}

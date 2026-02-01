@@ -1,4 +1,5 @@
 import { LayoutGrid, List, Table } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Toggle component for switching between different view modes
@@ -8,10 +9,12 @@ import { LayoutGrid, List, Table } from 'lucide-react';
  * @param {string} className - Additional CSS classes
  */
 const ViewModeToggle = ({ viewMode, onViewModeChange, className = '' }) => {
+  const { t } = useTranslation('common');
+
   const modes = [
-    { id: 'grid', label: 'Grid', icon: LayoutGrid },
-    { id: 'list', label: 'List', icon: List },
-    { id: 'table', label: 'Table', icon: Table },
+    { id: 'grid', labelKey: 'viewMode.grid', icon: LayoutGrid },
+    { id: 'list', labelKey: 'viewMode.list', icon: List },
+    { id: 'table', labelKey: 'viewMode.table', icon: Table },
   ];
 
   return (
@@ -33,12 +36,12 @@ const ViewModeToggle = ({ viewMode, onViewModeChange, className = '' }) => {
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               }
             `}
-            aria-label={`${mode.label} view`}
+            aria-label={t(mode.labelKey)}
             aria-pressed={isActive}
             type="button"
           >
             <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">{mode.label}</span>
+            <span className="hidden sm:inline">{t(mode.labelKey)}</span>
           </button>
         );
       })}

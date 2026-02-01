@@ -1,0 +1,77 @@
+{
+  "title": "Utilisateurs",
+  "singular": "Utilisateur",
+  "plural": "Utilisateurs",
+  "list": {
+    "title": "Gestion des utilisateurs",
+    "subtitle": "Gérer les utilisateurs du système et les permissions",
+    "addNew": "Ajouter un utilisateur",
+    "searchPlaceholder": "Rechercher des utilisateurs...",
+    "filterByRole": "Filtrer par rôle",
+    "filterByStatus": "Filtrer par statut",
+    "allRoles": "Tous les rôles",
+    "allStatuses": "Tous les statuts"
+  },
+  "detail": {
+    "title": "Détails de l'utilisateur",
+    "profile": "Profil",
+    "activity": "Activité",
+    "permissions": "Permissions",
+    "lastLogin": "Dernière connexion",
+    "createdAt": "Membre depuis",
+    "status": "Statut"
+  },
+  "form": {
+    "createTitle": "Créer un utilisateur",
+    "editTitle": "Modifier l'utilisateur",
+    "name": "Nom complet",
+    "namePlaceholder": "Entrez le nom complet",
+    "email": "Adresse courriel",
+    "emailPlaceholder": "Entrez l'adresse courriel",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Entrez le mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "confirmPasswordPlaceholder": "Confirmez le mot de passe",
+    "role": "Rôle",
+    "selectRole": "Sélectionner un rôle",
+    "status": "Statut",
+    "active": "Actif",
+    "inactive": "Inactif"
+  },
+  "roles": {
+    "admin": "Administrateur",
+    "editor": "Éditeur",
+    "viewer": "Lecteur"
+  },
+  "roleDescriptions": {
+    "admin": "Accès complet à toutes les fonctionnalités et paramètres",
+    "editor": "Peut créer et modifier du contenu",
+    "viewer": "Accès en lecture seule au contenu"
+  },
+  "status": {
+    "active": "Actif",
+    "inactive": "Inactif",
+    "pending": "En attente",
+    "suspended": "Suspendu"
+  },
+  "empty": {
+    "title": "Aucun utilisateur trouvé",
+    "description": "Commencez par créer votre premier utilisateur",
+    "action": "Ajouter un utilisateur"
+  },
+  "toast": {
+    "created": "Utilisateur créé avec succès",
+    "updated": "Utilisateur mis à jour avec succès",
+    "deleted": "Utilisateur supprimé avec succès",
+    "activated": "Utilisateur activé avec succès",
+    "deactivated": "Utilisateur désactivé avec succès",
+    "createError": "Échec de la création de l'utilisateur",
+    "updateError": "Échec de la mise à jour de l'utilisateur",
+    "deleteError": "Échec de la suppression de l'utilisateur",
+    "loadError": "Échec du chargement des utilisateurs"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cet utilisateur?",
+    "deactivate": "Êtes-vous sûr de vouloir désactiver cet utilisateur?"
+  }
+}

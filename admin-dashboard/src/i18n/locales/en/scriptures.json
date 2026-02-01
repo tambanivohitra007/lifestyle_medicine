@@ -1,0 +1,77 @@
+{
+  "title": "Scriptures",
+  "singular": "Scripture",
+  "plural": "Scriptures",
+  "list": {
+    "title": "Scriptures",
+    "subtitle": "Bible verses and passages",
+    "addNew": "Add Scripture",
+    "searchPlaceholder": "Search scriptures...",
+    "filterByBook": "Filter by book",
+    "allBooks": "All books"
+  },
+  "detail": {
+    "title": "Scripture Details",
+    "overview": "Overview",
+    "reference": "Reference",
+    "text": "Scripture Text",
+    "context": "Context",
+    "application": "Health Application",
+    "relatedConditions": "Related Conditions",
+    "relatedInterventions": "Related Interventions",
+    "tags": "Tags"
+  },
+  "form": {
+    "createTitle": "Add Scripture",
+    "editTitle": "Edit Scripture",
+    "book": "Book",
+    "selectBook": "Select book",
+    "chapter": "Chapter",
+    "chapterPlaceholder": "Chapter number",
+    "verseStart": "Start Verse",
+    "verseStartPlaceholder": "Starting verse",
+    "verseEnd": "End Verse",
+    "verseEndPlaceholder": "Ending verse (optional)",
+    "text": "Scripture Text",
+    "textPlaceholder": "Enter scripture text...",
+    "translation": "Translation",
+    "selectTranslation": "Select translation",
+    "context": "Context",
+    "contextPlaceholder": "Provide context...",
+    "application": "Health Application",
+    "applicationPlaceholder": "How this applies to health...",
+    "tags": "Tags",
+    "selectTags": "Select tags",
+    "status": "Status"
+  },
+  "translations": {
+    "kjv": "King James Version",
+    "nkjv": "New King James Version",
+    "niv": "New International Version",
+    "esv": "English Standard Version",
+    "nasb": "New American Standard Bible",
+    "nlt": "New Living Translation"
+  },
+  "search": {
+    "placeholder": "Search scriptures..."
+  },
+  "empty": {
+    "title": "No scriptures found",
+    "description": "Get started by adding your first scripture",
+    "action": "Add Scripture",
+    "noAvailable": "No available scriptures",
+    "allLinkedOrNoMatch": "All scriptures are already linked or none match your search."
+  },
+  "toast": {
+    "created": "Scripture added successfully",
+    "updated": "Scripture updated successfully",
+    "deleted": "Scripture deleted successfully",
+    "createError": "Failed to add scripture",
+    "updateError": "Failed to update scripture",
+    "deleteError": "Failed to delete scripture",
+    "loadError": "Failed to load scriptures"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete this scripture?"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "title": "AI Generator",
+  "subtitle": "AI-powered content generation",
+  "modes": {
+    "condition": "Generate Condition",
+    "intervention": "Generate Intervention",
+    "recipe": "Generate Recipe",
+    "content": "Generate Content",
+    "summary": "Generate Summary",
+    "description": "Generate Description"
+  },
+  "form": {
+    "prompt": "Prompt",
+    "promptPlaceholder": "Describe what you want to generate...",
+    "topic": "Topic",
+    "topicPlaceholder": "Enter the topic...",
+    "style": "Writing Style",
+    "selectStyle": "Select style",
+    "length": "Content Length",
+    "selectLength": "Select length",
+    "language": "Language",
+    "selectLanguage": "Select language",
+    "additionalContext": "Additional Context",
+    "contextPlaceholder": "Add any additional context or requirements..."
+  },
+  "styles": {
+    "professional": "Professional",
+    "conversational": "Conversational",
+    "academic": "Academic",
+    "simple": "Simple",
+    "detailed": "Detailed"
+  },
+  "lengths": {
+    "short": "Short",
+    "medium": "Medium",
+    "long": "Long",
+    "comprehensive": "Comprehensive"
+  },
+  "actions": {
+    "generate": "Generate",
+    "regenerate": "Regenerate",
+    "copy": "Copy",
+    "insert": "Insert",
+    "save": "Save",
+    "clear": "Clear",
+    "useThis": "Use This",
+    "editResult": "Edit Result"
+  },
+  "result": {
+    "title": "Generated Content",
+    "preview": "Preview",
+    "raw": "Raw Text",
+    "copied": "Copied to clipboard"
+  },
+  "status": {
+    "generating": "Generating content...",
+    "processing": "Processing your request...",
+    "complete": "Generation complete",
+    "failed": "Generation failed"
+  },
+  "history": {
+    "title": "Generation History",
+    "recent": "Recent Generations",
+    "noHistory": "No generation history",
+    "clearHistory": "Clear History"
+  },
+  "templates": {
+    "title": "Templates",
+    "useTemplate": "Use Template",
+    "conditionDescription": "Condition Description",
+    "interventionGuide": "Intervention Guide",
+    "recipeInstructions": "Recipe Instructions",
+    "healthTip": "Health Tip"
+  },
+  "empty": {
+    "title": "Generate AI Content",
+    "description": "Use AI to help create content for conditions, interventions, and more"
+  },
+  "toast": {
+    "generated": "Content generated successfully",
+    "copied": "Content copied to clipboard",
+    "saved": "Content saved successfully",
+    "generateError": "Failed to generate content",
+    "apiError": "AI service unavailable"
+  },
+  "errors": {
+    "emptyPrompt": "Please enter a prompt",
+    "tooShort": "Prompt is too short",
+    "rateLimited": "Too many requests. Please wait.",
+    "serverError": "Server error. Please try again."
+  }
+}

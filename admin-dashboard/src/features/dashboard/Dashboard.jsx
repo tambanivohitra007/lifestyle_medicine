@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { HeartPulse, Activity, Book, ChefHat, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { Link } from 'react-router-dom';
 import RichTextPreview from '../../components/shared/RichTextPreview';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Dashboard = () => {
+  const { t } = useTranslation(['dashboard', 'common']);
   const { canEdit } = useAuth();
   const [stats, setStats] = useState({
     conditions: 0,
@@ -46,7 +48,7 @@ const Dashboard = () => {
 
   const statCards = [
     {
-      title: 'Conditions',
+      titleKey: 'stats.conditions',
       value: stats.conditions,
       icon: HeartPulse,
       color: 'bg-primary-500',
@@ -55,7 +57,7 @@ const Dashboard = () => {
       link: '/conditions',
     },
     {
-      title: 'Interventions',
+      titleKey: 'stats.interventions',
       value: stats.interventions,
       icon: Activity,
       color: 'bg-secondary-500',
@@ -64,7 +66,7 @@ const Dashboard = () => {
       link: '/interventions',
     },
     {
-      title: 'Scriptures',
+      titleKey: 'stats.scriptures',
       value: stats.scriptures,
       icon: Book,
       color: 'bg-purple-500',
@@ -73,7 +75,7 @@ const Dashboard = () => {
       link: '/scriptures',
     },
     {
-      title: 'Recipes',
+      titleKey: 'stats.recipes',
       value: stats.recipes,
       icon: ChefHat,
       color: 'bg-green-500',
@@ -96,10 +98,10 @@ const Dashboard = () => {
       {/* Welcome Section */}
       <div className="card bg-gradient-to-r from-primary-600 to-primary-700 text-white">
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
-          Welcome to the Knowledge Platform
+          {t('dashboard:welcome')}
         </h1>
         <p className="text-primary-100 text-sm sm:text-base">
-          Manage lifestyle medicine content, evidence, and spiritual care resources
+          {t('dashboard:overview')}
         </p>
       </div>
 
@@ -107,14 +109,14 @@ const Dashboard = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {statCards.map((stat) => (
           <Link
-            key={stat.title}
+            key={stat.titleKey}
             to={stat.link}
             className="card hover:shadow-lg transition-shadow duration-200 cursor-pointer touch-manipulation"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="order-2 sm:order-1">
                 <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
-                  {stat.title}
+                  {t(`dashboard:${stat.titleKey}`)}
                 </p>
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</p>
               </div>
@@ -129,19 +131,19 @@ const Dashboard = () => {
       {/* Recent Conditions */}
       <div className="card">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Recent Conditions</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">{t('dashboard:activity.title')}</h2>
           <Link
             to="/conditions"
             className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
           >
-            View all →
+            {t('common:buttons.viewAll')} →
           </Link>
         </div>
 
         <div className="space-y-3 sm:space-y-4">
           {recentConditions.length === 0 ? (
             <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">
-              No conditions found. Create your first condition to get started.
+              {t('dashboard:activity.noActivity')}
             </p>
           ) : (
             recentConditions.map((condition) => (
@@ -182,10 +184,10 @@ const Dashboard = () => {
           >
             <HeartPulse className="w-10 sm:w-12 h-10 sm:h-12 text-primary-600 mx-auto mb-2 sm:mb-3" />
             <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
-              Add New Condition
+              {t('dashboard:actions.addCondition')}
             </h3>
             <p className="text-xs sm:text-sm text-gray-600">
-              Create a new medical condition entry
+              {t('dashboard:actions.addConditionDesc')}
             </p>
           </Link>
 
@@ -195,10 +197,10 @@ const Dashboard = () => {
           >
             <Activity className="w-10 sm:w-12 h-10 sm:h-12 text-secondary-600 mx-auto mb-2 sm:mb-3" />
             <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
-              Add Intervention
+              {t('dashboard:actions.addIntervention')}
             </h3>
             <p className="text-xs sm:text-sm text-gray-600">
-              Create a lifestyle intervention
+              {t('dashboard:actions.addInterventionDesc')}
             </p>
           </Link>
 
@@ -207,9 +209,9 @@ const Dashboard = () => {
             className="card hover:shadow-lg transition-shadow duration-200 text-center touch-manipulation"
           >
             <Book className="w-10 sm:w-12 h-10 sm:h-12 text-purple-600 mx-auto mb-2 sm:mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Add Scripture</h3>
+            <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">{t('dashboard:actions.addScripture')}</h3>
             <p className="text-xs sm:text-sm text-gray-600">
-              Add spiritual care content
+              {t('dashboard:actions.addScriptureDesc')}
             </p>
           </Link>
         </div>

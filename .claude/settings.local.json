@@ -55,7 +55,8 @@
       "Bash(dir:*)",
       "Bash(powershell:*)",
       "Bash(test:*)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "Bash(node scripts/check-translations.js:*)"
     ]
   }
 }

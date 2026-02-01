@@ -10,6 +10,7 @@ import {
   Edit2,
   Check,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 
@@ -33,6 +34,8 @@ const MediaUploader = ({
   onMediaChange,
   accept = "image/jpeg,image/png,image/gif,image/webp,application/pdf"
 }) => {
+  const { t } = useTranslation('common');
+
   // Backwards compatibility
   const resolvedEntityType = interventionId ? 'intervention' : entityType;
   const resolvedEntityId = interventionId || entityId;
@@ -187,27 +190,27 @@ const MediaUploader = ({
         {uploading ? (
           <div className="flex flex-col items-center">
             <Loader2 className="w-10 h-10 text-primary-600 animate-spin mb-3" />
-            <p className="text-gray-600">Uploading...</p>
+            <p className="text-gray-600">{t('media.uploading')}</p>
           </div>
         ) : (
           <>
             <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-600 mb-2">
-              Drag and drop files here, or{' '}
-              <label className="text-primary-600 hover:text-primary-700 cursor-pointer font-medium">
-                browse
-                <input
-                  type="file"
-                  className="hidden"
-                  multiple
-                  accept={accept}
-                  onChange={handleFileSelect}
-                />
-              </label>
+              {t('media.dropzone')}
             </p>
             <p className="text-sm text-gray-500">
-              Supports: JPEG, PNG, GIF, WebP, PDF (max 10MB)
+              {t('media.allowedTypes', { types: 'JPEG, PNG, GIF, WebP, PDF' })} ({t('media.maxSize', { size: '10MB' })})
             </p>
+            <label className="mt-3 inline-block text-primary-600 hover:text-primary-700 cursor-pointer font-medium">
+              {t('buttons.upload')}
+              <input
+                type="file"
+                className="hidden"
+                multiple
+                accept={accept}
+                onChange={handleFileSelect}
+              />
+            </label>
           </>
         )}
       </div>
@@ -384,7 +387,7 @@ const MediaUploader = ({
       {/* Empty State */}
       {media.length === 0 && !uploading && (
         <p className="text-sm text-gray-500 text-center py-4">
-          No media files uploaded yet
+          {t('messages.noData')}
         </p>
       )}
     </div>

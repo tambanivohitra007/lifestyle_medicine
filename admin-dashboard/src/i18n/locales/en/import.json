@@ -1,0 +1,93 @@
+{
+  "title": "Import Data",
+  "subtitle": "Bulk import content from files",
+  "steps": {
+    "upload": "Upload File",
+    "mapping": "Map Fields",
+    "preview": "Preview Data",
+    "import": "Import",
+    "complete": "Complete"
+  },
+  "upload": {
+    "title": "Upload File",
+    "description": "Upload a CSV or Excel file to import data",
+    "dropzone": "Drag and drop file here or click to browse",
+    "acceptedFormats": "Accepted formats: CSV, XLSX, XLS",
+    "maxSize": "Maximum file size: 10MB",
+    "selectFile": "Select File",
+    "changeFile": "Change File"
+  },
+  "mapping": {
+    "title": "Map Fields",
+    "description": "Match your file columns to the database fields",
+    "sourceColumn": "Source Column",
+    "targetField": "Target Field",
+    "skip": "Skip this column",
+    "required": "Required",
+    "optional": "Optional",
+    "preview": "Sample Data"
+  },
+  "preview": {
+    "title": "Preview Data",
+    "description": "Review the data before importing",
+    "totalRows": "Total Rows",
+    "validRows": "Valid Rows",
+    "invalidRows": "Invalid Rows",
+    "duplicates": "Duplicates",
+    "showErrors": "Show Errors",
+    "showAll": "Show All"
+  },
+  "options": {
+    "title": "Import Options",
+    "skipDuplicates": "Skip Duplicates",
+    "updateExisting": "Update Existing",
+    "createNew": "Create New Only",
+    "validateOnly": "Validate Only (Dry Run)"
+  },
+  "progress": {
+    "title": "Import Progress",
+    "processing": "Processing...",
+    "imported": "Imported",
+    "skipped": "Skipped",
+    "failed": "Failed",
+    "total": "Total"
+  },
+  "complete": {
+    "title": "Import Complete",
+    "success": "Successfully imported {{count}} records",
+    "partial": "Imported {{success}} of {{total}} records",
+    "failed": "Import failed",
+    "viewResults": "View Results",
+    "downloadReport": "Download Report",
+    "importAnother": "Import Another File"
+  },
+  "types": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "recipes": "Recipes",
+    "evidence": "Evidence",
+    "references": "References",
+    "scriptures": "Scriptures",
+    "users": "Users"
+  },
+  "errors": {
+    "invalidFile": "Invalid file format",
+    "fileTooLarge": "File is too large",
+    "emptyFile": "File is empty",
+    "parseError": "Failed to parse file",
+    "mappingRequired": "Please map required fields",
+    "validationFailed": "Validation failed",
+    "importFailed": "Import failed"
+  },
+  "toast": {
+    "uploadSuccess": "File uploaded successfully",
+    "importSuccess": "Import completed successfully",
+    "importError": "Import failed",
+    "validationError": "Validation errors found"
+  },
+  "templates": {
+    "title": "Download Templates",
+    "description": "Download sample templates to use for import",
+    "download": "Download Template"
+  }
+}

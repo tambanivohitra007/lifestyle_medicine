@@ -1,0 +1,92 @@
+{
+  "title": "Preuves",
+  "singular": "Preuve",
+  "plural": "Preuves",
+  "list": {
+    "title": "Preuves",
+    "subtitle": "Études de recherche et preuves scientifiques",
+    "addNew": "Ajouter une preuve",
+    "searchPlaceholder": "Rechercher des preuves...",
+    "filterByType": "Filtrer par type",
+    "filterByLevel": "Filtrer par niveau de preuve",
+    "allTypes": "Tous les types",
+    "allLevels": "Tous les niveaux"
+  },
+  "detail": {
+    "title": "Détails de la preuve",
+    "overview": "Aperçu",
+    "abstract": "Résumé",
+    "findings": "Principales conclusions",
+    "methodology": "Méthodologie",
+    "conclusions": "Conclusions",
+    "source": "Source",
+    "relatedConditions": "Conditions connexes",
+    "relatedInterventions": "Interventions connexes",
+    "tags": "Étiquettes"
+  },
+  "form": {
+    "createTitle": "Ajouter une preuve",
+    "editTitle": "Modifier la preuve",
+    "title": "Titre",
+    "titlePlaceholder": "Entrez le titre de la preuve",
+    "abstract": "Résumé",
+    "abstractPlaceholder": "Entrez le résumé...",
+    "source": "Source",
+    "sourcePlaceholder": "Journal, publication, etc.",
+    "authors": "Auteurs",
+    "authorsPlaceholder": "Entrez les auteurs",
+    "year": "Année de publication",
+    "yearPlaceholder": "ex: 2024",
+    "doi": "DOI",
+    "doiPlaceholder": "Identifiant d'objet numérique",
+    "url": "URL",
+    "urlPlaceholder": "Lien vers la source",
+    "evidenceLevel": "Niveau de preuve",
+    "selectLevel": "Sélectionner le niveau de preuve",
+    "type": "Type d'étude",
+    "selectType": "Sélectionner le type d'étude",
+    "tags": "Étiquettes",
+    "selectTags": "Sélectionner des étiquettes",
+    "status": "Statut"
+  },
+  "levels": {
+    "1a": "Niveau 1a - Revue systématique",
+    "1b": "Niveau 1b - ECR",
+    "2a": "Niveau 2a - Étude de cohorte",
+    "2b": "Niveau 2b - Cas-témoins",
+    "3": "Niveau 3 - Série de cas",
+    "4": "Niveau 4 - Opinion d'expert",
+    "high": "Élevé",
+    "moderate": "Modéré",
+    "low": "Faible",
+    "veryLow": "Très faible"
+  },
+  "types": {
+    "systematicReview": "Revue systématique",
+    "metaAnalysis": "Méta-analyse",
+    "rct": "Essai contrôlé randomisé",
+    "cohort": "Étude de cohorte",
+    "caseControl": "Étude cas-témoins",
+    "caseSeries": "Série de cas",
+    "caseReport": "Rapport de cas",
+    "expertOpinion": "Opinion d'expert",
+    "other": "Autre"
+  },
+  "empty": {
+    "title": "Aucune preuve trouvée",
+    "description": "Commencez par ajouter votre première preuve",
+    "action": "Ajouter une preuve"
+  },
+  "toast": {
+    "created": "Preuve ajoutée avec succès",
+    "updated": "Preuve mise à jour avec succès",
+    "deleted": "Preuve supprimée avec succès",
+    "createError": "Échec de l'ajout de la preuve",
+    "updateError": "Échec de la mise à jour de la preuve",
+    "deleteError": "Échec de la suppression de la preuve",
+    "loadError": "Échec du chargement des preuves"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cette preuve?"
+  }
+}

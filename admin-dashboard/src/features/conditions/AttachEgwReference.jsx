@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Search, BookMarked, Plus, ArrowLeft, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const AttachEgwReference = () => {
+  const { t } = useTranslation(['conditions', 'common', 'references']);
   const { id: conditionId } = useParams();
   const navigate = useNavigate();
 
@@ -40,7 +42,7 @@ const AttachEgwReference = () => {
       setBooks(booksRes.data.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load data');
+      toast.error(t('common:messages.error.loadFailed'));
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -65,10 +67,10 @@ const AttachEgwReference = () => {
       setAttaching(reference.id);
       await api.post(apiEndpoints.attachConditionEgwReference(conditionId, reference.id));
       setAttachedIds((prev) => new Set([...prev, reference.id]));
-      toast.success('EGW reference attached');
+      toast.success(t('references:toast.attached'));
     } catch (error) {
       console.error('Error attaching reference:', error);
-      toast.error('Failed to attach reference');
+      toast.error(t('references:toast.attachFailed'));
     } finally {
       setAttaching(null);
     }
@@ -83,10 +85,10 @@ const AttachEgwReference = () => {
         newSet.delete(reference.id);
         return newSet;
       });
-      toast.success('EGW reference removed');
+      toast.success(t('references:toast.removed'));
     } catch (error) {
       console.error('Error detaching reference:', error);
-      toast.error('Failed to remove reference');
+      toast.error(t('references:toast.removeFailed'));
     } finally {
       setAttaching(null);
     }
@@ -101,9 +103,9 @@ const AttachEgwReference = () => {
   }
 
   const breadcrumbItems = [
-    { label: 'Conditions', path: '/conditions' },
-    { label: condition?.name || 'Condition', path: `/conditions/${conditionId}` },
-    { label: 'Attach EGW Reference' },
+    { label: t('conditions:title'), path: '/conditions' },
+    { label: condition?.name || t('conditions:singular'), path: `/conditions/${conditionId}` },
+    { label: t('conditions:attach.egwReference') },
   ];
 
   return (
@@ -120,10 +122,10 @@ const AttachEgwReference = () => {
         </button>
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Attach EGW Reference
+            {t('conditions:attach.egwReference')}
           </h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Link Ellen G. White references to "{condition?.name}"
+            {t('references:attach.linkTo', { name: condition?.name })}
           </p>
         </div>
       </div>
@@ -135,7 +137,7 @@ const AttachEgwReference = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search quotes..."
+              placeholder={t('references:search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -146,7 +148,7 @@ const AttachEgwReference = () => {
             onChange={(e) => setBookFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Books</option>
+            <option value="">{t('common:filters.allBooks')}</option>
             {books.map((book) => (
               <option key={book} value={book}>
                 {book}
@@ -160,14 +162,14 @@ const AttachEgwReference = () => {
       {references.length === 0 ? (
         <div className="card text-center py-8">
           <BookMarked className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-600">No EGW references found</p>
+          <p className="text-gray-600">{t('references:empty.noResults')}</p>
           <p className="text-sm text-gray-500 mt-1">
-            Try adjusting your search or{' '}
+            {t('references:empty.adjustSearch')}{' '}
             <button
               onClick={() => navigate('/egw-references/new')}
               className="text-primary-600 hover:underline"
             >
-              create a new reference
+              {t('references:empty.createNew')}
             </button>
           </p>
         </div>
@@ -198,7 +200,7 @@ const AttachEgwReference = () => {
                       {isAttached && (
                         <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex items-center gap-1">
                           <Check className="w-3 h-3" />
-                          Linked
+                          {t('common:labels.linked')}
                         </span>
                       )}
                     </div>
@@ -220,11 +222,11 @@ const AttachEgwReference = () => {
                     {isProcessing ? (
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     ) : isAttached ? (
-                      'Remove'
+                      t('common:buttons.remove')
                     ) : (
                       <>
                         <Plus className="w-4 h-4" />
-                        Attach
+                        {t('common:buttons.attach')}
                       </>
                     )}
                   </button>
@@ -241,7 +243,7 @@ const AttachEgwReference = () => {
           onClick={() => navigate(`/conditions/${conditionId}`)}
           className="btn-primary"
         >
-          Done
+          {t('common:buttons.done')}
         </button>
       </div>
     </div>

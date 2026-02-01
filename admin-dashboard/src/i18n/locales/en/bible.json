@@ -1,0 +1,93 @@
+{
+  "title": "Bible Explorer",
+  "subtitle": "Search and explore scriptures",
+  "search": {
+    "placeholder": "Search for verses, topics, or keywords...",
+    "title": "Search",
+    "results": "Search Results",
+    "noResults": "No results found",
+    "searchTips": "Search Tips"
+  },
+  "navigation": {
+    "oldTestament": "Old Testament",
+    "newTestament": "New Testament",
+    "books": "Books",
+    "chapters": "Chapters",
+    "verses": "Verses",
+    "selectBook": "Select a book",
+    "selectChapter": "Select a chapter"
+  },
+  "books": {
+    "genesis": "Genesis",
+    "exodus": "Exodus",
+    "leviticus": "Leviticus",
+    "numbers": "Numbers",
+    "deuteronomy": "Deuteronomy",
+    "matthew": "Matthew",
+    "mark": "Mark",
+    "luke": "Luke",
+    "john": "John",
+    "acts": "Acts",
+    "romans": "Romans",
+    "revelation": "Revelation"
+  },
+  "verse": {
+    "reference": "Reference",
+    "text": "Text",
+    "translation": "Translation",
+    "context": "Context",
+    "crossReferences": "Cross References",
+    "copyVerse": "Copy Verse",
+    "shareVerse": "Share Verse",
+    "addToCollection": "Add to Collection"
+  },
+  "translations": {
+    "title": "Translations",
+    "kjv": "King James Version",
+    "nkjv": "New King James Version",
+    "niv": "New International Version",
+    "esv": "English Standard Version",
+    "nasb": "New American Standard Bible"
+  },
+  "topics": {
+    "title": "Health Topics",
+    "diet": "Diet & Nutrition",
+    "healing": "Healing",
+    "rest": "Rest & Sabbath",
+    "temperance": "Temperance",
+    "faith": "Faith & Trust",
+    "peace": "Peace & Mental Health"
+  },
+  "collections": {
+    "title": "Collections",
+    "myCollections": "My Collections",
+    "createCollection": "Create Collection",
+    "addToCollection": "Add to Collection",
+    "removeFromCollection": "Remove from Collection"
+  },
+  "history": {
+    "title": "Reading History",
+    "recentlyRead": "Recently Read",
+    "clearHistory": "Clear History"
+  },
+  "bookmarks": {
+    "title": "Bookmarks",
+    "addBookmark": "Add Bookmark",
+    "removeBookmark": "Remove Bookmark",
+    "noBookmarks": "No bookmarks yet"
+  },
+  "actions": {
+    "read": "Read",
+    "listen": "Listen",
+    "copy": "Copy",
+    "share": "Share",
+    "highlight": "Highlight",
+    "note": "Add Note"
+  },
+  "toast": {
+    "copied": "Verse copied to clipboard",
+    "bookmarkAdded": "Bookmark added",
+    "bookmarkRemoved": "Bookmark removed",
+    "addedToCollection": "Added to collection"
+  }
+}

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Save, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const ConditionForm = () => {
+  const { t } = useTranslation(['conditions', 'common']);
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -37,7 +39,7 @@ const ConditionForm = () => {
       });
     } catch (error) {
       console.error('Error fetching condition:', error);
-      toast.error('Failed to load condition');
+      toast.error(t('conditions:toast.loadFailed'));
       navigate('/conditions');
     } finally {
       setLoading(false);
@@ -47,7 +49,7 @@ const ConditionForm = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('common:validation.required', { field: t('conditions:form.name') });
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -70,7 +72,7 @@ const ConditionForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error('Failed to save condition');
+        toast.error(t('conditions:toast.saveFailed'));
       }
     } finally {
       setSaving(false);
@@ -99,20 +101,20 @@ const ConditionForm = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Conditions', href: '/conditions' },
-          { label: isEditing ? 'Edit Condition' : 'New Condition' },
+          { label: t('conditions:title'), href: '/conditions' },
+          { label: isEditing ? t('conditions:form.editTitle') : t('conditions:form.newTitle') },
         ]}
       />
 
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {isEditing ? 'Edit Condition' : 'New Condition'}
+          {isEditing ? t('conditions:form.editTitle') : t('conditions:form.newTitle')}
         </h1>
         <p className="text-gray-600 mt-1 text-sm sm:text-base">
           {isEditing
-            ? 'Update the condition details below'
-            : 'Create a new medical condition'}
+            ? t('conditions:form.editSubtitle')
+            : t('conditions:form.newSubtitle')}
         </p>
       </div>
 
@@ -122,7 +124,7 @@ const ConditionForm = () => {
           {/* Name */}
           <div>
             <label htmlFor="name" className="label">
-              Name <span className="text-red-500">*</span>
+              {t('conditions:form.name')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -131,7 +133,7 @@ const ConditionForm = () => {
               value={formData.name}
               onChange={handleChange}
               className={`input-field ${errors.name ? 'border-red-500' : ''}`}
-              placeholder="e.g., Type 2 Diabetes"
+              placeholder={t('conditions:form.namePlaceholder')}
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -141,7 +143,7 @@ const ConditionForm = () => {
           {/* Category */}
           <div>
             <label htmlFor="category" className="label">
-              Category
+              {t('conditions:form.category')}
             </label>
             <input
               type="text"
@@ -150,7 +152,7 @@ const ConditionForm = () => {
               value={formData.category}
               onChange={handleChange}
               className={`input-field ${errors.category ? 'border-red-500' : ''}`}
-              placeholder="e.g., Metabolic, Cardiovascular, Mental Health"
+              placeholder={t('conditions:form.categoryPlaceholder')}
             />
             {errors.category && (
               <p className="mt-1 text-sm text-red-500">{errors.category}</p>
@@ -160,7 +162,7 @@ const ConditionForm = () => {
           {/* Summary */}
           <div>
             <label htmlFor="summary" className="label">
-              Summary
+              {t('conditions:form.summary')}
             </label>
             <textarea
               id="summary"
@@ -169,7 +171,7 @@ const ConditionForm = () => {
               onChange={handleChange}
               rows={5}
               className={`input-field resize-y ${errors.summary ? 'border-red-500' : ''}`}
-              placeholder="A brief description of the condition..."
+              placeholder={t('conditions:form.summaryPlaceholder')}
             />
             {errors.summary && (
               <p className="mt-1 text-sm text-red-500">{errors.summary}</p>
@@ -188,10 +190,10 @@ const ConditionForm = () => {
               ) : (
                 <Save className="w-5 h-5" />
               )}
-              {saving ? 'Saving...' : 'Save Condition'}
+              {saving ? t('common:buttons.saving') : t('common:buttons.save')}
             </button>
             <Link to="/conditions" className="btn-outline text-center w-full sm:w-auto">
-              Cancel
+              {t('common:buttons.cancel')}
             </Link>
           </div>
         </div>

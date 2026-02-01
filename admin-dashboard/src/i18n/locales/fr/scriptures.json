@@ -1,0 +1,77 @@
+{
+  "title": "Écritures",
+  "singular": "Écriture",
+  "plural": "Écritures",
+  "list": {
+    "title": "Écritures",
+    "subtitle": "Versets et passages bibliques",
+    "addNew": "Ajouter une Écriture",
+    "searchPlaceholder": "Rechercher des Écritures...",
+    "filterByBook": "Filtrer par livre",
+    "allBooks": "Tous les livres"
+  },
+  "detail": {
+    "title": "Détails de l'Écriture",
+    "overview": "Aperçu",
+    "reference": "Référence",
+    "text": "Texte de l'Écriture",
+    "context": "Contexte",
+    "application": "Application à la santé",
+    "relatedConditions": "Conditions connexes",
+    "relatedInterventions": "Interventions connexes",
+    "tags": "Étiquettes"
+  },
+  "form": {
+    "createTitle": "Ajouter une Écriture",
+    "editTitle": "Modifier l'Écriture",
+    "book": "Livre",
+    "selectBook": "Sélectionner un livre",
+    "chapter": "Chapitre",
+    "chapterPlaceholder": "Numéro de chapitre",
+    "verseStart": "Verset de début",
+    "verseStartPlaceholder": "Verset de départ",
+    "verseEnd": "Verset de fin",
+    "verseEndPlaceholder": "Verset de fin (optionnel)",
+    "text": "Texte de l'Écriture",
+    "textPlaceholder": "Entrez le texte de l'Écriture...",
+    "translation": "Traduction",
+    "selectTranslation": "Sélectionner une traduction",
+    "context": "Contexte",
+    "contextPlaceholder": "Fournir le contexte...",
+    "application": "Application à la santé",
+    "applicationPlaceholder": "Comment cela s'applique à la santé...",
+    "tags": "Étiquettes",
+    "selectTags": "Sélectionner des étiquettes",
+    "status": "Statut"
+  },
+  "translations": {
+    "kjv": "Version King James",
+    "nkjv": "Nouvelle Version King James",
+    "niv": "Nouvelle Version Internationale",
+    "esv": "Version Standard Anglaise",
+    "nasb": "Nouvelle Bible Standard Américaine",
+    "nlt": "Nouvelle Traduction Vivante"
+  },
+  "search": {
+    "placeholder": "Rechercher des Écritures..."
+  },
+  "empty": {
+    "title": "Aucune Écriture trouvée",
+    "description": "Commencez par ajouter votre première Écriture",
+    "action": "Ajouter une Écriture",
+    "noAvailable": "Aucune Écriture disponible",
+    "allLinkedOrNoMatch": "Toutes les Écritures sont déjà liées ou aucune ne correspond à votre recherche."
+  },
+  "toast": {
+    "created": "Écriture ajoutée avec succès",
+    "updated": "Écriture mise à jour avec succès",
+    "deleted": "Écriture supprimée avec succès",
+    "createError": "Échec de l'ajout de l'Écriture",
+    "updateError": "Échec de la mise à jour de l'Écriture",
+    "deleteError": "Échec de la suppression de l'Écriture",
+    "loadError": "Échec du chargement des Écritures"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cette Écriture?"
+  }
+}

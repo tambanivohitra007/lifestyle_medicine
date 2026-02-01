@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Search, Check, Loader2, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const AttachScripture = () => {
+  const { t } = useTranslation(['conditions', 'common', 'scriptures']);
   const { id: conditionId } = useParams();
   const navigate = useNavigate();
 
@@ -36,7 +38,7 @@ const AttachScripture = () => {
       setLinkedScriptureIds(linkedRes.data.data.map((s) => s.id));
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load data');
+      toast.error(t('common:messages.error.loadFailed'));
       navigate(`/conditions/${conditionId}`);
     } finally {
       setLoading(false);
@@ -52,7 +54,7 @@ const AttachScripture = () => {
       navigate(`/conditions/${conditionId}`);
     } catch (error) {
       console.error('Error attaching scripture:', error);
-      toast.error('Failed to attach scripture');
+      toast.error(t('conditions:toast.attachFailed'));
     } finally {
       setSaving(false);
     }
@@ -82,18 +84,18 @@ const AttachScripture = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Conditions', href: '/conditions' },
-          { label: condition?.name || 'Condition', href: `/conditions/${conditionId}` },
-          { label: 'Attach Scripture' },
+          { label: t('conditions:title'), href: '/conditions' },
+          { label: condition?.name || t('conditions:singular'), href: `/conditions/${conditionId}` },
+          { label: t('conditions:attach.scripture') },
         ]}
       />
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Attach Scripture</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('conditions:attach.scripture')}</h1>
         {condition && (
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Link a scripture to: <span className="font-medium">{condition.name}</span>
+            {t('conditions:attach.linkTo')}: <span className="font-medium">{condition.name}</span>
           </p>
         )}
       </div>
@@ -105,7 +107,7 @@ const AttachScripture = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search scriptures..."
+              placeholder={t('scriptures:search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -116,7 +118,7 @@ const AttachScripture = () => {
             onChange={(e) => setThemeFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Themes</option>
+            <option value="">{t('common:filters.allThemes')}</option>
             {themes.map((theme) => (
               <option key={theme} value={theme}>
                 {theme}
@@ -131,10 +133,10 @@ const AttachScripture = () => {
         <div className="card text-center py-8 sm:py-12">
           <BookOpen className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-            No available scriptures
+            {t('scriptures:empty.noAvailable')}
           </h3>
           <p className="text-gray-600 text-sm sm:text-base">
-            All scriptures are already linked or none match your search.
+            {t('scriptures:empty.allLinkedOrNoMatch')}
           </p>
         </div>
       ) : (
@@ -177,7 +179,7 @@ const AttachScripture = () => {
         <div className="card fixed sm:sticky bottom-0 left-0 right-0 sm:bottom-4 rounded-none sm:rounded-lg shadow-lg sm:shadow border-t sm:border border-gray-200 z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <p className="text-gray-700 text-sm sm:text-base truncate">
-              Selected: <span className="font-medium">{selectedScripture.reference}</span>
+              {t('common:labels.selected')}: <span className="font-medium">{selectedScripture.reference}</span>
             </p>
             <div className="flex items-center gap-2 sm:gap-4">
               <button
@@ -185,7 +187,7 @@ const AttachScripture = () => {
                 onClick={() => setSelectedScripture(null)}
                 className="btn-outline flex-1 sm:flex-initial justify-center touch-manipulation"
               >
-                Clear
+                {t('common:buttons.clear')}
               </button>
               <button
                 type="button"
@@ -198,8 +200,8 @@ const AttachScripture = () => {
                 ) : (
                   <Check className="w-5 h-5" />
                 )}
-                <span className="hidden sm:inline">{saving ? 'Attaching...' : 'Attach Scripture'}</span>
-                <span className="sm:hidden">{saving ? 'Attaching...' : 'Attach'}</span>
+                <span className="hidden sm:inline">{saving ? t('common:buttons.attaching') : t('conditions:attach.scripture')}</span>
+                <span className="sm:hidden">{saving ? t('common:buttons.attaching') : t('common:buttons.attach')}</span>
               </button>
             </div>
           </div>

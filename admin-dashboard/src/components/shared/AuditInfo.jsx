@@ -1,12 +1,15 @@
 import { User, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const AuditInfo = ({ data }) => {
+  const { t, i18n } = useTranslation('common');
+
   if (!data) return null;
 
   const formatDateTime = (dateString) => {
     if (!dateString) return null;
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -22,10 +25,10 @@ const AuditInfo = ({ data }) => {
       {data.created_at && (
         <span className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
-          Created {formatDateTime(data.created_at)}
+          {t('audit.createdBy')} {formatDateTime(data.created_at)}
           {data.created_by && (
             <span className="flex items-center gap-1 text-gray-500">
-              by <User className="w-3 h-3" /> {data.created_by.name}
+              <User className="w-3 h-3" /> {data.created_by.name}
             </span>
           )}
         </span>
@@ -34,10 +37,10 @@ const AuditInfo = ({ data }) => {
         <>
           <span className="text-gray-300">·</span>
           <span className="flex items-center gap-1">
-            Updated {formatDateTime(data.updated_at)}
+            {t('audit.updatedBy')} {formatDateTime(data.updated_at)}
             {data.updated_by && (
               <span className="flex items-center gap-1 text-gray-500">
-                by <User className="w-3 h-3" /> {data.updated_by.name}
+                <User className="w-3 h-3" /> {data.updated_by.name}
               </span>
             )}
           </span>

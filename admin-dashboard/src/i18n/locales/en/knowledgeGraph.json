@@ -1,0 +1,80 @@
+{
+  "title": "Knowledge Graph",
+  "subtitle": "Visual representation of content relationships",
+  "controls": {
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fitView": "Fit View",
+    "resetView": "Reset View",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "layout": "Layout",
+    "filter": "Filter"
+  },
+  "layout": {
+    "hierarchical": "Hierarchical",
+    "force": "Force-Directed",
+    "circular": "Circular",
+    "grid": "Grid"
+  },
+  "filters": {
+    "title": "Filter Nodes",
+    "showConditions": "Show Conditions",
+    "showInterventions": "Show Interventions",
+    "showRecipes": "Show Recipes",
+    "showEvidence": "Show Evidence",
+    "showScriptures": "Show Scriptures",
+    "showCareDomains": "Show Care Domains",
+    "byDomain": "By Domain",
+    "allDomains": "All Domains"
+  },
+  "nodes": {
+    "condition": "Condition",
+    "intervention": "Intervention",
+    "recipe": "Recipe",
+    "evidence": "Evidence",
+    "scripture": "Scripture",
+    "careDomain": "Care Domain",
+    "reference": "Reference"
+  },
+  "edges": {
+    "treats": "treats",
+    "relatedTo": "related to",
+    "supports": "supports",
+    "references": "references",
+    "belongsTo": "belongs to",
+    "includes": "includes"
+  },
+  "details": {
+    "title": "Node Details",
+    "connections": "Connections",
+    "incomingLinks": "Incoming Links",
+    "outgoingLinks": "Outgoing Links",
+    "viewDetails": "View Full Details",
+    "noSelection": "Select a node to see details"
+  },
+  "search": {
+    "placeholder": "Search nodes...",
+    "noResults": "No nodes found"
+  },
+  "stats": {
+    "totalNodes": "Total Nodes",
+    "totalEdges": "Total Connections",
+    "conditions": "Conditions",
+    "interventions": "Interventions"
+  },
+  "export": {
+    "title": "Export Graph",
+    "asPng": "Export as PNG",
+    "asSvg": "Export as SVG",
+    "asJson": "Export as JSON"
+  },
+  "empty": {
+    "title": "No data to display",
+    "description": "Add content to see the knowledge graph"
+  },
+  "loading": {
+    "title": "Loading graph...",
+    "processing": "Processing relationships..."
+  }
+}

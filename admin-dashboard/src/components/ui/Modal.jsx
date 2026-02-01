@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const SIZES = {
   sm: 'sm:max-w-md',
@@ -18,6 +19,7 @@ const Modal = ({
   children,
   showCloseButton = true,
 }) => {
+  const { t } = useTranslation('common');
   const overlayRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -85,7 +87,7 @@ const Modal = ({
             <button
               onClick={onClose}
               className="p-2 -mr-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
-              aria-label="Close modal"
+              aria-label={t('modal.close')}
             >
               <X className="w-5 h-5" />
             </button>

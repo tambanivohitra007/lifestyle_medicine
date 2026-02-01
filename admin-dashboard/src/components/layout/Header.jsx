@@ -2,29 +2,31 @@ import { useState, useRef, useEffect } from 'react';
 import { User, Settings, PanelLeftClose, PanelLeft, HeartPulse, ChevronLeft, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import NotificationDropdown from './NotificationDropdown';
+import LanguageSwitcher from '../ui/LanguageSwitcher';
 import { confirmLogout } from '../../lib/swal';
 
-// Page title mapping
-const getPageTitle = (pathname) => {
+// Page title mapping using i18n keys
+const getPageTitleKey = (pathname) => {
   const routes = {
-    '/': { title: 'Lifestyle Medicine', subtitle: 'Knowledge Platform' },
-    '/conditions': { title: 'Conditions', subtitle: 'Health Conditions' },
-    '/interventions': { title: 'Interventions', subtitle: 'Treatment Options' },
-    '/care-domains': { title: 'Care Domains', subtitle: 'Lifestyle Categories' },
-    '/search': { title: 'Search', subtitle: 'Find Content' },
-    '/bible': { title: 'Bible Explorer', subtitle: 'Scripture Search' },
-    '/evidence': { title: 'Evidence', subtitle: 'Research & Studies' },
-    '/references': { title: 'References', subtitle: 'Citations & Sources' },
-    '/scriptures': { title: 'Scriptures', subtitle: 'Bible Verses' },
-    '/egw-references': { title: 'EGW Writings', subtitle: 'Spirit of Prophecy' },
-    '/recipes': { title: 'Recipes', subtitle: 'Healthy Meals' },
-    '/profile': { title: 'Settings', subtitle: 'Account & Preferences' },
-    '/analytics': { title: 'Analytics', subtitle: 'Usage Statistics' },
-    '/users': { title: 'Users', subtitle: 'User Management' },
-    '/tags': { title: 'Content Tags', subtitle: 'Tag Management' },
-    '/import': { title: 'Import Data', subtitle: 'Bulk Import' },
-    '/ai-generator': { title: 'AI Generator', subtitle: 'Content Generation' },
+    '/': 'lifestyleMedicine',
+    '/conditions': 'conditions',
+    '/interventions': 'interventions',
+    '/care-domains': 'careDomains',
+    '/search': 'search',
+    '/bible': 'bible',
+    '/evidence': 'evidence',
+    '/references': 'references',
+    '/scriptures': 'scriptures',
+    '/egw-references': 'egwReferences',
+    '/recipes': 'recipes',
+    '/profile': 'profile',
+    '/analytics': 'analytics',
+    '/users': 'users',
+    '/tags': 'tags',
+    '/import': 'import',
+    '/ai-generator': 'aiGenerator',
   };
 
   // Check for exact match first
@@ -34,56 +36,61 @@ const getPageTitle = (pathname) => {
 
   // Check for dynamic routes
   if (pathname.startsWith('/conditions/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit Condition', subtitle: 'Modify Details' };
-    if (pathname.includes('/interventions/attach')) return { title: 'Attach Intervention', subtitle: 'Link Treatment' };
-    return { title: 'Condition Details', subtitle: 'View Information' };
+    if (pathname.includes('/edit')) return 'editCondition';
+    if (pathname.includes('/interventions/attach')) return 'attachIntervention';
+    return 'conditionDetails';
   }
   if (pathname.startsWith('/interventions/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit Intervention', subtitle: 'Modify Details' };
-    return { title: 'Intervention Details', subtitle: 'View Information' };
+    if (pathname.includes('/edit')) return 'editIntervention';
+    return 'interventionDetails';
   }
   if (pathname.startsWith('/recipes/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit Recipe', subtitle: 'Modify Details' };
-    if (pathname === '/recipes/new') return { title: 'New Recipe', subtitle: 'Create Recipe' };
-    return { title: 'Recipe Details', subtitle: 'View Recipe' };
+    if (pathname.includes('/edit')) return 'editRecipe';
+    if (pathname === '/recipes/new') return 'newRecipe';
+    return 'recipeDetails';
   }
   if (pathname.startsWith('/scriptures/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit Scripture', subtitle: 'Modify Details' };
-    return { title: 'Scripture Details', subtitle: 'View Verse' };
+    if (pathname.includes('/edit')) return 'editScripture';
+    return 'scriptureDetails';
   }
   if (pathname.startsWith('/egw-references/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit EGW Reference', subtitle: 'Modify Details' };
-    return { title: 'EGW Reference', subtitle: 'View Writing' };
+    if (pathname.includes('/edit')) return 'editEgwReference';
+    return 'egwReferenceDetails';
   }
   if (pathname.startsWith('/evidence/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit Evidence', subtitle: 'Modify Details' };
-    return { title: 'Evidence Details', subtitle: 'View Study' };
+    if (pathname.includes('/edit')) return 'editEvidence';
+    return 'evidenceDetails';
   }
   if (pathname.startsWith('/references/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit Reference', subtitle: 'Modify Details' };
-    return { title: 'Reference Details', subtitle: 'View Citation' };
+    if (pathname.includes('/edit')) return 'editReference';
+    return 'referenceDetails';
   }
   if (pathname.startsWith('/care-domains/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit Care Domain', subtitle: 'Modify Details' };
-    return { title: 'Care Domain Details', subtitle: 'View Category' };
+    if (pathname.includes('/edit')) return 'editCareDomain';
+    return 'careDomainDetails';
   }
   if (pathname.startsWith('/users/')) {
-    if (pathname.includes('/edit')) return { title: 'Edit User', subtitle: 'Modify User' };
-    return { title: 'User Details', subtitle: 'View User' };
+    if (pathname.includes('/edit')) return 'editUser';
+    return 'userDetails';
   }
 
-  return { title: 'Lifestyle Medicine', subtitle: 'Knowledge Platform' };
+  return 'lifestyleMedicine';
 };
 
 const Header = ({ isCollapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation(['navigation', 'common']);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const isHomePage = location.pathname === '/';
-  const pageInfo = getPageTitle(location.pathname);
+  const pageKey = getPageTitleKey(location.pathname);
+  const pageInfo = {
+    title: t(`navigation:pages.${pageKey}.title`),
+    subtitle: t(`navigation:pages.${pageKey}.subtitle`),
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -135,7 +142,7 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
                 <button
                   onClick={handleBack}
                   className="p-2 -ml-1 rounded-lg hover:bg-white/10 active:bg-white/20 transition-colors touch-manipulation"
-                  aria-label="Go back"
+                  aria-label={t('navigation:header.goBack')}
                 >
                   <ChevronLeft className="w-6 h-6 text-white" />
                 </button>
@@ -170,8 +177,8 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
             <button
               onClick={onToggleCollapse}
               className="p-2 -ml-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors"
-              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-label={isCollapsed ? t('navigation:header.expandSidebar') : t('navigation:header.collapseSidebar')}
+              title={isCollapsed ? t('navigation:header.expandSidebar') : t('navigation:header.collapseSidebar')}
             >
               {isCollapsed ? (
                 <PanelLeft className="w-5 h-5 text-gray-600" />
@@ -183,16 +190,19 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
             {/* Title */}
             <div>
               <h1 className="text-xl lg:text-2xl font-bold text-primary-700">
-                Knowledge Platform
+                {t('navigation:header.title')}
               </h1>
               <p className="text-sm text-gray-600">
-                Lifestyle Medicine & Gospel Medical Evangelism
+                {t('navigation:header.subtitle')}
               </p>
             </div>
           </div>
 
           {/* Right: User Actions */}
           <div className="flex items-center gap-4">
+            {/* Language Switcher */}
+            <LanguageSwitcher variant="header" />
+
             {/* Notifications */}
             <NotificationDropdown />
 
@@ -225,7 +235,7 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <Settings className="w-4 h-4" />
-                    Settings
+                    {t('navigation:user.settings')}
                   </Link>
                   <div className="border-t border-gray-100" />
                   <button
@@ -233,7 +243,7 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
-                    Sign Out
+                    {t('navigation:user.signOut')}
                   </button>
                 </div>
               )}

@@ -1,0 +1,97 @@
+{
+  "title": "Recettes",
+  "singular": "Recette",
+  "plural": "Recettes",
+  "list": {
+    "title": "Recettes",
+    "subtitle": "Recettes de repas sains et guides de cuisine",
+    "addNew": "Ajouter une recette",
+    "searchPlaceholder": "Rechercher des recettes...",
+    "filterByCategory": "Filtrer par catégorie",
+    "filterByDifficulty": "Filtrer par difficulté",
+    "allCategories": "Toutes les catégories",
+    "allDifficulties": "Toutes les difficultés"
+  },
+  "detail": {
+    "title": "Détails de la recette",
+    "overview": "Aperçu",
+    "description": "Description",
+    "ingredients": "Ingrédients",
+    "instructions": "Instructions",
+    "nutritionInfo": "Informations nutritionnelles",
+    "servings": "Portions",
+    "prepTime": "Temps de préparation",
+    "cookTime": "Temps de cuisson",
+    "totalTime": "Temps total",
+    "difficulty": "Difficulté",
+    "tips": "Conseils et notes",
+    "relatedInterventions": "Interventions connexes",
+    "tags": "Étiquettes"
+  },
+  "form": {
+    "createTitle": "Créer une recette",
+    "editTitle": "Modifier la recette",
+    "name": "Nom de la recette",
+    "namePlaceholder": "Entrez le nom de la recette",
+    "description": "Description",
+    "descriptionPlaceholder": "Décrivez la recette...",
+    "category": "Catégorie",
+    "selectCategory": "Sélectionner une catégorie",
+    "image": "Image principale",
+    "ingredients": "Ingrédients",
+    "ingredientsPlaceholder": "Liste des ingrédients...",
+    "instructions": "Instructions",
+    "instructionsPlaceholder": "Instructions étape par étape...",
+    "servings": "Nombre de portions",
+    "prepTime": "Temps de préparation (minutes)",
+    "cookTime": "Temps de cuisson (minutes)",
+    "difficulty": "Niveau de difficulté",
+    "tags": "Étiquettes",
+    "selectTags": "Sélectionner des étiquettes",
+    "status": "Statut"
+  },
+  "difficulty": {
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile"
+  },
+  "categories": {
+    "breakfast": "Petit-déjeuner",
+    "lunch": "Déjeuner",
+    "dinner": "Dîner",
+    "snack": "Collation",
+    "dessert": "Dessert",
+    "beverage": "Boisson",
+    "soup": "Soupe",
+    "salad": "Salade",
+    "side": "Accompagnement"
+  },
+  "time": {
+    "minutes": "min",
+    "hours": "h",
+    "prep": "Préparation",
+    "cook": "Cuisson"
+  },
+  "search": {
+    "placeholder": "Rechercher des recettes..."
+  },
+  "empty": {
+    "title": "Aucune recette trouvée",
+    "description": "Commencez par créer votre première recette",
+    "action": "Ajouter une recette",
+    "noAvailable": "Aucune recette disponible",
+    "allLinkedOrNoMatch": "Toutes les recettes sont déjà liées ou aucune ne correspond à votre recherche."
+  },
+  "toast": {
+    "created": "Recette créée avec succès",
+    "updated": "Recette mise à jour avec succès",
+    "deleted": "Recette supprimée avec succès",
+    "createError": "Échec de la création de la recette",
+    "updateError": "Échec de la mise à jour de la recette",
+    "deleteError": "Échec de la suppression de la recette",
+    "loadError": "Échec du chargement des recettes"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cette recette?"
+  }
+}

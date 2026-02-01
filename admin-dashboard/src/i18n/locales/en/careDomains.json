@@ -1,0 +1,62 @@
+{
+  "title": "Care Domains",
+  "singular": "Care Domain",
+  "plural": "Care Domains",
+  "list": {
+    "title": "Care Domains",
+    "subtitle": "Lifestyle medicine categories",
+    "addNew": "Add Care Domain",
+    "searchPlaceholder": "Search care domains..."
+  },
+  "detail": {
+    "title": "Care Domain Details",
+    "overview": "Overview",
+    "description": "Description",
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "conditionsCount": "{{count}} condition(s)",
+    "interventionsCount": "{{count}} intervention(s)"
+  },
+  "form": {
+    "createTitle": "Create Care Domain",
+    "editTitle": "Edit Care Domain",
+    "name": "Domain Name",
+    "namePlaceholder": "Enter domain name",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the care domain...",
+    "icon": "Icon",
+    "selectIcon": "Select icon",
+    "color": "Color",
+    "selectColor": "Select color",
+    "order": "Display Order",
+    "orderPlaceholder": "e.g., 1, 2, 3",
+    "status": "Status"
+  },
+  "domains": {
+    "nutrition": "Nutrition",
+    "exercise": "Exercise",
+    "water": "Water",
+    "sunlight": "Sunlight",
+    "temperance": "Temperance",
+    "air": "Air",
+    "rest": "Rest",
+    "trust": "Trust in God"
+  },
+  "empty": {
+    "title": "No care domains found",
+    "description": "Get started by creating your first care domain",
+    "action": "Add Care Domain"
+  },
+  "toast": {
+    "created": "Care domain created successfully",
+    "updated": "Care domain updated successfully",
+    "deleted": "Care domain deleted successfully",
+    "createError": "Failed to create care domain",
+    "updateError": "Failed to update care domain",
+    "deleteError": "Failed to delete care domain",
+    "loadError": "Failed to load care domains"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete this care domain?"
+  }
+}

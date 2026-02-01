@@ -1,0 +1,62 @@
+{
+  "title": "Domaines de soins",
+  "singular": "Domaine de soins",
+  "plural": "Domaines de soins",
+  "list": {
+    "title": "Domaines de soins",
+    "subtitle": "Catégories de médecine du mode de vie",
+    "addNew": "Ajouter un domaine de soins",
+    "searchPlaceholder": "Rechercher des domaines de soins..."
+  },
+  "detail": {
+    "title": "Détails du domaine de soins",
+    "overview": "Aperçu",
+    "description": "Description",
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "conditionsCount": "{{count}} condition(s)",
+    "interventionsCount": "{{count}} intervention(s)"
+  },
+  "form": {
+    "createTitle": "Créer un domaine de soins",
+    "editTitle": "Modifier le domaine de soins",
+    "name": "Nom du domaine",
+    "namePlaceholder": "Entrez le nom du domaine",
+    "description": "Description",
+    "descriptionPlaceholder": "Décrivez le domaine de soins...",
+    "icon": "Icône",
+    "selectIcon": "Sélectionner une icône",
+    "color": "Couleur",
+    "selectColor": "Sélectionner une couleur",
+    "order": "Ordre d'affichage",
+    "orderPlaceholder": "ex: 1, 2, 3",
+    "status": "Statut"
+  },
+  "domains": {
+    "nutrition": "Nutrition",
+    "exercise": "Exercice",
+    "water": "Eau",
+    "sunlight": "Lumière du soleil",
+    "temperance": "Tempérance",
+    "air": "Air",
+    "rest": "Repos",
+    "trust": "Confiance en Dieu"
+  },
+  "empty": {
+    "title": "Aucun domaine de soins trouvé",
+    "description": "Commencez par créer votre premier domaine de soins",
+    "action": "Ajouter un domaine de soins"
+  },
+  "toast": {
+    "created": "Domaine de soins créé avec succès",
+    "updated": "Domaine de soins mis à jour avec succès",
+    "deleted": "Domaine de soins supprimé avec succès",
+    "createError": "Échec de la création du domaine de soins",
+    "updateError": "Échec de la mise à jour du domaine de soins",
+    "deleteError": "Échec de la suppression du domaine de soins",
+    "loadError": "Échec du chargement des domaines de soins"
+  },
+  "confirm": {
+    "delete": "Êtes-vous sûr de vouloir supprimer ce domaine de soins?"
+  }
+}

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   HeartPulse,
@@ -8,11 +9,13 @@ import {
 } from 'lucide-react';
 
 const BottomNav = ({ onMenuClick }) => {
+  const { t } = useTranslation('navigation');
+
   const navItems = [
-    { to: '/', icon: LayoutDashboard, label: 'Home' },
-    { to: '/conditions', icon: HeartPulse, label: 'Conditions' },
-    { to: '/interventions', icon: Activity, label: 'Interventions' },
-    { to: '/search', icon: Search, label: 'Search' },
+    { to: '/', icon: LayoutDashboard, labelKey: 'menu.home' },
+    { to: '/conditions', icon: HeartPulse, labelKey: 'menu.conditions' },
+    { to: '/interventions', icon: Activity, labelKey: 'menu.interventions' },
+    { to: '/search', icon: Search, labelKey: 'menu.search' },
   ];
 
   return (
@@ -32,7 +35,7 @@ const BottomNav = ({ onMenuClick }) => {
             }
           >
             <item.icon className="w-5 h-5 mb-1" />
-            <span className="text-[10px] font-medium">{item.label}</span>
+            <span className="text-[10px] font-medium">{t(item.labelKey)}</span>
           </NavLink>
         ))}
 
@@ -42,7 +45,7 @@ const BottomNav = ({ onMenuClick }) => {
           className="flex flex-col items-center justify-center flex-1 h-full px-2 text-gray-500 active:text-gray-700 transition-colors touch-manipulation"
         >
           <Menu className="w-5 h-5 mb-1" />
-          <span className="text-[10px] font-medium">More</span>
+          <span className="text-[10px] font-medium">{t('menu.more')}</span>
         </button>
       </div>
     </nav>
