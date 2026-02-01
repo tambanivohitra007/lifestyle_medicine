@@ -24,6 +24,7 @@ This platform enables healthcare practitioners and health educators to create, m
 - **Laravel DomPDF** - PDF generation
 - **Maatwebsite Excel** - CSV/Excel import
 - **Gemini API PHP Client** - AI content generation
+- **Google Cloud AI Platform** - Vertex AI Imagen for infographic generation
 
 ### Frontend (Admin Dashboard)
 - **React 19** - UI framework
@@ -123,10 +124,12 @@ Search across all content types:
 - **Export**: Generate PDF treatment guides for individual conditions or summary reports
 
 ### 11. Media Management
-- Upload images and documents to interventions
-- Drag-and-drop file upload
-- Image gallery with captions
-- Document downloads
+- Upload images and documents to interventions and conditions
+- Drag-and-drop file upload with multi-file support
+- Image gallery with captions and alt text
+- Document downloads (PDF support)
+- Reorderable media items
+- Separate media types: images, documents, and AI-generated infographics
 
 ### 12. Content Tagging
 - Create and manage content tags
@@ -143,7 +146,17 @@ Search across all content types:
 - Progress tracking during generation
 - Error handling with retry capability
 
-### 14. Analytics Dashboard
+### 14. AI Infographic Generator
+- Generate professional medical infographics using Google Vertex AI Imagen
+- Three infographic types per condition:
+  - **Condition Overview**: Key facts, symptoms, and prevalence visualization
+  - **Risk Factors**: Modifiable vs non-modifiable factors visualization
+  - **Lifestyle Solutions**: NEWSTART-based interventions visualization
+- Async job queue processing with status polling
+- Retry capability for failed generations
+- Automatic storage and linking to conditions
+
+### 15. Analytics Dashboard
 - **Overview Cards**: Real-time counts with weekly trends
 - **Category Distribution**: Pie chart of conditions by category
 - **Domain Distribution**: Bar chart of interventions by care domain
@@ -153,7 +166,7 @@ Search across all content types:
 - **Content Completeness**: Scores for intervention completeness
 - **Export Reports**: Download analytics as PDF
 
-### 15. Notification System
+### 16. Notification System
 - Real-time notifications for async operations
 - AI content generation completion alerts
 - Import success/failure notifications
@@ -161,7 +174,7 @@ Search across all content types:
 - Persistent notification history (localStorage)
 - Quick links to relevant pages from notifications
 
-### 16. Knowledge Graph Visualization
+### 17. Knowledge Graph Visualization
 Interactive node-based visualization of relationships between entities using React Flow:
 
 **Features:**
@@ -182,7 +195,7 @@ Interactive node-based visualization of relationships between entities using Rea
 - Sidebar: "Knowledge Graph" link for full explorer
 - Detail pages: "View Graph" button on condition and intervention detail pages
 
-### 17. Mobile-First Design (Capacitor-Ready)
+### 18. Mobile-First Design (Capacitor-Ready)
 - **Native App-Like Experience**: Optimized for Capacitor hybrid app builds
 - **Fixed App Bar**: Branded header with dynamic page titles and back navigation
 - **Bottom Navigation**: Quick access to Home, Conditions, Interventions, Search
@@ -278,6 +291,12 @@ php artisan key:generate
 
 # Configure Gemini for AI Content Generator (optional)
 # GEMINI_API_KEY=your-api-key-here
+
+# Configure Vertex AI for Infographic Generator (optional)
+# VERTEX_AI_PROJECT_ID=your-project-id
+# VERTEX_AI_LOCATION=us-central1
+# GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+# VERTEX_AI_IMAGEN_MODEL=imagen-4.0-fast-generate-001
 
 # Run migrations
 php artisan migrate
@@ -376,6 +395,7 @@ GET /api/v1/conditions/{id}/sections
 GET /api/v1/conditions/{id}/interventions
 GET /api/v1/conditions/{id}/scriptures
 GET /api/v1/conditions/{id}/recipes
+GET /api/v1/conditions/{id}/media
 
 GET /api/v1/interventions
 GET /api/v1/interventions/{id}
@@ -415,6 +435,11 @@ PUT    /api/v1/admin/interventions/{id}/media/{mediaId}
 DELETE /api/v1/admin/interventions/{id}/media/{mediaId}
 POST   /api/v1/admin/interventions/{id}/media/reorder
 
+POST   /api/v1/admin/conditions/{id}/media
+PUT    /api/v1/admin/conditions/{id}/media/{mediaId}
+DELETE /api/v1/admin/conditions/{id}/media/{mediaId}
+POST   /api/v1/admin/conditions/{id}/media/reorder
+
 POST   /api/v1/admin/import/conditions
 POST   /api/v1/admin/import/interventions
 GET    /api/v1/admin/import/templates
@@ -439,6 +464,13 @@ DELETE /api/v1/admin/conditions/{id}/recipes/{recipeId}
 # AI Content Generator
 POST /api/v1/admin/ai/generate-condition
 
+# Infographic Generator
+GET  /api/v1/admin/infographics/status
+GET  /api/v1/admin/conditions/{id}/infographics
+GET  /api/v1/admin/conditions/{id}/infographics/status
+POST /api/v1/admin/conditions/{id}/infographics/generate
+POST /api/v1/admin/infographics/{id}/retry
+
 # Analytics
 GET /api/v1/admin/analytics/overview
 GET /api/v1/admin/analytics/conditions-by-category
@@ -456,7 +488,7 @@ GET /api/v1/admin/analytics/content-completeness
 - `name`
 - `category`
 - `summary`
-- Relations: sections, interventions, scriptures, recipes
+- Relations: sections, interventions, scriptures, recipes, egwReferences, media
 
 ### ConditionSection
 - `id` (UUID)
@@ -524,13 +556,13 @@ GET /api/v1/admin/analytics/content-completeness
 
 ### Media
 - `id` (UUID)
-- `mediable_type` / `mediable_id` (polymorphic)
+- `mediable_type` / `mediable_id` (polymorphic: Condition, Intervention)
 - `filename`
 - `original_filename`
 - `mime_type`
 - `size`
 - `path`
-- `type` (image, document)
+- `type` (image, document, infographic)
 - `alt_text`
 - `caption`
 - `order_index`
