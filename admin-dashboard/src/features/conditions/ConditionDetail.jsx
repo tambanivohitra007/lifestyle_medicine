@@ -15,6 +15,7 @@ import {
   Download,
   Network,
   Image,
+  Upload,
 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../lib/swal';
@@ -29,6 +30,7 @@ import {
   SortableInterventionList,
 } from '../../components/relationships';
 import InfographicGenerator from '../ai-generator/components/InfographicGenerator';
+import MediaUploader from '../../components/shared/MediaUploader';
 
 const SECTION_TYPES = {
   risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
@@ -101,6 +103,7 @@ const ConditionDetail = () => {
   const [egwReferences, setEgwReferences] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [infographics, setInfographics] = useState([]);
+  const [media, setMedia] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
@@ -131,6 +134,7 @@ const ConditionDetail = () => {
       setEgwReferences(data.egw_references || []);
       setRecipes(data.recipes || []);
       setInfographics(data.infographics || []);
+      setMedia(data.media || []);
       setCareDomains(careDomainsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching condition:', error);
@@ -295,6 +299,7 @@ const ConditionDetail = () => {
     { id: 'scriptures', label: 'Scriptures', icon: BookOpen, count: scriptures.length },
     { id: 'egw', label: 'EGW Writings', icon: BookMarked, count: egwReferences.length },
     { id: 'recipes', label: 'Recipes', icon: ChefHat, count: recipes.length },
+    { id: 'media', label: 'Media', icon: Upload, count: media.length },
     { id: 'infographics', label: 'Infographics', icon: Image, count: infographics.length },
   ];
 
@@ -729,6 +734,66 @@ const ConditionDetail = () => {
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Media Tab */}
+        {activeTab === 'media' && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Images & Documents</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Upload custom images and documents for this condition
+                </p>
+              </div>
+            </div>
+
+            {canEdit ? (
+              <div className="card">
+                <MediaUploader
+                  entityType="condition"
+                  entityId={id}
+                  media={media}
+                  onMediaChange={setMedia}
+                />
+              </div>
+            ) : media.length === 0 ? (
+              <div className="card text-center py-8">
+                <Upload className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600">No media files uploaded yet</p>
+              </div>
+            ) : (
+              <div className="card">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {media.filter(m => m.type === 'image').map((item) => (
+                    <div key={item.id} className="relative group bg-gray-100 rounded-lg overflow-hidden aspect-square">
+                      <img
+                        src={item.url}
+                        alt={item.alt_text || item.original_filename}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+                {media.filter(m => m.type === 'document').length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {media.filter(m => m.type === 'document').map((item) => (
+                      <a
+                        key={item.id}
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
+                      >
+                        <FileText className="w-5 h-5 text-red-600" />
+                        <span className="text-sm text-gray-900">{item.original_filename}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

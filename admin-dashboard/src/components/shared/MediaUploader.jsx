@@ -13,11 +13,48 @@ import {
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 
-const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
+/**
+ * Generic media uploader component for entities with media support.
+ *
+ * @param {string} entityType - The type of entity ('intervention' or 'condition')
+ * @param {string} entityId - The ID of the entity
+ * @param {Array} media - Current media items
+ * @param {Function} onMediaChange - Callback when media changes
+ * @param {string} accept - Accepted file types (optional)
+ *
+ * For backwards compatibility, also accepts:
+ * @param {string} interventionId - Deprecated, use entityType='intervention' and entityId instead
+ */
+const MediaUploader = ({
+  entityType = 'intervention',
+  entityId,
+  interventionId, // Backwards compatibility
+  media = [],
+  onMediaChange,
+  accept = "image/jpeg,image/png,image/gif,image/webp,application/pdf"
+}) => {
+  // Backwards compatibility
+  const resolvedEntityType = interventionId ? 'intervention' : entityType;
+  const resolvedEntityId = interventionId || entityId;
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({ alt_text: '', caption: '' });
+
+  // Get the correct API endpoints based on entity type
+  const getEndpoints = useCallback(() => {
+    if (resolvedEntityType === 'condition') {
+      return {
+        upload: apiEndpoints.conditionMediaAdmin(resolvedEntityId),
+        item: (mediaId) => apiEndpoints.conditionMediaItem(resolvedEntityId, mediaId),
+      };
+    }
+    // Default to intervention
+    return {
+      upload: apiEndpoints.interventionMediaAdmin(resolvedEntityId),
+      item: (mediaId) => apiEndpoints.interventionMediaItem(resolvedEntityId, mediaId),
+    };
+  }, [resolvedEntityType, resolvedEntityId]);
 
   const handleDrag = useCallback((e) => {
     e.preventDefault();
@@ -37,7 +74,7 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleFiles(e.dataTransfer.files);
     }
-  }, [interventionId]);
+  }, [resolvedEntityId]);
 
   const handleFileSelect = (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -48,6 +85,7 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
   const handleFiles = async (files) => {
     setUploading(true);
     const newMedia = [...media];
+    const endpoints = getEndpoints();
 
     for (const file of Array.from(files)) {
       try {
@@ -55,7 +93,7 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
         formData.append('file', file);
 
         const response = await api.post(
-          apiEndpoints.interventionMediaAdmin(interventionId),
+          endpoints.upload,
           formData,
           {
             headers: {
@@ -79,8 +117,9 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
     const confirmed = await confirmDelete(mediaItem.original_filename || 'this file');
     if (!confirmed) return;
 
+    const endpoints = getEndpoints();
     try {
-      await api.delete(apiEndpoints.interventionMediaItem(interventionId, mediaItem.id));
+      await api.delete(endpoints.item(mediaItem.id));
       toast.success('File deleted');
       onMediaChange(media.filter((m) => m.id !== mediaItem.id));
     } catch (error) {
@@ -98,9 +137,10 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
   };
 
   const saveEdit = async (mediaItem) => {
+    const endpoints = getEndpoints();
     try {
       const response = await api.put(
-        apiEndpoints.interventionMediaItem(interventionId, mediaItem.id),
+        endpoints.item(mediaItem.id),
         editData
       );
 
@@ -160,7 +200,7 @@ const MediaUploader = ({ interventionId, media = [], onMediaChange }) => {
                   type="file"
                   className="hidden"
                   multiple
-                  accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                  accept={accept}
                   onChange={handleFileSelect}
                 />
               </label>

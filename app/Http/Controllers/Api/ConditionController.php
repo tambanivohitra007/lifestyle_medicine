@@ -79,10 +79,28 @@ class ConditionController extends Controller
             'scriptures',
             'recipes',
             'egwReferences',
-            'media' => fn($q) => $q->where('type', 'infographic'),
+            'media' => fn($q) => $q->orderBy('order_index'),
             'creator',
             'updater',
         ]);
+
+        // Separate infographics from other media
+        $infographics = $condition->media->where('type', 'infographic');
+        $otherMedia = $condition->media->whereIn('type', ['image', 'document']);
+
+        $formatMedia = fn($media) => [
+            'id' => $media->id,
+            'url' => $media->url,
+            'filename' => $media->filename,
+            'original_filename' => $media->original_filename,
+            'mime_type' => $media->mime_type,
+            'size' => $media->size,
+            'type' => $media->type,
+            'alt_text' => $media->alt_text,
+            'caption' => $media->caption,
+            'order_index' => $media->order_index,
+            'created_at' => $media->created_at,
+        ];
 
         return response()->json([
             'data' => [
@@ -92,13 +110,8 @@ class ConditionController extends Controller
                 'scriptures' => ScriptureResource::collection($condition->scriptures),
                 'recipes' => RecipeResource::collection($condition->recipes),
                 'egw_references' => EgwReferenceResource::collection($condition->egwReferences),
-                'infographics' => $condition->media->map(fn($media) => [
-                    'id' => $media->id,
-                    'url' => $media->url,
-                    'alt_text' => $media->alt_text,
-                    'caption' => $media->caption,
-                    'created_at' => $media->created_at,
-                ]),
+                'infographics' => $infographics->map($formatMedia)->values(),
+                'media' => $otherMedia->map($formatMedia)->values(),
             ],
         ]);
     }

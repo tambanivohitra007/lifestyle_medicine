@@ -221,6 +221,12 @@ export const apiEndpoints = {
   conditionInfographics: (id) => `/admin/conditions/${id}/infographics`,
   infographicRetry: (id) => `/admin/infographics/${id}/retry`,
 
+  // Condition Media
+  conditionMedia: (id) => `/conditions/${id}/media`,
+  conditionMediaAdmin: (id) => `/admin/conditions/${id}/media`,
+  conditionMediaItem: (conditionId, mediaId) => `/admin/conditions/${conditionId}/media/${mediaId}`,
+  conditionMediaReorder: (id) => `/admin/conditions/${id}/media/reorder`,
+
   // Bible Explorer API
   bibleLookup: '/bible/lookup',
   bibleSearch: '/bible/search',

@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ScriptureController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\MediaController;
+use App\Http\Controllers\Api\ConditionMediaController;
 use App\Http\Controllers\Api\InfographicController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
@@ -65,6 +66,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('conditions/{condition}/scriptures', [ConditionController::class, 'scriptures']);
     Route::get('conditions/{condition}/recipes', [ConditionController::class, 'recipes']);
     Route::get('conditions/{condition}/egw-references', [ConditionController::class, 'egwReferences']);
+    Route::get('conditions/{condition}/media', [ConditionMediaController::class, 'index']);
 
     // Interventions
     Route::apiResource('interventions', InterventionController::class)->only(['index', 'show']);
@@ -124,6 +126,12 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
     Route::put('interventions/{intervention}/media/{medium}', [MediaController::class, 'update']);
     Route::post('interventions/{intervention}/media/reorder', [MediaController::class, 'reorder']);
     Route::delete('interventions/{intervention}/media/{medium}', [MediaController::class, 'destroy']);
+
+    // Condition Media
+    Route::post('conditions/{condition}/media', [ConditionMediaController::class, 'store']);
+    Route::put('conditions/{condition}/media/{medium}', [ConditionMediaController::class, 'update']);
+    Route::post('conditions/{condition}/media/reorder', [ConditionMediaController::class, 'reorder']);
+    Route::delete('conditions/{condition}/media/{medium}', [ConditionMediaController::class, 'destroy']);
 
     // Evidence & References
     Route::apiResource('evidence-entries', EvidenceEntryController::class)->except(['index', 'show']);
