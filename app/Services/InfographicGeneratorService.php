@@ -10,35 +10,25 @@ use Illuminate\Support\Facades\Log;
 class InfographicGeneratorService
 {
     protected ImagenService $imagenService;
+    protected GeminiService $geminiService;
 
-    public function __construct(ImagenService $imagenService)
+    // Inject GeminiService
+    public function __construct(ImagenService $imagenService, GeminiService $geminiService)
     {
         $this->imagenService = $imagenService;
+        $this->geminiService = $geminiService;
     }
 
-    /**
-     * Check if infographic generation is available.
-     */
     public function isAvailable(): bool
     {
         return $this->imagenService->isConfigured();
     }
 
-    /**
-     * Get the configuration status.
-     */
     public function getStatus(): array
     {
         return $this->imagenService->getConfigurationStatus();
     }
 
-    /**
-     * Queue infographic generation for a condition.
-     *
-     * @param Condition $condition The condition to generate infographics for
-     * @param array $types The types of infographics to generate (default: all)
-     * @return array{success: bool, requests?: array, error?: string}
-     */
     public function queueGeneration(Condition $condition, array $types = []): array
     {
         if (!$this->isAvailable()) {
@@ -48,7 +38,6 @@ class InfographicGeneratorService
             ];
         }
 
-        // Default to all types if none specified
         if (empty($types)) {
             $types = array_keys(InfographicGenerationRequest::getTypes());
         }
@@ -56,7 +45,7 @@ class InfographicGeneratorService
         $requests = [];
 
         foreach ($types as $type) {
-            // Check if there's already a pending/processing request for this type
+            // Check for existing requests
             $existingRequest = InfographicGenerationRequest::where('condition_id', $condition->id)
                 ->where('infographic_type', $type)
                 ->whereIn('status', [
@@ -70,24 +59,28 @@ class InfographicGeneratorService
                 continue;
             }
 
-            // Build the prompt for this infographic type
-            $prompt = $this->buildPrompt($condition, $type);
+            // ============================================================
+            // STEP 1: THE ARCHITECT (Use Gemini to describe the image)
+            // architectVisualPrompt handles errors internally and returns fallback
+            // ============================================================
+            $visualPrompt = $this->architectVisualPrompt($condition, $type);
 
-            // Create the generation request
+            // ============================================================
+            // STEP 2: CREATE REQUEST (To be picked up by Job)
+            // ============================================================
             $request = InfographicGenerationRequest::create([
                 'condition_id' => $condition->id,
                 'infographic_type' => $type,
                 'status' => InfographicGenerationRequest::STATUS_PENDING,
-                'prompt' => $prompt,
+                'prompt' => $visualPrompt,
                 'generation_params' => [
-                    'aspectRatio' => '3:4', // Portrait for infographics
+                    'aspectRatio' => '3:4',
                     'model' => $this->imagenService->getModel(),
+                    'sampleCount' => 1,
                 ],
             ]);
 
-            // Dispatch the job
             GenerateInfographicJob::dispatch($request);
-
             $requests[] = $request;
         }
 
@@ -97,19 +90,32 @@ class InfographicGeneratorService
         ];
     }
 
-    /**
-     * Retry a failed infographic generation request.
-     */
     public function retryRequest(InfographicGenerationRequest $request): array
     {
         if (!$request->hasFailed()) {
-            return [
-                'success' => false,
-                'error' => 'Only failed requests can be retried.',
-            ];
+            return ['success' => false, 'error' => 'Only failed requests can be retried.'];
+        }
+
+        // Load the condition relationship if not already loaded
+        if (!$request->relationLoaded('condition')) {
+            $request->load('condition');
+        }
+
+        // Ensure condition exists
+        if (!$request->condition) {
+            return ['success' => false, 'error' => 'The associated condition no longer exists.'];
+        }
+
+        // Try to re-architect the prompt on retry for a fresh attempt
+        try {
+            $request->prompt = $this->architectVisualPrompt($request->condition, $request->infographic_type);
+        } catch (\Exception $e) {
+            Log::error("Failed to re-architect prompt for retry: " . $e->getMessage());
+            // Keep the existing prompt if Gemini fails
         }
 
         $request->resetForRetry();
+        $request->save();
 
         GenerateInfographicJob::dispatch($request);
 
@@ -120,90 +126,82 @@ class InfographicGeneratorService
     }
 
     /**
-     * Build an optimized prompt for a specific infographic type.
+     * Use Gemini to translate abstract medical topics into concrete visual descriptions
+     * that contain NO TEXT.
      */
-    public function buildPrompt(Condition $condition, string $type): string
+    protected function architectVisualPrompt(Condition $condition, string $type): string
     {
         $conditionName = $condition->name;
 
-        // Base style instructions for all infographics
-        $styleInstructions = "Create a professional medical infographic. " .
-            "Style: Clean, modern healthcare design with soft gradients, clear icons, and easy-to-read typography. " .
-            "Color palette: Calming blues, greens, and warm accents. " .
-            "Layout: Organized sections with visual hierarchy. " .
-            "Do NOT include any text or words in the image - use only icons, symbols, and visual elements.";
+        // If Gemini isn't configured, use static fallback prompts
+        if (!$this->geminiService->isConfigured()) {
+            return $this->getStaticFallbackPrompt($conditionName, $type);
+        }
 
-        switch ($type) {
-            case InfographicGenerationRequest::TYPE_OVERVIEW:
-                return $this->buildOverviewPrompt($conditionName, $styleInstructions);
+        // System Instruction: Strong rules against generating text
+        $systemInstruction = <<<EOT
+            You are an expert Medical Illustrator and Prompt Engineer for AI Image Generators.
+            Your goal is to write a descriptive prompt for an image generator (like Imagen or DALL-E) to create a background for a medical infographic.
 
-            case InfographicGenerationRequest::TYPE_RISK_FACTORS:
-                return $this->buildRiskFactorsPrompt($conditionName, $styleInstructions);
+            CRITICAL RULES:
+            1. NO TEXT: The output image must NOT contain any letters, words, labels, or numbers. The Image AI cannot spell.
+            2. VISUALS ONLY: Describe specific icons, symbols, shapes, layouts, and colors.
+            3. STYLE: Clean, modern, flat vector art style. Soft medical colors (blues, teals, soft greens). White or light background.
+            4. OUTPUT: Return ONLY the prompt string. Do not include "Here is the prompt:" or any markdown.
+            EOT;
 
-            case InfographicGenerationRequest::TYPE_LIFESTYLE_SOLUTIONS:
-                return $this->buildLifestyleSolutionsPrompt($conditionName, $styleInstructions);
+        // Specific task based on the infographic type
+        $userTask = match ($type) {
+            InfographicGenerationRequest::TYPE_OVERVIEW =>
+                "Create a prompt for an overview illustration of '{$conditionName}'. Describe a central, clean anatomical diagram or silhouette relevant to the condition. Surround it with 3-4 abstract bubbles or icons representing symptoms (e.g., lightning for pain, thermometer for fever). NO TEXT.",
 
-            default:
-                return $this->buildOverviewPrompt($conditionName, $styleInstructions);
+            InfographicGenerationRequest::TYPE_RISK_FACTORS =>
+                "Create a prompt for a 'Risk Factors' visualization for '{$conditionName}'. Describe a split composition. On one side, describe icons representing lifestyle risks (like unhealthy food, sedentary chair, or smoke). On the other side, describe icons for biological risks (like DNA helix or a clock for age). Use color coding (e.g., orange vs blue) to separate them. NO TEXT.",
+
+            InfographicGenerationRequest::TYPE_LIFESTYLE_SOLUTIONS =>
+                "Create a prompt for a 'Lifestyle Solutions' visualization for '{$conditionName}'. Describe a central circular layout. In the center, a happy/healthy human silhouette. Around it, arrange distinct circular icons representing: Water (droplet), Rest (moon/bed), Exercise (running figure), and Nutrition (leaf/apple). Connect them with soft lines. NO TEXT.",
+
+            default => "Create a prompt for a generic, clean medical background illustration suitable for '{$conditionName}'. NO TEXT.",
+        };
+
+        // Call Gemini to architect the prompt
+        try {
+            $result = $this->geminiService->generateText($systemInstruction, $userTask);
+
+            // Validate that Gemini returned an actual image prompt, not the task instruction
+            if (empty($result) || str_starts_with($result, 'Create a prompt for')) {
+                Log::warning("Gemini returned invalid prompt for {$type}, using static fallback");
+                return $this->getStaticFallbackPrompt($conditionName, $type);
+            }
+
+            return $result;
+        } catch (\Exception $e) {
+            Log::warning("Gemini prompt generation failed for {$type}: " . $e->getMessage());
+            return $this->getStaticFallbackPrompt($conditionName, $type);
         }
     }
 
     /**
-     * Build prompt for condition overview infographic.
+     * Get a static fallback prompt when Gemini is unavailable.
      */
-    protected function buildOverviewPrompt(string $conditionName, string $styleInstructions): string
+    protected function getStaticFallbackPrompt(string $conditionName, string $type): string
     {
-        return "{$styleInstructions} " .
-            "Topic: {$conditionName} health condition overview. " .
-            "Visual elements to include: " .
-            "- Central human body silhouette or organ illustration relevant to the condition " .
-            "- Symptom icons arranged around the body " .
-            "- Visual representation of affected body systems " .
-            "- Simple prevalence/statistics visualization using icons " .
-            "- Clear visual sections for different aspects of the condition";
+        $baseStyle = "Professional medical infographic, clean modern healthcare design, soft gradient blues and greens, clear icons, no text or words, white background, vector art style.";
+
+        return match ($type) {
+            InfographicGenerationRequest::TYPE_OVERVIEW =>
+                "{$baseStyle} Central human body silhouette with symptom icons arranged around it, representing {$conditionName}. Abstract bubbles showing affected body systems.",
+
+            InfographicGenerationRequest::TYPE_RISK_FACTORS =>
+                "{$baseStyle} Split composition showing risk factors for {$conditionName}. Left side: lifestyle icons (food, chair, clock). Right side: biological icons (DNA helix, family tree). Orange and blue color coding.",
+
+            InfographicGenerationRequest::TYPE_LIFESTYLE_SOLUTIONS =>
+                "{$baseStyle} Circular hub-and-spoke layout for {$conditionName} lifestyle solutions. Center: healthy person silhouette. Surrounding icons: water droplet, moon for rest, running figure, apple and leaf for nutrition. Soft connecting lines.",
+
+            default => "{$baseStyle} Clean medical illustration representing {$conditionName} health condition.",
+        };
     }
 
-    /**
-     * Build prompt for risk factors infographic.
-     */
-    protected function buildRiskFactorsPrompt(string $conditionName, string $styleInstructions): string
-    {
-        return "{$styleInstructions} " .
-            "Topic: Risk factors for {$conditionName}. " .
-            "Visual elements to include: " .
-            "- Split layout: modifiable vs non-modifiable factors " .
-            "- Lifestyle icons: diet, exercise, sleep, stress " .
-            "- Genetic/hereditary symbols (DNA helix, family tree) " .
-            "- Environmental factors icons " .
-            "- Age and demographic representations " .
-            "- Visual scale showing relative risk levels " .
-            "- Arrows or connections showing factor relationships";
-    }
-
-    /**
-     * Build prompt for lifestyle solutions infographic.
-     */
-    protected function buildLifestyleSolutionsPrompt(string $conditionName, string $styleInstructions): string
-    {
-        return "{$styleInstructions} " .
-            "Topic: Lifestyle medicine solutions for {$conditionName}. " .
-            "Visual elements to include: " .
-            "- Hub and spoke layout with person at center " .
-            "- NEWSTART health principles represented as icons: " .
-            "  - Nutrition: fruits, vegetables, whole grains " .
-            "  - Exercise: person in motion, walking, cycling " .
-            "  - Water: water glass, hydration " .
-            "  - Sunlight: sun rays, outdoor activities " .
-            "  - Temperance: balance scale, moderation " .
-            "  - Air: fresh air, breathing, nature " .
-            "  - Rest: sleeping figure, relaxation " .
-            "  - Trust: heart, peaceful imagery " .
-            "- Visual connections between lifestyle factors and health improvement";
-    }
-
-    /**
-     * Get all requests for a condition.
-     */
     public function getRequestsForCondition(Condition $condition): array
     {
         return $condition->infographicRequests()
@@ -215,16 +213,11 @@ class InfographicGeneratorService
             ->toArray();
     }
 
-    /**
-     * Get generation status for a condition.
-     */
     public function getConditionStatus(Condition $condition): array
     {
-        $requests = $condition->infographicRequests()
-            ->with('media')
-            ->get();
-
+        $requests = $condition->infographicRequests()->with('media')->get();
         $byType = [];
+
         foreach (InfographicGenerationRequest::getTypes() as $type => $label) {
             $request = $requests->where('infographic_type', $type)->sortByDesc('created_at')->first();
             $byType[$type] = [
@@ -240,15 +233,12 @@ class InfographicGeneratorService
             InfographicGenerationRequest::STATUS_PROCESSING,
         ])->count();
 
-        $completedCount = $requests->where('status', InfographicGenerationRequest::STATUS_COMPLETED)->count();
-        $failedCount = $requests->where('status', InfographicGenerationRequest::STATUS_FAILED)->count();
-
         return [
             'types' => $byType,
             'summary' => [
                 'pending' => $pendingCount,
-                'completed' => $completedCount,
-                'failed' => $failedCount,
+                'completed' => $requests->where('status', InfographicGenerationRequest::STATUS_COMPLETED)->count(),
+                'failed' => $requests->where('status', InfographicGenerationRequest::STATUS_FAILED)->count(),
                 'total' => count(InfographicGenerationRequest::getTypes()),
             ],
             'is_generating' => $pendingCount > 0,

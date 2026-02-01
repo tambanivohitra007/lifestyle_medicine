@@ -43,6 +43,43 @@ class GeminiService
     }
 
     /**
+     * Generate generic text content based on system instructions and a user prompt.
+     * Used for the Infographic "Architect" step.
+     *
+     * @throws \RuntimeException if Gemini is not configured
+     */
+    public function generateText(string $systemInstruction, string $userPrompt): string
+    {
+        if (!$this->isConfigured()) {
+            // Throw exception so caller can handle appropriately with context-aware fallback
+            throw new \RuntimeException('Gemini API is not configured.');
+        }
+
+        // Combine instructions since the wrapper usually handles single prompts best
+        $fullPrompt = $systemInstruction . "\n\nTask: " . $userPrompt;
+
+        try {
+            // Use gemini-2.5-flash for speed
+            $response = $this->client->generativeModel('gemini-2.5-flash')->generateContent(
+                new TextPart($fullPrompt)
+            );
+
+            $text = $response->text();
+
+            // Clean up any markdown formatting Gemini might add
+            $text = preg_replace('/^```[a-z]*\s*/i', '', $text);
+            $text = preg_replace('/\s*```$/i', '', $text);
+            $text = trim($text);
+
+            return $text;
+        } catch (\Exception $e) {
+            Log::error('Gemini text generation error: ' . $e->getMessage());
+            // Re-throw so caller can use context-aware fallback
+            throw $e;
+        }
+    }
+
+    /**
      * Suggest Scripture references for a health condition or intervention.
      */
     public function suggestScriptures(string $topic, string $context = ''): array
