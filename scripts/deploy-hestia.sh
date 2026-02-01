@@ -80,6 +80,71 @@ git pull origin main
 print_success "Code updated"
 
 #===============================================================================
+# Ensure server timeout configurations for AI requests
+#===============================================================================
+ensure_timeout_configs() {
+    print_info "Checking server timeout configurations..."
+
+    local NEEDS_APACHE_RESTART=false
+    local NEEDS_NGINX_RELOAD=false
+    local NEEDS_PHP_RESTART=false
+
+    # 1. Apache global timeout (needs to be 300 for AI requests)
+    if grep -q "^Timeout 30$" /etc/apache2/apache2.conf 2>/dev/null; then
+        print_info "Updating Apache timeout to 300s..."
+        sed -i 's/^Timeout 30$/Timeout 300/' /etc/apache2/apache2.conf
+        NEEDS_APACHE_RESTART=true
+    fi
+
+    # 2. Nginx timeout config for API domain
+    NGINX_TIMEOUT_CONF="/home/$HESTIA_USER/conf/web/$API_DOMAIN/nginx.ssl.conf_timeout"
+    if [ ! -f "$NGINX_TIMEOUT_CONF" ] || ! grep -q "proxy_read_timeout 300s" "$NGINX_TIMEOUT_CONF" 2>/dev/null; then
+        print_info "Creating Nginx timeout config..."
+        cat > "$NGINX_TIMEOUT_CONF" << 'NGINXTIMEOUT'
+proxy_connect_timeout 300s;
+proxy_send_timeout 300s;
+proxy_read_timeout 300s;
+fastcgi_read_timeout 300s;
+NGINXTIMEOUT
+        NEEDS_NGINX_RELOAD=true
+    fi
+
+    # 3. PHP-FPM pool timeout
+    PHP_FPM_CONF="/etc/php/8.4/fpm/pool.d/$API_DOMAIN.conf"
+    if [ -f "$PHP_FPM_CONF" ] && ! grep -q "request_terminate_timeout" "$PHP_FPM_CONF" 2>/dev/null; then
+        print_info "Adding PHP-FPM request_terminate_timeout..."
+        echo "request_terminate_timeout = 300" >> "$PHP_FPM_CONF"
+        NEEDS_PHP_RESTART=true
+    fi
+
+    # 4. PHP max_execution_time
+    PHP_INI="/etc/php/8.4/fpm/php.ini"
+    if [ -f "$PHP_INI" ] && grep -q "^max_execution_time = 30$" "$PHP_INI" 2>/dev/null; then
+        print_info "Updating PHP max_execution_time to 300..."
+        sed -i 's/^max_execution_time = 30$/max_execution_time = 300/' "$PHP_INI"
+        NEEDS_PHP_RESTART=true
+    fi
+
+    # Restart services if needed
+    if [ "$NEEDS_APACHE_RESTART" = true ]; then
+        print_info "Restarting Apache..."
+        systemctl restart apache2
+    fi
+
+    if [ "$NEEDS_NGINX_RELOAD" = true ]; then
+        print_info "Reloading Nginx..."
+        nginx -t && systemctl reload nginx
+    fi
+
+    if [ "$NEEDS_PHP_RESTART" = true ]; then
+        print_info "Restarting PHP-FPM..."
+        systemctl restart php8.4-fpm
+    fi
+
+    print_success "Timeout configurations verified"
+}
+
+#===============================================================================
 # Deploy API (Laravel)
 #===============================================================================
 deploy_api() {
@@ -161,6 +226,9 @@ INDEXPHP
     chmod -R 755 "$API_DIR"
     chmod -R 775 "$API_APP/storage"
     chmod -R 775 "$API_APP/bootstrap/cache"
+
+    # Ensure server timeout configs for AI requests
+    ensure_timeout_configs
 
     print_success "API deployment complete!"
 }
