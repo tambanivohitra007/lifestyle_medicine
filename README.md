@@ -17,7 +17,7 @@ This platform enables healthcare practitioners and health educators to create, m
 ## Tech Stack
 
 ### Backend
-- **PHP 8.2+**
+- **PHP 8.2+** (PHP 8.4 recommended for production)
 - **Laravel 12** - PHP framework
 - **Laravel Sanctum** - API authentication
 - **MySQL/SQLite** - Database
@@ -204,7 +204,47 @@ Interactive node-based visualization of relationships between entities using Rea
   - Route-aware page titles and subtitles
   - Smooth transitions between pages
 
-## Installation
+## Deployment
+
+### Production URLs
+- **API**: https://api.rindra.org
+- **Dashboard**: https://lifestyle.rindra.org
+
+### Deploy to Hostinger VPS with HestiaCP
+
+See [scripts/DEPLOY_HESTIA.md](scripts/DEPLOY_HESTIA.md) for detailed instructions.
+
+**Quick Start:**
+
+1. **Prerequisites (in HestiaCP Panel):**
+   - Create user `rindra`
+   - Add domain `api.rindra.org` with PHP 8.4
+   - Add domain `lifestyle.rindra.org`
+   - Enable SSL for both domains
+   - Create database
+
+2. **Initial Setup:**
+   ```bash
+   ssh root@YOUR_VPS_IP
+   cd /home/rindra/web
+   git clone YOUR_REPO_URL lifestyle-medicine
+   cd lifestyle-medicine
+   ./scripts/setup-hestia.sh
+   ```
+
+3. **Future Deployments:**
+   ```bash
+   # From Windows
+   scripts\remote-deploy-hestia.bat YOUR_VPS_IP
+
+   # Or from VPS
+   cd /home/rindra/web/lifestyle-medicine
+   ./scripts/deploy-hestia.sh
+   ```
+
+---
+
+## Installation (Local Development)
 
 ### Prerequisites
 - PHP 8.2 or higher
