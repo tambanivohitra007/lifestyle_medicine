@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Download, Printer, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { sanitizeHtml } from '../../lib/sanitize';
 import Modal from '../../components/ui/Modal';
@@ -13,35 +14,36 @@ const SECTION_ORDER = [
   'scripture',
 ];
 
-const SECTION_TITLES = {
-  risk_factors: 'RISK FACTORS/CAUSES',
-  physiology: 'RELEVANT PHYSIOLOGY',
-  complications: 'COMPLICATIONS',
-  solutions: 'LIFESTYLE SOLUTIONS',
-  additional_factors: 'ADDITIONAL FACTORS',
-  scripture: 'BIBLE & SPIRIT OF PROPHECY',
+const SECTION_TITLE_KEYS = {
+  risk_factors: 'conditions:preview.sectionTitles.riskFactors',
+  physiology: 'conditions:preview.sectionTitles.physiology',
+  complications: 'conditions:preview.sectionTitles.complications',
+  solutions: 'conditions:preview.sectionTitles.solutions',
+  additional_factors: 'conditions:preview.sectionTitles.additionalFactors',
+  scripture: 'conditions:preview.sectionTitles.scripture',
 };
 
-const EVIDENCE_STRENGTH_LABELS = {
-  high: 'High Evidence',
-  moderate: 'Moderate Evidence',
-  emerging: 'Emerging Evidence',
-  insufficient: 'Insufficient Evidence',
+const EVIDENCE_STRENGTH_KEYS = {
+  high: 'interventions:mapping.evidence.high',
+  moderate: 'interventions:mapping.evidence.moderate',
+  emerging: 'interventions:mapping.evidence.emerging',
+  insufficient: 'interventions:mapping.evidence.insufficient',
 };
 
-const RECOMMENDATION_LABELS = {
-  core: 'Core Recommendation',
-  adjunct: 'Adjunct Recommendation',
-  optional: 'Optional',
+const RECOMMENDATION_KEYS = {
+  core: 'interventions:mapping.recommendation.core',
+  adjunct: 'interventions:mapping.recommendation.adjunct',
+  optional: 'interventions:mapping.recommendation.optional',
 };
 
-const INFOGRAPHIC_LABELS = {
-  overview: 'Condition Overview',
-  risk_factors: 'Risk Factors',
-  lifestyle_solutions: 'Lifestyle Solutions',
+const INFOGRAPHIC_LABEL_KEYS = {
+  overview: 'conditions:preview.infographicLabels.overview',
+  risk_factors: 'conditions:preview.infographicLabels.riskFactors',
+  lifestyle_solutions: 'conditions:preview.infographicLabels.lifestyleSolutions',
 };
 
 const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
+  const { t } = useTranslation(['conditions', 'interventions', 'common']);
   const [condition, setCondition] = useState(null);
   const [sections, setSections] = useState([]);
   const [interventions, setInterventions] = useState([]);
@@ -99,7 +101,7 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
       <div className="my-4 text-center">
         <img
           src={infographic.url}
-          alt={infographic.alt_text || `${INFOGRAPHIC_LABELS[type]} infographic`}
+          alt={infographic.alt_text || `${t(INFOGRAPHIC_LABEL_KEYS[type])} ${t('conditions:preview.infographic')}`}
           className="max-w-full h-auto mx-auto rounded-lg shadow-md"
           style={{ maxHeight: '400px' }}
         />
@@ -134,14 +136,14 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Document Preview" size="full">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('conditions:preview.documentPreview')} size="full">
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
         </div>
       ) : !condition ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">Condition not found</p>
+          <p className="text-gray-500">{t('conditions:detail.notFound')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -150,20 +152,20 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
             <button
               onClick={handlePrint}
               className="btn-outline flex items-center gap-2 text-sm"
-              title="Open in new tab for printing"
+              title={t('conditions:preview.printPage')}
             >
               <Printer className="w-4 h-4" />
-              Print
+              {t('common:buttons.print')}
             </button>
             <a
               href={`${getApiBaseUrl()}/api/v1/export/conditions/${conditionId}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary flex items-center gap-2 text-sm"
-              title="Download PDF document"
+              title={t('conditions:preview.downloadPdf')}
             >
               <Download className="w-4 h-4" />
-              Download PDF
+              {t('conditions:preview.downloadPdf')}
             </a>
           </div>
 
@@ -172,7 +174,7 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
             {/* Title */}
             <div className="text-center mb-6">
               <p className="text-gray-500 text-xs uppercase tracking-wide mb-2">
-                Lifestyle Medicine Treatment Guide
+                {t('conditions:preview.lifestyleMedicineTreatmentGuide')}
               </p>
               <h1 className="text-2xl font-bold text-gray-900">{condition.name}</h1>
               {condition.category && (
@@ -198,7 +200,7 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
               return (
                 <div key={section.id} className="mb-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                    {section.title || SECTION_TITLES[section.section_type] || section.section_type}
+                    {section.title || (SECTION_TITLE_KEYS[section.section_type] ? t(SECTION_TITLE_KEYS[section.section_type]) : section.section_type)}
                   </h2>
                   {section.body && (
                     <div
@@ -221,7 +223,7 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
             {Object.keys(interventionsByDomain).length > 0 && (
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                  INTERVENTIONS BY CARE DOMAIN
+                  {t('conditions:preview.interventionsByDomain')}
                 </h2>
 
                 {Object.entries(interventionsByDomain).map(([domainName, domainInterventions]) => (
@@ -241,12 +243,12 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
                           </span>
                           {intervention.pivot?.strength_of_evidence && (
                             <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
-                              {EVIDENCE_STRENGTH_LABELS[intervention.pivot.strength_of_evidence]}
+                              {t(EVIDENCE_STRENGTH_KEYS[intervention.pivot.strength_of_evidence])}
                             </span>
                           )}
                           {intervention.pivot?.recommendation_level && (
                             <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
-                              {RECOMMENDATION_LABELS[intervention.pivot.recommendation_level]}
+                              {t(RECOMMENDATION_KEYS[intervention.pivot.recommendation_level])}
                             </span>
                           )}
                         </div>
@@ -259,13 +261,13 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
 
                         {intervention.mechanism && (
                           <p className="text-gray-500 text-xs italic">
-                            Mechanism: {intervention.mechanism}
+                            {t('conditions:preview.mechanism')}: {intervention.mechanism}
                           </p>
                         )}
 
                         {intervention.pivot?.clinical_notes && (
                           <p className="text-gray-600 text-xs mt-1 bg-yellow-50 p-2 rounded">
-                            <strong>Clinical Note:</strong> {intervention.pivot.clinical_notes}
+                            <strong>{t('conditions:preview.clinicalNote')}:</strong> {intervention.pivot.clinical_notes}
                           </p>
                         )}
                       </div>
@@ -283,7 +285,7 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
             {scriptures.length > 0 && (
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                  SCRIPTURE REFERENCES
+                  {t('conditions:preview.scriptureReferences')}
                 </h2>
                 <div className="space-y-3">
                   {scriptures.map((scripture) => (
@@ -311,7 +313,7 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
             {recipes.length > 0 && (
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                  RECOMMENDED RECIPES
+                  {t('conditions:preview.recommendedRecipes')}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {recipes.map((recipe) => (
@@ -345,9 +347,9 @@ const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
 
             {/* Footer */}
             <div className="mt-8 pt-4 border-t border-gray-200 text-center text-xs text-gray-500">
-              <p>Generated from the Lifestyle Medicine Knowledge Platform</p>
+              <p>{t('conditions:preview.generatedFrom')}</p>
               <p className="mt-1">
-                {new Date().toLocaleDateString('en-US', {
+                {new Date().toLocaleDateString(undefined, {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',

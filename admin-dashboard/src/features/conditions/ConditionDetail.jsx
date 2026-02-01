@@ -17,6 +17,7 @@ import {
   Image,
   Upload,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../lib/swal';
 import { sanitizeHtml } from '../../lib/sanitize';
@@ -34,26 +35,26 @@ import MediaUploader from '../../components/shared/MediaUploader';
 import ConditionPreviewModal from './ConditionPreviewModal';
 
 const SECTION_TYPES = {
-  risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
-  physiology: { label: 'Physiology', color: 'bg-blue-100 text-blue-700' },
-  complications: { label: 'Complications', color: 'bg-orange-100 text-orange-700' },
-  solutions: { label: 'Lifestyle Solutions', color: 'bg-green-100 text-green-700' },
-  additional_factors: { label: 'Additional Factors', color: 'bg-purple-100 text-purple-700' },
-  scripture: { label: 'Scripture / SOP', color: 'bg-indigo-100 text-indigo-700' },
-  research_ideas: { label: 'Research Ideas', color: 'bg-teal-100 text-teal-700' },
+  risk_factors: { labelKey: 'conditions:sections.types.riskFactors', color: 'bg-red-100 text-red-700' },
+  physiology: { labelKey: 'conditions:sections.types.physiology', color: 'bg-blue-100 text-blue-700' },
+  complications: { labelKey: 'conditions:sections.types.complications', color: 'bg-orange-100 text-orange-700' },
+  solutions: { labelKey: 'conditions:sections.types.solutions', color: 'bg-green-100 text-green-700' },
+  additional_factors: { labelKey: 'conditions:sections.types.additionalFactors', color: 'bg-purple-100 text-purple-700' },
+  scripture: { labelKey: 'conditions:sections.types.scripture', color: 'bg-indigo-100 text-indigo-700' },
+  research_ideas: { labelKey: 'conditions:sections.types.researchIdeas', color: 'bg-teal-100 text-teal-700' },
 };
 
 const EVIDENCE_STRENGTH = {
-  high: { label: 'High', color: 'bg-green-100 text-green-700' },
-  moderate: { label: 'Moderate', color: 'bg-yellow-100 text-yellow-700' },
-  emerging: { label: 'Emerging', color: 'bg-blue-100 text-blue-700' },
-  insufficient: { label: 'Insufficient', color: 'bg-gray-100 text-gray-700' },
+  high: { labelKey: 'interventions:mapping.evidence.high', color: 'bg-green-100 text-green-700' },
+  moderate: { labelKey: 'interventions:mapping.evidence.moderate', color: 'bg-yellow-100 text-yellow-700' },
+  emerging: { labelKey: 'interventions:mapping.evidence.emerging', color: 'bg-blue-100 text-blue-700' },
+  insufficient: { labelKey: 'interventions:mapping.evidence.insufficient', color: 'bg-gray-100 text-gray-700' },
 };
 
 const RECOMMENDATION_LEVEL = {
-  core: { label: 'Core', color: 'bg-green-100 text-green-700' },
-  adjunct: { label: 'Adjunct', color: 'bg-blue-100 text-blue-700' },
-  optional: { label: 'Optional', color: 'bg-gray-100 text-gray-700' },
+  core: { labelKey: 'interventions:mapping.recommendation.core', color: 'bg-green-100 text-green-700' },
+  adjunct: { labelKey: 'interventions:mapping.recommendation.adjunct', color: 'bg-blue-100 text-blue-700' },
+  optional: { labelKey: 'interventions:mapping.recommendation.optional', color: 'bg-gray-100 text-gray-700' },
 };
 
 // Parse scripture reference to extract book and chapter
@@ -94,6 +95,7 @@ const parseScriptureReference = (reference) => {
 };
 
 const ConditionDetail = () => {
+  const { t } = useTranslation(['conditions', 'interventions', 'common', 'recipes', 'references']);
   const { id } = useParams();
   const navigate = useNavigate();
   const { canEdit } = useAuth();
@@ -140,7 +142,7 @@ const ConditionDetail = () => {
       setCareDomains(careDomainsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching condition:', error);
-      toast.error('Failed to load condition');
+      toast.error(t('conditions:toast.loadFailed'));
       navigate('/conditions');
     } finally {
       setLoading(false);
@@ -153,11 +155,11 @@ const ConditionDetail = () => {
 
     try {
       await api.delete(`${apiEndpoints.conditionsAdmin}/${id}`);
-      toast.success('Condition deleted successfully');
+      toast.success(t('conditions:toast.deleted'));
       navigate('/conditions');
     } catch (error) {
       console.error('Error deleting condition:', error);
-      toast.error('Failed to delete condition');
+      toast.error(t('conditions:toast.deleteError'));
     }
   };
 
@@ -168,10 +170,10 @@ const ConditionDetail = () => {
     try {
       await api.delete(`${apiEndpoints.conditionSectionsAdmin}/${sectionId}`);
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
-      toast.success('Section deleted');
+      toast.success(t('conditions:sections.toast.deleted'));
     } catch (error) {
       console.error('Error deleting section:', error);
-      toast.error('Failed to delete section');
+      toast.error(t('conditions:detail.deleteSectionFailed'));
     }
   };
 
@@ -182,10 +184,10 @@ const ConditionDetail = () => {
     try {
       await api.delete(apiEndpoints.attachConditionIntervention(id, interventionId));
       setInterventions((prev) => prev.filter((i) => i.id !== interventionId));
-      toast.success('Intervention removed');
+      toast.success(t('conditions:detail.interventionRemoved'));
     } catch (error) {
       console.error('Error detaching intervention:', error);
-      toast.error('Failed to remove intervention');
+      toast.error(t('conditions:detail.removeInterventionFailed'));
     }
   };
 
@@ -196,10 +198,10 @@ const ConditionDetail = () => {
     try {
       await api.delete(apiEndpoints.attachConditionScripture(id, scriptureId));
       setScriptures((prev) => prev.filter((s) => s.id !== scriptureId));
-      toast.success('Scripture removed');
+      toast.success(t('conditions:detail.scriptureRemoved'));
     } catch (error) {
       console.error('Error detaching scripture:', error);
-      toast.error('Failed to remove scripture');
+      toast.error(t('conditions:detail.removeScriptureFailed'));
     }
   };
 
@@ -210,10 +212,10 @@ const ConditionDetail = () => {
     try {
       await api.delete(apiEndpoints.attachConditionRecipe(id, recipeId));
       setRecipes((prev) => prev.filter((r) => r.id !== recipeId));
-      toast.success('Recipe removed');
+      toast.success(t('conditions:detail.recipeRemoved'));
     } catch (error) {
       console.error('Error detaching recipe:', error);
-      toast.error('Failed to remove recipe');
+      toast.error(t('conditions:detail.removeRecipeFailed'));
     }
   };
 
@@ -224,10 +226,10 @@ const ConditionDetail = () => {
     try {
       await api.delete(apiEndpoints.attachConditionEgwReference(id, egwReferenceId));
       setEgwReferences((prev) => prev.filter((e) => e.id !== egwReferenceId));
-      toast.success('EGW reference removed');
+      toast.success(t('conditions:detail.egwRemoved'));
     } catch (error) {
       console.error('Error detaching EGW reference:', error);
-      toast.error('Failed to remove EGW reference');
+      toast.error(t('conditions:detail.removeEgwFailed'));
     }
   };
 
@@ -242,7 +244,7 @@ const ConditionDetail = () => {
       });
     } catch (error) {
       console.error('Error reordering interventions:', error);
-      toast.error('Failed to reorder interventions');
+      toast.error(t('conditions:detail.reorderFailed'));
       setInterventions(previousOrder);
     }
   };
@@ -286,23 +288,23 @@ const ConditionDetail = () => {
       <div className="card text-center py-8 sm:py-12">
         <AlertCircle className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Condition not found
+          {t('conditions:detail.notFound')}
         </h3>
         <Link to="/conditions" className="text-primary-600 hover:text-primary-700">
-          Back to conditions
+          {t('conditions:preview.backToConditions')}
         </Link>
       </div>
     );
   }
 
   const tabs = [
-    { id: 'sections', label: 'Sections', icon: FileText, count: sections.length },
-    { id: 'interventions', label: 'Interventions', icon: Stethoscope, count: interventions.length },
-    { id: 'scriptures', label: 'Scriptures', icon: BookOpen, count: scriptures.length },
-    { id: 'egw', label: 'EGW Writings', icon: BookMarked, count: egwReferences.length },
-    { id: 'recipes', label: 'Recipes', icon: ChefHat, count: recipes.length },
-    { id: 'media', label: 'Media', icon: Upload, count: media.length },
-    { id: 'infographics', label: 'Infographics', icon: Image, count: infographics.length },
+    { id: 'sections', labelKey: 'conditions:detail.sections', icon: FileText, count: sections.length },
+    { id: 'interventions', labelKey: 'conditions:detail.interventions', icon: Stethoscope, count: interventions.length },
+    { id: 'scriptures', labelKey: 'conditions:detail.scriptures', icon: BookOpen, count: scriptures.length },
+    { id: 'egw', labelKey: 'references:egwWritings', icon: BookMarked, count: egwReferences.length },
+    { id: 'recipes', labelKey: 'recipes:title', icon: ChefHat, count: recipes.length },
+    { id: 'media', labelKey: 'common:labels.media', icon: Upload, count: media.length },
+    { id: 'infographics', labelKey: 'conditions:detail.infographics', icon: Image, count: infographics.length },
   ];
 
   return (
@@ -310,7 +312,7 @@ const ConditionDetail = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Conditions', href: '/conditions' },
+          { label: t('conditions:title'), href: '/conditions' },
           { label: condition.name },
         ]}
       />
@@ -333,16 +335,15 @@ const ConditionDetail = () => {
             className="btn-primary flex items-center justify-center gap-2 text-sm touch-manipulation"
           >
             <Eye className="w-4 h-4" />
-            <span className="hidden sm:inline">Preview</span>
-            <span className="sm:hidden">Preview</span>
+            <span>{t('conditions:preview.title')}</span>
           </button>
           <Link
             to={`/knowledge-graph/condition/${id}`}
             className="btn-outline flex items-center justify-center gap-2 text-sm touch-manipulation"
-            title="View Knowledge Graph"
+            title={t('conditions:detail.graph')}
           >
             <Network className="w-4 h-4" />
-            <span className="hidden sm:inline">Graph</span>
+            <span className="hidden sm:inline">{t('conditions:detail.graph')}</span>
           </Link>
           <a
             href={`${getApiBaseUrl()}/api/v1/export/conditions/${id}/pdf`}
@@ -360,14 +361,14 @@ const ConditionDetail = () => {
                 className="btn-outline flex items-center justify-center gap-2 text-sm touch-manipulation"
               >
                 <Edit className="w-4 h-4" />
-                <span>Edit</span>
+                <span>{t('common:buttons.edit')}</span>
               </Link>
               <button
                 onClick={handleDelete}
                 className="btn-outline text-red-600 border-red-200 hover:bg-red-50 active:bg-red-100 flex items-center justify-center gap-2 text-sm touch-manipulation"
               >
                 <Trash2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Delete</span>
+                <span className="hidden sm:inline">{t('common:buttons.delete')}</span>
               </button>
             </>
           )}
@@ -377,7 +378,7 @@ const ConditionDetail = () => {
       {/* Summary */}
       {condition.summary && (
         <div className="card overflow-hidden">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Summary</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">{t('common:labels.summary')}</h2>
           <p className="text-gray-600 whitespace-pre-wrap text-sm sm:text-base break-words">{condition.summary}</p>
         </div>
       )}
@@ -411,8 +412,8 @@ const ConditionDetail = () => {
               }`}
             >
               <tab.icon className="w-4 sm:w-5 h-4 sm:h-5" />
-              <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              <span className="hidden sm:inline">{t(tab.labelKey)}</span>
+              <span className="sm:hidden">{t(tab.labelKey).split(' ')[0]}</span>
               <span
                 className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs ${
                   activeTab === tab.id
@@ -433,14 +434,14 @@ const ConditionDetail = () => {
         {activeTab === 'sections' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-gray-900">Condition Sections</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('conditions:sections.title')}</h2>
               {canEdit && (
                 <Link
                   to={`/conditions/${id}/sections/new`}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
-                  Add Section
+                  {t('conditions:detail.addSection')}
                 </Link>
               )}
             </div>
@@ -448,7 +449,7 @@ const ConditionDetail = () => {
             {sections.length === 0 ? (
               <div className="card text-center py-8">
                 <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600">No sections added yet</p>
+                <p className="text-gray-600">{t('conditions:detail.noSections')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -463,7 +464,7 @@ const ConditionDetail = () => {
                               SECTION_TYPES[section.section_type]?.color || 'bg-gray-100 text-gray-700'
                             }`}
                           >
-                            {SECTION_TYPES[section.section_type]?.label || section.section_type}
+                            {SECTION_TYPES[section.section_type]?.labelKey ? t(SECTION_TYPES[section.section_type].labelKey) : section.section_type}
                           </span>
                           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{section.title}</h3>
                         </div>
@@ -503,14 +504,14 @@ const ConditionDetail = () => {
         {activeTab === 'interventions' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-gray-900">Linked Interventions</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('conditions:detail.linkedInterventions')}</h2>
               {canEdit && (
                 <button
                   onClick={() => setAttachModalType('interventions')}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
-                  Attach Intervention
+                  {t('conditions:attach.intervention')}
                 </button>
               )}
             </div>
@@ -529,14 +530,14 @@ const ConditionDetail = () => {
         {activeTab === 'scriptures' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-gray-900">Linked Scriptures</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('conditions:detail.linkedScriptures')}</h2>
               {canEdit && (
                 <button
                   onClick={() => setAttachModalType('scriptures')}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
-                  Attach Scripture
+                  {t('conditions:attach.scripture')}
                 </button>
               )}
             </div>
@@ -544,7 +545,7 @@ const ConditionDetail = () => {
             {scriptures.length === 0 ? (
               <div className="card text-center py-8">
                 <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600">No scriptures linked yet</p>
+                <p className="text-gray-600">{t('conditions:detail.noScriptures')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -601,14 +602,14 @@ const ConditionDetail = () => {
         {activeTab === 'egw' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-gray-900">Ellen G. White Writings</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('references:egwWritings')}</h2>
               {canEdit && (
                 <button
                   onClick={() => setAttachModalType('egw-references')}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
-                  Attach EGW Reference
+                  {t('conditions:attach.egwReference')}
                 </button>
               )}
             </div>
@@ -616,7 +617,7 @@ const ConditionDetail = () => {
             {egwReferences.length === 0 ? (
               <div className="card text-center py-8">
                 <BookMarked className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600">No EGW references linked yet</p>
+                <p className="text-gray-600">{t('conditions:detail.noEgwReferences')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -670,14 +671,14 @@ const ConditionDetail = () => {
         {activeTab === 'recipes' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-gray-900">Linked Recipes</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('conditions:detail.linkedRecipes')}</h2>
               {canEdit && (
                 <button
                   onClick={() => setAttachModalType('recipes')}
                   className="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4" />
-                  Attach Recipe
+                  {t('conditions:attach.recipe')}
                 </button>
               )}
             </div>
@@ -685,7 +686,7 @@ const ConditionDetail = () => {
             {recipes.length === 0 ? (
               <div className="card text-center py-8">
                 <ChefHat className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600">No recipes linked yet</p>
+                <p className="text-gray-600">{t('conditions:detail.noRecipes')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -746,9 +747,9 @@ const ConditionDetail = () => {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Images & Documents</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('conditions:detail.imagesDocuments')}</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Upload custom images and documents for this condition
+                  {t('conditions:detail.uploadMediaDescription')}
                 </p>
               </div>
             </div>
@@ -765,7 +766,7 @@ const ConditionDetail = () => {
             ) : media.length === 0 ? (
               <div className="card text-center py-8">
                 <Upload className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600">No media files uploaded yet</p>
+                <p className="text-gray-600">{t('conditions:detail.noMedia')}</p>
               </div>
             ) : (
               <div className="card">
@@ -805,7 +806,7 @@ const ConditionDetail = () => {
         {activeTab === 'infographics' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-gray-900">Infographics</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('conditions:detail.infographics')}</h2>
             </div>
 
             {/* Show existing infographics */}
@@ -848,7 +849,7 @@ const ConditionDetail = () => {
             {!canEdit && infographics.length === 0 && (
               <div className="card text-center py-8">
                 <Image className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600">No infographics generated yet</p>
+                <p className="text-gray-600">{t('conditions:detail.noInfographics')}</p>
               </div>
             )}
           </div>

@@ -264,37 +264,37 @@ const Conditions = () => {
           {/* View mode toggle and count - top row on mobile */}
           <div className="flex items-center justify-between">
             <div className="text-xs text-gray-500">
-              {pagination.total} {pagination.total === 1 ? 'condition' : 'conditions'}
+              {pagination.total} {pagination.total === 1 ? t('conditions:singular') : t('conditions:plural')}
             </div>
             <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
           </div>
           {/* Sort options - scrollable on mobile */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            <span className="text-xs text-gray-600 font-medium whitespace-nowrap">Sort:</span>
+            <span className="text-xs text-gray-600 font-medium whitespace-nowrap">{t('common:filters.sortBy')}:</span>
             <SortableHeader
               field="name"
-              label="Name"
+              label={t('common:labels.name')}
               currentSort={sortBy}
               currentOrder={sortOrder}
               onSort={handleSort}
             />
             <SortableHeader
               field="category"
-              label="Category"
+              label={t('common:labels.category')}
               currentSort={sortBy}
               currentOrder={sortOrder}
               onSort={handleSort}
             />
             <SortableHeader
               field="created_at"
-              label="Created"
+              label={t('common:labels.createdAt')}
               currentSort={sortBy}
               currentOrder={sortOrder}
               onSort={handleSort}
             />
             <SortableHeader
               field="updated_at"
-              label="Updated"
+              label={t('common:labels.updatedAt')}
               currentSort={sortBy}
               currentOrder={sortOrder}
               onSort={handleSort}
@@ -304,31 +304,31 @@ const Conditions = () => {
         {/* Desktop: Single row layout */}
         <div className="hidden sm:flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <span className="text-sm text-gray-600 font-medium">Sort by:</span>
+            <span className="text-sm text-gray-600 font-medium">{t('common:filters.sortBy')}:</span>
             <SortableHeader
               field="name"
-              label="Name"
+              label={t('common:labels.name')}
               currentSort={sortBy}
               currentOrder={sortOrder}
               onSort={handleSort}
             />
             <SortableHeader
               field="category"
-              label="Category"
+              label={t('common:labels.category')}
               currentSort={sortBy}
               currentOrder={sortOrder}
               onSort={handleSort}
             />
             <SortableHeader
               field="created_at"
-              label="Date Created"
+              label={t('common:labels.createdAt')}
               currentSort={sortBy}
               currentOrder={sortOrder}
               onSort={handleSort}
             />
             <SortableHeader
               field="updated_at"
-              label="Last Updated"
+              label={t('common:labels.updatedAt')}
               currentSort={sortBy}
               currentOrder={sortOrder}
               onSort={handleSort}
@@ -336,7 +336,7 @@ const Conditions = () => {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-sm text-gray-500">
-              {pagination.total} {pagination.total === 1 ? 'condition' : 'conditions'}
+              {pagination.total} {pagination.total === 1 ? t('conditions:singular') : t('conditions:plural')}
             </div>
             <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
           </div>

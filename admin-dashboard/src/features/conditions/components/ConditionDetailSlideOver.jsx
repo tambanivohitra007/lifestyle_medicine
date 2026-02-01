@@ -17,6 +17,7 @@ import {
   Image,
   ExternalLink,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../../lib/swal';
 import { sanitizeHtml } from '../../../lib/sanitize';
@@ -30,17 +31,18 @@ import {
 } from '../../../components/relationships';
 import InfographicGenerator from '../../ai-generator/components/InfographicGenerator';
 
-const SECTION_TYPES = {
-  risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
-  physiology: { label: 'Physiology', color: 'bg-blue-100 text-blue-700' },
-  complications: { label: 'Complications', color: 'bg-orange-100 text-orange-700' },
-  solutions: { label: 'Lifestyle Solutions', color: 'bg-green-100 text-green-700' },
-  additional_factors: { label: 'Additional Factors', color: 'bg-purple-100 text-purple-700' },
-  scripture: { label: 'Scripture / SOP', color: 'bg-indigo-100 text-indigo-700' },
-  research_ideas: { label: 'Research Ideas', color: 'bg-teal-100 text-teal-700' },
-};
-
 const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDelete }) => {
+  const { t } = useTranslation(['conditions', 'common']);
+
+  const SECTION_TYPES = {
+    risk_factors: { labelKey: 'conditions:sections.types.riskFactors', color: 'bg-red-100 text-red-700' },
+    physiology: { labelKey: 'conditions:sections.types.physiology', color: 'bg-blue-100 text-blue-700' },
+    complications: { labelKey: 'conditions:sections.types.complications', color: 'bg-orange-100 text-orange-700' },
+    solutions: { labelKey: 'conditions:sections.types.solutions', color: 'bg-green-100 text-green-700' },
+    additional_factors: { labelKey: 'conditions:sections.types.additionalFactors', color: 'bg-purple-100 text-purple-700' },
+    scripture: { labelKey: 'conditions:sections.types.scripture', color: 'bg-indigo-100 text-indigo-700' },
+    research_ideas: { labelKey: 'conditions:sections.types.researchIdeas', color: 'bg-teal-100 text-teal-700' },
+  };
   const { canEdit } = useAuth();
   const [condition, setCondition] = useState(null);
   const [sections, setSections] = useState([]);
@@ -76,7 +78,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
       setInfographics(data.infographics || []);
     } catch (error) {
       console.error('Error fetching condition:', error);
-      toast.error('Failed to load condition');
+      toast.error(t('conditions:toast.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -89,10 +91,10 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
     try {
       await api.delete(`${apiEndpoints.conditionSectionsAdmin}/${sectionId}`);
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
-      toast.success('Section deleted');
+      toast.success(t('conditions:sections.toast.deleted'));
     } catch (error) {
       console.error('Error deleting section:', error);
-      toast.error('Failed to delete section');
+      toast.error(t('conditions:detail.deleteSectionFailed'));
     }
   };
 
@@ -103,10 +105,10 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
     try {
       await api.delete(apiEndpoints.attachConditionIntervention(conditionId, interventionId));
       setInterventions((prev) => prev.filter((i) => i.id !== interventionId));
-      toast.success('Intervention removed');
+      toast.success(t('conditions:detail.interventionRemoved'));
     } catch (error) {
       console.error('Error detaching intervention:', error);
-      toast.error('Failed to remove intervention');
+      toast.error(t('conditions:detail.removeInterventionFailed'));
     }
   };
 
@@ -117,10 +119,10 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
     try {
       await api.delete(apiEndpoints.attachConditionScripture(conditionId, scriptureId));
       setScriptures((prev) => prev.filter((s) => s.id !== scriptureId));
-      toast.success('Scripture removed');
+      toast.success(t('conditions:detail.scriptureRemoved'));
     } catch (error) {
       console.error('Error detaching scripture:', error);
-      toast.error('Failed to remove scripture');
+      toast.error(t('conditions:detail.removeScriptureFailed'));
     }
   };
 
@@ -131,10 +133,10 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
     try {
       await api.delete(apiEndpoints.attachConditionRecipe(conditionId, recipeId));
       setRecipes((prev) => prev.filter((r) => r.id !== recipeId));
-      toast.success('Recipe removed');
+      toast.success(t('conditions:detail.recipeRemoved'));
     } catch (error) {
       console.error('Error detaching recipe:', error);
-      toast.error('Failed to remove recipe');
+      toast.error(t('conditions:detail.removeRecipeFailed'));
     }
   };
 
@@ -145,10 +147,10 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
     try {
       await api.delete(apiEndpoints.attachConditionEgwReference(conditionId, egwReferenceId));
       setEgwReferences((prev) => prev.filter((e) => e.id !== egwReferenceId));
-      toast.success('EGW reference removed');
+      toast.success(t('conditions:detail.egwRemoved'));
     } catch (error) {
       console.error('Error detaching EGW reference:', error);
-      toast.error('Failed to remove EGW reference');
+      toast.error(t('conditions:detail.removeEgwFailed'));
     }
   };
 
@@ -162,7 +164,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
       });
     } catch (error) {
       console.error('Error reordering interventions:', error);
-      toast.error('Failed to reorder interventions');
+      toast.error(t('conditions:detail.reorderFailed'));
       setInterventions(previousOrder);
     }
   };
@@ -192,12 +194,12 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
   };
 
   const tabs = [
-    { id: 'sections', label: 'Sections', icon: FileText, count: sections.length },
-    { id: 'interventions', label: 'Interventions', icon: Stethoscope, count: interventions.length },
-    { id: 'scriptures', label: 'Scriptures', icon: BookOpen, count: scriptures.length },
-    { id: 'egw', label: 'EGW', icon: BookMarked, count: egwReferences.length },
-    { id: 'recipes', label: 'Recipes', icon: ChefHat, count: recipes.length },
-    { id: 'infographics', label: 'Images', icon: Image, count: infographics.length },
+    { id: 'sections', labelKey: 'conditions:detail.sections', icon: FileText, count: sections.length },
+    { id: 'interventions', labelKey: 'conditions:detail.interventions', icon: Stethoscope, count: interventions.length },
+    { id: 'scriptures', labelKey: 'conditions:detail.scriptures', icon: BookOpen, count: scriptures.length },
+    { id: 'egw', labelKey: 'conditions:detail.egwShort', icon: BookMarked, count: egwReferences.length },
+    { id: 'recipes', labelKey: 'recipes:title', icon: ChefHat, count: recipes.length },
+    { id: 'infographics', labelKey: 'common:labels.images', icon: Image, count: infographics.length },
   ];
 
   return (
@@ -205,7 +207,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
       <SlideOver
         isOpen={isOpen}
         onClose={onClose}
-        title={loading ? 'Loading...' : condition?.name || 'Condition Details'}
+        title={loading ? t('common:messages.loading') : condition?.name || t('conditions:detail.title')}
         subtitle={condition?.category}
         size="xl"
       >
@@ -223,7 +225,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                 onClick={onClose}
               >
                 <ExternalLink className="w-4 h-4" />
-                Full Page
+                {t('conditions:detail.fullPage')}
               </Link>
               <Link
                 to={`/conditions/${conditionId}/preview`}
@@ -231,7 +233,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                 onClick={onClose}
               >
                 <Eye className="w-4 h-4" />
-                Preview
+                {t('conditions:preview.title')}
               </Link>
               <Link
                 to={`/knowledge-graph/condition/${conditionId}`}
@@ -239,7 +241,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                 onClick={onClose}
               >
                 <Network className="w-4 h-4" />
-                Graph
+                {t('conditions:detail.graph')}
               </Link>
               <a
                 href={`${getApiBaseUrl()}/api/v1/export/conditions/${conditionId}/pdf`}
@@ -260,14 +262,14 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                     className="btn-outline flex items-center gap-2 text-sm"
                   >
                     <Edit className="w-4 h-4" />
-                    Edit
+                    {t('common:buttons.edit')}
                   </button>
                   <button
                     onClick={() => onDelete(conditionId, condition.name)}
                     className="btn-outline text-red-600 border-red-200 hover:bg-red-50 flex items-center gap-2 text-sm"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Delete
+                    {t('common:buttons.delete')}
                   </button>
                 </>
               )}
@@ -276,7 +278,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
             {/* Summary */}
             {condition.summary && (
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Summary</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">{t('common:labels.summary')}</h3>
                 <p className="text-gray-600 text-sm whitespace-pre-wrap">{condition.summary}</p>
               </div>
             )}
@@ -298,7 +300,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                     }`}
                   >
                     <tab.icon className="w-4 h-4" />
-                    {tab.label}
+                    {t(tab.labelKey)}
                     <span
                       className={`px-1.5 py-0.5 rounded-full text-xs ${
                         activeTab === tab.id
@@ -325,13 +327,13 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                       onClick={onClose}
                     >
                       <Plus className="w-4 h-4" />
-                      Add Section
+                      {t('conditions:detail.addSection')}
                     </Link>
                   )}
                   {sections.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <FileText className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No sections added yet</p>
+                      <p className="text-sm">{t('conditions:detail.noSections')}</p>
                     </div>
                   ) : (
                     sections
@@ -345,7 +347,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                                   SECTION_TYPES[section.section_type]?.color || 'bg-gray-100 text-gray-700'
                                 }`}
                               >
-                                {SECTION_TYPES[section.section_type]?.label || section.section_type}
+                                {SECTION_TYPES[section.section_type]?.labelKey ? t(SECTION_TYPES[section.section_type].labelKey) : section.section_type}
                               </span>
                               <span className="font-medium text-gray-900 text-sm">{section.title}</span>
                             </div>
@@ -388,7 +390,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                       className="btn-primary flex items-center justify-center gap-2 text-sm w-full"
                     >
                       <Plus className="w-4 h-4" />
-                      Attach Intervention
+                      {t('conditions:attach.intervention')}
                     </button>
                   )}
                   <SortableInterventionList
@@ -410,13 +412,13 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                       className="btn-primary flex items-center justify-center gap-2 text-sm w-full"
                     >
                       <Plus className="w-4 h-4" />
-                      Attach Scripture
+                      {t('conditions:attach.scripture')}
                     </button>
                   )}
                   {scriptures.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <BookOpen className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No scriptures linked yet</p>
+                      <p className="text-sm">{t('conditions:detail.noScriptures')}</p>
                     </div>
                   ) : (
                     scriptures.map((scripture) => (
@@ -453,13 +455,13 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                       className="btn-primary flex items-center justify-center gap-2 text-sm w-full"
                     >
                       <Plus className="w-4 h-4" />
-                      Attach EGW Reference
+                      {t('conditions:attach.egwReference')}
                     </button>
                   )}
                   {egwReferences.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <BookMarked className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No EGW references linked yet</p>
+                      <p className="text-sm">{t('conditions:detail.noEgwReferences')}</p>
                     </div>
                   ) : (
                     egwReferences.map((egwRef) => (
@@ -498,13 +500,13 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                       className="btn-primary flex items-center justify-center gap-2 text-sm w-full"
                     >
                       <Plus className="w-4 h-4" />
-                      Attach Recipe
+                      {t('conditions:attach.recipe')}
                     </button>
                   )}
                   {recipes.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <ChefHat className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No recipes linked yet</p>
+                      <p className="text-sm">{t('conditions:detail.noRecipes')}</p>
                     </div>
                   ) : (
                     recipes.map((recipe) => (
@@ -586,7 +588,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                   {!canEdit && infographics.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                       <Image className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No infographics generated yet</p>
+                      <p className="text-sm">{t('conditions:detail.noInfographics')}</p>
                     </div>
                   )}
                 </div>
@@ -595,7 +597,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
-            <p>Condition not found</p>
+            <p>{t('conditions:detail.notFound')}</p>
           </div>
         )}
       </SlideOver>

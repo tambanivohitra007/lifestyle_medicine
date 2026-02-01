@@ -1,5 +1,6 @@
 import { Eye, Edit, Trash2, HeartPulse } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
 
 /**
@@ -10,6 +11,8 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {boolean} canEdit - Whether user has edit permissions
  */
 const ConditionList = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
+  const { t } = useTranslation(['conditions', 'common']);
+
   return (
     <div className="space-y-3">
       {conditions.map((condition) => (
@@ -75,9 +78,9 @@ const ConditionList = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
               {/* Footer */}
               <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
                 <span>
-                  Updated {condition.updated_at
+                  {t('common:labels.updatedAt')} {condition.updated_at
                     ? formatDistanceToNow(new Date(condition.updated_at), { addSuffix: true })
-                    : 'recently'}
+                    : t('common:time.justNow')}
                 </span>
               </div>
             </div>
