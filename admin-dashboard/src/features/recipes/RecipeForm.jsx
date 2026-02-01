@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Save, Loader2, Plus, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const RecipeForm = () => {
+  const { t } = useTranslation(['recipes', 'common']);
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -58,7 +60,7 @@ const RecipeForm = () => {
       });
     } catch (error) {
       console.error('Error fetching recipe:', error);
-      toast.error('Failed to load recipe');
+      toast.error(t('recipes:toast.loadError'));
       navigate('/recipes');
     } finally {
       setLoading(false);
@@ -68,7 +70,7 @@ const RecipeForm = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('common:validation.required', { field: t('common:labels.title') });
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -98,7 +100,7 @@ const RecipeForm = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error('Failed to save recipe');
+        toast.error(t('recipes:toast.updateError'));
       }
     } finally {
       setSaving(false);
@@ -160,18 +162,18 @@ const RecipeForm = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Recipes', href: '/recipes' },
-          { label: isEditing ? 'Edit Recipe' : 'New Recipe' },
+          { label: t('recipes:title'), href: '/recipes' },
+          { label: isEditing ? t('recipes:form.editTitle') : t('recipes:form.createTitle') },
         ]}
       />
 
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {isEditing ? 'Edit Recipe' : 'New Recipe'}
+          {isEditing ? t('recipes:form.editTitle') : t('recipes:form.createTitle')}
         </h1>
         <p className="text-gray-600 mt-1">
-          {isEditing ? 'Update the recipe details' : 'Add a new healthy recipe'}
+          {isEditing ? t('recipes:form.editSubtitle') : t('recipes:form.newSubtitle')}
         </p>
       </div>
 
@@ -180,7 +182,7 @@ const RecipeForm = () => {
           {/* Title */}
           <div>
             <label htmlFor="title" className="label">
-              Title <span className="text-red-500">*</span>
+              {t('recipes:form.title')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -189,7 +191,7 @@ const RecipeForm = () => {
               value={formData.title}
               onChange={handleChange}
               className={`input-field ${errors.title ? 'border-red-500' : ''}`}
-              placeholder="e.g., Mediterranean Quinoa Salad"
+              placeholder={t('recipes:form.titlePlaceholder')}
             />
             {errors.title && (
               <p className="mt-1 text-sm text-red-500">
@@ -201,7 +203,7 @@ const RecipeForm = () => {
           {/* Description */}
           <div>
             <label htmlFor="description" className="label">
-              Description
+              {t('recipes:form.description')}
             </label>
             <textarea
               id="description"
@@ -210,13 +212,13 @@ const RecipeForm = () => {
               onChange={handleChange}
               rows={3}
               className="input-field"
-              placeholder="A brief description of the recipe..."
+              placeholder={t('recipes:form.descriptionPlaceholder')}
             />
           </div>
 
           {/* Dietary Tags */}
           <div>
-            <label className="label">Dietary Tags</label>
+            <label className="label">{t('recipes:form.dietaryTags')}</label>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -224,7 +226,7 @@ const RecipeForm = () => {
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                 className="input-field flex-1"
-                placeholder="e.g., Vegan, Gluten-Free"
+                placeholder={t('recipes:form.dietaryTagsPlaceholder')}
               />
               <button
                 type="button"
@@ -259,7 +261,7 @@ const RecipeForm = () => {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label htmlFor="prep_time_minutes" className="label">
-                Prep Time (min)
+                {t('recipes:form.prepTime')}
               </label>
               <input
                 type="number"
@@ -273,7 +275,7 @@ const RecipeForm = () => {
             </div>
             <div>
               <label htmlFor="cook_time_minutes" className="label">
-                Cook Time (min)
+                {t('recipes:form.cookTime')}
               </label>
               <input
                 type="number"
@@ -287,7 +289,7 @@ const RecipeForm = () => {
             </div>
             <div>
               <label htmlFor="servings" className="label">
-                Servings
+                {t('recipes:form.servings')}
               </label>
               <input
                 type="number"
@@ -303,7 +305,7 @@ const RecipeForm = () => {
 
           {/* Ingredients */}
           <div>
-            <label className="label">Ingredients</label>
+            <label className="label">{t('recipes:form.ingredients')}</label>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -311,7 +313,7 @@ const RecipeForm = () => {
                 onChange={(e) => setNewIngredient(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIngredient())}
                 className="input-field flex-1"
-                placeholder="e.g., 1 cup quinoa"
+                placeholder={t('recipes:form.ingredientPlaceholder')}
               />
               <button
                 type="button"
@@ -345,7 +347,7 @@ const RecipeForm = () => {
           {/* Instructions */}
           <div>
             <label htmlFor="instructions" className="label">
-              Instructions
+              {t('recipes:form.instructions')}
             </label>
             <textarea
               id="instructions"
@@ -354,7 +356,7 @@ const RecipeForm = () => {
               onChange={handleChange}
               rows={6}
               className="input-field"
-              placeholder="Step-by-step cooking instructions..."
+              placeholder={t('recipes:form.instructionsPlaceholder')}
             />
           </div>
 
@@ -370,10 +372,10 @@ const RecipeForm = () => {
               ) : (
                 <Save className="w-5 h-5" />
               )}
-              {saving ? 'Saving...' : 'Save Recipe'}
+              {saving ? t('common:buttons.saving') : t('common:buttons.save')}
             </button>
             <Link to="/recipes" className="btn-outline">
-              Cancel
+              {t('common:buttons.cancel')}
             </Link>
           </div>
         </div>

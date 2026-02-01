@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, ChefHat, Clock, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
 
 /**
@@ -11,6 +12,8 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {boolean} canEdit - Whether user has edit permissions
  */
 const RecipeList = ({ recipes, onDelete, canEdit }) => {
+  const { t } = useTranslation(['recipes', 'common']);
+
   return (
     <div className="space-y-3">
       {recipes.map((recipe) => (
@@ -72,9 +75,9 @@ const RecipeList = ({ recipes, onDelete, canEdit }) => {
                     <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                       <Clock className="w-3 h-3" />
                       <span>
-                        {recipe.prep_time_minutes && `Prep: ${recipe.prep_time_minutes}min`}
+                        {recipe.prep_time_minutes && `${t('recipes:time.prep')}: ${recipe.prep_time_minutes}${t('recipes:time.minutes')}`}
                         {recipe.prep_time_minutes && recipe.cook_time_minutes && ' | '}
-                        {recipe.cook_time_minutes && `Cook: ${recipe.cook_time_minutes}min`}
+                        {recipe.cook_time_minutes && `${t('recipes:time.cook')}: ${recipe.cook_time_minutes}${t('recipes:time.minutes')}`}
                       </span>
                     </div>
                   )}
@@ -91,7 +94,7 @@ const RecipeList = ({ recipes, onDelete, canEdit }) => {
                   <Link
                     to={`/recipes/${recipe.id}`}
                     className="action-btn p-2 touch-manipulation"
-                    title="View Details"
+                    title={t('common:buttons.viewDetails')}
                   >
                     <Eye className="w-4 h-4 text-gray-600" />
                   </Link>
@@ -100,14 +103,14 @@ const RecipeList = ({ recipes, onDelete, canEdit }) => {
                       <Link
                         to={`/recipes/${recipe.id}/edit`}
                         className="action-btn p-2 touch-manipulation"
-                        title="Edit"
+                        title={t('common:buttons.edit')}
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
                       </Link>
                       <button
                         onClick={() => onDelete(recipe.id, recipe.title)}
                         className="action-btn p-2 touch-manipulation hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
+                        title={t('common:buttons.delete')}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
@@ -119,9 +122,9 @@ const RecipeList = ({ recipes, onDelete, canEdit }) => {
               {/* Footer */}
               <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
                 <span>
-                  Updated {recipe.updated_at
+                  {t('common:audit.updatedAt')} {recipe.updated_at
                     ? formatDistanceToNow(new Date(recipe.updated_at), { addSuffix: true })
-                    : 'recently'}
+                    : t('common:time.recently')}
                 </span>
               </div>
             </div>

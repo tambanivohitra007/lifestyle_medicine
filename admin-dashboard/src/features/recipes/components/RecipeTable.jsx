@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, Clock, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
 
 /**
@@ -12,6 +13,8 @@ import RichTextPreview from '../../../components/shared/RichTextPreview';
  * @param {boolean} canEdit - Whether user has edit permissions
  */
 const RecipeTable = ({ recipes, onDelete, canEdit }) => {
+  const { t } = useTranslation(['recipes', 'common']);
+
   return (
     <>
       {/* Mobile Card Layout */}
@@ -38,7 +41,7 @@ const RecipeTable = ({ recipes, onDelete, canEdit }) => {
                 <Link
                   to={`/recipes/${recipe.id}`}
                   className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
-                  title="View"
+                  title={t('common:buttons.view')}
                 >
                   <Eye className="w-4 h-4" />
                 </Link>
@@ -47,14 +50,14 @@ const RecipeTable = ({ recipes, onDelete, canEdit }) => {
                     <Link
                       to={`/recipes/${recipe.id}/edit`}
                       className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
-                      title="Edit"
+                      title={t('common:buttons.edit')}
                     >
                       <Edit className="w-4 h-4" />
                     </Link>
                     <button
                       onClick={() => onDelete(recipe.id, recipe.title)}
                       className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation"
-                      title="Delete"
+                      title={t('common:buttons.delete')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -87,7 +90,7 @@ const RecipeTable = ({ recipes, onDelete, canEdit }) => {
               </div>
             )}
             <div className="mt-2 text-xs text-gray-400">
-              Updated {recipe.updated_at
+              {t('common:audit.updatedAt')} {recipe.updated_at
                 ? formatDistanceToNow(new Date(recipe.updated_at), { addSuffix: true })
                 : '-'}
             </div>
@@ -102,22 +105,22 @@ const RecipeTable = ({ recipes, onDelete, canEdit }) => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
+                  {t('common:labels.title')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Dietary Tags
+                  {t('recipes:list.dietaryTags')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Times
+                  {t('recipes:list.times')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
+                  {t('common:labels.description')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Updated
+                  {t('common:labels.updatedAt')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('common:labels.actions')}
                 </th>
               </tr>
             </thead>
@@ -184,7 +187,7 @@ const RecipeTable = ({ recipes, onDelete, canEdit }) => {
                       <Link
                         to={`/recipes/${recipe.id}`}
                         className="action-btn"
-                        title="View Details"
+                        title={t('common:buttons.viewDetails')}
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
@@ -193,14 +196,14 @@ const RecipeTable = ({ recipes, onDelete, canEdit }) => {
                           <Link
                             to={`/recipes/${recipe.id}/edit`}
                             className="action-btn"
-                            title="Edit"
+                            title={t('common:buttons.edit')}
                           >
                             <Edit className="w-4 h-4 text-gray-600" />
                           </Link>
                           <button
                             onClick={() => onDelete(recipe.id, recipe.title)}
                             className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title="Delete"
+                            title={t('common:buttons.delete')}
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>

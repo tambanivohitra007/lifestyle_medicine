@@ -9,6 +9,7 @@ import {
   AlertCircle,
   Download,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
@@ -16,6 +17,7 @@ import AuditInfo from '../../components/shared/AuditInfo';
 import { useAuth } from '../../contexts/AuthContext';
 
 const RecipeDetail = () => {
+  const { t } = useTranslation(['recipes', 'common']);
   const { id } = useParams();
   const navigate = useNavigate();
   const { canEdit } = useAuth();
@@ -33,7 +35,7 @@ const RecipeDetail = () => {
       setRecipe(response.data.data);
     } catch (error) {
       console.error('Error fetching recipe:', error);
-      toast.error('Failed to load recipe');
+      toast.error(t('recipes:toast.loadError'));
       navigate('/recipes');
     } finally {
       setLoading(false);
@@ -46,11 +48,11 @@ const RecipeDetail = () => {
 
     try {
       await api.delete(`${apiEndpoints.recipesAdmin}/${id}`);
-      toast.success('Recipe deleted');
+      toast.success(t('recipes:toast.deleted'));
       navigate('/recipes');
     } catch (error) {
       console.error('Error deleting recipe:', error);
-      toast.error('Failed to delete recipe');
+      toast.error(t('recipes:toast.deleteError'));
     }
   };
 
@@ -67,10 +69,10 @@ const RecipeDetail = () => {
       <div className="card text-center py-12">
         <AlertCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Recipe not found
+          {t('recipes:detail.notFound')}
         </h3>
         <Link to="/recipes" className="text-primary-600 hover:text-primary-700">
-          Back to recipes
+          {t('recipes:detail.backToRecipes')}
         </Link>
       </div>
     );
@@ -84,7 +86,7 @@ const RecipeDetail = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Recipes', href: '/recipes' },
+          { label: t('recipes:title'), href: '/recipes' },
           { label: recipe.title },
         ]}
       />
@@ -114,7 +116,7 @@ const RecipeDetail = () => {
             className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-initial"
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Download PDF</span>
+            <span className="hidden sm:inline">{t('recipes:detail.downloadPdf')}</span>
             <span className="sm:hidden">PDF</span>
           </a>
           {canEdit && (
@@ -124,14 +126,14 @@ const RecipeDetail = () => {
                 className="btn-outline flex items-center justify-center gap-2 flex-1 sm:flex-initial"
               >
                 <Edit className="w-4 h-4" />
-                Edit
+                {t('common:buttons.edit')}
               </Link>
               <button
                 onClick={handleDelete}
                 className="btn-outline text-red-600 border-red-200 hover:bg-red-50 active:bg-red-100 flex items-center justify-center gap-2 flex-1 sm:flex-initial touch-manipulation"
               >
                 <Trash2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Delete</span>
+                <span className="hidden sm:inline">{t('common:buttons.delete')}</span>
               </button>
             </>
           )}
@@ -146,9 +148,9 @@ const RecipeDetail = () => {
               <Clock className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Prep Time</p>
+              <p className="text-sm text-gray-500">{t('recipes:detail.prepTime')}</p>
               <p className="font-semibold text-gray-900">
-                {recipe.prep_time_minutes} min
+                {recipe.prep_time_minutes} {t('recipes:time.minutes')}
               </p>
             </div>
           </div>
@@ -160,9 +162,9 @@ const RecipeDetail = () => {
               <ChefHat className="w-6 h-6 text-orange-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Cook Time</p>
+              <p className="text-sm text-gray-500">{t('recipes:detail.cookTime')}</p>
               <p className="font-semibold text-gray-900">
-                {recipe.cook_time_minutes} min
+                {recipe.cook_time_minutes} {t('recipes:time.minutes')}
               </p>
             </div>
           </div>
@@ -174,7 +176,7 @@ const RecipeDetail = () => {
               <Users className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Servings</p>
+              <p className="text-sm text-gray-500">{t('recipes:detail.servings')}</p>
               <p className="font-semibold text-gray-900">{recipe.servings}</p>
             </div>
           </div>
@@ -184,7 +186,7 @@ const RecipeDetail = () => {
       {/* Description */}
       {recipe.description && (
         <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Description</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">{t('recipes:detail.description')}</h2>
           <p className="text-gray-600">{recipe.description}</p>
         </div>
       )}
@@ -194,7 +196,7 @@ const RecipeDetail = () => {
         {recipe.ingredients && recipe.ingredients.length > 0 && (
           <div className="card">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Ingredients
+              {t('recipes:detail.ingredients')}
             </h2>
             <ul className="space-y-2">
               {recipe.ingredients.map((ingredient, idx) => (
@@ -222,7 +224,7 @@ const RecipeDetail = () => {
         {recipe.instructions && (
           <div className="card">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Instructions
+              {t('recipes:detail.instructions')}
             </h2>
             <div className="text-gray-700 whitespace-pre-wrap">
               {recipe.instructions}
@@ -240,12 +242,12 @@ const RecipeDetail = () => {
         !recipe.instructions && (
           <div className="card text-center py-8">
             <ChefHat className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-600">No recipe details added yet</p>
+            <p className="text-gray-600">{t('recipes:detail.noDetails')}</p>
             <Link
               to={`/recipes/${id}/edit`}
               className="text-primary-600 hover:text-primary-700 text-sm mt-2 inline-block"
             >
-              Add details
+              {t('recipes:detail.addDetails')}
             </Link>
           </div>
         )}

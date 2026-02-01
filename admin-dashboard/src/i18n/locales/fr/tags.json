@@ -8,7 +8,8 @@
     "addNew": "Ajouter une étiquette",
     "searchPlaceholder": "Rechercher des étiquettes...",
     "filterByType": "Filtrer par type",
-    "allTypes": "Tous les types"
+    "allTypes": "Tous les types",
+    "allTags": "Toutes les étiquettes"
   },
   "detail": {
     "title": "Détails de l'étiquette",

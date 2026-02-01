@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, ChefHat, Edit, Trash2, Eye, Clock, Tag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -12,6 +13,7 @@ import RichTextPreview from '../../components/shared/RichTextPreview';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Recipes = () => {
+  const { t } = useTranslation(['recipes', 'common', 'tags']);
   const { canEdit } = useAuth();
   const [recipes, setRecipes] = useState([]);
   const [contentTags, setContentTags] = useState([]);
@@ -85,11 +87,11 @@ const Recipes = () => {
 
     try {
       await api.delete(`${apiEndpoints.recipesAdmin}/${id}`);
-      toast.success('Recipe deleted');
+      toast.success(t('recipes:toast.deleted'));
       fetchRecipes();
     } catch (error) {
       console.error('Error deleting recipe:', error);
-      toast.error('Failed to delete recipe');
+      toast.error(t('recipes:toast.deleteError'));
     }
   };
 
@@ -103,15 +105,15 @@ const Recipes = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Recipes</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('recipes:list.title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage healthy recipes for dietary interventions
+            {t('recipes:list.subtitle')}
           </p>
         </div>
         {canEdit && (
           <Link to="/recipes/new" className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
             <Plus className="w-5 h-5" />
-            Add Recipe
+            {t('recipes:list.addNew')}
           </Link>
         )}
       </div>
@@ -124,7 +126,7 @@ const Recipes = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search recipes..."
+              placeholder={t('recipes:list.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -136,7 +138,7 @@ const Recipes = () => {
             onChange={(e) => setTagFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Dietary Tags</option>
+            <option value="">{t('recipes:list.allDietaryTags')}</option>
             {allTags.map((tag) => (
               <option key={tag} value={tag}>
                 {tag}
@@ -149,7 +151,7 @@ const Recipes = () => {
             onChange={(e) => setContentTagFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Content Tags</option>
+            <option value="">{t('tags:list.allTags')}</option>
             {contentTags.map((tag) => (
               <option key={tag.id} value={tag.id}>
                 {tag.name}
@@ -162,7 +164,7 @@ const Recipes = () => {
       {/* View Mode Toggle Bar */}
       <div className="flex items-center justify-between gap-3 bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200">
         <div className="text-xs sm:text-sm text-gray-500">
-          {pagination.total} {pagination.total === 1 ? 'recipe' : 'recipes'}
+          {pagination.total} {pagination.total === 1 ? t('recipes:singular') : t('recipes:plural')}
         </div>
         <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
       </div>
@@ -178,15 +180,15 @@ const Recipes = () => {
         <div className="card text-center py-8 sm:py-12">
           <ChefHat className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No recipes found
+            {t('recipes:empty.title')}
           </h3>
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Get started by adding healthy recipes.
+            {t('recipes:empty.description')}
           </p>
           {canEdit && (
             <Link to="/recipes/new" className="btn-primary inline-flex items-center gap-2">
               <Plus className="w-5 h-5" />
-              Add Recipe
+              {t('recipes:empty.action')}
             </Link>
           )}
         </div>
@@ -208,7 +210,7 @@ const Recipes = () => {
                       <Link
                         to={`/recipes/${recipe.id}`}
                         className="action-btn"
-                        title="View"
+                        title={t('common:buttons.view')}
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </Link>
@@ -217,14 +219,14 @@ const Recipes = () => {
                           <Link
                             to={`/recipes/${recipe.id}/edit`}
                             className="action-btn"
-                            title="Edit"
+                            title={t('common:buttons.edit')}
                           >
                             <Edit className="w-4 h-4 text-gray-600" />
                           </Link>
                           <button
                             onClick={() => handleDelete(recipe.id, recipe.title)}
                             className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title="Delete"
+                            title={t('common:buttons.delete')}
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
@@ -249,7 +251,7 @@ const Recipes = () => {
                       ))}
                       {recipe.dietary_tags.length > 3 && (
                         <span className="text-xs text-gray-500">
-                          +{recipe.dietary_tags.length - 3} more
+                          +{recipe.dietary_tags.length - 3}
                         </span>
                       )}
                     </div>
@@ -276,9 +278,9 @@ const Recipes = () => {
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-3">
                       <Clock className="w-4 h-4 flex-shrink-0" />
                       <span>
-                        {recipe.prep_time_minutes && `Prep: ${recipe.prep_time_minutes}min`}
+                        {recipe.prep_time_minutes && `${t('recipes:time.prep')}: ${recipe.prep_time_minutes}${t('recipes:time.minutes')}`}
                         {recipe.prep_time_minutes && recipe.cook_time_minutes && ' | '}
-                        {recipe.cook_time_minutes && `Cook: ${recipe.cook_time_minutes}min`}
+                        {recipe.cook_time_minutes && `${t('recipes:time.cook')}: ${recipe.cook_time_minutes}${t('recipes:time.minutes')}`}
                       </span>
                     </div>
                   )}
@@ -294,7 +296,7 @@ const Recipes = () => {
                       to={`/recipes/${recipe.id}`}
                       className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
                     >
-                      View Recipe →
+                      {t('recipes:detail.viewRecipe')} →
                     </Link>
                   </div>
                 </div>

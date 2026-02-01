@@ -8,7 +8,8 @@
     "addNew": "Add Tag",
     "searchPlaceholder": "Search tags...",
     "filterByType": "Filter by type",
-    "allTypes": "All types"
+    "allTypes": "All types",
+    "allTags": "All Content Tags"
   },
   "detail": {
     "title": "Tag Details",
