@@ -52,4 +52,11 @@ return [
         'default_bible_id' => env('BIBLE_API_DEFAULT_ID', 'de4e12af7f28f599-02'), // KJV
     ],
 
+    'vertex_ai' => [
+        'project_id' => env('VERTEX_AI_PROJECT_ID'),
+        'location' => env('VERTEX_AI_LOCATION', 'us-central1'),
+        'credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
+        'imagen_model' => env('VERTEX_AI_IMAGEN_MODEL', 'imagen-4.0-fast-generate-001'),
+    ],
+
 ];

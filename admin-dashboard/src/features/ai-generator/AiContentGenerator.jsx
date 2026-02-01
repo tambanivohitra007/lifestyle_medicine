@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import { Sparkles, AlertCircle, CheckCircle, Image } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { useNotifications } from '../../contexts/NotificationContext';
 import ConditionInput from './components/ConditionInput';
 import DraftReview from './components/DraftReview';
 import StructuredPreview from './components/StructuredPreview';
 import ImportProgress from './components/ImportProgress';
+import InfographicGenerator from './components/InfographicGenerator';
 
 const PHASES = {
   INPUT: 'input',
@@ -13,6 +14,7 @@ const PHASES = {
   STRUCTURED: 'structured',
   IMPORTING: 'importing',
   COMPLETE: 'complete',
+  INFOGRAPHICS: 'infographics',
 };
 
 const AiContentGenerator = () => {
@@ -318,7 +320,7 @@ const AiContentGenerator = () => {
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-6">
                 <button
                   onClick={handleReset}
                   className="px-4 sm:px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 text-sm sm:text-base order-2 sm:order-1"
@@ -334,6 +336,59 @@ const AiContentGenerator = () => {
                   </a>
                 )}
               </div>
+
+              {/* Optional Phase 4: Infographics */}
+              {importResult?.condition_id && (
+                <div className="border-t border-gray-200 pt-6 mt-6">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Image className="w-5 h-5 text-purple-600" />
+                    <h3 className="font-semibold text-gray-900">Optional: Generate Infographics</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Create AI-generated visual summaries for this condition using Google Vertex AI Imagen.
+                  </p>
+                  <button
+                    onClick={() => setPhase(PHASES.INFOGRAPHICS)}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 text-sm"
+                  >
+                    Generate Infographics
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {phase === PHASES.INFOGRAPHICS && importResult?.condition_id && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setPhase(PHASES.COMPLETE)}
+                className="text-sm text-gray-600 hover:text-gray-900"
+              >
+                Back to Summary
+              </button>
+              <a
+                href={`/conditions/${importResult.condition_id}`}
+                className="text-sm text-primary-600 hover:text-primary-700"
+              >
+                View Condition
+              </a>
+            </div>
+            <InfographicGenerator
+              conditionId={importResult.condition_id}
+              conditionName={conditionName}
+              onComplete={() => {
+                // Optionally redirect or show success message
+              }}
+            />
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 text-sm"
+              >
+                Generate Another Condition
+              </button>
             </div>
           </div>
         )}

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasAuditFields;
+use App\Models\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Condition extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, HasAuditFields;
+    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, HasMedia;
 
     protected $fillable = [
         'name',
@@ -74,5 +75,21 @@ class Condition extends Model
         return $this->belongsToMany(EgwReference::class, 'condition_egw_reference')
             ->withPivot(['created_by', 'deleted_by'])
             ->withTimestamps();
+    }
+
+    /**
+     * Get the infographic generation requests for this condition.
+     */
+    public function infographicRequests(): HasMany
+    {
+        return $this->hasMany(InfographicGenerationRequest::class);
+    }
+
+    /**
+     * Get infographics (media items of type 'infographic').
+     */
+    public function infographics()
+    {
+        return $this->media()->where('type', 'infographic');
     }
 }

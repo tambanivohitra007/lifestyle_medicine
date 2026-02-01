@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ScriptureController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\MediaController;
+use App\Http\Controllers\Api\InfographicController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -177,6 +178,13 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin'])->group(fun
         Route::post('ai/generate-draft', [AiContentController::class, 'generateDraft']);
         Route::post('ai/structure-content', [AiContentController::class, 'structureContent']);
         Route::post('ai/import-content', [AiContentController::class, 'importContent']);
+
+        // Infographic Generation (admin only)
+        Route::get('infographics/status', [InfographicController::class, 'status']);
+        Route::post('conditions/{condition}/infographics/generate', [InfographicController::class, 'generate']);
+        Route::get('conditions/{condition}/infographics/status', [InfographicController::class, 'getStatus']);
+        Route::get('conditions/{condition}/infographics', [InfographicController::class, 'index']);
+        Route::post('infographics/{infographic}/retry', [InfographicController::class, 'retry']);
     });
 
     // Analytics (admin only)

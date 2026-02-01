@@ -48,7 +48,9 @@
       "Bash(more:*)",
       "WebSearch",
       "Bash(dir \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\\\\bootstrap\\\\cache\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm run lint)",
+      "Bash(npx eslint:*)"
     ]
   }
 }

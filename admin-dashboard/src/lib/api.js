@@ -214,6 +214,13 @@ export const apiEndpoints = {
   aiStructureContent: '/admin/ai/structure-content',
   aiImportContent: '/admin/ai/import-content',
 
+  // Infographic Generation
+  infographicsStatus: '/admin/infographics/status',
+  conditionInfographicsGenerate: (id) => `/admin/conditions/${id}/infographics/generate`,
+  conditionInfographicsStatus: (id) => `/admin/conditions/${id}/infographics/status`,
+  conditionInfographics: (id) => `/admin/conditions/${id}/infographics`,
+  infographicRetry: (id) => `/admin/infographics/${id}/retry`,
+
   // Bible Explorer API
   bibleLookup: '/bible/lookup',
   bibleSearch: '/bible/search',

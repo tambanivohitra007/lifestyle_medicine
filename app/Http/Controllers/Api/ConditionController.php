@@ -79,6 +79,7 @@ class ConditionController extends Controller
             'scriptures',
             'recipes',
             'egwReferences',
+            'media' => fn($q) => $q->where('type', 'infographic'),
             'creator',
             'updater',
         ]);
@@ -91,6 +92,13 @@ class ConditionController extends Controller
                 'scriptures' => ScriptureResource::collection($condition->scriptures),
                 'recipes' => RecipeResource::collection($condition->recipes),
                 'egw_references' => EgwReferenceResource::collection($condition->egwReferences),
+                'infographics' => $condition->media->map(fn($media) => [
+                    'id' => $media->id,
+                    'url' => $media->url,
+                    'alt_text' => $media->alt_text,
+                    'caption' => $media->caption,
+                    'created_at' => $media->created_at,
+                ]),
             ],
         ]);
     }

@@ -14,6 +14,7 @@ import {
   Eye,
   Download,
   Network,
+  Image,
 } from 'lucide-react';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete, confirmRemove } from '../../lib/swal';
@@ -27,6 +28,7 @@ import {
   EditInterventionMapping,
   SortableInterventionList,
 } from '../../components/relationships';
+import InfographicGenerator from '../ai-generator/components/InfographicGenerator';
 
 const SECTION_TYPES = {
   risk_factors: { label: 'Risk Factors / Causes', color: 'bg-red-100 text-red-700' },
@@ -98,6 +100,7 @@ const ConditionDetail = () => {
   const [scriptures, setScriptures] = useState([]);
   const [egwReferences, setEgwReferences] = useState([]);
   const [recipes, setRecipes] = useState([]);
+  const [infographics, setInfographics] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
@@ -127,6 +130,7 @@ const ConditionDetail = () => {
       setScriptures(data.scriptures || []);
       setEgwReferences(data.egw_references || []);
       setRecipes(data.recipes || []);
+      setInfographics(data.infographics || []);
       setCareDomains(careDomainsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching condition:', error);
@@ -291,6 +295,7 @@ const ConditionDetail = () => {
     { id: 'scriptures', label: 'Scriptures', icon: BookOpen, count: scriptures.length },
     { id: 'egw', label: 'EGW Writings', icon: BookMarked, count: egwReferences.length },
     { id: 'recipes', label: 'Recipes', icon: ChefHat, count: recipes.length },
+    { id: 'infographics', label: 'Infographics', icon: Image, count: infographics.length },
   ];
 
   return (
@@ -724,6 +729,59 @@ const ConditionDetail = () => {
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Infographics Tab */}
+        {activeTab === 'infographics' && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-gray-900">Infographics</h2>
+            </div>
+
+            {/* Show existing infographics */}
+            {infographics.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {infographics.map((media) => (
+                  <div key={media.id} className="card hover:shadow-md transition-shadow">
+                    <a
+                      href={media.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <img
+                        src={media.url}
+                        alt={media.alt_text || 'Infographic'}
+                        className="w-full h-48 object-cover rounded-lg mb-2"
+                      />
+                    </a>
+                    {media.caption && (
+                      <p className="text-sm text-gray-600">{media.caption}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Infographic Generator */}
+            {canEdit && (
+              <InfographicGenerator
+                conditionId={id}
+                conditionName={condition?.name}
+                onComplete={() => {
+                  // Refresh infographics after generation
+                  fetchConditionData();
+                }}
+              />
+            )}
+
+            {!canEdit && infographics.length === 0 && (
+              <div className="card text-center py-8">
+                <Image className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600">No infographics generated yet</p>
               </div>
             )}
           </div>
