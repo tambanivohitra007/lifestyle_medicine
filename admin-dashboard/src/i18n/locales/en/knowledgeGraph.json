@@ -9,7 +9,14 @@
     "fullscreen": "Fullscreen",
     "exitFullscreen": "Exit Fullscreen",
     "layout": "Layout",
-    "filter": "Filter"
+    "filter": "Filter",
+    "backTo": "Back to {{name}}",
+    "showUI": "Show UI",
+    "hideUI": "Hide UI",
+    "hideUITooltip": "Hide UI (show only graph)",
+    "depth": "Depth",
+    "resetLayout": "Reset Layout",
+    "resetLayoutTooltip": "Reset to default layout"
   },
   "layout": {
     "hierarchical": "Hierarchical",
@@ -26,7 +33,19 @@
     "showScriptures": "Show Scriptures",
     "showCareDomains": "Show Care Domains",
     "byDomain": "By Domain",
-    "allDomains": "All Domains"
+    "allDomains": "All Domains",
+    "showAll": "Show All",
+    "hideAll": "Hide All"
+  },
+  "nodeTypes": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "careDomains": "Care Domains",
+    "scriptures": "Scriptures",
+    "egwReferences": "EGW References",
+    "recipes": "Recipes",
+    "evidence": "Evidence",
+    "references": "References"
   },
   "nodes": {
     "condition": "Condition",
@@ -35,7 +54,8 @@
     "evidence": "Evidence",
     "scripture": "Scripture",
     "careDomain": "Care Domain",
-    "reference": "Reference"
+    "reference": "Reference",
+    "egwReference": "EGW Reference"
   },
   "edges": {
     "treats": "treats",
@@ -51,7 +71,24 @@
     "incomingLinks": "Incoming Links",
     "outgoingLinks": "Outgoing Links",
     "viewDetails": "View Full Details",
-    "noSelection": "Select a node to see details"
+    "noSelection": "Select a node to see details",
+    "category": "Category",
+    "summary": "Summary",
+    "careDomain": "Care Domain",
+    "mechanism": "Mechanism",
+    "theme": "Theme",
+    "text": "Text",
+    "book": "Book",
+    "topic": "Topic",
+    "quote": "Quote",
+    "dietaryTags": "Dietary Tags",
+    "description": "Description",
+    "studyType": "Study Type",
+    "quality": "Quality",
+    "population": "Population",
+    "year": "Year",
+    "citation": "Citation",
+    "links": "Links"
   },
   "search": {
     "placeholder": "Search nodes...",
@@ -61,7 +98,9 @@
     "totalNodes": "Total Nodes",
     "totalEdges": "Total Connections",
     "conditions": "Conditions",
-    "interventions": "Interventions"
+    "interventions": "Interventions",
+    "nodes": "Nodes",
+    "edges": "Edges"
   },
   "export": {
     "title": "Export Graph",
@@ -69,12 +108,28 @@
     "asSvg": "Export as SVG",
     "asJson": "Export as JSON"
   },
+  "shortcuts": {
+    "title": "Shortcuts",
+    "saveAsPng": "Save as PNG",
+    "resetZoom": "Reset zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fitToView": "Fit to view",
+    "hierarchicalLayout": "Hierarchical layout",
+    "radialLayout": "Radial layout",
+    "clusterLayout": "Cluster layout",
+    "clearSelection": "Clear selection"
+  },
   "empty": {
     "title": "No data to display",
     "description": "Add content to see the knowledge graph"
   },
   "loading": {
-    "title": "Loading graph...",
+    "title": "Loading knowledge graph...",
     "processing": "Processing relationships..."
+  },
+  "error": {
+    "title": "Error loading graph",
+    "retry": "Retry"
   }
 }

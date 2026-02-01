@@ -1,15 +1,22 @@
 {
   "title": "Graphe de connaissances",
-  "subtitle": "Représentation visuelle des relations de contenu",
+  "subtitle": "Représentation visuelle des relations entre les contenus",
   "controls": {
     "zoomIn": "Zoom avant",
     "zoomOut": "Zoom arrière",
-    "fitView": "Ajuster la vue",
+    "fitView": "Ajuster à la vue",
     "resetView": "Réinitialiser la vue",
     "fullscreen": "Plein écran",
     "exitFullscreen": "Quitter le plein écran",
     "layout": "Disposition",
-    "filter": "Filtrer"
+    "filter": "Filtrer",
+    "backTo": "Retour à {{name}}",
+    "showUI": "Afficher l'interface",
+    "hideUI": "Masquer l'interface",
+    "hideUITooltip": "Masquer l'interface (afficher uniquement le graphe)",
+    "depth": "Profondeur",
+    "resetLayout": "Réinitialiser la disposition",
+    "resetLayoutTooltip": "Réinitialiser à la disposition par défaut"
   },
   "layout": {
     "hierarchical": "Hiérarchique",
@@ -23,10 +30,22 @@
     "showInterventions": "Afficher les interventions",
     "showRecipes": "Afficher les recettes",
     "showEvidence": "Afficher les preuves",
-    "showScriptures": "Afficher les Écritures",
+    "showScriptures": "Afficher les écritures",
     "showCareDomains": "Afficher les domaines de soins",
     "byDomain": "Par domaine",
-    "allDomains": "Tous les domaines"
+    "allDomains": "Tous les domaines",
+    "showAll": "Tout afficher",
+    "hideAll": "Tout masquer"
+  },
+  "nodeTypes": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "careDomains": "Domaines de soins",
+    "scriptures": "Écritures",
+    "egwReferences": "Références EGW",
+    "recipes": "Recettes",
+    "evidence": "Preuves",
+    "references": "Références"
   },
   "nodes": {
     "condition": "Condition",
@@ -35,7 +54,8 @@
     "evidence": "Preuve",
     "scripture": "Écriture",
     "careDomain": "Domaine de soins",
-    "reference": "Référence"
+    "reference": "Référence",
+    "egwReference": "Référence EGW"
   },
   "edges": {
     "treats": "traite",
@@ -51,7 +71,24 @@
     "incomingLinks": "Liens entrants",
     "outgoingLinks": "Liens sortants",
     "viewDetails": "Voir les détails complets",
-    "noSelection": "Sélectionnez un nœud pour voir les détails"
+    "noSelection": "Sélectionnez un nœud pour voir les détails",
+    "category": "Catégorie",
+    "summary": "Résumé",
+    "careDomain": "Domaine de soins",
+    "mechanism": "Mécanisme",
+    "theme": "Thème",
+    "text": "Texte",
+    "book": "Livre",
+    "topic": "Sujet",
+    "quote": "Citation",
+    "dietaryTags": "Étiquettes diététiques",
+    "description": "Description",
+    "studyType": "Type d'étude",
+    "quality": "Qualité",
+    "population": "Population",
+    "year": "Année",
+    "citation": "Citation",
+    "links": "Liens"
   },
   "search": {
     "placeholder": "Rechercher des nœuds...",
@@ -61,7 +98,9 @@
     "totalNodes": "Total des nœuds",
     "totalEdges": "Total des connexions",
     "conditions": "Conditions",
-    "interventions": "Interventions"
+    "interventions": "Interventions",
+    "nodes": "Nœuds",
+    "edges": "Connexions"
   },
   "export": {
     "title": "Exporter le graphe",
@@ -69,12 +108,28 @@
     "asSvg": "Exporter en SVG",
     "asJson": "Exporter en JSON"
   },
+  "shortcuts": {
+    "title": "Raccourcis",
+    "saveAsPng": "Enregistrer en PNG",
+    "resetZoom": "Réinitialiser le zoom",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "fitToView": "Ajuster à la vue",
+    "hierarchicalLayout": "Disposition hiérarchique",
+    "radialLayout": "Disposition radiale",
+    "clusterLayout": "Disposition en cluster",
+    "clearSelection": "Effacer la sélection"
+  },
   "empty": {
     "title": "Aucune donnée à afficher",
     "description": "Ajoutez du contenu pour voir le graphe de connaissances"
   },
   "loading": {
-    "title": "Chargement du graphe...",
+    "title": "Chargement du graphe de connaissances...",
     "processing": "Traitement des relations..."
+  },
+  "error": {
+    "title": "Erreur de chargement du graphe",
+    "retry": "Réessayer"
   }
 }

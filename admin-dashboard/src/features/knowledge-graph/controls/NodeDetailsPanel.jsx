@@ -1,71 +1,75 @@
 import { memo } from 'react';
 import { X, ExternalLink, AlertCircle, Pill, BookOpen, UtensilsCrossed, FileText, Quote, FlaskConical, Heart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const NODE_TYPE_CONFIG = {
   condition: {
     icon: AlertCircle,
     color: '#ef4444',
     bgColor: '#fef2f2',
-    title: 'Condition',
+    titleKey: 'knowledgeGraph:nodes.condition',
   },
   intervention: {
     icon: Pill,
     color: '#f43f5e',
     bgColor: '#fff1f2',
-    title: 'Intervention',
+    titleKey: 'knowledgeGraph:nodes.intervention',
   },
   careDomain: {
     icon: Heart,
     color: '#3b82f6',
     bgColor: '#eff6ff',
-    title: 'Care Domain',
+    titleKey: 'knowledgeGraph:nodes.careDomain',
   },
   scripture: {
     icon: BookOpen,
     color: '#6366f1',
     bgColor: '#eef2ff',
-    title: 'Scripture',
+    titleKey: 'knowledgeGraph:nodes.scripture',
   },
   egwReference: {
     icon: Quote,
     color: '#8b5cf6',
     bgColor: '#f5f3ff',
-    title: 'EGW Reference',
+    titleKey: 'knowledgeGraph:nodes.egwReference',
   },
   recipe: {
     icon: UtensilsCrossed,
     color: '#f59e0b',
     bgColor: '#fffbeb',
-    title: 'Recipe',
+    titleKey: 'knowledgeGraph:nodes.recipe',
   },
   evidenceEntry: {
     icon: FlaskConical,
     color: '#10b981',
     bgColor: '#ecfdf5',
-    title: 'Evidence',
+    titleKey: 'knowledgeGraph:nodes.evidence',
   },
   reference: {
     icon: FileText,
     color: '#64748b',
     bgColor: '#f8fafc',
-    title: 'Reference',
+    titleKey: 'knowledgeGraph:nodes.reference',
   },
 };
 
 const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
+  const { t } = useTranslation(['knowledgeGraph']);
+
   if (!node) return null;
 
   const config = NODE_TYPE_CONFIG[node.type] || NODE_TYPE_CONFIG.reference;
   const Icon = config.icon;
   const data = node.data || {};
+  const title = t(config.titleKey);
 
   const renderConditionDetails = () => (
     <>
       {data.category && (
-        <DetailRow label="Category" value={data.category} />
+        <DetailRow label={t('knowledgeGraph:details.category')} value={data.category} />
       )}
       {data.summary && (
-        <DetailSection label="Summary" value={data.summary} />
+        <DetailSection label={t('knowledgeGraph:details.summary')} value={data.summary} />
       )}
     </>
   );
@@ -73,10 +77,10 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
   const renderInterventionDetails = () => (
     <>
       {data.careDomain && (
-        <DetailRow label="Care Domain" value={data.careDomain} />
+        <DetailRow label={t('knowledgeGraph:details.careDomain')} value={data.careDomain} />
       )}
       {data.mechanism && (
-        <DetailSection label="Mechanism" value={data.mechanism} />
+        <DetailSection label={t('knowledgeGraph:details.mechanism')} value={data.mechanism} />
       )}
     </>
   );
@@ -84,10 +88,10 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
   const renderScriptureDetails = () => (
     <>
       {data.theme && (
-        <DetailRow label="Theme" value={data.theme} />
+        <DetailRow label={t('knowledgeGraph:details.theme')} value={data.theme} />
       )}
       {data.text && (
-        <DetailSection label="Text" value={data.text} isQuote />
+        <DetailSection label={t('knowledgeGraph:details.text')} value={data.text} isQuote />
       )}
     </>
   );
@@ -95,13 +99,13 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
   const renderEgwDetails = () => (
     <>
       {data.book && (
-        <DetailRow label="Book" value={data.book} />
+        <DetailRow label={t('knowledgeGraph:details.book')} value={data.book} />
       )}
       {data.topic && (
-        <DetailRow label="Topic" value={data.topic} />
+        <DetailRow label={t('knowledgeGraph:details.topic')} value={data.topic} />
       )}
       {data.quote && (
-        <DetailSection label="Quote" value={data.quote} isQuote />
+        <DetailSection label={t('knowledgeGraph:details.quote')} value={data.quote} isQuote />
       )}
     </>
   );
@@ -110,7 +114,7 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
     <>
       {data.dietaryTags && data.dietaryTags.length > 0 && (
         <div className="mb-3">
-          <div className="text-xs text-gray-500 mb-1">Dietary Tags</div>
+          <div className="text-xs text-gray-500 mb-1">{t('knowledgeGraph:details.dietaryTags')}</div>
           <div className="flex flex-wrap gap-1">
             {(Array.isArray(data.dietaryTags) ? data.dietaryTags : [data.dietaryTags]).map((tag, i) => (
               <span
@@ -124,7 +128,7 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
         </div>
       )}
       {data.description && (
-        <DetailSection label="Description" value={data.description} />
+        <DetailSection label={t('knowledgeGraph:details.description')} value={data.description} />
       )}
     </>
   );
@@ -132,16 +136,16 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
   const renderEvidenceDetails = () => (
     <>
       {data.studyType && (
-        <DetailRow label="Study Type" value={data.studyType.replace(/_/g, ' ')} />
+        <DetailRow label={t('knowledgeGraph:details.studyType')} value={data.studyType.replace(/_/g, ' ')} />
       )}
       {data.qualityRating && (
-        <DetailRow label="Quality" value={data.qualityRating} />
+        <DetailRow label={t('knowledgeGraph:details.quality')} value={data.qualityRating} />
       )}
       {data.population && (
-        <DetailRow label="Population" value={data.population} />
+        <DetailRow label={t('knowledgeGraph:details.population')} value={data.population} />
       )}
       {data.summary && (
-        <DetailSection label="Summary" value={data.summary} />
+        <DetailSection label={t('knowledgeGraph:details.summary')} value={data.summary} />
       )}
     </>
   );
@@ -149,14 +153,14 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
   const renderReferenceDetails = () => (
     <>
       {data.year && (
-        <DetailRow label="Year" value={data.year} />
+        <DetailRow label={t('knowledgeGraph:details.year')} value={data.year} />
       )}
       {data.citation && (
-        <DetailSection label="Citation" value={data.citation} />
+        <DetailSection label={t('knowledgeGraph:details.citation')} value={data.citation} />
       )}
       {(data.doi || data.pmid || data.url) && (
         <div className="mt-3 pt-3 border-t border-gray-100">
-          <div className="text-xs text-gray-500 mb-2">Links</div>
+          <div className="text-xs text-gray-500 mb-2">{t('knowledgeGraph:details.links')}</div>
           <div className="flex flex-wrap gap-2">
             {data.doi && (
               <a
@@ -200,7 +204,7 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
   const renderCareDomainDetails = () => (
     <>
       {data.description && (
-        <DetailSection label="Description" value={data.description} />
+        <DetailSection label={t('knowledgeGraph:details.description')} value={data.description} />
       )}
     </>
   );
@@ -248,7 +252,7 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
                 className="text-[10px] font-semibold uppercase tracking-wide mb-0.5"
                 style={{ color: config.color }}
               >
-                {config.title}
+                {title}
               </div>
               <h3 className="font-bold text-gray-900 text-sm leading-tight break-words">
                 {data.label || 'Untitled'}
@@ -278,7 +282,7 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
             style={{ backgroundColor: config.color }}
           >
             <ExternalLink className="w-4 h-4" />
-            View Full Details
+            {t('knowledgeGraph:details.viewDetails')}
           </button>
         </div>
       )}

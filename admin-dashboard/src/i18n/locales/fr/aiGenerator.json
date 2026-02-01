@@ -14,6 +14,65 @@
     "review": "Révision",
     "import": "Importer"
   },
+  "phases": {
+    "input": {
+      "title": "Phase 1 : Entrer les détails de la condition"
+    },
+    "draft": {
+      "title": "Phase 2 : Réviser le brouillon",
+      "forCondition": "pour \"{{conditionName}}\""
+    },
+    "preview": {
+      "title": "Phase 3 : Aperçu et importation"
+    }
+  },
+  "input": {
+    "conditionName": "Nom de la condition",
+    "conditionNamePlaceholder": "ex: Hypertension, Diabète de type 2",
+    "conditionNameHint": "Entrez le nom de la condition médicale tel qu'il doit apparaître dans la base de données.",
+    "additionalContext": "Contexte supplémentaire",
+    "optional": "(optionnel)",
+    "additionalContextPlaceholder": "Ajoutez des domaines d'intérêt spécifiques, des populations de patients ou des approches de médecine de style de vie...",
+    "additionalContextHint": "Fournissez un contexte pour guider l'IA vers des aspects ou des approches spécifiques.",
+    "whatGenerated": "Ce qui sera généré :",
+    "item1": "Aperçu et résumé de la condition",
+    "item2": "Facteurs de risque, physiologie et complications",
+    "item3": "Interventions de médecine de style de vie (NEWSTART+)",
+    "item4": "Entrées de preuves avec références d'études",
+    "item5": "Passages bibliques et soins spirituels",
+    "item6": "Références Ellen G. White",
+    "item7": "Recettes pertinentes (le cas échéant)"
+  },
+  "draft": {
+    "notSaved": "BROUILLON — PAS ENCORE ENREGISTRÉ",
+    "editInstructions": "Modifiez le contenu à l'aide de la barre d'outils. Cliquez sur \"Terminé\" lorsque vous avez fini.",
+    "reviewInstructions": "Révisez le contenu ci-dessous et approuvez lorsque vous êtes prêt.",
+    "editPlaceholder": "Modifiez votre contenu ici..."
+  },
+  "preview": {
+    "downloadJson": "Télécharger JSON",
+    "reviewInstructions": "Révisez les données structurées ci-dessous. Cliquez sur \"Importer\" pour enregistrer toutes les entités.",
+    "condition": "Condition",
+    "sections": "Sections",
+    "interventions": "Interventions",
+    "evidence": "Preuves",
+    "scriptures": "Écritures",
+    "egwReferences": "Références EGW",
+    "recipes": "Recettes",
+    "tags": "Étiquettes",
+    "name": "Nom",
+    "category": "Catégorie",
+    "summary": "Résumé",
+    "type": "Type :",
+    "theme": "Thème :"
+  },
+  "importing": {
+    "title": "Importation du contenu...",
+    "description": "Création des enregistrements de base de données pour le contenu de votre condition. Veuillez patienter...",
+    "creatingCondition": "Création de l'enregistrement de la condition",
+    "creatingSections": "Création des sections et interventions",
+    "linkingRelationships": "Liaison des relations"
+  },
   "modes": {
     "condition": "Générer une condition",
     "intervention": "Générer une intervention",
@@ -61,7 +120,17 @@
     "generateAnother": "Générer un autre",
     "viewCondition": "Voir la condition",
     "generateAnotherCondition": "Générer une autre condition",
-    "backToSummary": "Retour au résumé"
+    "backToSummary": "Retour au résumé",
+    "generatingDraft": "Génération du brouillon...",
+    "generateDraft": "Générer le brouillon",
+    "edit": "Modifier",
+    "cancel": "Annuler",
+    "done": "Terminé",
+    "back": "Retour",
+    "structuring": "Structuration...",
+    "approveStructure": "Approuver et structurer",
+    "importing": "Importation...",
+    "importToDatabase": "Importer dans la base de données"
   },
   "result": {
     "title": "Contenu généré",
@@ -124,7 +193,38 @@
   },
   "infographics": {
     "title": "Optionnel : Générer des infographies",
+    "cardTitle": "Générer des infographies",
     "description": "Créez des résumés visuels générés par IA pour cette condition en utilisant Google Vertex AI Imagen.",
-    "generate": "Générer des infographies"
+    "cardSubtitle": "Créez des résumés visuels générés par IA pour {{conditionName}}",
+    "generate": "Générer des infographies",
+    "regenerate": "Régénérer les infographies",
+    "selectTypes": "Sélectionner les types d'infographie :",
+    "notConfigured": {
+      "title": "Imagen non configuré",
+      "message": "Les infographies générées par IA nécessitent Google Vertex AI Imagen. Contactez votre administrateur pour configurer",
+      "envVar": "VERTEX_AI_PROJECT_ID",
+      "suffix": "et les identifiants."
+    },
+    "types": {
+      "overview": "Aperçu de la condition",
+      "overviewDesc": "Visualisation des faits clés, symptômes et prévalence",
+      "riskFactors": "Facteurs de risque",
+      "riskFactorsDesc": "Visualisation des facteurs modifiables vs non modifiables",
+      "lifestyleSolutions": "Solutions de style de vie",
+      "lifestyleSolutionsDesc": "Visualisation des interventions basées sur NEWSTART"
+    },
+    "status": {
+      "notStarted": "Non démarré",
+      "queued": "En file d'attente",
+      "generating": "Génération",
+      "complete": "Terminé",
+      "failed": "Échec"
+    },
+    "view": "Voir",
+    "retry": "Réessayer",
+    "progress": "Génération des infographies... {{completed}}/{{total}} terminé",
+    "starting": "Démarrage...",
+    "timeEstimate": "La génération prend généralement 30-60 secondes par infographie",
+    "selectAtLeastOne": "Veuillez sélectionner au moins un type d'infographie"
   }
 }

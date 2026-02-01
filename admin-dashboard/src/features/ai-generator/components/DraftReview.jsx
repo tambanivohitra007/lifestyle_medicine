@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, RefreshCw, Check, Edit3 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import MDEditor from '@uiw/react-md-editor';
 
@@ -11,6 +12,7 @@ const DraftReview = ({
   onRegenerateDraft,
   loading,
 }) => {
+  const { t } = useTranslation(['aiGenerator']);
   const [isEditing, setIsEditing] = useState(false);
   const [editedDraft, setEditedDraft] = useState(draft);
 
@@ -36,8 +38,8 @@ const DraftReview = ({
     <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
         <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-          Phase 2: Review Draft
-          <span className="hidden sm:inline"> for "{conditionName}"</span>
+          {t('aiGenerator:phases.draft.title')}
+          <span className="hidden sm:inline"> {t('aiGenerator:phases.draft.forCondition', { conditionName })}</span>
         </h2>
         <div className="flex gap-2">
           {!isEditing && (
@@ -47,7 +49,7 @@ const DraftReview = ({
               className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >
               <Edit3 className="w-4 h-4 mr-1.5" />
-              Edit
+              {t('aiGenerator:actions.edit')}
             </button>
           )}
           {isEditing && (
@@ -57,7 +59,7 @@ const DraftReview = ({
                 disabled={loading}
                 className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
               >
-                Cancel
+                {t('aiGenerator:actions.cancel')}
               </button>
               <button
                 onClick={handleSaveEdit}
@@ -65,7 +67,7 @@ const DraftReview = ({
                 className="inline-flex items-center px-3 py-1.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
               >
                 <Check className="w-4 h-4 mr-1.5" />
-                Done
+                {t('aiGenerator:actions.done')}
               </button>
             </>
           )}
@@ -74,11 +76,11 @@ const DraftReview = ({
 
       <div className="mb-4">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm text-yellow-700">
-          <strong>DRAFT — NOT YET SAVED</strong>
+          <strong>{t('aiGenerator:draft.notSaved')}</strong>
           <span className="hidden sm:inline ml-2">
             {isEditing
-              ? 'Edit the content using the toolbar. Click "Done" when finished.'
-              : 'Review the content below and approve when ready.'}
+              ? t('aiGenerator:draft.editInstructions')
+              : t('aiGenerator:draft.reviewInstructions')}
           </span>
         </div>
       </div>
@@ -97,7 +99,7 @@ const DraftReview = ({
               visibleDragbar={false}
               textareaProps={{
                 disabled: loading,
-                placeholder: 'Edit your content here...',
+                placeholder: t('aiGenerator:draft.editPlaceholder'),
               }}
             />
             <style>{`
@@ -136,7 +138,7 @@ const DraftReview = ({
           className="inline-flex items-center justify-center sm:justify-start px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 order-3 sm:order-1"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          {t('aiGenerator:actions.back')}
         </button>
 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 order-1 sm:order-2">
@@ -146,7 +148,7 @@ const DraftReview = ({
             className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Regenerate
+            {t('aiGenerator:actions.regenerate')}
           </button>
 
           <button
@@ -157,12 +159,12 @@ const DraftReview = ({
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Structuring...
+                {t('aiGenerator:actions.structuring')}
               </>
             ) : (
               <>
                 <Check className="w-4 h-4 mr-2" />
-                Approve & Structure
+                {t('aiGenerator:actions.approveStructure')}
               </>
             )}
           </button>

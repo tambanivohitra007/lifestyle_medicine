@@ -11,6 +11,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Loader2, Layout, Maximize2, Eye, EyeOff, RotateCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { nodeTypes } from './nodes';
 import { edgeTypes } from './edges';
 import { applyLayout, layoutOptions } from './utils/layoutEngine';
@@ -26,6 +27,7 @@ const KnowledgeGraphInner = ({
   className = '',
   backButton = null,
 }) => {
+  const { t } = useTranslation(['knowledgeGraph']);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [allNodes, setAllNodes] = useState([]); // Store original unfiltered nodes
@@ -371,7 +373,7 @@ const KnowledgeGraphInner = ({
       <div className={`flex items-center justify-center h-full w-full overflow-hidden bg-gray-50 ${className}`}>
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Loading knowledge graph...</p>
+          <p className="text-sm text-gray-600">{t('knowledgeGraph:loading.title')}</p>
         </div>
       </div>
     );
@@ -381,13 +383,13 @@ const KnowledgeGraphInner = ({
     return (
       <div className={`flex items-center justify-center h-full w-full overflow-hidden bg-gray-50 ${className}`}>
         <div className="text-center text-red-600">
-          <p className="font-medium">Error loading graph</p>
+          <p className="font-medium">{t('knowledgeGraph:error.title')}</p>
           <p className="text-sm">{error}</p>
           <button
             onClick={fetchGraphData}
             className="mt-2 px-3 py-1 text-sm bg-red-100 hover:bg-red-200 rounded-md transition-colors"
           >
-            Retry
+            {t('knowledgeGraph:error.retry')}
           </button>
         </div>
       </div>
@@ -484,10 +486,10 @@ const KnowledgeGraphInner = ({
             <button
               onClick={() => setShowUI(!showUI)}
               className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              title={showUI ? 'Hide UI (show only graph)' : 'Show UI'}
+              title={showUI ? t('knowledgeGraph:controls.hideUITooltip') : t('knowledgeGraph:controls.showUI')}
             >
               {showUI ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              <span className="hidden sm:inline">{showUI ? 'Hide UI' : 'Show UI'}</span>
+              <span className="hidden sm:inline">{showUI ? t('knowledgeGraph:controls.hideUI') : t('knowledgeGraph:controls.showUI')}</span>
             </button>
           </div>
 
@@ -516,7 +518,7 @@ const KnowledgeGraphInner = ({
             <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
               <div className="flex items-center gap-2 mb-2">
                 <Layout className="w-4 h-4 text-gray-500" />
-                <span className="text-xs font-medium text-gray-700">Layout</span>
+                <span className="text-xs font-medium text-gray-700">{t('knowledgeGraph:controls.layout')}</span>
               </div>
               <select
                 value={layoutType}
@@ -535,7 +537,7 @@ const KnowledgeGraphInner = ({
             <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
               <div className="flex items-center gap-2 mb-2">
                 <Maximize2 className="w-4 h-4 text-gray-500" />
-                <span className="text-xs font-medium text-gray-700">Depth: {depth}</span>
+                <span className="text-xs font-medium text-gray-700">{t('knowledgeGraph:controls.depth')}: {depth}</span>
               </div>
               <input
                 type="range"
@@ -559,17 +561,17 @@ const KnowledgeGraphInner = ({
                 fetchGraphData();
               }}
               className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2"
-              title="Reset to default layout"
+              title={t('knowledgeGraph:controls.resetLayoutTooltip')}
             >
               <RotateCcw className="w-4 h-4" />
-              <span>Reset Layout</span>
+              <span>{t('knowledgeGraph:controls.resetLayout')}</span>
             </button>
 
             {/* Stats */}
             {meta && (
               <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600">
-                <div>Nodes: {nodes.length}{nodes.length !== meta.totalNodes ? ` / ${meta.totalNodes}` : ''}</div>
-                <div>Edges: {edges.length}{edges.length !== meta.totalEdges ? ` / ${meta.totalEdges}` : ''}</div>
+                <div>{t('knowledgeGraph:stats.nodes')}: {nodes.length}{nodes.length !== meta.totalNodes ? ` / ${meta.totalNodes}` : ''}</div>
+                <div>{t('knowledgeGraph:stats.edges')}: {edges.length}{edges.length !== meta.totalEdges ? ` / ${meta.totalEdges}` : ''}</div>
               </div>
             )}
 

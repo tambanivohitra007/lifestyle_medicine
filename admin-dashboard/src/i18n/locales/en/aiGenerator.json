@@ -14,6 +14,65 @@
     "review": "Review",
     "import": "Import"
   },
+  "phases": {
+    "input": {
+      "title": "Phase 1: Enter Condition Details"
+    },
+    "draft": {
+      "title": "Phase 2: Review Draft",
+      "forCondition": "for \"{{conditionName}}\""
+    },
+    "preview": {
+      "title": "Phase 3: Preview & Import"
+    }
+  },
+  "input": {
+    "conditionName": "Condition Name",
+    "conditionNamePlaceholder": "e.g., Hypertension, Type 2 Diabetes",
+    "conditionNameHint": "Enter the medical condition name as it should appear in the database.",
+    "additionalContext": "Additional Context",
+    "optional": "(optional)",
+    "additionalContextPlaceholder": "Add any specific focus areas, patient populations, or lifestyle medicine approaches...",
+    "additionalContextHint": "Provide context to guide the AI toward specific aspects or approaches.",
+    "whatGenerated": "What will be generated:",
+    "item1": "Condition overview and summary",
+    "item2": "Risk factors, physiology, and complications",
+    "item3": "Lifestyle medicine interventions (NEWSTART+)",
+    "item4": "Evidence entries with study references",
+    "item5": "Scripture passages and spiritual care",
+    "item6": "Ellen G. White references",
+    "item7": "Relevant recipes (when applicable)"
+  },
+  "draft": {
+    "notSaved": "DRAFT — NOT YET SAVED",
+    "editInstructions": "Edit the content using the toolbar. Click \"Done\" when finished.",
+    "reviewInstructions": "Review the content below and approve when ready.",
+    "editPlaceholder": "Edit your content here..."
+  },
+  "preview": {
+    "downloadJson": "Download JSON",
+    "reviewInstructions": "Review the structured data below. Click \"Import\" to save all entities.",
+    "condition": "Condition",
+    "sections": "Sections",
+    "interventions": "Interventions",
+    "evidence": "Evidence",
+    "scriptures": "Scriptures",
+    "egwReferences": "EGW References",
+    "recipes": "Recipes",
+    "tags": "Tags",
+    "name": "Name",
+    "category": "Category",
+    "summary": "Summary",
+    "type": "Type:",
+    "theme": "Theme:"
+  },
+  "importing": {
+    "title": "Importing Content...",
+    "description": "Creating database records for your condition content. Please wait...",
+    "creatingCondition": "Creating condition record",
+    "creatingSections": "Creating sections and interventions",
+    "linkingRelationships": "Linking relationships"
+  },
   "modes": {
     "condition": "Generate Condition",
     "intervention": "Generate Intervention",
@@ -61,7 +120,17 @@
     "generateAnother": "Generate Another",
     "viewCondition": "View Condition",
     "generateAnotherCondition": "Generate Another Condition",
-    "backToSummary": "Back to Summary"
+    "backToSummary": "Back to Summary",
+    "generatingDraft": "Generating Draft...",
+    "generateDraft": "Generate Draft",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "done": "Done",
+    "back": "Back",
+    "structuring": "Structuring...",
+    "approveStructure": "Approve & Structure",
+    "importing": "Importing...",
+    "importToDatabase": "Import to Database"
   },
   "result": {
     "title": "Generated Content",
@@ -124,7 +193,38 @@
   },
   "infographics": {
     "title": "Optional: Generate Infographics",
+    "cardTitle": "Generate Infographics",
     "description": "Create AI-generated visual summaries for this condition using Google Vertex AI Imagen.",
-    "generate": "Generate Infographics"
+    "cardSubtitle": "Create AI-generated visual summaries for {{conditionName}}",
+    "generate": "Generate Infographics",
+    "regenerate": "Regenerate Infographics",
+    "selectTypes": "Select infographic types:",
+    "notConfigured": {
+      "title": "Imagen Not Configured",
+      "message": "AI-generated infographics require Google Vertex AI Imagen. Contact your administrator to set up the",
+      "envVar": "VERTEX_AI_PROJECT_ID",
+      "suffix": "and credentials."
+    },
+    "types": {
+      "overview": "Condition Overview",
+      "overviewDesc": "Key facts, symptoms, and prevalence visualization",
+      "riskFactors": "Risk Factors",
+      "riskFactorsDesc": "Modifiable vs non-modifiable factors visualization",
+      "lifestyleSolutions": "Lifestyle Solutions",
+      "lifestyleSolutionsDesc": "NEWSTART-based interventions visualization"
+    },
+    "status": {
+      "notStarted": "Not Started",
+      "queued": "Queued",
+      "generating": "Generating",
+      "complete": "Complete",
+      "failed": "Failed"
+    },
+    "view": "View",
+    "retry": "Retry",
+    "progress": "Generating infographics... {{completed}}/{{total}} complete",
+    "starting": "Starting...",
+    "timeEstimate": "Generation typically takes 30-60 seconds per infographic",
+    "selectAtLeastOne": "Please select at least one infographic type"
   }
 }

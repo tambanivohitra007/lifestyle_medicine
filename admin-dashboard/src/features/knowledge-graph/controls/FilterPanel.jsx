@@ -1,17 +1,19 @@
 import { Filter, Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const NODE_TYPE_CONFIG = [
-  { type: 'condition', label: 'Conditions', color: '#ef4444' },
-  { type: 'intervention', label: 'Interventions', color: '#f43f5e' },
-  { type: 'careDomain', label: 'Care Domains', color: '#3b82f6' },
-  { type: 'scripture', label: 'Scriptures', color: '#6366f1' },
-  { type: 'egwReference', label: 'EGW References', color: '#8b5cf6' },
-  { type: 'recipe', label: 'Recipes', color: '#f59e0b' },
-  { type: 'evidenceEntry', label: 'Evidence', color: '#10b981' },
-  { type: 'reference', label: 'References', color: '#64748b' },
+  { type: 'condition', labelKey: 'knowledgeGraph:nodeTypes.conditions', color: '#ef4444' },
+  { type: 'intervention', labelKey: 'knowledgeGraph:nodeTypes.interventions', color: '#f43f5e' },
+  { type: 'careDomain', labelKey: 'knowledgeGraph:nodeTypes.careDomains', color: '#3b82f6' },
+  { type: 'scripture', labelKey: 'knowledgeGraph:nodeTypes.scriptures', color: '#6366f1' },
+  { type: 'egwReference', labelKey: 'knowledgeGraph:nodeTypes.egwReferences', color: '#8b5cf6' },
+  { type: 'recipe', labelKey: 'knowledgeGraph:nodeTypes.recipes', color: '#f59e0b' },
+  { type: 'evidenceEntry', labelKey: 'knowledgeGraph:nodeTypes.evidence', color: '#10b981' },
+  { type: 'reference', labelKey: 'knowledgeGraph:nodeTypes.references', color: '#64748b' },
 ];
 
 const FilterPanel = ({ hiddenTypes = [], onToggleType, onShowAll, onHideAll }) => {
+  const { t } = useTranslation(['knowledgeGraph']);
   const visibleCount = NODE_TYPE_CONFIG.length - hiddenTypes.length;
 
   return (
@@ -19,7 +21,7 @@ const FilterPanel = ({ hiddenTypes = [], onToggleType, onShowAll, onHideAll }) =
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-500" />
-          <span className="text-xs font-medium text-gray-700">Filter Nodes</span>
+          <span className="text-xs font-medium text-gray-700">{t('knowledgeGraph:filters.title')}</span>
         </div>
         <span className="text-[10px] text-gray-400">
           {visibleCount}/{NODE_TYPE_CONFIG.length}
@@ -27,7 +29,7 @@ const FilterPanel = ({ hiddenTypes = [], onToggleType, onShowAll, onHideAll }) =
       </div>
 
       <div className="space-y-1.5 mb-3">
-        {NODE_TYPE_CONFIG.map(({ type, label, color }) => {
+        {NODE_TYPE_CONFIG.map(({ type, labelKey, color }) => {
           const isHidden = hiddenTypes.includes(type);
           return (
             <button
@@ -45,7 +47,7 @@ const FilterPanel = ({ hiddenTypes = [], onToggleType, onShowAll, onHideAll }) =
                 }`}
                 style={{ backgroundColor: color }}
               />
-              <span className="flex-1 text-left">{label}</span>
+              <span className="flex-1 text-left">{t(labelKey)}</span>
               {isHidden ? (
                 <EyeOff className="w-3 h-3 text-gray-400" />
               ) : (
@@ -61,13 +63,13 @@ const FilterPanel = ({ hiddenTypes = [], onToggleType, onShowAll, onHideAll }) =
           onClick={onShowAll}
           className="flex-1 text-[10px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
         >
-          Show All
+          {t('knowledgeGraph:filters.showAll')}
         </button>
         <button
           onClick={onHideAll}
           className="flex-1 text-[10px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
         >
-          Hide All
+          {t('knowledgeGraph:filters.hideAll')}
         </button>
       </div>
     </div>

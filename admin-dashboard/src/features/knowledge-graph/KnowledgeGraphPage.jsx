@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import KnowledgeGraph from './KnowledgeGraph';
 import api, { apiEndpoints } from '../../lib/api';
 
 const KnowledgeGraphPage = () => {
+  const { t } = useTranslation(['knowledgeGraph']);
   const { type, id } = useParams();
   const [searchParams] = useSearchParams();
   const [entityName, setEntityName] = useState('');
@@ -43,7 +45,7 @@ const KnowledgeGraphPage = () => {
       className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
     >
       <ArrowLeft className="w-4 h-4" />
-      <span className="hidden sm:inline">Back to {loading ? '...' : entityName}</span>
+      <span className="hidden sm:inline">{t('knowledgeGraph:controls.backTo', { name: loading ? '...' : entityName })}</span>
     </Link>
   );
 

@@ -12,8 +12,10 @@ import {
   UtensilsCrossed,
   Tag,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const StructuredPreview = ({ conditionName, structured, onImport, onBack, loading }) => {
+  const { t } = useTranslation(['aiGenerator']);
   const [expandedSections, setExpandedSections] = useState({
     condition: true,
     sections: true,
@@ -69,20 +71,20 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
     <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-          Phase 3: Preview & Import
+          {t('aiGenerator:phases.preview.title')}
         </h2>
         <button
           onClick={handleDownloadJson}
           className="inline-flex items-center justify-center sm:justify-start px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
         >
           <Download className="w-4 h-4 mr-1.5" />
-          Download JSON
+          {t('aiGenerator:preview.downloadJson')}
         </button>
       </div>
 
       <div className="mb-4">
         <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm text-blue-700">
-          Review the structured data below. Click "Import" to save all entities.
+          {t('aiGenerator:preview.reviewInstructions')}
         </div>
       </div>
 
@@ -91,23 +93,23 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
         {/* Condition */}
         {structured?.condition && (
           <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <SectionHeader icon={FileText} title="Condition" sectionKey="condition" color="primary" />
+            <SectionHeader icon={FileText} title={t('aiGenerator:preview.condition')} sectionKey="condition" color="primary" />
             {expandedSections.condition && (
               <div className="p-3 sm:p-4 bg-white">
                 <dl className="space-y-2 text-xs sm:text-sm">
                   <div>
-                    <dt className="font-medium text-gray-500">Name</dt>
+                    <dt className="font-medium text-gray-500">{t('aiGenerator:preview.name')}</dt>
                     <dd className="text-gray-900">{structured.condition.name}</dd>
                   </div>
                   {structured.condition.category && (
                     <div>
-                      <dt className="font-medium text-gray-500">Category</dt>
+                      <dt className="font-medium text-gray-500">{t('aiGenerator:preview.category')}</dt>
                       <dd className="text-gray-900">{structured.condition.category}</dd>
                     </div>
                   )}
                   {structured.condition.summary && (
                     <div>
-                      <dt className="font-medium text-gray-500">Summary</dt>
+                      <dt className="font-medium text-gray-500">{t('aiGenerator:preview.summary')}</dt>
                       <dd className="text-gray-700">{structured.condition.summary}</dd>
                     </div>
                   )}
@@ -122,7 +124,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <SectionHeader
               icon={FileText}
-              title="Sections"
+              title={t('aiGenerator:preview.sections')}
               count={structured.condition_sections.length}
               sectionKey="sections"
               color="blue"
@@ -135,7 +137,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
                       {section.title || section.section_type}
                     </p>
                     <p className="text-xs text-gray-500 mb-1">
-                      Type: {section.section_type}
+                      {t('aiGenerator:preview.type')} {section.section_type}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
                       {section.body?.replace(/<[^>]+>/g, '').substring(0, 100)}...
@@ -152,7 +154,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <SectionHeader
               icon={Pill}
-              title="Interventions"
+              title={t('aiGenerator:preview.interventions')}
               count={structured.interventions.length}
               sectionKey="interventions"
               color="green"
@@ -187,7 +189,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <SectionHeader
               icon={BookOpen}
-              title="Evidence"
+              title={t('aiGenerator:preview.evidence')}
               count={structured.evidence_entries.length}
               sectionKey="evidence"
               color="purple"
@@ -214,7 +216,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <SectionHeader
               icon={BookOpen}
-              title="Scriptures"
+              title={t('aiGenerator:preview.scriptures')}
               count={structured.scriptures.length}
               sectionKey="scriptures"
               color="amber"
@@ -225,7 +227,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
                   <div key={idx} className="border-l-4 border-amber-300 pl-2 sm:pl-3">
                     <p className="font-medium text-gray-900 text-sm">{scripture.reference}</p>
                     {scripture.theme && (
-                      <p className="text-xs text-gray-500 mb-1">Theme: {scripture.theme}</p>
+                      <p className="text-xs text-gray-500 mb-1">{t('aiGenerator:preview.theme')} {scripture.theme}</p>
                     )}
                     <p className="text-xs sm:text-sm text-gray-600 italic line-clamp-2">
                       "{scripture.text}"
@@ -242,7 +244,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <SectionHeader
               icon={Quote}
-              title="EGW References"
+              title={t('aiGenerator:preview.egwReferences')}
               count={structured.egw_references.length}
               sectionKey="egwReferences"
               color="indigo"
@@ -271,7 +273,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <SectionHeader
               icon={UtensilsCrossed}
-              title="Recipes"
+              title={t('aiGenerator:preview.recipes')}
               count={structured.recipes.length}
               sectionKey="recipes"
               color="orange"
@@ -305,7 +307,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <SectionHeader
               icon={Tag}
-              title="Tags"
+              title={t('aiGenerator:preview.tags')}
               count={structured.content_tags.length}
               sectionKey="tags"
               color="gray"
@@ -336,7 +338,7 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           className="inline-flex items-center justify-center sm:justify-start px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 order-2 sm:order-1"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          {t('aiGenerator:actions.back')}
         </button>
 
         <button
@@ -347,12 +349,12 @@ const StructuredPreview = ({ conditionName, structured, onImport, onBack, loadin
           {loading ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-              Importing...
+              {t('aiGenerator:actions.importing')}
             </>
           ) : (
             <>
               <Upload className="w-4 h-4 mr-2" />
-              Import to Database
+              {t('aiGenerator:actions.importToDatabase')}
             </>
           )}
         </button>

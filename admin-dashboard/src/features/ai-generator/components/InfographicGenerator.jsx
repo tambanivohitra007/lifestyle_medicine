@@ -1,31 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Image, RefreshCw, CheckCircle, XCircle, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../../lib/api';
 
 const INFOGRAPHIC_TYPES = {
   overview: {
-    label: 'Condition Overview',
-    description: 'Key facts, symptoms, and prevalence visualization',
+    labelKey: 'aiGenerator:infographics.types.overview',
+    descriptionKey: 'aiGenerator:infographics.types.overviewDesc',
   },
   risk_factors: {
-    label: 'Risk Factors',
-    description: 'Modifiable vs non-modifiable factors visualization',
+    labelKey: 'aiGenerator:infographics.types.riskFactors',
+    descriptionKey: 'aiGenerator:infographics.types.riskFactorsDesc',
   },
   lifestyle_solutions: {
-    label: 'Lifestyle Solutions',
-    description: 'NEWSTART-based interventions visualization',
+    labelKey: 'aiGenerator:infographics.types.lifestyleSolutions',
+    descriptionKey: 'aiGenerator:infographics.types.lifestyleSolutionsDesc',
   },
 };
 
 const STATUS_CONFIG = {
-  not_started: { icon: Image, color: 'text-gray-400', bg: 'bg-gray-100', label: 'Not Started' },
-  pending: { icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Queued' },
-  processing: { icon: Loader2, color: 'text-blue-500', bg: 'bg-blue-50', label: 'Generating', animate: true },
-  completed: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50', label: 'Complete' },
-  failed: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', label: 'Failed' },
+  not_started: { icon: Image, color: 'text-gray-400', bg: 'bg-gray-100', labelKey: 'aiGenerator:infographics.status.notStarted' },
+  pending: { icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-50', labelKey: 'aiGenerator:infographics.status.queued' },
+  processing: { icon: Loader2, color: 'text-blue-500', bg: 'bg-blue-50', labelKey: 'aiGenerator:infographics.status.generating', animate: true },
+  completed: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50', labelKey: 'aiGenerator:infographics.status.complete' },
+  failed: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', labelKey: 'aiGenerator:infographics.status.failed' },
 };
 
 const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
+  const { t } = useTranslation(['aiGenerator']);
   const [configured, setConfigured] = useState(null);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -98,7 +100,7 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
 
   const handleGenerate = async () => {
     if (selectedTypes.length === 0) {
-      setError('Please select at least one infographic type');
+      setError(t('aiGenerator:infographics.selectAtLeastOne'));
       return;
     }
 
@@ -144,11 +146,11 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
         <div className="flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-medium text-yellow-800">Imagen Not Configured</h3>
+            <h3 className="font-medium text-yellow-800">{t('aiGenerator:infographics.notConfigured.title')}</h3>
             <p className="text-sm text-yellow-700 mt-1">
-              AI-generated infographics require Google Vertex AI Imagen. Contact your administrator
-              to set up the <code className="px-1 py-0.5 bg-yellow-100 rounded text-xs">VERTEX_AI_PROJECT_ID</code> and
-              credentials.
+              {t('aiGenerator:infographics.notConfigured.message')}{' '}
+              <code className="px-1 py-0.5 bg-yellow-100 rounded text-xs">{t('aiGenerator:infographics.notConfigured.envVar')}</code>{' '}
+              {t('aiGenerator:infographics.notConfigured.suffix')}
             </p>
           </div>
         </div>
@@ -172,9 +174,9 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
           <Image className="w-5 h-5 text-purple-600" />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">Generate Infographics</h3>
+          <h3 className="font-semibold text-gray-900">{t('aiGenerator:infographics.cardTitle')}</h3>
           <p className="text-sm text-gray-500">
-            Create AI-generated visual summaries for {conditionName}
+            {t('aiGenerator:infographics.cardSubtitle', { conditionName })}
           </p>
         </div>
       </div>
@@ -188,7 +190,7 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
       {/* Type Selection */}
       {!generating && (!status || status.summary.completed === 0) && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">Select infographic types:</p>
+          <p className="text-sm font-medium text-gray-700 mb-2">{t('aiGenerator:infographics.selectTypes')}</p>
           <div className="space-y-2">
             {Object.entries(INFOGRAPHIC_TYPES).map(([type, config]) => (
               <label
@@ -206,8 +208,8 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
                   className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">{config.label}</span>
-                  <p className="text-xs text-gray-500">{config.description}</p>
+                  <span className="font-medium text-gray-900">{t(config.labelKey)}</span>
+                  <p className="text-xs text-gray-500">{t(config.descriptionKey)}</p>
                 </div>
               </label>
             ))}
@@ -236,7 +238,7 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
                   <div>
                     <span className="font-medium text-gray-900">{data.label}</span>
                     <span className={`ml-2 text-xs ${statusConfig.color}`}>
-                      {statusConfig.label}
+                      {t(statusConfig.labelKey)}
                     </span>
                   </div>
                 </div>
@@ -249,7 +251,7 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
                       rel="noopener noreferrer"
                       className="text-sm text-purple-600 hover:text-purple-700"
                     >
-                      View
+                      {t('aiGenerator:infographics.view')}
                     </a>
                   )}
                   {data.status === 'failed' && data.request_id && (
@@ -258,7 +260,7 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
                       className="flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
                     >
                       <RefreshCw className="w-3 h-3" />
-                      Retry
+                      {t('aiGenerator:infographics.retry')}
                     </button>
                   )}
                 </div>
@@ -274,7 +276,7 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
           <div className="flex items-center gap-2 text-sm text-blue-700">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>
-              Generating infographics... {status.summary.completed}/{status.summary.total} complete
+              {t('aiGenerator:infographics.progress', { completed: status.summary.completed, total: status.summary.total })}
             </span>
           </div>
           <div className="mt-2 h-2 bg-blue-200 rounded-full overflow-hidden">
@@ -302,24 +304,24 @@ const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Starting...
+              {t('aiGenerator:infographics.starting')}
             </>
           ) : status && status.summary.completed > 0 ? (
             <>
               <RefreshCw className="w-4 h-4" />
-              Regenerate Infographics
+              {t('aiGenerator:infographics.regenerate')}
             </>
           ) : (
             <>
               <Image className="w-4 h-4" />
-              Generate Infographics
+              {t('aiGenerator:infographics.generate')}
             </>
           )}
         </button>
       )}
 
       <p className="mt-3 text-xs text-gray-500 text-center">
-        Generation typically takes 30-60 seconds per infographic
+        {t('aiGenerator:infographics.timeEstimate')}
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import { Sparkles, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ConditionInput = ({
   conditionName,
@@ -8,50 +9,51 @@ const ConditionInput = ({
   onGenerate,
   loading,
 }) => {
+  const { t } = useTranslation(['aiGenerator']);
   const canGenerate = conditionName.trim().length > 0;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
       <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
-        Phase 1: Enter Condition Details
+        {t('aiGenerator:phases.input.title')}
       </h2>
 
       <div className="space-y-4 sm:space-y-6">
         {/* Condition Name */}
         <div>
           <label htmlFor="conditionName" className="block text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-            Condition Name <span className="text-red-500">*</span>
+            {t('aiGenerator:input.conditionName')} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             id="conditionName"
             value={conditionName}
             onChange={(e) => onConditionNameChange(e.target.value)}
-            placeholder="e.g., Hypertension, Type 2 Diabetes"
+            placeholder={t('aiGenerator:input.conditionNamePlaceholder')}
             className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             disabled={loading}
           />
           <p className="mt-1 text-xs sm:text-sm text-gray-500">
-            Enter the medical condition name as it should appear in the database.
+            {t('aiGenerator:input.conditionNameHint')}
           </p>
         </div>
 
         {/* Additional Context */}
         <div>
           <label htmlFor="context" className="block text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-            Additional Context <span className="text-gray-400">(optional)</span>
+            {t('aiGenerator:input.additionalContext')} <span className="text-gray-400">{t('aiGenerator:input.optional')}</span>
           </label>
           <textarea
             id="context"
             value={context}
             onChange={(e) => onContextChange(e.target.value)}
             rows={3}
-            placeholder="Add any specific focus areas, patient populations, or lifestyle medicine approaches..."
+            placeholder={t('aiGenerator:input.additionalContextPlaceholder')}
             className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             disabled={loading}
           />
           <p className="mt-1 text-xs sm:text-sm text-gray-500">
-            Provide context to guide the AI toward specific aspects or approaches.
+            {t('aiGenerator:input.additionalContextHint')}
           </p>
         </div>
 
@@ -60,15 +62,15 @@ const ConditionInput = ({
           <div className="flex gap-2 sm:gap-3">
             <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="text-xs sm:text-sm text-blue-700">
-              <p className="font-medium mb-1">What will be generated:</p>
+              <p className="font-medium mb-1">{t('aiGenerator:input.whatGenerated')}</p>
               <ul className="list-disc ml-4 space-y-0.5 sm:space-y-1">
-                <li>Condition overview and summary</li>
-                <li>Risk factors, physiology, and complications</li>
-                <li>Lifestyle medicine interventions (NEWSTART+)</li>
-                <li>Evidence entries with study references</li>
-                <li>Scripture passages and spiritual care</li>
-                <li>Ellen G. White references</li>
-                <li>Relevant recipes (when applicable)</li>
+                <li>{t('aiGenerator:input.item1')}</li>
+                <li>{t('aiGenerator:input.item2')}</li>
+                <li>{t('aiGenerator:input.item3')}</li>
+                <li>{t('aiGenerator:input.item4')}</li>
+                <li>{t('aiGenerator:input.item5')}</li>
+                <li>{t('aiGenerator:input.item6')}</li>
+                <li>{t('aiGenerator:input.item7')}</li>
               </ul>
             </div>
           </div>
@@ -84,12 +86,12 @@ const ConditionInput = ({
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2" />
-                Generating Draft...
+                {t('aiGenerator:actions.generatingDraft')}
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Generate Draft
+                {t('aiGenerator:actions.generateDraft')}
               </>
             )}
           </button>
