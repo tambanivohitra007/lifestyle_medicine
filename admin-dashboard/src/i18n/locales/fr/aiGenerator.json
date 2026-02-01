@@ -1,6 +1,19 @@
 {
-  "title": "Générateur IA",
-  "subtitle": "Génération de contenu par intelligence artificielle",
+  "title": "Générateur de contenu IA",
+  "subtitle": "Générez du contenu complet de conditions par intelligence artificielle",
+  "notConfigured": {
+    "title": "Service IA non configuré",
+    "message": "Le générateur de contenu IA nécessite une clé API Gemini. Veuillez ajouter votre clé API à la variable",
+    "envVar": "GEMINI_API_KEY",
+    "envVarSuffix": "d'environnement."
+  },
+  "steps": {
+    "input": "Saisie",
+    "reviewDraft": "Réviser le brouillon",
+    "previewImport": "Aperçu et importation",
+    "review": "Révision",
+    "import": "Importer"
+  },
   "modes": {
     "condition": "Générer une condition",
     "intervention": "Générer une intervention",
@@ -44,7 +57,11 @@
     "save": "Enregistrer",
     "clear": "Effacer",
     "useThis": "Utiliser ceci",
-    "editResult": "Modifier le résultat"
+    "editResult": "Modifier le résultat",
+    "generateAnother": "Générer un autre",
+    "viewCondition": "Voir la condition",
+    "generateAnotherCondition": "Générer une autre condition",
+    "backToSummary": "Retour au résumé"
   },
   "result": {
     "title": "Contenu généré",
@@ -87,6 +104,27 @@
     "emptyPrompt": "Veuillez entrer un prompt",
     "tooShort": "Le prompt est trop court",
     "rateLimited": "Trop de requêtes. Veuillez patienter.",
-    "serverError": "Erreur serveur. Veuillez réessayer."
+    "serverError": "Erreur serveur. Veuillez réessayer.",
+    "draftFailed": "Échec de la génération du brouillon. Veuillez réessayer.",
+    "structureFailed": "Échec de la structuration du contenu. Veuillez réessayer.",
+    "importFailed": "Échec de l'importation du contenu"
+  },
+  "complete": {
+    "title": "Importation terminée !",
+    "message": "Le contenu pour <strong>{{conditionName}}</strong> a été importé avec succès."
+  },
+  "summary": {
+    "title": "Résumé de l'importation",
+    "conditionId": "ID de la condition :",
+    "sectionsCreated": "{{count}} sections créées",
+    "interventionsCreated": "{{count}} interventions créées",
+    "scripturesCreated": "{{count}} écritures créées",
+    "egwReferencesCreated": "{{count}} références EGW créées",
+    "recipesCreated": "{{count}} recettes créées"
+  },
+  "infographics": {
+    "title": "Optionnel : Générer des infographies",
+    "description": "Créez des résumés visuels générés par IA pour cette condition en utilisant Google Vertex AI Imagen.",
+    "generate": "Générer des infographies"
   }
 }

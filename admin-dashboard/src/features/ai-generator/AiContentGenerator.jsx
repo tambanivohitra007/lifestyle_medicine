@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, AlertCircle, CheckCircle, Image } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { useNotifications } from '../../contexts/NotificationContext';
 import ConditionInput from './components/ConditionInput';
@@ -18,6 +19,7 @@ const PHASES = {
 };
 
 const AiContentGenerator = () => {
+  const { t } = useTranslation(['aiGenerator', 'common']);
   const { notifyAiGeneration } = useNotifications();
   const [phase, setPhase] = useState(PHASES.INPUT);
   const [aiConfigured, setAiConfigured] = useState(null);
@@ -58,7 +60,7 @@ const AiContentGenerator = () => {
       setDraft(response.data.draft);
       setPhase(PHASES.DRAFT);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to generate draft. Please try again.');
+      setError(err.response?.data?.error || t('aiGenerator:errors.draftFailed'));
     } finally {
       setLoading(false);
     }
@@ -78,7 +80,7 @@ const AiContentGenerator = () => {
       setStructured(response.data.structured);
       setPhase(PHASES.STRUCTURED);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to structure content. Please try again.');
+      setError(err.response?.data?.error || t('aiGenerator:errors.structureFailed'));
     } finally {
       setLoading(false);
     }
@@ -104,7 +106,7 @@ const AiContentGenerator = () => {
         message: `Successfully imported "${conditionName}" with ${response.data.sections_created || 0} sections, ${response.data.interventions_created || 0} interventions.`,
       });
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to import content');
+      setError(err.response?.data?.error || t('aiGenerator:errors.importFailed'));
       setPhase(PHASES.STRUCTURED);
       // Send error notification
       notifyAiGeneration({
@@ -143,11 +145,11 @@ const AiContentGenerator = () => {
             <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
               <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0" />
               <div>
-                <h2 className="text-base sm:text-lg font-semibold text-yellow-800">AI Service Not Configured</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-yellow-800">{t('aiGenerator:notConfigured.title')}</h2>
                 <p className="mt-2 text-sm sm:text-base text-yellow-700">
-                  The AI Content Generator requires a Gemini API key. Please add your API key to the
-                  <code className="mx-1 px-2 py-0.5 bg-yellow-100 rounded text-xs sm:text-sm break-all">GEMINI_API_KEY</code>
-                  environment variable.
+                  {t('aiGenerator:notConfigured.message')}
+                  <code className="mx-1 px-2 py-0.5 bg-yellow-100 rounded text-xs sm:text-sm break-all">{t('aiGenerator:notConfigured.envVar')}</code>
+                  {t('aiGenerator:notConfigured.envVarSuffix')}
                 </p>
               </div>
             </div>
@@ -178,9 +180,9 @@ const AiContentGenerator = () => {
               <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">AI Content Generator</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('aiGenerator:title')}</h1>
               <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
-                Generate comprehensive condition content using AI
+                {t('aiGenerator:subtitle')}
               </p>
             </div>
           </div>
@@ -190,9 +192,9 @@ const AiContentGenerator = () => {
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between">
             {[
-              { key: PHASES.INPUT, label: 'Input', mobileLabel: '1', num: 1 },
-              { key: PHASES.DRAFT, label: 'Review Draft', mobileLabel: '2', num: 2 },
-              { key: PHASES.STRUCTURED, label: 'Preview & Import', mobileLabel: '3', num: 3 },
+              { key: PHASES.INPUT, labelKey: 'aiGenerator:steps.input', mobileLabelKey: 'aiGenerator:steps.input', num: 1 },
+              { key: PHASES.DRAFT, labelKey: 'aiGenerator:steps.reviewDraft', mobileLabelKey: 'aiGenerator:steps.review', num: 2 },
+              { key: PHASES.STRUCTURED, labelKey: 'aiGenerator:steps.previewImport', mobileLabelKey: 'aiGenerator:steps.import', num: 3 },
             ].map((step, index) => {
               const isActive = phase === step.key ||
                 (phase === PHASES.IMPORTING && step.key === PHASES.STRUCTURED) ||
@@ -221,8 +223,8 @@ const AiContentGenerator = () => {
                         isActive || isComplete ? 'text-gray-900' : 'text-gray-500'
                       }`}
                     >
-                      <span className="hidden sm:inline">{step.label}</span>
-                      <span className="sm:hidden">{step.num === 1 ? 'Input' : step.num === 2 ? 'Review' : 'Import'}</span>
+                      <span className="hidden sm:inline">{t(step.labelKey)}</span>
+                      <span className="sm:hidden">{t(step.mobileLabelKey)}</span>
                     </span>
                   </div>
                   {index < 2 && (
@@ -289,32 +291,30 @@ const AiContentGenerator = () => {
               <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
                 <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Import Complete!</h2>
-              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                The content for <strong>{conditionName}</strong> has been successfully imported.
-              </p>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{t('aiGenerator:complete.title')}</h2>
+              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6" dangerouslySetInnerHTML={{ __html: t('aiGenerator:complete.message', { conditionName }) }} />
 
               {importResult && (
                 <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 text-left max-w-md mx-auto">
-                  <h3 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">Import Summary</h3>
+                  <h3 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">{t('aiGenerator:summary.title')}</h3>
                   <ul className="space-y-1 text-xs sm:text-sm text-gray-600">
                     {importResult.condition_id && (
-                      <li className="break-all">Condition ID: <code className="bg-gray-200 px-1 rounded text-xs">{importResult.condition_id}</code></li>
+                      <li className="break-all">{t('aiGenerator:summary.conditionId')} <code className="bg-gray-200 px-1 rounded text-xs">{importResult.condition_id}</code></li>
                     )}
                     {importResult.sections_created > 0 && (
-                      <li>{importResult.sections_created} sections created</li>
+                      <li>{t('aiGenerator:summary.sectionsCreated', { count: importResult.sections_created })}</li>
                     )}
                     {importResult.interventions_created > 0 && (
-                      <li>{importResult.interventions_created} interventions created</li>
+                      <li>{t('aiGenerator:summary.interventionsCreated', { count: importResult.interventions_created })}</li>
                     )}
                     {importResult.scriptures_created > 0 && (
-                      <li>{importResult.scriptures_created} scriptures created</li>
+                      <li>{t('aiGenerator:summary.scripturesCreated', { count: importResult.scriptures_created })}</li>
                     )}
                     {importResult.egw_references_created > 0 && (
-                      <li>{importResult.egw_references_created} EGW references created</li>
+                      <li>{t('aiGenerator:summary.egwReferencesCreated', { count: importResult.egw_references_created })}</li>
                     )}
                     {importResult.recipes_created > 0 && (
-                      <li>{importResult.recipes_created} recipes created</li>
+                      <li>{t('aiGenerator:summary.recipesCreated', { count: importResult.recipes_created })}</li>
                     )}
                   </ul>
                 </div>
@@ -325,14 +325,14 @@ const AiContentGenerator = () => {
                   onClick={handleReset}
                   className="px-4 sm:px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 text-sm sm:text-base order-2 sm:order-1"
                 >
-                  Generate Another
+                  {t('aiGenerator:actions.generateAnother')}
                 </button>
                 {importResult?.condition_id && (
                   <a
                     href={`/conditions/${importResult.condition_id}`}
                     className="px-4 sm:px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 text-sm sm:text-base order-1 sm:order-2"
                   >
-                    View Condition
+                    {t('aiGenerator:actions.viewCondition')}
                   </a>
                 )}
               </div>
@@ -342,16 +342,16 @@ const AiContentGenerator = () => {
                 <div className="border-t border-gray-200 pt-6 mt-6">
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <Image className="w-5 h-5 text-purple-600" />
-                    <h3 className="font-semibold text-gray-900">Optional: Generate Infographics</h3>
+                    <h3 className="font-semibold text-gray-900">{t('aiGenerator:infographics.title')}</h3>
                   </div>
                   <p className="text-sm text-gray-600 mb-4">
-                    Create AI-generated visual summaries for this condition using Google Vertex AI Imagen.
+                    {t('aiGenerator:infographics.description')}
                   </p>
                   <button
                     onClick={() => setPhase(PHASES.INFOGRAPHICS)}
                     className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 text-sm"
                   >
-                    Generate Infographics
+                    {t('aiGenerator:infographics.generate')}
                   </button>
                 </div>
               )}
@@ -366,13 +366,13 @@ const AiContentGenerator = () => {
                 onClick={() => setPhase(PHASES.COMPLETE)}
                 className="text-sm text-gray-600 hover:text-gray-900"
               >
-                Back to Summary
+                {t('aiGenerator:actions.backToSummary')}
               </button>
               <a
                 href={`/conditions/${importResult.condition_id}`}
                 className="text-sm text-primary-600 hover:text-primary-700"
               >
-                View Condition
+                {t('aiGenerator:actions.viewCondition')}
               </a>
             </div>
             <InfographicGenerator
@@ -387,7 +387,7 @@ const AiContentGenerator = () => {
                 onClick={handleReset}
                 className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 text-sm"
               >
-                Generate Another Condition
+                {t('aiGenerator:actions.generateAnotherCondition')}
               </button>
             </div>
           </div>

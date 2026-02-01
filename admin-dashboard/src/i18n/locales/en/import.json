@@ -1,6 +1,7 @@
 {
   "title": "Import Data",
-  "subtitle": "Bulk import content from files",
+  "subtitle": "Bulk import conditions and interventions from CSV or Excel files",
+  "selectType": "Select Import Type",
   "steps": {
     "upload": "Upload File",
     "mapping": "Map Fields",
@@ -12,10 +13,14 @@
     "title": "Upload File",
     "description": "Upload a CSV or Excel file to import data",
     "dropzone": "Drag and drop file here or click to browse",
+    "dropText": "Drop your CSV or Excel file here, or",
+    "browse": "browse",
+    "supportedFormats": "Supports .csv, .xlsx, .xls (max 10MB)",
     "acceptedFormats": "Accepted formats: CSV, XLSX, XLS",
     "maxSize": "Maximum file size: 10MB",
     "selectFile": "Select File",
-    "changeFile": "Change File"
+    "changeFile": "Change File",
+    "remove": "Remove"
   },
   "mapping": {
     "title": "Map Fields",
@@ -47,10 +52,22 @@
   "progress": {
     "title": "Import Progress",
     "processing": "Processing...",
+    "importing": "Importing...",
+    "loading": "Loading...",
     "imported": "Imported",
     "skipped": "Skipped",
     "failed": "Failed",
     "total": "Total"
+  },
+  "actions": {
+    "import": "Import {{type}}",
+    "downloadTemplate": "Download {{type}} Template"
+  },
+  "results": {
+    "success": "Import Successful",
+    "failed": "Import Failed",
+    "errors": "Errors:",
+    "rowError": "Row {{row}}: {{message}}"
   },
   "complete": {
     "title": "Import Complete",
@@ -86,8 +103,19 @@
     "validationError": "Validation errors found"
   },
   "templates": {
-    "title": "Download Templates",
-    "description": "Download sample templates to use for import",
-    "download": "Download Template"
+    "title": "Download Template",
+    "description": "Download a sample CSV template with the correct format for importing {{type}}.",
+    "download": "Download Template",
+    "requiredColumns": "Required columns:"
+  },
+  "instructions": {
+    "title": "Import Instructions",
+    "step1": "1. Download the template for the type of data you want to import",
+    "step2": "2. Fill in your data following the template format (first row must be headers)",
+    "step3": "3. Save the file as CSV or Excel format",
+    "step4": "4. Upload the file and click Import",
+    "step5": "5. Duplicate entries (matching by name) will be automatically skipped",
+    "note": "Note:",
+    "interventionNote": "For interventions, if a care domain doesn't exist, it will be created automatically."
   }
 }

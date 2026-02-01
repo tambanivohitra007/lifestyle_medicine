@@ -1,6 +1,7 @@
 {
   "title": "Importer des données",
-  "subtitle": "Importation en masse de contenu depuis des fichiers",
+  "subtitle": "Importation en masse de conditions et d'interventions depuis des fichiers CSV ou Excel",
+  "selectType": "Sélectionner le type d'importation",
   "steps": {
     "upload": "Téléverser le fichier",
     "mapping": "Mapper les champs",
@@ -12,10 +13,14 @@
     "title": "Téléverser le fichier",
     "description": "Téléversez un fichier CSV ou Excel pour importer des données",
     "dropzone": "Glissez-déposez un fichier ici ou cliquez pour parcourir",
+    "dropText": "Déposez votre fichier CSV ou Excel ici, ou",
+    "browse": "parcourir",
+    "supportedFormats": "Formats supportés: .csv, .xlsx, .xls (max 10 Mo)",
     "acceptedFormats": "Formats acceptés: CSV, XLSX, XLS",
     "maxSize": "Taille maximale du fichier: 10 Mo",
     "selectFile": "Sélectionner un fichier",
-    "changeFile": "Changer de fichier"
+    "changeFile": "Changer de fichier",
+    "remove": "Supprimer"
   },
   "mapping": {
     "title": "Mapper les champs",
@@ -47,10 +52,22 @@
   "progress": {
     "title": "Progression de l'importation",
     "processing": "Traitement...",
+    "importing": "Importation...",
+    "loading": "Chargement...",
     "imported": "Importés",
     "skipped": "Ignorés",
     "failed": "Échoués",
     "total": "Total"
+  },
+  "actions": {
+    "import": "Importer {{type}}",
+    "downloadTemplate": "Télécharger le modèle {{type}}"
+  },
+  "results": {
+    "success": "Importation réussie",
+    "failed": "Échec de l'importation",
+    "errors": "Erreurs:",
+    "rowError": "Ligne {{row}}: {{message}}"
   },
   "complete": {
     "title": "Importation terminée",
@@ -86,8 +103,19 @@
     "validationError": "Erreurs de validation détectées"
   },
   "templates": {
-    "title": "Télécharger les modèles",
-    "description": "Téléchargez des modèles d'exemple pour l'importation",
-    "download": "Télécharger le modèle"
+    "title": "Télécharger le modèle",
+    "description": "Téléchargez un modèle CSV avec le format correct pour importer {{type}}.",
+    "download": "Télécharger le modèle",
+    "requiredColumns": "Colonnes requises:"
+  },
+  "instructions": {
+    "title": "Instructions d'importation",
+    "step1": "1. Téléchargez le modèle pour le type de données que vous souhaitez importer",
+    "step2": "2. Remplissez vos données en suivant le format du modèle (la première ligne doit être les en-têtes)",
+    "step3": "3. Enregistrez le fichier au format CSV ou Excel",
+    "step4": "4. Téléversez le fichier et cliquez sur Importer",
+    "step5": "5. Les entrées en double (correspondant par nom) seront automatiquement ignorées",
+    "note": "Remarque:",
+    "interventionNote": "Pour les interventions, si un domaine de soins n'existe pas, il sera créé automatiquement."
   }
 }

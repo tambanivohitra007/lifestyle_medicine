@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
 import { Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, X, FileText, Stethoscope, HeartPulse } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { useNotifications } from '../../contexts/NotificationContext';
 
 const Import = () => {
+  const { t } = useTranslation(['import', 'common']);
   const { notifyImport } = useNotifications();
   const [activeType, setActiveType] = useState('conditions');
   const [file, setFile] = useState(null);
@@ -14,8 +16,8 @@ const Import = () => {
   const fileInputRef = useRef(null);
 
   const importTypes = [
-    { id: 'conditions', label: 'Conditions', icon: HeartPulse, color: 'primary' },
-    { id: 'interventions', label: 'Interventions', icon: Stethoscope, color: 'secondary' },
+    { id: 'conditions', labelKey: 'import:types.conditions', icon: HeartPulse, color: 'primary' },
+    { id: 'interventions', labelKey: 'import:types.interventions', icon: Stethoscope, color: 'secondary' },
   ];
 
   const fetchTemplates = async () => {
@@ -134,13 +136,13 @@ const Import = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Import Data</h1>
-        <p className="text-gray-600 mt-1">Bulk import conditions and interventions from CSV or Excel files</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('import:title')}</h1>
+        <p className="text-gray-600 mt-1">{t('import:subtitle')}</p>
       </div>
 
       {/* Import Type Selection */}
       <div className="card">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Import Type</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('import:selectType')}</h2>
         <div className="flex gap-4">
           {importTypes.map((type) => (
             <button
@@ -162,7 +164,7 @@ const Import = () => {
               <div className={`font-medium ${
                 activeType === type.id ? `text-${type.color}-700` : 'text-gray-700'
               }`}>
-                {type.label}
+                {t(type.labelKey)}
               </div>
             </button>
           ))}
@@ -172,7 +174,7 @@ const Import = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upload Section */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload File</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('import:upload.title')}</h2>
 
           <div
             onDrop={handleDrop}
@@ -206,17 +208,17 @@ const Import = () => {
                   className="text-red-600 hover:text-red-700 text-sm mt-2 inline-flex items-center gap-1"
                 >
                   <X className="w-4 h-4" />
-                  Remove
+                  {t('import:upload.remove')}
                 </button>
               </div>
             ) : (
               <div>
                 <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600">
-                  Drop your CSV or Excel file here, or <span className="text-primary-600">browse</span>
+                  {t('import:upload.dropText')} <span className="text-primary-600">{t('import:upload.browse')}</span>
                 </p>
                 <p className="text-sm text-gray-400 mt-2">
-                  Supports .csv, .xlsx, .xls (max 10MB)
+                  {t('import:upload.supportedFormats')}
                 </p>
               </div>
             )}
@@ -230,12 +232,12 @@ const Import = () => {
             {uploading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                Importing...
+                {t('import:progress.importing')}
               </>
             ) : (
               <>
                 <Upload className="w-4 h-4" />
-                Import {importTypes.find(t => t.id === activeType)?.label}
+                {t('import:actions.import', { type: t(importTypes.find(tp => tp.id === activeType)?.labelKey) })}
               </>
             )}
           </button>
@@ -245,9 +247,9 @@ const Import = () => {
         <div className="space-y-6">
           {/* Download Template */}
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Download Template</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('import:templates.title')}</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Download a sample CSV template with the correct format for importing {activeType}.
+              {t('import:templates.description', { type: t(importTypes.find(tp => tp.id === activeType)?.labelKey).toLowerCase() })}
             </p>
             <button
               onClick={() => {
@@ -262,19 +264,19 @@ const Import = () => {
               {loadingTemplates ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-500 border-t-transparent"></div>
-                  Loading...
+                  {t('import:progress.loading')}
                 </>
               ) : (
                 <>
                   <Download className="w-4 h-4" />
-                  Download {activeType === 'conditions' ? 'Conditions' : 'Interventions'} Template
+                  {t('import:actions.downloadTemplate', { type: t(importTypes.find(tp => tp.id === activeType)?.labelKey) })}
                 </>
               )}
             </button>
 
             {templates && templates[activeType] && (
               <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                <p className="text-xs font-medium text-gray-500 mb-2">Required columns:</p>
+                <p className="text-xs font-medium text-gray-500 mb-2">{t('import:templates.requiredColumns')}</p>
                 <div className="flex flex-wrap gap-2">
                   {templates[activeType].headers.map((header) => (
                     <span
@@ -302,7 +304,7 @@ const Import = () => {
                 )}
                 <div className="flex-1">
                   <h3 className={`font-semibold ${result.success ? 'text-green-700' : 'text-red-700'}`}>
-                    {result.success ? 'Import Successful' : 'Import Failed'}
+                    {result.success ? t('import:results.success') : t('import:results.failed')}
                   </h3>
                   <p className="text-sm text-gray-600 mt-1">{result.message}</p>
 
@@ -310,22 +312,22 @@ const Import = () => {
                     <div className="mt-3 flex gap-4">
                       <div className="bg-green-50 px-3 py-2 rounded-lg">
                         <div className="text-lg font-bold text-green-700">{result.imported}</div>
-                        <div className="text-xs text-green-600">Imported</div>
+                        <div className="text-xs text-green-600">{t('import:progress.imported')}</div>
                       </div>
                       <div className="bg-yellow-50 px-3 py-2 rounded-lg">
                         <div className="text-lg font-bold text-yellow-700">{result.skipped}</div>
-                        <div className="text-xs text-yellow-600">Skipped</div>
+                        <div className="text-xs text-yellow-600">{t('import:progress.skipped')}</div>
                       </div>
                     </div>
                   )}
 
                   {result.errors && result.errors.length > 0 && (
                     <div className="mt-3">
-                      <p className="text-xs font-medium text-gray-500 mb-2">Errors:</p>
+                      <p className="text-xs font-medium text-gray-500 mb-2">{t('import:results.errors')}</p>
                       <ul className="text-xs text-red-600 space-y-1 max-h-32 overflow-y-auto">
                         {result.errors.map((error, idx) => (
                           <li key={idx}>
-                            Row {error.row}: {error.message}
+                            {t('import:results.rowError', { row: error.row, message: error.message })}
                           </li>
                         ))}
                       </ul>
@@ -342,19 +344,19 @@ const Import = () => {
       <div className="card bg-blue-50 border-blue-200">
         <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
           <FileText className="w-5 h-5" />
-          Import Instructions
+          {t('import:instructions.title')}
         </h3>
         <ul className="text-sm text-blue-800 space-y-2">
-          <li>1. Download the template for the type of data you want to import</li>
-          <li>2. Fill in your data following the template format (first row must be headers)</li>
-          <li>3. Save the file as CSV or Excel format</li>
-          <li>4. Upload the file and click Import</li>
-          <li>5. Duplicate entries (matching by name) will be automatically skipped</li>
+          <li>{t('import:instructions.step1')}</li>
+          <li>{t('import:instructions.step2')}</li>
+          <li>{t('import:instructions.step3')}</li>
+          <li>{t('import:instructions.step4')}</li>
+          <li>{t('import:instructions.step5')}</li>
         </ul>
 
         <div className="mt-4 pt-4 border-t border-blue-200">
           <p className="text-sm text-blue-800">
-            <strong>Note:</strong> For interventions, if a care domain doesn&apos;t exist, it will be created automatically.
+            <strong>{t('import:instructions.note')}</strong> {t('import:instructions.interventionNote')}
           </p>
         </div>
       </div>

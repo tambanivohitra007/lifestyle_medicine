@@ -80,15 +80,15 @@ const GrowthLineChart = ({ data, loading, onMonthsChange }) => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Content Growth Over Time</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{t('analytics:charts.contentGrowth')}</h3>
         <select
           value={months}
           onChange={(e) => handleMonthsChange(Number(e.target.value))}
           className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         >
-          <option value={6}>Last 6 months</option>
-          <option value={12}>Last 12 months</option>
-          <option value={24}>Last 24 months</option>
+          <option value={6}>{t('analytics:filters.last6Months')}</option>
+          <option value={12}>{t('analytics:filters.last12Months')}</option>
+          <option value={24}>{t('analytics:filters.last24Months')}</option>
         </select>
       </div>
 

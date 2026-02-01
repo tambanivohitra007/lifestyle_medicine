@@ -1,4 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 const QUALITY_COLORS = {
   high: '#10b981',
@@ -9,6 +10,8 @@ const QUALITY_COLORS = {
 };
 
 const QualityDistribution = ({ data, loading }) => {
+  const { t } = useTranslation(['analytics']);
+
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -29,9 +32,9 @@ const QualityDistribution = ({ data, loading }) => {
   if (!data || data.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Evidence Quality Distribution</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:charts.evidenceQuality')}</h3>
         <div className="h-[250px] flex items-center justify-center text-gray-500">
-          No evidence quality data available
+          {t('analytics:empty.noQualityData')}
         </div>
       </div>
     );
@@ -46,7 +49,7 @@ const QualityDistribution = ({ data, loading }) => {
       return (
         <div className="bg-white px-3 py-2 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-medium text-gray-900">{item.label}</p>
-          <p className="text-sm text-gray-600">{item.count} entries ({percentage}%)</p>
+          <p className="text-sm text-gray-600">{item.count} {t('analytics:labels.entries')} ({percentage}%)</p>
         </div>
       );
     }
@@ -55,7 +58,7 @@ const QualityDistribution = ({ data, loading }) => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Evidence Quality Distribution</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:charts.evidenceQuality')}</h3>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-5 gap-2 mb-4">

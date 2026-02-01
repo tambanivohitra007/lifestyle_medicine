@@ -1,6 +1,8 @@
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ContentCompleteness = ({ data, loading }) => {
+  const { t } = useTranslation(['analytics']);
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -20,18 +22,18 @@ const ContentCompleteness = ({ data, loading }) => {
   if (!data) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Content Completeness</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:charts.completeness')}</h3>
         <div className="flex items-center justify-center py-8 text-gray-500">
-          No completeness data available
+          {t('analytics:empty.noCompletenessData')}
         </div>
       </div>
     );
   }
 
   const categories = [
-    { key: 'conditions', label: 'Conditions', color: 'primary' },
-    { key: 'interventions', label: 'Interventions', color: 'secondary' },
-    { key: 'recipes', label: 'Recipes', color: 'amber' },
+    { key: 'conditions', labelKey: 'analytics:cards.conditions', color: 'primary' },
+    { key: 'interventions', labelKey: 'analytics:cards.interventions', color: 'secondary' },
+    { key: 'recipes', labelKey: 'analytics:cards.recipes', color: 'amber' },
   ];
 
   const getProgressColor = (percentage) => {
@@ -42,7 +44,7 @@ const ContentCompleteness = ({ data, loading }) => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Content Completeness</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:charts.completeness')}</h3>
 
       <div className="space-y-6">
         {categories.map((category) => {
@@ -56,9 +58,9 @@ const ContentCompleteness = ({ data, loading }) => {
           return (
             <div key={category.key}>
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-medium text-gray-700">{category.label}</h4>
+                <h4 className="text-sm font-medium text-gray-700">{t(category.labelKey)}</h4>
                 <span className="text-sm text-gray-500">
-                  Avg: <span className="font-semibold text-gray-900">{stats.average_score}%</span>
+                  {t('analytics:labels.average')} <span className="font-semibold text-gray-900">{stats.average_score}%</span>
                 </span>
               </div>
 
@@ -67,17 +69,17 @@ const ContentCompleteness = ({ data, loading }) => {
                 <div
                   className="bg-green-500 transition-all"
                   style={{ width: `${completePercent}%` }}
-                  title={`Complete: ${stats.complete}`}
+                  title={`${t('analytics:labels.complete')} ${stats.complete}`}
                 />
                 <div
                   className="bg-amber-500 transition-all"
                   style={{ width: `${partialPercent}%` }}
-                  title={`Partial: ${stats.partial}`}
+                  title={`${t('analytics:labels.partial')} ${stats.partial}`}
                 />
                 <div
                   className="bg-red-400 transition-all"
                   style={{ width: `${incompletePercent}%` }}
-                  title={`Incomplete: ${stats.incomplete}`}
+                  title={`${t('analytics:labels.incomplete')} ${stats.incomplete}`}
                 />
               </div>
 
@@ -85,15 +87,15 @@ const ContentCompleteness = ({ data, loading }) => {
               <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
                 <div className="flex items-center gap-1">
                   <CheckCircle className="w-3.5 h-3.5 text-green-500" />
-                  <span>Complete: {stats.complete}</span>
+                  <span>{t('analytics:labels.complete')} {stats.complete}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Partial: {stats.partial}</span>
+                  <span>{t('analytics:labels.partial')} {stats.partial}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <XCircle className="w-3.5 h-3.5 text-red-400" />
-                  <span>Incomplete: {stats.incomplete}</span>
+                  <span>{t('analytics:labels.incomplete')} {stats.incomplete}</span>
                 </div>
               </div>
             </div>
@@ -111,7 +113,7 @@ const ContentCompleteness = ({ data, loading }) => {
             return (
               <div key={`summary-${category.key}`}>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                <p className="text-xs text-gray-500">{category.label}</p>
+                <p className="text-xs text-gray-500">{t(category.labelKey)}</p>
               </div>
             );
           })}
