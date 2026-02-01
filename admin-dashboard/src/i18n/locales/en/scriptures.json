@@ -4,11 +4,15 @@
   "plural": "Scriptures",
   "list": {
     "title": "Scriptures",
-    "subtitle": "Bible verses and passages",
+    "subtitle": "Manage scripture references for spiritual care",
     "addNew": "Add Scripture",
     "searchPlaceholder": "Search scriptures...",
     "filterByBook": "Filter by book",
-    "allBooks": "All books"
+    "filterByTheme": "Filter by theme",
+    "filterByTag": "Filter by tag",
+    "allBooks": "All books",
+    "allThemes": "All Themes",
+    "allTags": "All Tags"
   },
   "detail": {
     "title": "Scripture Details",
@@ -22,8 +26,12 @@
     "tags": "Tags"
   },
   "form": {
-    "createTitle": "Add Scripture",
+    "createTitle": "New Scripture",
+    "createSubtitle": "Add a new scripture reference",
     "editTitle": "Edit Scripture",
+    "editSubtitle": "Update the scripture details",
+    "reference": "Reference",
+    "referencePlaceholder": "e.g., John 3:16, Psalm 23:1-6",
     "book": "Book",
     "selectBook": "Select book",
     "chapter": "Chapter",
@@ -32,8 +40,10 @@
     "verseStartPlaceholder": "Starting verse",
     "verseEnd": "End Verse",
     "verseEndPlaceholder": "Ending verse (optional)",
-    "text": "Scripture Text",
-    "textPlaceholder": "Enter scripture text...",
+    "text": "Text",
+    "textPlaceholder": "Enter the scripture text...",
+    "theme": "Theme",
+    "themePlaceholder": "e.g., Healing, Peace, Faith",
     "translation": "Translation",
     "selectTranslation": "Select translation",
     "context": "Context",
@@ -42,7 +52,12 @@
     "applicationPlaceholder": "How this applies to health...",
     "tags": "Tags",
     "selectTags": "Select tags",
-    "status": "Status"
+    "status": "Status",
+    "saveScripture": "Save Scripture"
+  },
+  "validation": {
+    "referenceRequired": "Reference is required",
+    "textRequired": "Text is required"
   },
   "translations": {
     "kjv": "King James Version",

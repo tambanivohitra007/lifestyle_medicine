@@ -23,20 +23,27 @@
   },
   "form": {
     "createTitle": "Créer un utilisateur",
+    "createSubtitle": "Ajouter un nouvel utilisateur au système",
     "editTitle": "Modifier l'utilisateur",
+    "editSubtitle": "Mettre à jour les informations de l'utilisateur",
     "name": "Nom complet",
     "namePlaceholder": "Entrez le nom complet",
     "email": "Adresse courriel",
     "emailPlaceholder": "Entrez l'adresse courriel",
     "password": "Mot de passe",
     "passwordPlaceholder": "Entrez le mot de passe",
+    "passwordKeepCurrent": "Laisser vide pour conserver l'actuel",
     "confirmPassword": "Confirmer le mot de passe",
     "confirmPasswordPlaceholder": "Confirmez le mot de passe",
     "role": "Rôle",
     "selectRole": "Sélectionner un rôle",
     "status": "Statut",
     "active": "Actif",
-    "inactive": "Inactif"
+    "inactive": "Inactif",
+    "activeAccount": "Compte actif",
+    "activeAccountDescription": "L'utilisateur peut se connecter et accéder au système",
+    "createUser": "Créer l'utilisateur",
+    "updateUser": "Mettre à jour l'utilisateur"
   },
   "roles": {
     "admin": "Administrateur",
@@ -52,12 +59,33 @@
     "active": "Actif",
     "inactive": "Inactif",
     "pending": "En attente",
-    "suspended": "Suspendu"
+    "suspended": "Suspendu",
+    "deleted": "Supprimé"
+  },
+  "actions": {
+    "activate": "Activer",
+    "deactivate": "Désactiver",
+    "restore": "Restaurer",
+    "activateTitle": "Activer l'utilisateur",
+    "deactivateTitle": "Désactiver l'utilisateur",
+    "restoreTitle": "Restaurer l'utilisateur",
+    "activateConfirm": "Êtes-vous sûr de vouloir activer {{name}}?",
+    "deactivateConfirm": "Êtes-vous sûr de vouloir désactiver {{name}}? Il ne pourra plus se connecter.",
+    "restoreConfirm": "Êtes-vous sûr de vouloir restaurer {{name}}?",
+    "yesActivate": "Oui, Activer",
+    "yesDeactivate": "Oui, Désactiver",
+    "yesRestore": "Oui, Restaurer"
+  },
+  "validation": {
+    "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordMismatch": "Les mots de passe ne correspondent pas"
   },
   "empty": {
     "title": "Aucun utilisateur trouvé",
     "description": "Commencez par créer votre premier utilisateur",
-    "action": "Ajouter un utilisateur"
+    "action": "Ajouter un utilisateur",
+    "noUsersYet": "Aucun utilisateur pour le moment",
+    "adjustFilters": "Essayez d'ajuster votre recherche ou vos filtres"
   },
   "toast": {
     "created": "Utilisateur créé avec succès",
@@ -65,10 +93,14 @@
     "deleted": "Utilisateur supprimé avec succès",
     "activated": "Utilisateur activé avec succès",
     "deactivated": "Utilisateur désactivé avec succès",
+    "restored": "Utilisateur restauré avec succès",
     "createError": "Échec de la création de l'utilisateur",
     "updateError": "Échec de la mise à jour de l'utilisateur",
     "deleteError": "Échec de la suppression de l'utilisateur",
-    "loadError": "Échec du chargement des utilisateurs"
+    "loadError": "Échec du chargement des utilisateurs",
+    "activateError": "Échec de l'activation de l'utilisateur",
+    "deactivateError": "Échec de la désactivation de l'utilisateur",
+    "restoreError": "Échec de la restauration de l'utilisateur"
   },
   "confirm": {
     "delete": "Êtes-vous sûr de vouloir supprimer cet utilisateur?",

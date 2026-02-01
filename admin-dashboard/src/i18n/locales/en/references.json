@@ -5,11 +5,14 @@
   "egwWritings": "Ellen G. White Writings",
   "list": {
     "title": "References",
-    "subtitle": "Citations and source materials",
+    "subtitle": "Manage citations and scientific references",
     "addNew": "Add Reference",
-    "searchPlaceholder": "Search references...",
+    "searchPlaceholder": "Search by citation, DOI, or PMID...",
     "filterByType": "Filter by type",
-    "allTypes": "All types"
+    "filterByYear": "Filter by year",
+    "allTypes": "All types",
+    "allYears": "All Years",
+    "exportCsv": "Export CSV"
   },
   "detail": {
     "title": "Reference Details",
@@ -21,22 +24,28 @@
     "tags": "Tags"
   },
   "form": {
-    "createTitle": "Add Reference",
+    "createTitle": "New Reference",
+    "createSubtitle": "Add a new scientific reference",
     "editTitle": "Edit Reference",
+    "editSubtitle": "Update the reference details",
     "title": "Title",
     "titlePlaceholder": "Enter reference title",
     "authors": "Authors",
     "authorsPlaceholder": "Enter authors",
+    "citation": "Citation",
+    "citationPlaceholder": "Full citation text (e.g., Author A, Author B. Title. Journal. Year;Volume:Pages)",
     "source": "Source",
     "sourcePlaceholder": "Journal, book, website, etc.",
     "year": "Year",
-    "yearPlaceholder": "Publication year",
+    "yearPlaceholder": "e.g., 2023",
     "type": "Reference Type",
     "selectType": "Select type",
     "url": "URL",
-    "urlPlaceholder": "Link to source",
+    "urlPlaceholder": "https://...",
     "doi": "DOI",
-    "doiPlaceholder": "Digital Object Identifier",
+    "doiPlaceholder": "e.g., 10.1000/xyz123",
+    "pmid": "PubMed ID (PMID)",
+    "pmidPlaceholder": "e.g., 12345678",
     "isbn": "ISBN",
     "isbnPlaceholder": "ISBN number",
     "abstract": "Abstract",
@@ -45,7 +54,14 @@
     "notesPlaceholder": "Additional notes...",
     "tags": "Tags",
     "selectTags": "Select tags",
-    "status": "Status"
+    "status": "Status",
+    "saveReference": "Save Reference"
+  },
+  "validation": {
+    "citationRequired": "Citation is required"
+  },
+  "labels": {
+    "link": "Link"
   },
   "types": {
     "journal": "Journal Article",

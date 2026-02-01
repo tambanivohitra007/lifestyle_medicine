@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loader2, Save, Shield, PenTool, Eye } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const UserForm = () => {
+  const { t } = useTranslation(['users', 'common']);
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -43,7 +45,7 @@ const UserForm = () => {
       });
     } catch (error) {
       console.error('Error fetching user:', error);
-      toast.error('Failed to load user');
+      toast.error(t('users:toast.loadError'));
       navigate('/users');
     } finally {
       setLoading(false);
@@ -66,23 +68,23 @@ const UserForm = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('common:validation.required', { field: t('common:labels.name') });
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('common:validation.required', { field: t('common:labels.email') });
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
+      newErrors.email = t('common:messages.error.invalidEmail');
     }
 
     if (!isEditing && !formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('common:validation.required', { field: t('users:form.password') });
     } else if (formData.password && formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+      newErrors.password = t('users:validation.passwordMinLength');
     }
 
     if (formData.password && formData.password !== formData.password_confirmation) {
-      newErrors.password_confirmation = 'Passwords do not match';
+      newErrors.password_confirmation = t('users:validation.passwordMismatch');
     }
 
     setErrors(newErrors);
@@ -111,10 +113,10 @@ const UserForm = () => {
 
       if (isEditing) {
         await api.put(`${apiEndpoints.users}/${id}`, payload);
-        toast.success('User updated');
+        toast.success(t('users:toast.updated'));
       } else {
         await api.post(apiEndpoints.users, payload);
-        toast.success('User created');
+        toast.success(t('users:toast.created'));
       }
 
       navigate('/users');
@@ -125,7 +127,7 @@ const UserForm = () => {
       } else if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error('Failed to save user');
+        toast.error(t('users:toast.updateError'));
       }
     } finally {
       setSaving(false);
@@ -133,8 +135,8 @@ const UserForm = () => {
   };
 
   const breadcrumbItems = [
-    { label: 'Users', path: '/users' },
-    { label: isEditing ? 'Edit User' : 'New User' },
+    { label: t('users:title'), path: '/users' },
+    { label: isEditing ? t('users:form.editTitle') : t('users:form.createTitle') },
   ];
 
   if (loading) {
@@ -152,10 +154,10 @@ const UserForm = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {isEditing ? 'Edit User' : 'New User'}
+          {isEditing ? t('users:form.editTitle') : t('users:form.createTitle')}
         </h1>
         <p className="text-gray-600 mt-1 text-sm sm:text-base">
-          {isEditing ? 'Update user information and permissions' : 'Create a new user account'}
+          {isEditing ? t('users:form.editSubtitle') : t('users:form.createSubtitle')}
         </p>
       </div>
 
@@ -165,7 +167,7 @@ const UserForm = () => {
           {/* Name */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Name <span className="text-red-500">*</span>
+              {t('users:form.name')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -174,7 +176,7 @@ const UserForm = () => {
               value={formData.name}
               onChange={handleChange}
               className={`input-field ${errors.name ? 'border-red-500' : ''}`}
-              placeholder="Enter full name"
+              placeholder={t('users:form.namePlaceholder')}
             />
             {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
           </div>
@@ -182,7 +184,7 @@ const UserForm = () => {
           {/* Email */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email <span className="text-red-500">*</span>
+              {t('users:form.email')} <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -191,7 +193,7 @@ const UserForm = () => {
               value={formData.email}
               onChange={handleChange}
               className={`input-field ${errors.email ? 'border-red-500' : ''}`}
-              placeholder="Enter email address"
+              placeholder={t('users:form.emailPlaceholder')}
             />
             {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
           </div>
@@ -200,7 +202,7 @@ const UserForm = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password {!isEditing && <span className="text-red-500">*</span>}
+                {t('users:form.password')} {!isEditing && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="password"
@@ -209,13 +211,13 @@ const UserForm = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className={`input-field ${errors.password ? 'border-red-500' : ''}`}
-                placeholder={isEditing ? 'Leave blank to keep current' : 'Enter password'}
+                placeholder={isEditing ? t('users:form.passwordKeepCurrent') : t('users:form.passwordPlaceholder')}
               />
               {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
             </div>
             <div>
               <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
+                {t('users:form.confirmPassword')}
               </label>
               <input
                 type="password"
@@ -224,7 +226,7 @@ const UserForm = () => {
                 value={formData.password_confirmation}
                 onChange={handleChange}
                 className={`input-field ${errors.password_confirmation ? 'border-red-500' : ''}`}
-                placeholder="Confirm password"
+                placeholder={t('users:form.confirmPasswordPlaceholder')}
               />
               {errors.password_confirmation && (
                 <p className="mt-1 text-sm text-red-500">{errors.password_confirmation}</p>
@@ -235,13 +237,13 @@ const UserForm = () => {
           {/* Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Role <span className="text-red-500">*</span>
+              {t('users:form.role')} <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { value: 'admin', label: 'Admin', icon: Shield, description: 'Full access to all features', color: 'purple' },
-                { value: 'editor', label: 'Editor', icon: PenTool, description: 'Can create and edit content', color: 'blue' },
-                { value: 'viewer', label: 'Viewer', icon: Eye, description: 'Read-only access', color: 'gray' },
+                { value: 'admin', labelKey: 'users:roles.admin', icon: Shield, descKey: 'users:roleDescriptions.admin', color: 'purple' },
+                { value: 'editor', labelKey: 'users:roles.editor', icon: PenTool, descKey: 'users:roleDescriptions.editor', color: 'blue' },
+                { value: 'viewer', labelKey: 'users:roles.viewer', icon: Eye, descKey: 'users:roleDescriptions.viewer', color: 'gray' },
               ].map((role) => (
                 <label
                   key={role.value}
@@ -268,9 +270,9 @@ const UserForm = () => {
                     <p className={`font-medium ${
                       formData.role === role.value ? `text-${role.color}-900` : 'text-gray-900'
                     }`}>
-                      {role.label}
+                      {t(role.labelKey)}
                     </p>
-                    <p className="text-sm text-gray-500">{role.description}</p>
+                    <p className="text-sm text-gray-500">{t(role.descKey)}</p>
                   </div>
                   {formData.role === role.value && (
                     <div className={`absolute top-2 right-2 w-2 h-2 rounded-full bg-${role.color}-500`} />
@@ -291,8 +293,8 @@ const UserForm = () => {
                 className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
               <div>
-                <span className="font-medium text-gray-900">Active Account</span>
-                <p className="text-sm text-gray-500">Inactive users cannot log in</p>
+                <span className="font-medium text-gray-900">{t('users:form.activeAccount')}</span>
+                <p className="text-sm text-gray-500">{t('users:form.activeAccountDescription')}</p>
               </div>
             </label>
           </div>
@@ -308,12 +310,12 @@ const UserForm = () => {
             {saving ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Saving...
+                {t('common:buttons.saving')}
               </>
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                {isEditing ? 'Update User' : 'Create User'}
+                {isEditing ? t('users:form.updateUser') : t('users:form.createUser')}
               </>
             )}
           </button>
@@ -322,7 +324,7 @@ const UserForm = () => {
             onClick={() => navigate('/users')}
             className="btn-secondary order-2 sm:order-1"
           >
-            Cancel
+            {t('common:buttons.cancel')}
           </button>
         </div>
       </form>

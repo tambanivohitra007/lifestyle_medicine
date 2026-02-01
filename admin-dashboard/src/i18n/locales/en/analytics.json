@@ -1,6 +1,6 @@
 {
   "title": "Analytics",
-  "subtitle": "Usage statistics and insights",
+  "subtitle": "Content metrics, activity tracking, and data insights",
   "overview": {
     "title": "Overview",
     "totalContent": "Total Content",
@@ -38,7 +38,8 @@
     "created": "Created",
     "updated": "Updated",
     "deleted": "Deleted",
-    "viewed": "Viewed"
+    "viewed": "Viewed",
+    "noActivity": "No recent activity"
   },
   "charts": {
     "contentOverTime": "Content Over Time",
@@ -47,11 +48,19 @@
     "userGrowth": "User Growth",
     "dailyActivity": "Daily Activity",
     "weeklyActivity": "Weekly Activity",
-    "monthlyActivity": "Monthly Activity"
+    "monthlyActivity": "Monthly Activity",
+    "conditionsByCategory": "Conditions by Category",
+    "interventionsByDomain": "Interventions by Care Domain",
+    "contentGrowth": "Content Growth Over Time",
+    "evidenceQuality": "Evidence Quality Distribution",
+    "completeness": "Content Completeness"
   },
   "filters": {
     "dateRange": "Date Range",
+    "last6Months": "Last 6 months",
     "last7Days": "Last 7 Days",
+    "last12Months": "Last 12 months",
+    "last24Months": "Last 24 months",
     "last30Days": "Last 30 Days",
     "last90Days": "Last 90 Days",
     "lastYear": "Last Year",
@@ -62,10 +71,47 @@
     "title": "Export Data",
     "csv": "Export as CSV",
     "pdf": "Export as PDF",
-    "excel": "Export as Excel"
+    "excel": "Export as Excel",
+    "report": "Export Report"
   },
   "empty": {
     "noData": "No analytics data available",
-    "noActivity": "No activity recorded"
+    "noActivity": "No activity recorded",
+    "noCategoryData": "No category data available",
+    "noDomainData": "No care domain data available",
+    "noGrowthData": "No growth data available",
+    "noQualityData": "No evidence quality data available",
+    "noCompletenessData": "No completeness data available"
+  },
+  "cards": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "scriptures": "Scriptures",
+    "recipes": "Recipes",
+    "egwWritings": "EGW Writings",
+    "evidenceEntries": "Evidence Entries",
+    "users": "Users",
+    "createdToday": "Created Today",
+    "thisWeek": "this week",
+    "updated": "updated"
+  },
+  "types": {
+    "condition": "Condition",
+    "intervention": "Intervention",
+    "scripture": "Scripture",
+    "recipe": "Recipe",
+    "egwReference": "EGW Reference"
+  },
+  "labels": {
+    "conditions": "conditions",
+    "interventions": "interventions",
+    "entries": "entries",
+    "average": "Avg:",
+    "complete": "Complete:",
+    "partial": "Partial:",
+    "incomplete": "Incomplete:"
+  },
+  "actions": {
+    "refresh": "Refresh"
   }
 }

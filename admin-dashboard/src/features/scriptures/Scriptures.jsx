@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, BookOpen, Edit, Trash2, Tag, Save, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -8,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 
 const Scriptures = () => {
+  const { t } = useTranslation(['scriptures', 'common']);
   const { canEdit } = useAuth();
   const [scriptures, setScriptures] = useState([]);
   const [contentTags, setContentTags] = useState([]);
@@ -70,16 +72,16 @@ const Scriptures = () => {
   };
 
   const handleDelete = async (id, reference) => {
-    const confirmed = await confirmDelete(reference || 'this scripture');
+    const confirmed = await confirmDelete(reference || t('scriptures:singular'));
     if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.scripturesAdmin}/${id}`);
-      toast.success('Scripture deleted');
+      toast.success(t('scriptures:toast.deleted'));
       fetchScriptures();
     } catch (error) {
       console.error('Error deleting scripture:', error);
-      toast.error('Failed to delete scripture');
+      toast.error(t('scriptures:toast.deleteError'));
     }
   };
 
@@ -107,7 +109,7 @@ const Scriptures = () => {
       });
     } catch (error) {
       console.error('Error fetching scripture:', error);
-      toast.error('Failed to load scripture');
+      toast.error(t('scriptures:toast.loadError'));
       setIsModalOpen(false);
     } finally {
       setFormLoading(false);
@@ -124,10 +126,10 @@ const Scriptures = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.reference.trim()) {
-      newErrors.reference = 'Reference is required';
+      newErrors.reference = t('scriptures:validation.referenceRequired');
     }
     if (!formData.text.trim()) {
-      newErrors.text = 'Text is required';
+      newErrors.text = t('scriptures:validation.textRequired');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -141,10 +143,10 @@ const Scriptures = () => {
       setSaving(true);
       if (editingId) {
         await api.put(`${apiEndpoints.scripturesAdmin}/${editingId}`, formData);
-        toast.success('Scripture updated');
+        toast.success(t('scriptures:toast.updated'));
       } else {
         await api.post(apiEndpoints.scripturesAdmin, formData);
-        toast.success('Scripture created');
+        toast.success(t('scriptures:toast.created'));
       }
       closeModal();
       fetchScriptures();
@@ -153,7 +155,7 @@ const Scriptures = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error('Failed to save scripture');
+        toast.error(t('scriptures:toast.updateError'));
       }
     } finally {
       setSaving(false);
@@ -175,9 +177,9 @@ const Scriptures = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Scriptures</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('scriptures:list.title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage scripture references for spiritual care
+            {t('scriptures:list.subtitle')}
           </p>
         </div>
         {canEdit && (
@@ -186,7 +188,7 @@ const Scriptures = () => {
             className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Plus className="w-5 h-5" />
-            Add Scripture
+            {t('scriptures:list.addNew')}
           </button>
         )}
       </div>
@@ -198,7 +200,7 @@ const Scriptures = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search scriptures..."
+              placeholder={t('scriptures:list.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -209,7 +211,7 @@ const Scriptures = () => {
             onChange={(e) => setThemeFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Themes</option>
+            <option value="">{t('scriptures:list.allThemes')}</option>
             {themes.map((theme) => (
               <option key={theme} value={theme}>
                 {theme}
@@ -221,7 +223,7 @@ const Scriptures = () => {
             onChange={(e) => setTagFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Tags</option>
+            <option value="">{t('scriptures:list.allTags')}</option>
             {contentTags.map((tag) => (
               <option key={tag.id} value={tag.id}>
                 {tag.name}
@@ -238,10 +240,10 @@ const Scriptures = () => {
         <div className="card text-center py-8 sm:py-12">
           <BookOpen className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No scriptures found
+            {t('scriptures:empty.title')}
           </h3>
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Get started by adding scripture references.
+            {t('scriptures:empty.description')}
           </p>
           {canEdit && (
             <button
@@ -249,7 +251,7 @@ const Scriptures = () => {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Scripture
+              {t('scriptures:empty.action')}
             </button>
           )}
         </div>
@@ -270,14 +272,14 @@ const Scriptures = () => {
                       <button
                         onClick={() => openEditModal(scripture.id)}
                         className="action-btn"
-                        title="Edit"
+                        title={t('common:buttons.edit')}
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
                         onClick={() => handleDelete(scripture.id, scripture.reference)}
                         className="action-btn hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
+                        title={t('common:buttons.delete')}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
@@ -332,8 +334,8 @@ const Scriptures = () => {
       <SlideOver
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingId ? 'Edit Scripture' : 'New Scripture'}
-        subtitle={editingId ? 'Update the scripture details' : 'Add a new scripture reference'}
+        title={editingId ? t('scriptures:form.editTitle') : t('scriptures:form.createTitle')}
+        subtitle={editingId ? t('scriptures:form.editSubtitle') : t('scriptures:form.createSubtitle')}
         size="md"
       >
         {formLoading ? (
@@ -345,7 +347,7 @@ const Scriptures = () => {
             {/* Reference */}
             <div>
               <label htmlFor="reference" className="label">
-                Reference <span className="text-red-500">*</span>
+                {t('scriptures:form.reference')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -354,7 +356,7 @@ const Scriptures = () => {
                 value={formData.reference}
                 onChange={handleChange}
                 className={`input-field ${errors.reference ? 'border-red-500' : ''}`}
-                placeholder="e.g., John 3:16, Psalm 23:1-6"
+                placeholder={t('scriptures:form.referencePlaceholder')}
                 autoFocus
               />
               {errors.reference && (
@@ -367,7 +369,7 @@ const Scriptures = () => {
             {/* Text */}
             <div>
               <label htmlFor="text" className="label">
-                Text <span className="text-red-500">*</span>
+                {t('scriptures:form.text')} <span className="text-red-500">*</span>
               </label>
               <textarea
                 id="text"
@@ -376,7 +378,7 @@ const Scriptures = () => {
                 onChange={handleChange}
                 rows={5}
                 className={`input-field resize-y ${errors.text ? 'border-red-500' : ''}`}
-                placeholder="Enter the scripture text..."
+                placeholder={t('scriptures:form.textPlaceholder')}
               />
               {errors.text && (
                 <p className="mt-1 text-sm text-red-500">
@@ -388,7 +390,7 @@ const Scriptures = () => {
             {/* Theme */}
             <div>
               <label htmlFor="theme" className="label">
-                Theme
+                {t('scriptures:form.theme')}
               </label>
               <input
                 type="text"
@@ -397,7 +399,7 @@ const Scriptures = () => {
                 value={formData.theme}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="e.g., Healing, Peace, Faith"
+                placeholder={t('scriptures:form.themePlaceholder')}
               />
             </div>
 
@@ -413,14 +415,14 @@ const Scriptures = () => {
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {saving ? 'Saving...' : 'Save Scripture'}
+                {saving ? t('common:buttons.saving') : t('scriptures:form.saveScripture')}
               </button>
               <button
                 type="button"
                 onClick={closeModal}
                 className="btn-outline w-full sm:w-auto"
               >
-                Cancel
+                {t('common:buttons.cancel')}
               </button>
             </div>
           </form>

@@ -3,14 +3,17 @@
   "singular": "Preuve",
   "plural": "Preuves",
   "list": {
-    "title": "Preuves",
-    "subtitle": "Études de recherche et preuves scientifiques",
+    "title": "Entrées de preuves",
+    "subtitle": "Gérer les preuves appuyant les interventions",
     "addNew": "Ajouter une preuve",
     "searchPlaceholder": "Rechercher des preuves...",
     "filterByType": "Filtrer par type",
     "filterByLevel": "Filtrer par niveau de preuve",
     "allTypes": "Tous les types",
-    "allLevels": "Tous les niveaux"
+    "allLevels": "Tous les niveaux",
+    "allStudyTypes": "Tous les types d'étude",
+    "allQualityRatings": "Toutes les évaluations de qualité",
+    "exportCsv": "Exporter CSV"
   },
   "detail": {
     "title": "Détails de la preuve",
@@ -25,8 +28,10 @@
     "tags": "Étiquettes"
   },
   "form": {
-    "createTitle": "Ajouter une preuve",
+    "createTitle": "Nouvelle entrée de preuve",
+    "createSubtitle": "Ajouter une nouvelle preuve pour une intervention",
     "editTitle": "Modifier la preuve",
+    "editSubtitle": "Mettre à jour les détails de la preuve",
     "title": "Titre",
     "titlePlaceholder": "Entrez le titre de la preuve",
     "abstract": "Résumé",
@@ -47,7 +52,20 @@
     "selectType": "Sélectionner le type d'étude",
     "tags": "Étiquettes",
     "selectTags": "Sélectionner des étiquettes",
-    "status": "Statut"
+    "status": "Statut",
+    "intervention": "Intervention",
+    "selectIntervention": "Sélectionner une intervention",
+    "studyType": "Type d'étude",
+    "selectStudyType": "Sélectionner le type",
+    "qualityRating": "Évaluation de qualité",
+    "selectQualityRating": "Sélectionner l'évaluation",
+    "population": "Population de l'étude",
+    "populationPlaceholder": "ex: Adultes atteints de diabète de type 2",
+    "summary": "Résumé",
+    "summaryPlaceholder": "Principales conclusions et résultats...",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes ou commentaires supplémentaires...",
+    "saveEvidence": "Enregistrer la preuve"
   },
   "levels": {
     "1a": "Niveau 1a - Revue systématique",
@@ -76,23 +94,41 @@
     "high": "Haute qualité",
     "good": "Bonne qualité",
     "moderate": "Qualité modérée",
-    "low": "Faible qualité"
+    "low": "Faible qualité",
+    "A": "A - Élevée",
+    "B": "B - Bonne",
+    "C": "C - Modérée",
+    "D": "D - Faible",
+    "A_full": "A - Haute qualité",
+    "B_full": "B - Bonne qualité",
+    "C_full": "C - Qualité modérée",
+    "D_full": "D - Faible qualité"
   },
   "studyTypes": {
     "rct": "ECR",
-    "metaAnalysis": "Méta-analyse",
-    "systematicReview": "Revue systématique",
+    "meta_analysis": "Méta-analyse",
+    "systematic_review": "Revue systématique",
     "observational": "Observationnel",
-    "caseSeries": "Série de cas",
-    "expertOpinion": "Opinion d'expert"
+    "case_series": "Série de cas",
+    "expert_opinion": "Opinion d'expert",
+    "rct_full": "Essai contrôlé randomisé",
+    "meta_analysis_full": "Méta-analyse",
+    "systematic_review_full": "Revue systématique",
+    "observational_full": "Étude observationnelle",
+    "case_series_full": "Série de cas",
+    "expert_opinion_full": "Opinion d'expert"
   },
   "labels": {
     "population": "Population",
-    "references": "Références"
+    "references": "Références",
+    "referencesCount": "{{count}} référence(s)"
+  },
+  "validation": {
+    "interventionRequired": "L'intervention est requise"
   },
   "empty": {
-    "title": "Aucune preuve trouvée",
-    "description": "Commencez par ajouter votre première preuve",
+    "title": "Aucune entrée de preuve trouvée",
+    "description": "Commencez par ajouter des preuves pour les interventions.",
     "action": "Ajouter une preuve"
   },
   "toast": {

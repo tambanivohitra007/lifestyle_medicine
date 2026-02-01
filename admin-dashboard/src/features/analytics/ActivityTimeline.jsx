@@ -1,5 +1,6 @@
 import { HeartPulse, Activity, Book, ChefHat, BookMarked, Plus, Edit2, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 const typeIcons = {
   condition: HeartPulse,
@@ -17,15 +18,16 @@ const typeColors = {
   egw_reference: 'bg-purple-100 text-purple-700',
 };
 
-const typeLabels = {
-  condition: 'Condition',
-  intervention: 'Intervention',
-  scripture: 'Scripture',
-  recipe: 'Recipe',
-  egw_reference: 'EGW Reference',
+const typeLabelKeys = {
+  condition: 'analytics:types.condition',
+  intervention: 'analytics:types.intervention',
+  scripture: 'analytics:types.scripture',
+  recipe: 'analytics:types.recipe',
+  egw_reference: 'analytics:types.egwReference',
 };
 
 const ActivityTimeline = ({ data, loading }) => {
+  const { t } = useTranslation(['analytics']);
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -48,10 +50,10 @@ const ActivityTimeline = ({ data, loading }) => {
   if (!data || data.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:activity.recentActivity')}</h3>
         <div className="flex flex-col items-center justify-center py-8 text-gray-500">
           <Clock className="w-12 h-12 text-gray-300 mb-2" />
-          <p>No recent activity</p>
+          <p>{t('analytics:activity.noActivity')}</p>
         </div>
       </div>
     );
@@ -59,12 +61,12 @@ const ActivityTimeline = ({ data, loading }) => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:activity.recentActivity')}</h3>
       <div className="space-y-4 max-h-[400px] overflow-y-auto">
         {data.map((activity, index) => {
           const Icon = typeIcons[activity.type] || HeartPulse;
           const colorClass = typeColors[activity.type] || 'bg-gray-100 text-gray-700';
-          const typeLabel = typeLabels[activity.type] || activity.type;
+          const typeLabel = typeLabelKeys[activity.type] ? t(typeLabelKeys[activity.type]) : activity.type;
 
           return (
             <div key={`${activity.type}-${activity.id}-${activity.action}-${index}`} className="flex gap-3">

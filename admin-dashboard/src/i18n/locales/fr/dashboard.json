@@ -31,7 +31,11 @@
   },
   "actions": {
     "addCondition": "Ajouter une condition",
+    "addConditionDesc": "Créer une nouvelle entrée de condition de santé",
     "addIntervention": "Ajouter une intervention",
+    "addInterventionDesc": "Créer une nouvelle intervention de mode de vie",
+    "addScripture": "Ajouter une écriture",
+    "addScriptureDesc": "Ajouter un passage biblique lié à la santé",
     "addRecipe": "Ajouter une recette",
     "viewAnalytics": "Voir les analytiques",
     "manageUsers": "Gérer les utilisateurs",

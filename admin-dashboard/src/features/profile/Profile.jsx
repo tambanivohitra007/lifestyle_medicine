@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { User, Mail, Lock, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import api, { apiEndpoints } from '../../lib/api';
 
 const Profile = () => {
+  const { t } = useTranslation(['profile', 'common']);
   const { user, updateUser } = useAuth();
 
   // Profile form state
@@ -56,14 +58,14 @@ const Profile = () => {
       // Update the auth context with new user data
       updateUser(updatedUser);
 
-      setProfileSuccess('Profile updated successfully');
+      setProfileSuccess(t('profile:toast.profileUpdated'));
     } catch (error) {
       if (error.response?.data?.errors) {
         setProfileErrors(error.response.data.errors);
       } else if (error.response?.data?.message) {
         setProfileErrors({ general: error.response.data.message });
       } else {
-        setProfileErrors({ general: 'Failed to update profile' });
+        setProfileErrors({ general: t('profile:errors.profileUpdateFailed') });
       }
     } finally {
       setProfileLoading(false);
@@ -78,14 +80,14 @@ const Profile = () => {
 
     // Client-side validation
     if (passwordData.password !== passwordData.password_confirmation) {
-      setPasswordErrors({ password_confirmation: 'Passwords do not match' });
+      setPasswordErrors({ password_confirmation: t('profile:errors.passwordMismatch') });
       setPasswordLoading(false);
       return;
     }
 
     try {
       await api.put(apiEndpoints.updatePassword, passwordData);
-      setPasswordSuccess('Password updated successfully');
+      setPasswordSuccess(t('profile:toast.passwordUpdated'));
       setPasswordData({
         current_password: '',
         password: '',
@@ -97,7 +99,7 @@ const Profile = () => {
       } else if (error.response?.data?.message) {
         setPasswordErrors({ general: error.response.data.message });
       } else {
-        setPasswordErrors({ general: 'Failed to update password' });
+        setPasswordErrors({ general: t('profile:errors.passwordUpdateFailed') });
       }
     } finally {
       setPasswordLoading(false);
@@ -118,9 +120,9 @@ const Profile = () => {
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Profile Settings</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('profile:header.title')}</h1>
         <p className="text-gray-600 mt-1 text-sm sm:text-base">
-          Manage your account information and password
+          {t('profile:header.subtitle')}
         </p>
       </div>
 
@@ -132,8 +134,8 @@ const Profile = () => {
               <User className="w-5 h-5 text-primary-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Profile Information</h2>
-              <p className="text-sm text-gray-600">Update your name and email address</p>
+              <h2 className="text-lg font-semibold text-gray-900">{t('profile:profile.title')}</h2>
+              <p className="text-sm text-gray-600">{t('profile:profile.updateDescription')}</p>
             </div>
           </div>
 
@@ -157,7 +159,7 @@ const Profile = () => {
             {/* Name */}
             <div>
               <label htmlFor="name" className="label">
-                Name
+                {t('profile:profile.name')}
               </label>
               <div className="relative">
                 <User className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -168,7 +170,7 @@ const Profile = () => {
                   value={profileData.name}
                   onChange={handleProfileChange}
                   className={`input-field pl-10 ${profileErrors.name ? 'border-red-500' : ''}`}
-                  placeholder="Your name"
+                  placeholder={t('profile:profile.namePlaceholder')}
                 />
               </div>
               {renderError('name', profileErrors)}
@@ -177,7 +179,7 @@ const Profile = () => {
             {/* Email */}
             <div>
               <label htmlFor="email" className="label">
-                Email Address
+                {t('profile:profile.email')}
               </label>
               <div className="relative">
                 <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -188,7 +190,7 @@ const Profile = () => {
                   value={profileData.email}
                   onChange={handleProfileChange}
                   className={`input-field pl-10 ${profileErrors.email ? 'border-red-500' : ''}`}
-                  placeholder="your@email.com"
+                  placeholder={t('profile:profile.emailPlaceholder')}
                 />
               </div>
               {renderError('email', profileErrors)}
@@ -204,7 +206,7 @@ const Profile = () => {
               ) : (
                 <Save className="w-5 h-5" />
               )}
-              {profileLoading ? 'Saving...' : 'Save Changes'}
+              {profileLoading ? t('profile:actions.saving') : t('profile:actions.save')}
             </button>
           </form>
         </div>
@@ -216,8 +218,8 @@ const Profile = () => {
               <Lock className="w-5 h-5 text-secondary-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Change Password</h2>
-              <p className="text-sm text-gray-600">Update your account password</p>
+              <h2 className="text-lg font-semibold text-gray-900">{t('profile:security.changePassword')}</h2>
+              <p className="text-sm text-gray-600">{t('profile:security.updateDescription')}</p>
             </div>
           </div>
 
@@ -241,7 +243,7 @@ const Profile = () => {
             {/* Current Password */}
             <div>
               <label htmlFor="current_password" className="label">
-                Current Password
+                {t('profile:security.currentPassword')}
               </label>
               <div className="relative">
                 <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -252,7 +254,7 @@ const Profile = () => {
                   value={passwordData.current_password}
                   onChange={handlePasswordChange}
                   className={`input-field pl-10 ${passwordErrors.current_password ? 'border-red-500' : ''}`}
-                  placeholder="Enter current password"
+                  placeholder={t('profile:security.currentPasswordPlaceholder')}
                   autoComplete="current-password"
                 />
               </div>
@@ -262,7 +264,7 @@ const Profile = () => {
             {/* New Password */}
             <div>
               <label htmlFor="password" className="label">
-                New Password
+                {t('profile:security.newPassword')}
               </label>
               <div className="relative">
                 <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -273,18 +275,18 @@ const Profile = () => {
                   value={passwordData.password}
                   onChange={handlePasswordChange}
                   className={`input-field pl-10 ${passwordErrors.password ? 'border-red-500' : ''}`}
-                  placeholder="Enter new password"
+                  placeholder={t('profile:security.newPasswordPlaceholder')}
                   autoComplete="new-password"
                 />
               </div>
               {renderError('password', passwordErrors)}
-              <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+              <p className="mt-1 text-xs text-gray-500">{t('profile:security.minLength')}</p>
             </div>
 
             {/* Confirm Password */}
             <div>
               <label htmlFor="password_confirmation" className="label">
-                Confirm New Password
+                {t('profile:security.confirmPassword')}
               </label>
               <div className="relative">
                 <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -295,7 +297,7 @@ const Profile = () => {
                   value={passwordData.password_confirmation}
                   onChange={handlePasswordChange}
                   className={`input-field pl-10 ${passwordErrors.password_confirmation ? 'border-red-500' : ''}`}
-                  placeholder="Confirm new password"
+                  placeholder={t('profile:security.confirmPasswordPlaceholder')}
                   autoComplete="new-password"
                 />
               </div>
@@ -312,7 +314,7 @@ const Profile = () => {
               ) : (
                 <Lock className="w-5 h-5" />
               )}
-              {passwordLoading ? 'Updating...' : 'Update Password'}
+              {passwordLoading ? t('profile:actions.updating') : t('profile:actions.updatePassword')}
             </button>
           </form>
         </div>

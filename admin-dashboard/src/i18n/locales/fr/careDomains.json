@@ -4,7 +4,7 @@
   "plural": "Domaines de soins",
   "list": {
     "title": "Domaines de soins",
-    "subtitle": "Catégories de médecine du mode de vie",
+    "subtitle": "Gérer les domaines de soins qui catégorisent les interventions",
     "addNew": "Ajouter un domaine de soins",
     "searchPlaceholder": "Rechercher des domaines de soins..."
   },
@@ -18,10 +18,12 @@
     "interventionsCount": "{{count}} intervention(s)"
   },
   "form": {
-    "createTitle": "Créer un domaine de soins",
+    "createTitle": "Nouveau domaine de soins",
+    "createSubtitle": "Créer un nouveau domaine de soins pour catégoriser les interventions",
     "editTitle": "Modifier le domaine de soins",
-    "name": "Nom du domaine",
-    "namePlaceholder": "Entrez le nom du domaine",
+    "editSubtitle": "Mettre à jour les détails du domaine de soins",
+    "name": "Nom",
+    "namePlaceholder": "ex: Nutrition, Exercice, Hydrothérapie",
     "description": "Description",
     "descriptionPlaceholder": "Décrivez le domaine de soins...",
     "icon": "Icône",
@@ -30,7 +32,11 @@
     "selectColor": "Sélectionner une couleur",
     "order": "Ordre d'affichage",
     "orderPlaceholder": "ex: 1, 2, 3",
-    "status": "Statut"
+    "status": "Statut",
+    "saveCareDomain": "Enregistrer le domaine de soins"
+  },
+  "validation": {
+    "nameRequired": "Le nom est requis"
   },
   "domains": {
     "nutrition": "Nutrition",
@@ -44,7 +50,9 @@
   },
   "empty": {
     "title": "Aucun domaine de soins trouvé",
-    "description": "Commencez par créer votre premier domaine de soins",
+    "noDomainsYet": "Aucun domaine de soins pour le moment",
+    "description": "Commencez par créer votre premier domaine de soins.",
+    "adjustSearch": "Essayez de modifier votre terme de recherche",
     "action": "Ajouter un domaine de soins",
     "noAvailable": "Aucun domaine de soins disponible.",
     "createFirst": "Créer un domaine d'abord"
@@ -56,6 +64,7 @@
     "createError": "Échec de la création du domaine de soins",
     "updateError": "Échec de la mise à jour du domaine de soins",
     "deleteError": "Échec de la suppression du domaine de soins",
+    "deleteErrorLinked": "Échec de la suppression du domaine de soins. Il peut avoir des interventions liées.",
     "loadError": "Échec du chargement des domaines de soins"
   },
   "confirm": {

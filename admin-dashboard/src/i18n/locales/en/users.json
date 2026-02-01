@@ -23,20 +23,27 @@
   },
   "form": {
     "createTitle": "Create User",
+    "createSubtitle": "Add a new user to the system",
     "editTitle": "Edit User",
+    "editSubtitle": "Update user information",
     "name": "Full Name",
     "namePlaceholder": "Enter full name",
     "email": "Email Address",
     "emailPlaceholder": "Enter email address",
     "password": "Password",
     "passwordPlaceholder": "Enter password",
+    "passwordKeepCurrent": "Leave blank to keep current",
     "confirmPassword": "Confirm Password",
     "confirmPasswordPlaceholder": "Confirm password",
     "role": "Role",
     "selectRole": "Select role",
     "status": "Status",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "activeAccount": "Active Account",
+    "activeAccountDescription": "User can log in and access the system",
+    "createUser": "Create User",
+    "updateUser": "Update User"
   },
   "roles": {
     "admin": "Administrator",
@@ -52,12 +59,33 @@
     "active": "Active",
     "inactive": "Inactive",
     "pending": "Pending",
-    "suspended": "Suspended"
+    "suspended": "Suspended",
+    "deleted": "Deleted"
+  },
+  "actions": {
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "restore": "Restore",
+    "activateTitle": "Activate User",
+    "deactivateTitle": "Deactivate User",
+    "restoreTitle": "Restore User",
+    "activateConfirm": "Are you sure you want to activate {{name}}?",
+    "deactivateConfirm": "Are you sure you want to deactivate {{name}}? They will no longer be able to log in.",
+    "restoreConfirm": "Are you sure you want to restore {{name}}?",
+    "yesActivate": "Yes, Activate",
+    "yesDeactivate": "Yes, Deactivate",
+    "yesRestore": "Yes, Restore"
+  },
+  "validation": {
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordMismatch": "Passwords do not match"
   },
   "empty": {
     "title": "No users found",
     "description": "Get started by creating your first user",
-    "action": "Add User"
+    "action": "Add User",
+    "noUsersYet": "No users yet",
+    "adjustFilters": "Try adjusting your search or filters"
   },
   "toast": {
     "created": "User created successfully",
@@ -65,10 +93,14 @@
     "deleted": "User deleted successfully",
     "activated": "User activated successfully",
     "deactivated": "User deactivated successfully",
+    "restored": "User restored successfully",
     "createError": "Failed to create user",
     "updateError": "Failed to update user",
     "deleteError": "Failed to delete user",
-    "loadError": "Failed to load users"
+    "loadError": "Failed to load users",
+    "activateError": "Failed to activate user",
+    "deactivateError": "Failed to deactivate user",
+    "restoreError": "Failed to restore user"
   },
   "confirm": {
     "delete": "Are you sure you want to delete this user?",

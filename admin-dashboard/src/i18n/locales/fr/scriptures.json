@@ -4,11 +4,15 @@
   "plural": "Écritures",
   "list": {
     "title": "Écritures",
-    "subtitle": "Versets et passages bibliques",
+    "subtitle": "Gérer les références scripturaires pour les soins spirituels",
     "addNew": "Ajouter une Écriture",
     "searchPlaceholder": "Rechercher des Écritures...",
     "filterByBook": "Filtrer par livre",
-    "allBooks": "Tous les livres"
+    "filterByTheme": "Filtrer par thème",
+    "filterByTag": "Filtrer par étiquette",
+    "allBooks": "Tous les livres",
+    "allThemes": "Tous les thèmes",
+    "allTags": "Toutes les étiquettes"
   },
   "detail": {
     "title": "Détails de l'Écriture",
@@ -22,8 +26,12 @@
     "tags": "Étiquettes"
   },
   "form": {
-    "createTitle": "Ajouter une Écriture",
+    "createTitle": "Nouvelle Écriture",
+    "createSubtitle": "Ajouter une nouvelle référence scripturaire",
     "editTitle": "Modifier l'Écriture",
+    "editSubtitle": "Mettre à jour les détails de l'Écriture",
+    "reference": "Référence",
+    "referencePlaceholder": "ex: Jean 3:16, Psaume 23:1-6",
     "book": "Livre",
     "selectBook": "Sélectionner un livre",
     "chapter": "Chapitre",
@@ -32,8 +40,10 @@
     "verseStartPlaceholder": "Verset de départ",
     "verseEnd": "Verset de fin",
     "verseEndPlaceholder": "Verset de fin (optionnel)",
-    "text": "Texte de l'Écriture",
+    "text": "Texte",
     "textPlaceholder": "Entrez le texte de l'Écriture...",
+    "theme": "Thème",
+    "themePlaceholder": "ex: Guérison, Paix, Foi",
     "translation": "Traduction",
     "selectTranslation": "Sélectionner une traduction",
     "context": "Contexte",
@@ -42,7 +52,12 @@
     "applicationPlaceholder": "Comment cela s'applique à la santé...",
     "tags": "Étiquettes",
     "selectTags": "Sélectionner des étiquettes",
-    "status": "Statut"
+    "status": "Statut",
+    "saveScripture": "Enregistrer l'Écriture"
+  },
+  "validation": {
+    "referenceRequired": "La référence est requise",
+    "textRequired": "Le texte est requis"
   },
   "translations": {
     "kjv": "Version King James",

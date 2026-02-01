@@ -1,0 +1,46 @@
+{
+  "title": "Recherche",
+  "header": {
+    "badge": "Recherche instantanée",
+    "title": "Rechercher dans la plateforme",
+    "subtitle": "Trouvez des conditions, interventions, écritures, recettes et plus"
+  },
+  "input": {
+    "placeholder": "Tapez pour rechercher..."
+  },
+  "types": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "scriptures": "Écritures",
+    "egwReferences": "Écrits d'EGW",
+    "recipes": "Recettes",
+    "evidence": "Preuves",
+    "references": "Références"
+  },
+  "filters": {
+    "clear": "Effacer"
+  },
+  "recent": {
+    "title": "Recherches récentes",
+    "clearAll": "Tout effacer"
+  },
+  "empty": {
+    "title": "Commencez à taper pour rechercher",
+    "description": "Recherchez instantanément dans les conditions, interventions, écritures, recettes, preuves et références."
+  },
+  "loading": "Recherche en cours...",
+  "results": {
+    "count": "{{count}} résultats",
+    "inCategories": "dans {{count}} catégories",
+    "pressEnter": "Appuyez sur",
+    "toOpen": "pour ouvrir",
+    "noResults": "Aucun résultat trouvé",
+    "noResultsHint": "Essayez un autre terme de recherche ou ajustez vos filtres",
+    "open": "Ouvrir"
+  },
+  "keyboard": {
+    "toClear": "pour effacer",
+    "toNavigate": "pour naviguer",
+    "toSelect": "pour sélectionner"
+  }
+}

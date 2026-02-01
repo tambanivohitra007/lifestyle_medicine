@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, Layers, Edit, Trash2, Stethoscope, Save, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 
 const CareDomains = () => {
+  const { t } = useTranslation(['careDomains', 'common']);
   const { canEdit } = useAuth();
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,16 +38,16 @@ const CareDomains = () => {
   };
 
   const handleDelete = async (id, name) => {
-    const confirmed = await confirmDelete(name || 'this care domain');
+    const confirmed = await confirmDelete(name || t('careDomains:singular'));
     if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.careDomainsAdmin}/${id}`);
-      toast.success('Care domain deleted');
+      toast.success(t('careDomains:toast.deleted'));
       fetchCareDomains();
     } catch (error) {
       console.error('Error deleting care domain:', error);
-      toast.error('Failed to delete care domain. It may have linked interventions.');
+      toast.error(t('careDomains:toast.deleteErrorLinked'));
     }
   };
 
@@ -68,7 +70,7 @@ const CareDomains = () => {
       setFormData({ name: domain.name || '' });
     } catch (error) {
       console.error('Error fetching care domain:', error);
-      toast.error('Failed to load care domain');
+      toast.error(t('careDomains:toast.loadError'));
       setIsModalOpen(false);
     } finally {
       setFormLoading(false);
@@ -85,7 +87,7 @@ const CareDomains = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('careDomains:validation.nameRequired');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -99,10 +101,10 @@ const CareDomains = () => {
       setSaving(true);
       if (editingId) {
         await api.put(`${apiEndpoints.careDomainsAdmin}/${editingId}`, formData);
-        toast.success('Care domain updated');
+        toast.success(t('careDomains:toast.updated'));
       } else {
         await api.post(apiEndpoints.careDomainsAdmin, formData);
-        toast.success('Care domain created');
+        toast.success(t('careDomains:toast.created'));
       }
       closeModal();
       fetchCareDomains();
@@ -113,7 +115,7 @@ const CareDomains = () => {
       } else if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error('Failed to save care domain');
+        toast.error(t('careDomains:toast.updateError'));
       }
     } finally {
       setSaving(false);
@@ -137,9 +139,9 @@ const CareDomains = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Care Domains</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('careDomains:list.title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage care domains that categorize interventions
+            {t('careDomains:list.subtitle')}
           </p>
         </div>
         {canEdit && (
@@ -148,7 +150,7 @@ const CareDomains = () => {
             className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Plus className="w-5 h-5" />
-            Add Care Domain
+            {t('careDomains:list.addNew')}
           </button>
         )}
       </div>
@@ -159,7 +161,7 @@ const CareDomains = () => {
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search care domains..."
+            placeholder={t('careDomains:list.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="input-field pl-10"
@@ -176,12 +178,12 @@ const CareDomains = () => {
         <div className="card text-center py-8 sm:py-12">
           <Layers className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {searchTerm ? 'No care domains found' : 'No care domains yet'}
+            {searchTerm ? t('careDomains:empty.title') : t('careDomains:empty.noDomainsYet')}
           </h3>
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
             {searchTerm
-              ? 'Try adjusting your search term'
-              : 'Get started by creating your first care domain.'}
+              ? t('careDomains:empty.adjustSearch')
+              : t('careDomains:empty.description')}
           </p>
           {!searchTerm && canEdit && (
             <button
@@ -189,7 +191,7 @@ const CareDomains = () => {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Care Domain
+              {t('careDomains:empty.action')}
             </button>
           )}
         </div>
@@ -209,14 +211,14 @@ const CareDomains = () => {
                     <button
                       onClick={() => openEditModal(domain.id)}
                       className="action-btn"
-                      title="Edit"
+                      title={t('common:buttons.edit')}
                     >
                       <Edit className="w-4 h-4 text-gray-600" />
                     </button>
                     <button
                       onClick={() => handleDelete(domain.id, domain.name)}
                       className="action-btn hover:bg-red-50 active:bg-red-100"
-                      title="Delete"
+                      title={t('common:buttons.delete')}
                     >
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
@@ -231,7 +233,7 @@ const CareDomains = () => {
               {domain.interventions_count !== undefined && (
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Stethoscope className="w-4 h-4" />
-                  <span>{domain.interventions_count} interventions</span>
+                  <span>{t('careDomains:detail.interventionsCount', { count: domain.interventions_count })}</span>
                 </div>
               )}
             </div>
@@ -243,8 +245,8 @@ const CareDomains = () => {
       <SlideOver
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingId ? 'Edit Care Domain' : 'New Care Domain'}
-        subtitle={editingId ? 'Update the care domain details' : 'Create a new care domain to categorize interventions'}
+        title={editingId ? t('careDomains:form.editTitle') : t('careDomains:form.createTitle')}
+        subtitle={editingId ? t('careDomains:form.editSubtitle') : t('careDomains:form.createSubtitle')}
         size="sm"
       >
         {formLoading ? (
@@ -256,7 +258,7 @@ const CareDomains = () => {
             {/* Name */}
             <div>
               <label htmlFor="name" className="label">
-                Name <span className="text-red-500">*</span>
+                {t('careDomains:form.name')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -265,7 +267,7 @@ const CareDomains = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className={`input-field ${errors.name ? 'border-red-500' : ''}`}
-                placeholder="e.g., Nutrition, Exercise, Hydrotherapy"
+                placeholder={t('careDomains:form.namePlaceholder')}
                 autoFocus
               />
               {errors.name && (
@@ -287,14 +289,14 @@ const CareDomains = () => {
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {saving ? 'Saving...' : 'Save Care Domain'}
+                {saving ? t('common:buttons.saving') : t('careDomains:form.saveCareDomain')}
               </button>
               <button
                 type="button"
                 onClick={closeModal}
                 className="btn-outline w-full sm:w-auto"
               >
-                Cancel
+                {t('common:buttons.cancel')}
               </button>
             </div>
           </form>

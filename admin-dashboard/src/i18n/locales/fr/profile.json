@@ -1,6 +1,10 @@
 {
   "title": "Paramètres",
   "subtitle": "Compte et préférences",
+  "header": {
+    "title": "Paramètres du profil",
+    "subtitle": "Gérez vos informations de compte et votre mot de passe"
+  },
   "tabs": {
     "profile": "Profil",
     "security": "Sécurité",
@@ -10,6 +14,7 @@
   "profile": {
     "title": "Informations du profil",
     "description": "Mettez à jour vos informations personnelles",
+    "updateDescription": "Mettez à jour votre nom et adresse courriel",
     "avatar": "Photo de profil",
     "changeAvatar": "Changer la photo",
     "removeAvatar": "Supprimer la photo",
@@ -27,6 +32,7 @@
   "security": {
     "title": "Paramètres de sécurité",
     "description": "Gérez votre mot de passe et la sécurité",
+    "updateDescription": "Mettez à jour le mot de passe de votre compte",
     "changePassword": "Changer le mot de passe",
     "currentPassword": "Mot de passe actuel",
     "currentPasswordPlaceholder": "Entrez le mot de passe actuel",
@@ -80,8 +86,10 @@
   },
   "actions": {
     "save": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
     "cancel": "Annuler",
     "updatePassword": "Mettre à jour le mot de passe",
+    "updating": "Mise à jour...",
     "deleteAccount": "Supprimer le compte"
   },
   "toast": {
@@ -96,7 +104,9 @@
   "errors": {
     "incorrectPassword": "Le mot de passe actuel est incorrect",
     "passwordMismatch": "Les mots de passe ne correspondent pas",
-    "weakPassword": "Le mot de passe est trop faible"
+    "weakPassword": "Le mot de passe est trop faible",
+    "profileUpdateFailed": "Échec de la mise à jour du profil",
+    "passwordUpdateFailed": "Échec de la mise à jour du mot de passe"
   },
   "language": {
     "title": "Langue",

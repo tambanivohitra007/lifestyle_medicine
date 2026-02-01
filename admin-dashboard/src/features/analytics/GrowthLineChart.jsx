@@ -1,15 +1,18 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const SERIES = [
-  { key: 'conditions', label: 'Conditions', color: '#d31e3a' },
-  { key: 'interventions', label: 'Interventions', color: '#243b53' },
-  { key: 'scriptures', label: 'Scriptures', color: '#3b82f6' },
-  { key: 'recipes', label: 'Recipes', color: '#f59e0b' },
-  { key: 'egw_references', label: 'EGW Writings', color: '#8b5cf6' },
+const SERIES_CONFIG = [
+  { key: 'conditions', labelKey: 'analytics:cards.conditions', color: '#d31e3a' },
+  { key: 'interventions', labelKey: 'analytics:cards.interventions', color: '#243b53' },
+  { key: 'scriptures', labelKey: 'analytics:cards.scriptures', color: '#3b82f6' },
+  { key: 'recipes', labelKey: 'analytics:cards.recipes', color: '#f59e0b' },
+  { key: 'egw_references', labelKey: 'analytics:cards.egwWritings', color: '#8b5cf6' },
 ];
 
 const GrowthLineChart = ({ data, loading, onMonthsChange }) => {
+  const { t } = useTranslation(['analytics']);
+  const SERIES = SERIES_CONFIG.map(s => ({ ...s, label: t(s.labelKey) }));
   const [months, setMonths] = useState(12);
   const [visibleSeries, setVisibleSeries] = useState(
     SERIES.reduce((acc, s) => ({ ...acc, [s.key]: true }), {})
@@ -43,9 +46,9 @@ const GrowthLineChart = ({ data, loading, onMonthsChange }) => {
   if (!data || data.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Content Growth Over Time</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:charts.contentGrowth')}</h3>
         <div className="h-[300px] flex items-center justify-center text-gray-500">
-          No growth data available
+          {t('analytics:empty.noGrowthData')}
         </div>
       </div>
     );

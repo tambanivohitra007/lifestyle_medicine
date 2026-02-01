@@ -1,6 +1,6 @@
 {
   "title": "Analytique",
-  "subtitle": "Statistiques d'utilisation et insights",
+  "subtitle": "Métriques de contenu, suivi d'activité et aperçu des données",
   "overview": {
     "title": "Aperçu",
     "totalContent": "Contenu total",
@@ -38,7 +38,8 @@
     "created": "Créé",
     "updated": "Mis à jour",
     "deleted": "Supprimé",
-    "viewed": "Consulté"
+    "viewed": "Consulté",
+    "noActivity": "Aucune activité récente"
   },
   "charts": {
     "contentOverTime": "Contenu au fil du temps",
@@ -47,11 +48,19 @@
     "userGrowth": "Croissance des utilisateurs",
     "dailyActivity": "Activité quotidienne",
     "weeklyActivity": "Activité hebdomadaire",
-    "monthlyActivity": "Activité mensuelle"
+    "monthlyActivity": "Activité mensuelle",
+    "conditionsByCategory": "Conditions par catégorie",
+    "interventionsByDomain": "Interventions par domaine de soins",
+    "contentGrowth": "Croissance du contenu au fil du temps",
+    "evidenceQuality": "Distribution de la qualité des preuves",
+    "completeness": "Complétude du contenu"
   },
   "filters": {
     "dateRange": "Période",
+    "last6Months": "6 derniers mois",
     "last7Days": "7 derniers jours",
+    "last12Months": "12 derniers mois",
+    "last24Months": "24 derniers mois",
     "last30Days": "30 derniers jours",
     "last90Days": "90 derniers jours",
     "lastYear": "Dernière année",
@@ -62,10 +71,47 @@
     "title": "Exporter les données",
     "csv": "Exporter en CSV",
     "pdf": "Exporter en PDF",
-    "excel": "Exporter en Excel"
+    "excel": "Exporter en Excel",
+    "report": "Exporter le rapport"
   },
   "empty": {
     "noData": "Aucune donnée analytique disponible",
-    "noActivity": "Aucune activité enregistrée"
+    "noActivity": "Aucune activité enregistrée",
+    "noCategoryData": "Aucune donnée de catégorie disponible",
+    "noDomainData": "Aucune donnée de domaine de soins disponible",
+    "noGrowthData": "Aucune donnée de croissance disponible",
+    "noQualityData": "Aucune donnée de qualité des preuves disponible",
+    "noCompletenessData": "Aucune donnée de complétude disponible"
+  },
+  "cards": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "scriptures": "Écritures",
+    "recipes": "Recettes",
+    "egwWritings": "Écrits EGW",
+    "evidenceEntries": "Entrées de preuves",
+    "users": "Utilisateurs",
+    "createdToday": "Créé aujourd'hui",
+    "thisWeek": "cette semaine",
+    "updated": "mis à jour"
+  },
+  "types": {
+    "condition": "Condition",
+    "intervention": "Intervention",
+    "scripture": "Écriture",
+    "recipe": "Recette",
+    "egwReference": "Référence EGW"
+  },
+  "labels": {
+    "conditions": "conditions",
+    "interventions": "interventions",
+    "entries": "entrées",
+    "average": "Moy:",
+    "complete": "Complet:",
+    "partial": "Partiel:",
+    "incomplete": "Incomplet:"
+  },
+  "actions": {
+    "refresh": "Actualiser"
   }
 }

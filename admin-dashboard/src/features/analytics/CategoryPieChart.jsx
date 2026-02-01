@@ -1,8 +1,10 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 const COLORS = ['#d31e3a', '#243b53', '#10b981', '#f59e0b', '#8b5cf6', '#6b7280', '#06b6d4', '#ec4899'];
 
 const CategoryPieChart = ({ data, loading }) => {
+  const { t } = useTranslation(['analytics']);
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -17,9 +19,9 @@ const CategoryPieChart = ({ data, loading }) => {
   if (!data || data.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Conditions by Category</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:charts.conditionsByCategory')}</h3>
         <div className="h-[300px] flex items-center justify-center text-gray-500">
-          No category data available
+          {t('analytics:empty.noCategoryData')}
         </div>
       </div>
     );
@@ -30,7 +32,7 @@ const CategoryPieChart = ({ data, loading }) => {
       return (
         <div className="bg-white px-3 py-2 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-medium text-gray-900">{payload[0].payload.category}</p>
-          <p className="text-sm text-gray-600">{payload[0].value} conditions</p>
+          <p className="text-sm text-gray-600">{payload[0].value} {t('analytics:labels.conditions')}</p>
         </div>
       );
     }
@@ -39,7 +41,7 @@ const CategoryPieChart = ({ data, loading }) => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Conditions by Category</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics:charts.conditionsByCategory')}</h3>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie

@@ -4,7 +4,7 @@
   "plural": "Care Domains",
   "list": {
     "title": "Care Domains",
-    "subtitle": "Lifestyle medicine categories",
+    "subtitle": "Manage care domains that categorize interventions",
     "addNew": "Add Care Domain",
     "searchPlaceholder": "Search care domains..."
   },
@@ -18,10 +18,12 @@
     "interventionsCount": "{{count}} intervention(s)"
   },
   "form": {
-    "createTitle": "Create Care Domain",
+    "createTitle": "New Care Domain",
+    "createSubtitle": "Create a new care domain to categorize interventions",
     "editTitle": "Edit Care Domain",
-    "name": "Domain Name",
-    "namePlaceholder": "Enter domain name",
+    "editSubtitle": "Update the care domain details",
+    "name": "Name",
+    "namePlaceholder": "e.g., Nutrition, Exercise, Hydrotherapy",
     "description": "Description",
     "descriptionPlaceholder": "Describe the care domain...",
     "icon": "Icon",
@@ -30,7 +32,11 @@
     "selectColor": "Select color",
     "order": "Display Order",
     "orderPlaceholder": "e.g., 1, 2, 3",
-    "status": "Status"
+    "status": "Status",
+    "saveCareDomain": "Save Care Domain"
+  },
+  "validation": {
+    "nameRequired": "Name is required"
   },
   "domains": {
     "nutrition": "Nutrition",
@@ -44,7 +50,9 @@
   },
   "empty": {
     "title": "No care domains found",
-    "description": "Get started by creating your first care domain",
+    "noDomainsYet": "No care domains yet",
+    "description": "Get started by creating your first care domain.",
+    "adjustSearch": "Try adjusting your search term",
     "action": "Add Care Domain",
     "noAvailable": "No care domains available.",
     "createFirst": "Create one first"
@@ -56,6 +64,7 @@
     "createError": "Failed to create care domain",
     "updateError": "Failed to update care domain",
     "deleteError": "Failed to delete care domain",
+    "deleteErrorLinked": "Failed to delete care domain. It may have linked interventions.",
     "loadError": "Failed to load care domains"
   },
   "confirm": {

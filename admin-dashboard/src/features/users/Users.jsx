@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, Users as UsersIcon, Edit, Trash2, RotateCcw, UserCheck, UserX, Shield, PenTool, Eye, Save, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Swal from 'sweetalert2';
 import SlideOver from '../../components/shared/SlideOver';
 
 const Users = () => {
+  const { t } = useTranslation(['users', 'common']);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,7 +48,7 @@ const Users = () => {
       setPagination(response.data.meta || {});
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('Failed to load users');
+      toast.error(t('users:toast.loadError'));
     } finally {
       setLoading(false);
     }
@@ -58,81 +60,85 @@ const Users = () => {
 
     try {
       await api.delete(`${apiEndpoints.users}/${user.id}`);
-      toast.success('User deleted');
+      toast.success(t('users:toast.deleted'));
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error('Failed to delete user');
+        toast.error(t('users:toast.deleteError'));
       }
     }
   };
 
   const handleToggleActive = async (user) => {
-    const action = user.is_active ? 'deactivate' : 'activate';
+    const isDeactivating = user.is_active;
     const result = await Swal.fire({
-      title: `${action.charAt(0).toUpperCase() + action.slice(1)} User?`,
-      text: `Are you sure you want to ${action} "${user.name}"?`,
+      title: isDeactivating ? t('users:actions.deactivateTitle') : t('users:actions.activateTitle'),
+      text: isDeactivating
+        ? t('users:actions.deactivateConfirm', { name: user.name })
+        : t('users:actions.activateConfirm', { name: user.name }),
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: user.is_active ? '#dc2626' : '#16a34a',
+      confirmButtonColor: isDeactivating ? '#dc2626' : '#16a34a',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: `Yes, ${action}`,
+      confirmButtonText: isDeactivating ? t('users:actions.yesDeactivate') : t('users:actions.yesActivate'),
+      cancelButtonText: t('common:buttons.cancel'),
     });
 
     if (!result.isConfirmed) return;
 
     try {
       await api.post(apiEndpoints.userToggleActive(user.id));
-      toast.success(`User ${action}d`);
+      toast.success(isDeactivating ? t('users:toast.deactivated') : t('users:toast.activated'));
       fetchUsers();
     } catch (error) {
       console.error('Error toggling user status:', error);
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error(`Failed to ${action} user`);
+        toast.error(isDeactivating ? t('users:toast.deactivateError') : t('users:toast.activateError'));
       }
     }
   };
 
   const handleRestore = async (user) => {
     const result = await Swal.fire({
-      title: 'Restore User?',
-      text: `Are you sure you want to restore "${user.name}"?`,
+      title: t('users:actions.restoreTitle'),
+      text: t('users:actions.restoreConfirm', { name: user.name }),
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#16a34a',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Yes, restore',
+      confirmButtonText: t('users:actions.yesRestore'),
+      cancelButtonText: t('common:buttons.cancel'),
     });
 
     if (!result.isConfirmed) return;
 
     try {
       await api.post(apiEndpoints.userRestore(user.id));
-      toast.success('User restored');
+      toast.success(t('users:toast.restored'));
       fetchUsers();
     } catch (error) {
       console.error('Error restoring user:', error);
-      toast.error('Failed to restore user');
+      toast.error(t('users:toast.restoreError'));
     }
   };
 
   const getRoleBadge = (role) => {
     const badges = {
-      admin: { icon: Shield, class: 'bg-purple-100 text-purple-700' },
-      editor: { icon: PenTool, class: 'bg-blue-100 text-blue-700' },
-      viewer: { icon: Eye, class: 'bg-gray-100 text-gray-700' },
+      admin: { icon: Shield, class: 'bg-purple-100 text-purple-700', labelKey: 'users:roles.admin' },
+      editor: { icon: PenTool, class: 'bg-blue-100 text-blue-700', labelKey: 'users:roles.editor' },
+      viewer: { icon: Eye, class: 'bg-gray-100 text-gray-700', labelKey: 'users:roles.viewer' },
     };
     const badge = badges[role] || badges.viewer;
     const Icon = badge.icon;
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${badge.class}`}>
         <Icon className="w-3 h-3" />
-        {role.charAt(0).toUpperCase() + role.slice(1)}
+        {t(badge.labelKey)}
       </span>
     );
   };
@@ -142,19 +148,19 @@ const Users = () => {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
           <Trash2 className="w-3 h-3" />
-          Deleted
+          {t('users:status.deleted')}
         </span>
       );
     }
     return isActive ? (
       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
         <UserCheck className="w-3 h-3" />
-        Active
+        {t('users:status.active')}
       </span>
     ) : (
       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
         <UserX className="w-3 h-3" />
-        Inactive
+        {t('users:status.inactive')}
       </span>
     );
   };
@@ -193,7 +199,7 @@ const Users = () => {
       });
     } catch (error) {
       console.error('Error fetching user:', error);
-      toast.error('Failed to load user');
+      toast.error(t('users:toast.loadError'));
       setIsModalOpen(false);
     } finally {
       setFormLoading(false);
@@ -218,23 +224,23 @@ const Users = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('common:validation.required', { field: t('common:labels.name') });
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('common:validation.required', { field: t('common:labels.email') });
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
+      newErrors.email = t('common:messages.error.invalidEmail');
     }
 
     if (!editingId && !formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('common:validation.required', { field: t('users:form.password') });
     } else if (formData.password && formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+      newErrors.password = t('users:validation.passwordMinLength');
     }
 
     if (formData.password && formData.password !== formData.password_confirmation) {
-      newErrors.password_confirmation = 'Passwords do not match';
+      newErrors.password_confirmation = t('users:validation.passwordMismatch');
     }
 
     setErrors(newErrors);
@@ -260,10 +266,10 @@ const Users = () => {
 
       if (editingId) {
         await api.put(`${apiEndpoints.users}/${editingId}`, payload);
-        toast.success('User updated');
+        toast.success(t('users:toast.updated'));
       } else {
         await api.post(apiEndpoints.users, payload);
-        toast.success('User created');
+        toast.success(t('users:toast.created'));
       }
       closeModal();
       fetchUsers();
@@ -274,7 +280,7 @@ const Users = () => {
       } else if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error('Failed to save user');
+        toast.error(t('users:toast.updateError'));
       }
     } finally {
       setSaving(false);
@@ -299,9 +305,9 @@ const Users = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Users</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('users:list.title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage user accounts and permissions
+            {t('users:list.subtitle')}
           </p>
         </div>
         <button
@@ -309,7 +315,7 @@ const Users = () => {
           className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
         >
           <Plus className="w-5 h-5" />
-          Add User
+          {t('users:list.addNew')}
         </button>
       </div>
 
@@ -321,7 +327,7 @@ const Users = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by name or email..."
+              placeholder={t('users:list.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -334,10 +340,10 @@ const Users = () => {
             onChange={(e) => setRoleFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="editor">Editor</option>
-            <option value="viewer">Viewer</option>
+            <option value="">{t('users:list.allRoles')}</option>
+            <option value="admin">{t('users:roles.admin')}</option>
+            <option value="editor">{t('users:roles.editor')}</option>
+            <option value="viewer">{t('users:roles.viewer')}</option>
           </select>
 
           {/* Status Filter */}
@@ -346,9 +352,9 @@ const Users = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Status</option>
-            <option value="1">Active</option>
-            <option value="0">Inactive</option>
+            <option value="">{t('users:list.allStatuses')}</option>
+            <option value="1">{t('users:status.active')}</option>
+            <option value="0">{t('users:status.inactive')}</option>
           </select>
         </div>
       </div>
@@ -362,12 +368,12 @@ const Users = () => {
         <div className="card text-center py-8 sm:py-12">
           <UsersIcon className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {searchTerm || roleFilter || statusFilter ? 'No users found' : 'No users yet'}
+            {searchTerm || roleFilter || statusFilter ? t('users:empty.title') : t('users:empty.noUsersYet')}
           </h3>
           <p className="text-gray-600 text-sm sm:text-base mb-4">
             {searchTerm || roleFilter || statusFilter
-              ? 'Try adjusting your filters'
-              : 'Get started by creating a new user'}
+              ? t('users:empty.adjustFilters')
+              : t('users:empty.description')}
           </p>
           {!searchTerm && !roleFilter && !statusFilter && (
             <button
@@ -375,7 +381,7 @@ const Users = () => {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add User
+              {t('users:empty.action')}
             </button>
           )}
         </div>
@@ -386,19 +392,19 @@ const Users = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User
+                    {t('users:singular')}
                   </th>
                   <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                    Role
+                    {t('users:form.role')}
                   </th>
                   <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                    Status
+                    {t('common:labels.status')}
                   </th>
                   <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                    Created
+                    {t('common:labels.createdAt')}
                   </th>
                   <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    {t('common:labels.actions')}
                   </th>
                 </tr>
               </thead>
@@ -438,7 +444,7 @@ const Users = () => {
                           <button
                             onClick={() => handleRestore(user)}
                             className="action-btn hover:bg-green-50"
-                            title="Restore"
+                            title={t('users:actions.restore')}
                           >
                             <RotateCcw className="w-4 h-4 text-green-600" />
                           </button>
@@ -447,14 +453,14 @@ const Users = () => {
                             <button
                               onClick={() => openEditModal(user.id)}
                               className="action-btn"
-                              title="Edit"
+                              title={t('common:buttons.edit')}
                             >
                               <Edit className="w-4 h-4 text-gray-600" />
                             </button>
                             <button
                               onClick={() => handleToggleActive(user)}
                               className={`action-btn ${user.is_active ? 'hover:bg-yellow-50' : 'hover:bg-green-50'}`}
-                              title={user.is_active ? 'Deactivate' : 'Activate'}
+                              title={user.is_active ? t('users:actions.deactivate') : t('users:actions.activate')}
                             >
                               {user.is_active ? (
                                 <UserX className="w-4 h-4 text-yellow-600" />
@@ -465,7 +471,7 @@ const Users = () => {
                             <button
                               onClick={() => handleDelete(user)}
                               className="action-btn hover:bg-red-50 active:bg-red-100"
-                              title="Delete"
+                              title={t('common:buttons.delete')}
                             >
                               <Trash2 className="w-4 h-4 text-red-600" />
                             </button>
@@ -483,7 +489,7 @@ const Users = () => {
           {pagination.last_page > 1 && (
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-t border-gray-200">
               <div className="text-sm text-gray-700">
-                Page {pagination.current_page} of {pagination.last_page}
+                {t('common:pagination.page')} {pagination.current_page} {t('common:pagination.of')} {pagination.last_page}
               </div>
               <div className="flex gap-2">
                 <button
@@ -491,14 +497,14 @@ const Users = () => {
                   disabled={pagination.current_page === 1}
                   className="btn-secondary text-sm disabled:opacity-50"
                 >
-                  Previous
+                  {t('common:pagination.previous')}
                 </button>
                 <button
                   onClick={() => fetchUsers(pagination.current_page + 1)}
                   disabled={pagination.current_page === pagination.last_page}
                   className="btn-secondary text-sm disabled:opacity-50"
                 >
-                  Next
+                  {t('common:pagination.next')}
                 </button>
               </div>
             </div>
@@ -510,8 +516,8 @@ const Users = () => {
       <SlideOver
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingId ? 'Edit User' : 'New User'}
-        subtitle={editingId ? 'Update user information and permissions' : 'Create a new user account'}
+        title={editingId ? t('users:form.editTitle') : t('users:form.createTitle')}
+        subtitle={editingId ? t('users:form.editSubtitle') : t('users:form.createSubtitle')}
         size="lg"
       >
         {formLoading ? (
@@ -523,7 +529,7 @@ const Users = () => {
             {/* Name */}
             <div>
               <label htmlFor="name" className="label">
-                Name <span className="text-red-500">*</span>
+                {t('users:form.name')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -532,7 +538,7 @@ const Users = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className={`input-field ${errors.name ? 'border-red-500' : ''}`}
-                placeholder="Enter full name"
+                placeholder={t('users:form.namePlaceholder')}
                 autoFocus
               />
               {errors.name && (
@@ -545,7 +551,7 @@ const Users = () => {
             {/* Email */}
             <div>
               <label htmlFor="email" className="label">
-                Email <span className="text-red-500">*</span>
+                {t('users:form.email')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -554,7 +560,7 @@ const Users = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className={`input-field ${errors.email ? 'border-red-500' : ''}`}
-                placeholder="Enter email address"
+                placeholder={t('users:form.emailPlaceholder')}
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-500">
@@ -567,7 +573,7 @@ const Users = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="password" className="label">
-                  Password {!editingId && <span className="text-red-500">*</span>}
+                  {t('users:form.password')} {!editingId && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="password"
@@ -576,7 +582,7 @@ const Users = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className={`input-field ${errors.password ? 'border-red-500' : ''}`}
-                  placeholder={editingId ? 'Leave blank to keep current' : 'Enter password'}
+                  placeholder={editingId ? t('users:form.passwordKeepCurrent') : t('users:form.passwordPlaceholder')}
                 />
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-500">
@@ -586,7 +592,7 @@ const Users = () => {
               </div>
               <div>
                 <label htmlFor="password_confirmation" className="label">
-                  Confirm Password
+                  {t('users:form.confirmPassword')}
                 </label>
                 <input
                   type="password"
@@ -595,7 +601,7 @@ const Users = () => {
                   value={formData.password_confirmation}
                   onChange={handleChange}
                   className={`input-field ${errors.password_confirmation ? 'border-red-500' : ''}`}
-                  placeholder="Confirm password"
+                  placeholder={t('users:form.confirmPasswordPlaceholder')}
                 />
                 {errors.password_confirmation && (
                   <p className="mt-1 text-sm text-red-500">
@@ -608,13 +614,13 @@ const Users = () => {
             {/* Role */}
             <div>
               <label className="label">
-                Role <span className="text-red-500">*</span>
+                {t('users:form.role')} <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  { value: 'admin', label: 'Admin', icon: Shield, description: 'Full access to all features', color: 'purple' },
-                  { value: 'editor', label: 'Editor', icon: PenTool, description: 'Can create and edit content', color: 'blue' },
-                  { value: 'viewer', label: 'Viewer', icon: Eye, description: 'Read-only access', color: 'gray' },
+                  { value: 'admin', labelKey: 'users:roles.admin', icon: Shield, descKey: 'users:roleDescriptions.admin', color: 'purple' },
+                  { value: 'editor', labelKey: 'users:roles.editor', icon: PenTool, descKey: 'users:roleDescriptions.editor', color: 'blue' },
+                  { value: 'viewer', labelKey: 'users:roles.viewer', icon: Eye, descKey: 'users:roleDescriptions.viewer', color: 'gray' },
                 ].map((role) => (
                   <label
                     key={role.value}
@@ -641,9 +647,9 @@ const Users = () => {
                       <p className={`font-medium ${
                         formData.role === role.value ? `text-${role.color}-900` : 'text-gray-900'
                       }`}>
-                        {role.label}
+                        {t(role.labelKey)}
                       </p>
-                      <p className="text-sm text-gray-500">{role.description}</p>
+                      <p className="text-sm text-gray-500">{t(role.descKey)}</p>
                     </div>
                     {formData.role === role.value && (
                       <div className={`absolute top-2 right-2 w-2 h-2 rounded-full bg-${role.color}-500`} />
@@ -664,8 +670,8 @@ const Users = () => {
                   className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">Active Account</span>
-                  <p className="text-sm text-gray-500">Inactive users cannot log in</p>
+                  <span className="font-medium text-gray-900">{t('users:form.activeAccount')}</span>
+                  <p className="text-sm text-gray-500">{t('users:form.activeAccountDescription')}</p>
                 </div>
               </label>
             </div>
@@ -682,14 +688,14 @@ const Users = () => {
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {saving ? 'Saving...' : editingId ? 'Update User' : 'Create User'}
+                {saving ? t('common:buttons.saving') : editingId ? t('users:form.updateUser') : t('users:form.createUser')}
               </button>
               <button
                 type="button"
                 onClick={closeModal}
                 className="btn-outline w-full sm:w-auto"
               >
-                Cancel
+                {t('common:buttons.cancel')}
               </button>
             </div>
           </form>

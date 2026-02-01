@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Download, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import OverviewCards from './OverviewCards';
 import CategoryPieChart from './CategoryPieChart';
@@ -10,6 +11,7 @@ import QualityDistribution from './QualityDistribution';
 import ContentCompleteness from './ContentCompleteness';
 
 const Analytics = () => {
+  const { t } = useTranslation(['analytics', 'common']);
   const [loading, setLoading] = useState({
     overview: true,
     categories: true,
@@ -178,9 +180,9 @@ const Analytics = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('analytics:title')}</h1>
           <p className="text-sm text-gray-600 mt-1">
-            Content metrics, activity tracking, and data insights
+            {t('analytics:subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -190,14 +192,14 @@ const Analytics = () => {
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('analytics:actions.refresh')}
           </button>
           <button
             onClick={handleExport}
             className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             <Download className="w-4 h-4 mr-2" />
-            Export Report
+            {t('analytics:export.report')}
           </button>
         </div>
       </div>

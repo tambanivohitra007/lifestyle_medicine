@@ -5,11 +5,14 @@
   "egwWritings": "Écrits d'Ellen G. White",
   "list": {
     "title": "Références",
-    "subtitle": "Citations et sources documentaires",
+    "subtitle": "Gérer les citations et références scientifiques",
     "addNew": "Ajouter une référence",
-    "searchPlaceholder": "Rechercher des références...",
+    "searchPlaceholder": "Rechercher par citation, DOI ou PMID...",
     "filterByType": "Filtrer par type",
-    "allTypes": "Tous les types"
+    "filterByYear": "Filtrer par année",
+    "allTypes": "Tous les types",
+    "allYears": "Toutes les années",
+    "exportCsv": "Exporter CSV"
   },
   "detail": {
     "title": "Détails de la référence",
@@ -21,22 +24,28 @@
     "tags": "Étiquettes"
   },
   "form": {
-    "createTitle": "Ajouter une référence",
+    "createTitle": "Nouvelle référence",
+    "createSubtitle": "Ajouter une nouvelle référence scientifique",
     "editTitle": "Modifier la référence",
+    "editSubtitle": "Mettre à jour les détails de la référence",
     "title": "Titre",
     "titlePlaceholder": "Entrez le titre de la référence",
     "authors": "Auteurs",
     "authorsPlaceholder": "Entrez les auteurs",
+    "citation": "Citation",
+    "citationPlaceholder": "Texte de citation complet (ex: Auteur A, Auteur B. Titre. Journal. Année;Volume:Pages)",
     "source": "Source",
     "sourcePlaceholder": "Journal, livre, site web, etc.",
     "year": "Année",
-    "yearPlaceholder": "Année de publication",
+    "yearPlaceholder": "ex: 2023",
     "type": "Type de référence",
     "selectType": "Sélectionner le type",
     "url": "URL",
-    "urlPlaceholder": "Lien vers la source",
+    "urlPlaceholder": "https://...",
     "doi": "DOI",
-    "doiPlaceholder": "Identifiant d'objet numérique",
+    "doiPlaceholder": "ex: 10.1000/xyz123",
+    "pmid": "PubMed ID (PMID)",
+    "pmidPlaceholder": "ex: 12345678",
     "isbn": "ISBN",
     "isbnPlaceholder": "Numéro ISBN",
     "abstract": "Résumé",
@@ -45,7 +54,14 @@
     "notesPlaceholder": "Notes additionnelles...",
     "tags": "Étiquettes",
     "selectTags": "Sélectionner des étiquettes",
-    "status": "Statut"
+    "status": "Statut",
+    "saveReference": "Enregistrer la référence"
+  },
+  "validation": {
+    "citationRequired": "La citation est requise"
+  },
+  "labels": {
+    "link": "Lien"
   },
   "types": {
     "journal": "Article de journal",

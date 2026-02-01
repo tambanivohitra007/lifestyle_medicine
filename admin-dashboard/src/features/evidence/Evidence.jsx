@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, FileText, Edit, Trash2, Stethoscope, Download, Save, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -8,38 +9,39 @@ import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 
 const QUALITY_RATING = {
-  A: { label: 'A - High', color: 'bg-green-100 text-green-700' },
-  B: { label: 'B - Good', color: 'bg-blue-100 text-blue-700' },
-  C: { label: 'C - Moderate', color: 'bg-yellow-100 text-yellow-700' },
-  D: { label: 'D - Low', color: 'bg-red-100 text-red-700' },
+  A: { labelKey: 'evidence:quality.A', color: 'bg-green-100 text-green-700' },
+  B: { labelKey: 'evidence:quality.B', color: 'bg-blue-100 text-blue-700' },
+  C: { labelKey: 'evidence:quality.C', color: 'bg-yellow-100 text-yellow-700' },
+  D: { labelKey: 'evidence:quality.D', color: 'bg-red-100 text-red-700' },
 };
 
 const STUDY_TYPE = {
-  rct: 'RCT',
-  meta_analysis: 'Meta-Analysis',
-  systematic_review: 'Systematic Review',
-  observational: 'Observational',
-  case_series: 'Case Series',
-  expert_opinion: 'Expert Opinion',
+  rct: 'evidence:studyTypes.rct',
+  meta_analysis: 'evidence:studyTypes.meta_analysis',
+  systematic_review: 'evidence:studyTypes.systematic_review',
+  observational: 'evidence:studyTypes.observational',
+  case_series: 'evidence:studyTypes.case_series',
+  expert_opinion: 'evidence:studyTypes.expert_opinion',
 };
 
 const STUDY_TYPES = [
-  { value: 'rct', label: 'Randomized Controlled Trial' },
-  { value: 'meta_analysis', label: 'Meta-Analysis' },
-  { value: 'systematic_review', label: 'Systematic Review' },
-  { value: 'observational', label: 'Observational Study' },
-  { value: 'case_series', label: 'Case Series' },
-  { value: 'expert_opinion', label: 'Expert Opinion' },
+  { value: 'rct', labelKey: 'evidence:studyTypes.rct_full' },
+  { value: 'meta_analysis', labelKey: 'evidence:studyTypes.meta_analysis_full' },
+  { value: 'systematic_review', labelKey: 'evidence:studyTypes.systematic_review_full' },
+  { value: 'observational', labelKey: 'evidence:studyTypes.observational_full' },
+  { value: 'case_series', labelKey: 'evidence:studyTypes.case_series_full' },
+  { value: 'expert_opinion', labelKey: 'evidence:studyTypes.expert_opinion_full' },
 ];
 
 const QUALITY_RATINGS = [
-  { value: 'A', label: 'A - High Quality' },
-  { value: 'B', label: 'B - Good Quality' },
-  { value: 'C', label: 'C - Moderate Quality' },
-  { value: 'D', label: 'D - Low Quality' },
+  { value: 'A', labelKey: 'evidence:quality.A_full' },
+  { value: 'B', labelKey: 'evidence:quality.B_full' },
+  { value: 'C', labelKey: 'evidence:quality.C_full' },
+  { value: 'D', labelKey: 'evidence:quality.D_full' },
 ];
 
 const Evidence = () => {
+  const { t } = useTranslation(['evidence', 'common']);
   const { canEdit } = useAuth();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -109,16 +111,16 @@ const Evidence = () => {
   };
 
   const handleDelete = async (id, summary) => {
-    const confirmed = await confirmDelete(summary ? `"${summary.substring(0, 50)}..."` : 'this evidence entry');
+    const confirmed = await confirmDelete(summary ? `"${summary.substring(0, 50)}..."` : t('evidence:singular'));
     if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.evidenceEntriesAdmin}/${id}`);
-      toast.success('Evidence entry deleted');
+      toast.success(t('evidence:toast.deleted'));
       fetchEntries();
     } catch (error) {
       console.error('Error deleting evidence:', error);
-      toast.error('Failed to delete evidence entry');
+      toast.error(t('evidence:toast.deleteError'));
     }
   };
 
@@ -156,7 +158,7 @@ const Evidence = () => {
       });
     } catch (error) {
       console.error('Error fetching evidence:', error);
-      toast.error('Failed to load evidence');
+      toast.error(t('evidence:toast.loadError'));
       setIsModalOpen(false);
     } finally {
       setFormLoading(false);
@@ -180,7 +182,7 @@ const Evidence = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.intervention_id) {
-      newErrors.intervention_id = 'Intervention is required';
+      newErrors.intervention_id = t('evidence:validation.interventionRequired');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -194,10 +196,10 @@ const Evidence = () => {
       setSaving(true);
       if (editingId) {
         await api.put(`${apiEndpoints.evidenceEntriesAdmin}/${editingId}`, formData);
-        toast.success('Evidence updated');
+        toast.success(t('evidence:toast.updated'));
       } else {
         await api.post(apiEndpoints.evidenceEntriesAdmin, formData);
-        toast.success('Evidence created');
+        toast.success(t('evidence:toast.created'));
       }
       closeModal();
       fetchEntries();
@@ -206,7 +208,7 @@ const Evidence = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error('Failed to save evidence');
+        toast.error(t('evidence:toast.updateError'));
       }
     } finally {
       setSaving(false);
@@ -226,9 +228,9 @@ const Evidence = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Evidence Entries</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('evidence:list.title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage evidence supporting interventions
+            {t('evidence:list.subtitle')}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -237,7 +239,7 @@ const Evidence = () => {
             className="btn-outline flex items-center justify-center gap-2"
           >
             <Download className="w-5 h-5" />
-            Export CSV
+            {t('evidence:list.exportCsv')}
           </a>
           {canEdit && (
             <button
@@ -245,7 +247,7 @@ const Evidence = () => {
               className="btn-primary flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Evidence
+              {t('evidence:list.addNew')}
             </button>
           )}
         </div>
@@ -259,7 +261,7 @@ const Evidence = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search evidence..."
+              placeholder={t('evidence:list.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -270,10 +272,10 @@ const Evidence = () => {
             onChange={(e) => setStudyTypeFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Study Types</option>
-            {Object.entries(STUDY_TYPE).map(([key, label]) => (
+            <option value="">{t('evidence:list.allStudyTypes')}</option>
+            {Object.entries(STUDY_TYPE).map(([key, labelKey]) => (
               <option key={key} value={key}>
-                {label}
+                {t(labelKey)}
               </option>
             ))}
           </select>
@@ -282,10 +284,10 @@ const Evidence = () => {
             onChange={(e) => setQualityFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Quality Ratings</option>
-            {Object.entries(QUALITY_RATING).map(([key, { label }]) => (
+            <option value="">{t('evidence:list.allQualityRatings')}</option>
+            {Object.entries(QUALITY_RATING).map(([key, { labelKey }]) => (
               <option key={key} value={key}>
-                {label}
+                {t(labelKey)}
               </option>
             ))}
           </select>
@@ -301,10 +303,10 @@ const Evidence = () => {
         <div className="card text-center py-8 sm:py-12">
           <FileText className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No evidence entries found
+            {t('evidence:empty.title')}
           </h3>
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Get started by adding evidence for interventions.
+            {t('evidence:empty.description')}
           </p>
           {canEdit && (
             <button
@@ -312,7 +314,7 @@ const Evidence = () => {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Evidence
+              {t('evidence:empty.action')}
             </button>
           )}
         </div>
@@ -327,18 +329,18 @@ const Evidence = () => {
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      {entry.quality_rating && (
+                      {entry.quality_rating && QUALITY_RATING[entry.quality_rating] && (
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
                             QUALITY_RATING[entry.quality_rating]?.color
                           }`}
                         >
-                          {QUALITY_RATING[entry.quality_rating]?.label}
+                          {t(QUALITY_RATING[entry.quality_rating]?.labelKey)}
                         </span>
                       )}
-                      {entry.study_type && (
+                      {entry.study_type && STUDY_TYPE[entry.study_type] && (
                         <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
-                          {STUDY_TYPE[entry.study_type]}
+                          {t(STUDY_TYPE[entry.study_type])}
                         </span>
                       )}
                     </div>
@@ -361,13 +363,13 @@ const Evidence = () => {
 
                     {entry.population && (
                       <p className="text-xs sm:text-sm text-gray-500">
-                        <span className="font-medium">Population:</span> {entry.population}
+                        <span className="font-medium">{t('evidence:labels.population')}:</span> {entry.population}
                       </p>
                     )}
 
                     {entry.references && entry.references.length > 0 && (
                       <p className="text-xs text-gray-400 mt-2">
-                        {entry.references.length} reference(s)
+                        {t('evidence:labels.referencesCount', { count: entry.references.length })}
                       </p>
                     )}
                   </div>
@@ -377,14 +379,14 @@ const Evidence = () => {
                       <button
                         onClick={() => openEditModal(entry.id)}
                         className="action-btn"
-                        title="Edit"
+                        title={t('common:buttons.edit')}
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
                         onClick={() => handleDelete(entry.id, entry.summary)}
                         className="action-btn hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
+                        title={t('common:buttons.delete')}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
@@ -408,8 +410,8 @@ const Evidence = () => {
       <SlideOver
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingId ? 'Edit Evidence' : 'New Evidence Entry'}
-        subtitle={editingId ? 'Update the evidence details' : 'Add new evidence for an intervention'}
+        title={editingId ? t('evidence:form.editTitle') : t('evidence:form.createTitle')}
+        subtitle={editingId ? t('evidence:form.editSubtitle') : t('evidence:form.createSubtitle')}
         size="lg"
       >
         {formLoading ? (
@@ -421,7 +423,7 @@ const Evidence = () => {
             {/* Intervention */}
             <div>
               <label htmlFor="intervention_id" className="label">
-                Intervention <span className="text-red-500">*</span>
+                {t('evidence:form.intervention')} <span className="text-red-500">*</span>
               </label>
               <select
                 id="intervention_id"
@@ -430,7 +432,7 @@ const Evidence = () => {
                 onChange={handleChange}
                 className={`input-field ${errors.intervention_id ? 'border-red-500' : ''}`}
               >
-                <option value="">Select an intervention</option>
+                <option value="">{t('evidence:form.selectIntervention')}</option>
                 {interventions.map((intervention) => (
                   <option key={intervention.id} value={intervention.id}>
                     {intervention.name}
@@ -449,7 +451,7 @@ const Evidence = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="study_type" className="label">
-                  Study Type
+                  {t('evidence:form.studyType')}
                 </label>
                 <select
                   id="study_type"
@@ -458,17 +460,17 @@ const Evidence = () => {
                   onChange={handleChange}
                   className="input-field"
                 >
-                  <option value="">Select type</option>
-                  {STUDY_TYPES.map(({ value, label }) => (
+                  <option value="">{t('evidence:form.selectStudyType')}</option>
+                  {STUDY_TYPES.map(({ value, labelKey }) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(labelKey)}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
                 <label htmlFor="quality_rating" className="label">
-                  Quality Rating
+                  {t('evidence:form.qualityRating')}
                 </label>
                 <select
                   id="quality_rating"
@@ -477,10 +479,10 @@ const Evidence = () => {
                   onChange={handleChange}
                   className="input-field"
                 >
-                  <option value="">Select rating</option>
-                  {QUALITY_RATINGS.map(({ value, label }) => (
+                  <option value="">{t('evidence:form.selectQualityRating')}</option>
+                  {QUALITY_RATINGS.map(({ value, labelKey }) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(labelKey)}
                     </option>
                   ))}
                 </select>
@@ -490,7 +492,7 @@ const Evidence = () => {
             {/* Population */}
             <div>
               <label htmlFor="population" className="label">
-                Study Population
+                {t('evidence:form.population')}
               </label>
               <input
                 type="text"
@@ -499,14 +501,14 @@ const Evidence = () => {
                 value={formData.population}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="e.g., Adults with Type 2 Diabetes"
+                placeholder={t('evidence:form.populationPlaceholder')}
               />
             </div>
 
             {/* Summary */}
             <div>
               <label htmlFor="summary" className="label">
-                Summary
+                {t('evidence:form.summary')}
               </label>
               <textarea
                 id="summary"
@@ -515,14 +517,14 @@ const Evidence = () => {
                 onChange={handleChange}
                 rows={4}
                 className="input-field resize-y"
-                placeholder="Key findings and conclusions..."
+                placeholder={t('evidence:form.summaryPlaceholder')}
               />
             </div>
 
             {/* Notes */}
             <div>
               <label htmlFor="notes" className="label">
-                Notes
+                {t('evidence:form.notes')}
               </label>
               <textarea
                 id="notes"
@@ -531,7 +533,7 @@ const Evidence = () => {
                 onChange={handleChange}
                 rows={3}
                 className="input-field resize-y"
-                placeholder="Additional notes or comments..."
+                placeholder={t('evidence:form.notesPlaceholder')}
               />
             </div>
 
@@ -547,14 +549,14 @@ const Evidence = () => {
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {saving ? 'Saving...' : 'Save Evidence'}
+                {saving ? t('common:buttons.saving') : t('evidence:form.saveEvidence')}
               </button>
               <button
                 type="button"
                 onClick={closeModal}
                 className="btn-outline w-full sm:w-auto"
               >
-                Cancel
+                {t('common:buttons.cancel')}
               </button>
             </div>
           </form>

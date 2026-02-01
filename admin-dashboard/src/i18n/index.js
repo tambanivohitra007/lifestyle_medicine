@@ -22,6 +22,7 @@ import enAiGenerator from './locales/en/aiGenerator.json';
 import enImport from './locales/en/import.json';
 import enBible from './locales/en/bible.json';
 import enProfile from './locales/en/profile.json';
+import enSearch from './locales/en/search.json';
 
 // Import French translations
 import frCommon from './locales/fr/common.json';
@@ -43,6 +44,7 @@ import frAiGenerator from './locales/fr/aiGenerator.json';
 import frImport from './locales/fr/import.json';
 import frBible from './locales/fr/bible.json';
 import frProfile from './locales/fr/profile.json';
+import frSearch from './locales/fr/search.json';
 
 const resources = {
   en: {
@@ -65,6 +67,7 @@ const resources = {
     import: enImport,
     bible: enBible,
     profile: enProfile,
+    search: enSearch,
   },
   fr: {
     common: frCommon,
@@ -86,6 +89,7 @@ const resources = {
     import: frImport,
     bible: frBible,
     profile: frProfile,
+    search: frSearch,
   },
 };
 
@@ -116,6 +120,7 @@ i18n
       'import',
       'bible',
       'profile',
+      'search',
     ],
     detection: {
       order: ['localStorage', 'navigator'],

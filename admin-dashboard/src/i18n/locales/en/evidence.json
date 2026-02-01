@@ -3,14 +3,17 @@
   "singular": "Evidence",
   "plural": "Evidence",
   "list": {
-    "title": "Evidence",
-    "subtitle": "Research studies and scientific evidence",
+    "title": "Evidence Entries",
+    "subtitle": "Manage evidence supporting interventions",
     "addNew": "Add Evidence",
     "searchPlaceholder": "Search evidence...",
     "filterByType": "Filter by type",
     "filterByLevel": "Filter by evidence level",
     "allTypes": "All types",
-    "allLevels": "All levels"
+    "allLevels": "All levels",
+    "allStudyTypes": "All Study Types",
+    "allQualityRatings": "All Quality Ratings",
+    "exportCsv": "Export CSV"
   },
   "detail": {
     "title": "Evidence Details",
@@ -25,8 +28,10 @@
     "tags": "Tags"
   },
   "form": {
-    "createTitle": "Add Evidence",
+    "createTitle": "New Evidence Entry",
+    "createSubtitle": "Add new evidence for an intervention",
     "editTitle": "Edit Evidence",
+    "editSubtitle": "Update the evidence details",
     "title": "Title",
     "titlePlaceholder": "Enter evidence title",
     "abstract": "Abstract",
@@ -47,7 +52,20 @@
     "selectType": "Select study type",
     "tags": "Tags",
     "selectTags": "Select tags",
-    "status": "Status"
+    "status": "Status",
+    "intervention": "Intervention",
+    "selectIntervention": "Select an intervention",
+    "studyType": "Study Type",
+    "selectStudyType": "Select type",
+    "qualityRating": "Quality Rating",
+    "selectQualityRating": "Select rating",
+    "population": "Study Population",
+    "populationPlaceholder": "e.g., Adults with Type 2 Diabetes",
+    "summary": "Summary",
+    "summaryPlaceholder": "Key findings and conclusions...",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes or comments...",
+    "saveEvidence": "Save Evidence"
   },
   "levels": {
     "1a": "Level 1a - Systematic Review",
@@ -76,23 +94,41 @@
     "high": "High Quality",
     "good": "Good Quality",
     "moderate": "Moderate Quality",
-    "low": "Low Quality"
+    "low": "Low Quality",
+    "A": "A - High",
+    "B": "B - Good",
+    "C": "C - Moderate",
+    "D": "D - Low",
+    "A_full": "A - High Quality",
+    "B_full": "B - Good Quality",
+    "C_full": "C - Moderate Quality",
+    "D_full": "D - Low Quality"
   },
   "studyTypes": {
     "rct": "RCT",
-    "metaAnalysis": "Meta-Analysis",
-    "systematicReview": "Systematic Review",
+    "meta_analysis": "Meta-Analysis",
+    "systematic_review": "Systematic Review",
     "observational": "Observational",
-    "caseSeries": "Case Series",
-    "expertOpinion": "Expert Opinion"
+    "case_series": "Case Series",
+    "expert_opinion": "Expert Opinion",
+    "rct_full": "Randomized Controlled Trial",
+    "meta_analysis_full": "Meta-Analysis",
+    "systematic_review_full": "Systematic Review",
+    "observational_full": "Observational Study",
+    "case_series_full": "Case Series",
+    "expert_opinion_full": "Expert Opinion"
   },
   "labels": {
     "population": "Population",
-    "references": "References"
+    "references": "References",
+    "referencesCount": "{{count}} reference(s)"
+  },
+  "validation": {
+    "interventionRequired": "Intervention is required"
   },
   "empty": {
-    "title": "No evidence found",
-    "description": "Get started by adding your first evidence",
+    "title": "No evidence entries found",
+    "description": "Get started by adding evidence for interventions.",
     "action": "Add Evidence"
   },
   "toast": {

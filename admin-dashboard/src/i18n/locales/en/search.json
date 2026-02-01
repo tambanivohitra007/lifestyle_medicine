@@ -1,0 +1,46 @@
+{
+  "title": "Search",
+  "header": {
+    "badge": "Instant Search",
+    "title": "Search the Knowledge Platform",
+    "subtitle": "Find conditions, interventions, scriptures, recipes, and more"
+  },
+  "input": {
+    "placeholder": "Type to search..."
+  },
+  "types": {
+    "conditions": "Conditions",
+    "interventions": "Interventions",
+    "scriptures": "Scriptures",
+    "egwReferences": "EGW Writings",
+    "recipes": "Recipes",
+    "evidence": "Evidence",
+    "references": "References"
+  },
+  "filters": {
+    "clear": "Clear"
+  },
+  "recent": {
+    "title": "Recent Searches",
+    "clearAll": "Clear all"
+  },
+  "empty": {
+    "title": "Start typing to search",
+    "description": "Search across conditions, interventions, scriptures, recipes, evidence, and references instantly."
+  },
+  "loading": "Searching...",
+  "results": {
+    "count": "{{count}} results",
+    "inCategories": "in {{count}} categories",
+    "pressEnter": "Press",
+    "toOpen": "to open",
+    "noResults": "No results found",
+    "noResultsHint": "Try a different search term or adjust your filters",
+    "open": "Open"
+  },
+  "keyboard": {
+    "toClear": "to clear",
+    "toNavigate": "to navigate",
+    "toSelect": "to select"
+  }
+}

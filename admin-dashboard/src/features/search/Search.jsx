@@ -19,16 +19,17 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 
 const ENTITY_TYPES = [
-  { key: 'conditions', label: 'Conditions', icon: Heart, color: 'text-rose-600', bgColor: 'bg-rose-50', borderColor: 'border-rose-200' },
-  { key: 'interventions', label: 'Interventions', icon: Activity, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
-  { key: 'scriptures', label: 'Scriptures', icon: Book, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' },
-  { key: 'egw_references', label: 'EGW Writings', icon: BookMarked, color: 'text-violet-600', bgColor: 'bg-violet-50', borderColor: 'border-violet-200' },
-  { key: 'recipes', label: 'Recipes', icon: ChefHat, color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-200' },
-  { key: 'evidence', label: 'Evidence', icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' },
-  { key: 'references', label: 'References', icon: Library, color: 'text-slate-600', bgColor: 'bg-slate-50', borderColor: 'border-slate-200' },
+  { key: 'conditions', labelKey: 'search:types.conditions', icon: Heart, color: 'text-rose-600', bgColor: 'bg-rose-50', borderColor: 'border-rose-200' },
+  { key: 'interventions', labelKey: 'search:types.interventions', icon: Activity, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
+  { key: 'scriptures', labelKey: 'search:types.scriptures', icon: Book, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' },
+  { key: 'egw_references', labelKey: 'search:types.egwReferences', icon: BookMarked, color: 'text-violet-600', bgColor: 'bg-violet-50', borderColor: 'border-violet-200' },
+  { key: 'recipes', labelKey: 'search:types.recipes', icon: ChefHat, color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-200' },
+  { key: 'evidence', labelKey: 'search:types.evidence', icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' },
+  { key: 'references', labelKey: 'search:types.references', icon: Library, color: 'text-slate-600', bgColor: 'bg-slate-50', borderColor: 'border-slate-200' },
 ];
 
 const RECENT_SEARCHES_KEY = 'lm_recent_searches';
@@ -71,6 +72,7 @@ const HighlightedText = ({ text, query }) => {
 };
 
 const Search = () => {
+  const { t } = useTranslation(['search', 'common']);
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const resultsRef = useRef(null);
@@ -238,13 +240,13 @@ const Search = () => {
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-full text-sm text-primary-700 mb-4">
           <Sparkles className="w-4 h-4" />
-          Instant Search
+          {t('search:header.badge')}
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-          Search the Knowledge Platform
+          {t('search:header.title')}
         </h1>
         <p className="text-gray-500">
-          Find conditions, interventions, scriptures, recipes, and more
+          {t('search:header.subtitle')}
         </p>
       </div>
 
@@ -261,7 +263,7 @@ const Search = () => {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Type to search..."
+              placeholder={t('search:input.placeholder')}
               className="flex-1 text-lg bg-transparent outline-none placeholder-gray-400"
             />
             {loading && (
@@ -285,9 +287,9 @@ const Search = () => {
             <div className="hidden sm:flex items-center gap-1 text-xs text-gray-400 border-l border-gray-200 pl-3">
               <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-500">↑</kbd>
               <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-500">↓</kbd>
-              <span className="mx-1">to navigate</span>
+              <span className="mx-1">{t('search:keyboard.toNavigate')}</span>
               <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-500">↵</kbd>
-              <span>to select</span>
+              <span>{t('search:keyboard.toSelect')}</span>
             </div>
           </div>
 
@@ -307,7 +309,7 @@ const Search = () => {
                 `}
               >
                 <type.icon className="w-3.5 h-3.5" />
-                {type.label}
+                {t(type.labelKey)}
               </button>
             ))}
             {selectedTypes.length > 0 && (
@@ -315,7 +317,7 @@ const Search = () => {
                 onClick={() => setSelectedTypes([])}
                 className="text-sm text-gray-500 hover:text-gray-700 px-2"
               >
-                Clear
+                {t('search:filters.clear')}
               </button>
             )}
           </div>
@@ -330,13 +332,13 @@ const Search = () => {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
                 <Clock className="w-4 h-4" />
-                Recent Searches
+                {t('search:recent.title')}
               </div>
               <button
                 onClick={clearRecentSearches}
                 className="text-xs text-gray-400 hover:text-gray-600"
               >
-                Clear all
+                {t('search:recent.clearAll')}
               </button>
             </div>
             <div className="space-y-1">
@@ -362,10 +364,10 @@ const Search = () => {
               <Zap className="w-8 h-8 text-primary-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Start typing to search
+              {t('search:empty.title')}
             </h3>
             <p className="text-gray-500 max-w-sm mx-auto">
-              Search across conditions, interventions, scriptures, recipes, evidence, and references instantly.
+              {t('search:empty.description')}
             </p>
           </div>
         )}
@@ -375,7 +377,7 @@ const Search = () => {
           <div className="p-8 text-center">
             <div className="inline-flex items-center gap-3 text-gray-500">
               <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-              Searching...
+              {t('search:loading')}
             </div>
           </div>
         )}
@@ -387,13 +389,13 @@ const Search = () => {
             <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">
-                  <span className="font-semibold text-gray-900">{results.total_count}</span> results
+                  {t('search:results.count', { count: results.total_count })}
                   {selectedTypes.length > 0 && (
-                    <span className="text-gray-400"> in {selectedTypes.length} categories</span>
+                    <span className="text-gray-400"> {t('search:results.inCategories', { count: selectedTypes.length })}</span>
                   )}
                 </span>
                 <span className="text-xs text-gray-400">
-                  Press <kbd className="px-1 py-0.5 bg-white rounded border border-gray-200 text-gray-500">↵</kbd> to open
+                  {t('search:results.pressEnter')} <kbd className="px-1 py-0.5 bg-white rounded border border-gray-200 text-gray-500">↵</kbd> {t('search:results.toOpen')}
                 </span>
               </div>
             </div>
@@ -402,9 +404,9 @@ const Search = () => {
             {allResults.length === 0 ? (
               <div className="py-16 px-4 text-center">
                 <SearchIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No results found</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('search:results.noResults')}</h3>
                 <p className="text-gray-500">
-                  Try a different search term or adjust your filters
+                  {t('search:results.noResultsHint')}
                 </p>
               </div>
             ) : (
@@ -432,7 +434,7 @@ const Search = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className={`text-[10px] uppercase tracking-wider font-semibold ${config.color}`}>
-                            {config.label.slice(0, -1)}
+                            {t(config.labelKey).replace(/s$/, '')}
                           </span>
                           {item.category && (
                             <span className="text-[10px] text-gray-400">• {item.category}</span>
@@ -457,7 +459,7 @@ const Search = () => {
                       </div>
                       <div className={`flex-shrink-0 transition-opacity ${isSelected ? 'opacity-100' : 'opacity-0'}`}>
                         <div className="flex items-center gap-1 text-xs text-primary-600">
-                          <span>Open</span>
+                          <span>{t('search:results.open')}</span>
                           <CornerDownLeft className="w-3 h-3" />
                         </div>
                       </div>
@@ -474,7 +476,7 @@ const Search = () => {
       <div className="mt-6 flex items-center justify-center gap-6 text-xs text-gray-400">
         <div className="flex items-center gap-1.5">
           <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 shadow-sm">Esc</kbd>
-          <span>to clear</span>
+          <span>{t('search:keyboard.toClear')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 shadow-sm">
@@ -483,11 +485,11 @@ const Search = () => {
           <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 shadow-sm">
             <ChevronDown className="w-3 h-3 inline" />
           </kbd>
-          <span>to navigate</span>
+          <span>{t('search:keyboard.toNavigate')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 shadow-sm">↵</kbd>
-          <span>to open</span>
+          <span>{t('search:results.toOpen')}</span>
         </div>
       </div>
     </div>

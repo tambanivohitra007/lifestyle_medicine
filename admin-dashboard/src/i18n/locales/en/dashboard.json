@@ -31,7 +31,11 @@
   },
   "actions": {
     "addCondition": "Add Condition",
+    "addConditionDesc": "Create a new health condition entry",
     "addIntervention": "Add Intervention",
+    "addInterventionDesc": "Create a new lifestyle intervention",
+    "addScripture": "Add Scripture",
+    "addScriptureDesc": "Add a health-related Bible passage",
     "addRecipe": "Add Recipe",
     "viewAnalytics": "View Analytics",
     "manageUsers": "Manage Users",

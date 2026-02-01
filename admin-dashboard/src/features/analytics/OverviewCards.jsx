@@ -1,4 +1,5 @@
 import { HeartPulse, Activity, Book, ChefHat, BookMarked, TestTube, Users, Plus, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const StatCard = ({ title, value, icon: Icon, color, subValue, subLabel }) => (
   <div className="bg-white rounded-lg shadow p-6">
@@ -20,6 +21,8 @@ const StatCard = ({ title, value, icon: Icon, color, subValue, subLabel }) => (
 );
 
 const OverviewCards = ({ data, loading }) => {
+  const { t } = useTranslation(['analytics']);
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -40,58 +43,58 @@ const OverviewCards = ({ data, loading }) => {
 
   const stats = [
     {
-      title: 'Conditions',
+      title: t('analytics:cards.conditions'),
       value: data?.counts?.conditions,
       icon: HeartPulse,
       color: 'bg-primary-600',
       subValue: data?.this_week?.created,
-      subLabel: 'this week',
+      subLabel: t('analytics:cards.thisWeek'),
     },
     {
-      title: 'Interventions',
+      title: t('analytics:cards.interventions'),
       value: data?.counts?.interventions,
       icon: Activity,
       color: 'bg-secondary-600',
       subValue: data?.this_week?.created,
-      subLabel: 'this week',
+      subLabel: t('analytics:cards.thisWeek'),
     },
     {
-      title: 'Scriptures',
+      title: t('analytics:cards.scriptures'),
       value: data?.counts?.scriptures,
       icon: Book,
       color: 'bg-blue-600',
     },
     {
-      title: 'Recipes',
+      title: t('analytics:cards.recipes'),
       value: data?.counts?.recipes,
       icon: ChefHat,
       color: 'bg-amber-600',
     },
     {
-      title: 'EGW Writings',
+      title: t('analytics:cards.egwWritings'),
       value: data?.counts?.egw_references,
       icon: BookMarked,
       color: 'bg-purple-600',
     },
     {
-      title: 'Evidence Entries',
+      title: t('analytics:cards.evidenceEntries'),
       value: data?.counts?.evidence_entries,
       icon: TestTube,
       color: 'bg-emerald-600',
     },
     {
-      title: 'Users',
+      title: t('analytics:cards.users'),
       value: data?.counts?.users,
       icon: Users,
       color: 'bg-slate-600',
     },
     {
-      title: 'Created Today',
+      title: t('analytics:cards.createdToday'),
       value: data?.today?.created,
       icon: Plus,
       color: 'bg-green-600',
       subValue: data?.today?.updated,
-      subLabel: 'updated',
+      subLabel: t('analytics:cards.updated'),
     },
   ];
 

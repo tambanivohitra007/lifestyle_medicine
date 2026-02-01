@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, BookMarked, Edit, Trash2, ExternalLink, Download, Save, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
@@ -7,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 
 const References = () => {
+  const { t } = useTranslation(['references', 'common']);
   const { canEdit } = useAuth();
   const [references, setReferences] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,16 +61,16 @@ const References = () => {
   };
 
   const handleDelete = async (id, citation) => {
-    const confirmed = await confirmDelete(citation ? `"${citation.substring(0, 50)}..."` : 'this reference');
+    const confirmed = await confirmDelete(citation ? `"${citation.substring(0, 50)}..."` : t('references:singular'));
     if (!confirmed) return;
 
     try {
       await api.delete(`${apiEndpoints.referencesAdmin}/${id}`);
-      toast.success('Reference deleted');
+      toast.success(t('references:toast.deleted'));
       fetchReferences();
     } catch (error) {
       console.error('Error deleting reference:', error);
-      toast.error('Failed to delete reference');
+      toast.error(t('references:toast.deleteError'));
     }
   };
 
@@ -104,7 +106,7 @@ const References = () => {
       });
     } catch (error) {
       console.error('Error fetching reference:', error);
-      toast.error('Failed to load reference');
+      toast.error(t('references:toast.loadError'));
       setIsModalOpen(false);
     } finally {
       setFormLoading(false);
@@ -127,7 +129,7 @@ const References = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.citation.trim()) {
-      newErrors.citation = 'Citation is required';
+      newErrors.citation = t('references:validation.citationRequired');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -146,10 +148,10 @@ const References = () => {
 
       if (editingId) {
         await api.put(`${apiEndpoints.referencesAdmin}/${editingId}`, payload);
-        toast.success('Reference updated');
+        toast.success(t('references:toast.updated'));
       } else {
         await api.post(apiEndpoints.referencesAdmin, payload);
-        toast.success('Reference created');
+        toast.success(t('references:toast.created'));
       }
       closeModal();
       fetchReferences();
@@ -158,7 +160,7 @@ const References = () => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error('Failed to save reference');
+        toast.error(t('references:toast.updateError'));
       }
     } finally {
       setSaving(false);
@@ -180,9 +182,9 @@ const References = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">References</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('references:list.title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage citations and scientific references
+            {t('references:list.subtitle')}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -191,7 +193,7 @@ const References = () => {
             className="btn-outline flex items-center justify-center gap-2"
           >
             <Download className="w-5 h-5" />
-            Export CSV
+            {t('references:list.exportCsv')}
           </a>
           {canEdit && (
             <button
@@ -199,7 +201,7 @@ const References = () => {
               className="btn-primary flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Reference
+              {t('references:list.addNew')}
             </button>
           )}
         </div>
@@ -212,7 +214,7 @@ const References = () => {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by citation, DOI, or PMID..."
+              placeholder={t('references:list.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field pl-10"
@@ -223,7 +225,7 @@ const References = () => {
             onChange={(e) => setYearFilter(e.target.value)}
             className="input-field"
           >
-            <option value="">All Years</option>
+            <option value="">{t('references:list.allYears')}</option>
             {years.map((year) => (
               <option key={year} value={year}>
                 {year}
@@ -242,10 +244,10 @@ const References = () => {
         <div className="card text-center py-8 sm:py-12">
           <BookMarked className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No references found
+            {t('references:empty.title')}
           </h3>
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Get started by adding scientific references.
+            {t('references:empty.description')}
           </p>
           {canEdit && (
             <button
@@ -253,7 +255,7 @@ const References = () => {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Reference
+              {t('references:empty.action')}
             </button>
           )}
         </div>
@@ -308,7 +310,7 @@ const References = () => {
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 text-primary-600 hover:underline"
                         >
-                          Link
+                          {t('references:labels.link')}
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
@@ -320,14 +322,14 @@ const References = () => {
                       <button
                         onClick={() => openEditModal(reference.id)}
                         className="action-btn"
-                        title="Edit"
+                        title={t('common:buttons.edit')}
                       >
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
                         onClick={() => handleDelete(reference.id, reference.citation)}
                         className="action-btn hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
+                        title={t('common:buttons.delete')}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
@@ -351,8 +353,8 @@ const References = () => {
       <SlideOver
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingId ? 'Edit Reference' : 'New Reference'}
-        subtitle={editingId ? 'Update the reference details' : 'Add a new scientific reference'}
+        title={editingId ? t('references:form.editTitle') : t('references:form.createTitle')}
+        subtitle={editingId ? t('references:form.editSubtitle') : t('references:form.createSubtitle')}
         size="md"
       >
         {formLoading ? (
@@ -364,7 +366,7 @@ const References = () => {
             {/* Citation */}
             <div>
               <label htmlFor="citation" className="label">
-                Citation <span className="text-red-500">*</span>
+                {t('references:form.citation')} <span className="text-red-500">*</span>
               </label>
               <textarea
                 id="citation"
@@ -373,7 +375,7 @@ const References = () => {
                 onChange={handleChange}
                 rows={3}
                 className={`input-field resize-y ${errors.citation ? 'border-red-500' : ''}`}
-                placeholder="Full citation text (e.g., Author A, Author B. Title. Journal. Year;Volume:Pages)"
+                placeholder={t('references:form.citationPlaceholder')}
                 autoFocus
               />
               {errors.citation && (
@@ -386,7 +388,7 @@ const References = () => {
             {/* Year */}
             <div>
               <label htmlFor="year" className="label">
-                Year
+                {t('references:form.year')}
               </label>
               <input
                 type="number"
@@ -395,7 +397,7 @@ const References = () => {
                 value={formData.year}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="e.g., 2023"
+                placeholder={t('references:form.yearPlaceholder')}
                 min="1900"
                 max={new Date().getFullYear()}
               />
@@ -404,7 +406,7 @@ const References = () => {
             {/* DOI */}
             <div>
               <label htmlFor="doi" className="label">
-                DOI
+                {t('references:form.doi')}
               </label>
               <input
                 type="text"
@@ -413,14 +415,14 @@ const References = () => {
                 value={formData.doi}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="e.g., 10.1000/xyz123"
+                placeholder={t('references:form.doiPlaceholder')}
               />
             </div>
 
             {/* PMID */}
             <div>
               <label htmlFor="pmid" className="label">
-                PubMed ID (PMID)
+                {t('references:form.pmid')}
               </label>
               <input
                 type="text"
@@ -429,14 +431,14 @@ const References = () => {
                 value={formData.pmid}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="e.g., 12345678"
+                placeholder={t('references:form.pmidPlaceholder')}
               />
             </div>
 
             {/* URL */}
             <div>
               <label htmlFor="url" className="label">
-                URL
+                {t('references:form.url')}
               </label>
               <input
                 type="url"
@@ -445,7 +447,7 @@ const References = () => {
                 value={formData.url}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="https://..."
+                placeholder={t('references:form.urlPlaceholder')}
               />
             </div>
 
@@ -461,14 +463,14 @@ const References = () => {
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {saving ? 'Saving...' : 'Save Reference'}
+                {saving ? t('common:buttons.saving') : t('references:form.saveReference')}
               </button>
               <button
                 type="button"
                 onClick={closeModal}
                 className="btn-outline w-full sm:w-auto"
               >
-                Cancel
+                {t('common:buttons.cancel')}
               </button>
             </div>
           </form>
