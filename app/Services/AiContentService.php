@@ -22,6 +22,8 @@ class AiContentService
 {
     protected ?Client $client = null;
     protected ?string $apiKey = null;
+    protected string $draftModel;
+    protected string $structureModel;
 
     /**
      * Valid study types for evidence entries (must match database enum).
@@ -74,9 +76,15 @@ class AiContentService
     {
         $this->apiKey = config('services.gemini.api_key');
 
+        // Fast model for draft generation (System 1 - quick, creative)
+        $this->draftModel = config('services.gemini.draft_model', 'gemini-2.0-flash');
+
+        // Thinking model for structuring (System 2 - slow, deliberate, accurate)
+        $this->structureModel = config('services.gemini.structure_model', 'gemini-2.5-flash-preview-04-17');
+
         if ($this->apiKey) {
             $guzzleOptions = [
-                'timeout' => 120, // 2 minute timeout for AI requests
+                'timeout' => 300, // 5 minute timeout for AI requests
                 'connect_timeout' => 30,
             ];
 
@@ -106,20 +114,36 @@ class AiContentService
 
         $prompt = $this->buildDraftPrompt($conditionName, $context);
 
-        try {
-            $response = $this->client->generativeModel('gemini-2.0-flash')->generateContent(
-                new TextPart($prompt)
-            );
+        $maxRetries = 3;
+        $lastError = null;
 
-            return [
-                'success' => true,
-                'condition_name' => $conditionName,
-                'draft' => $response->text(),
-            ];
-        } catch (\Exception $e) {
-            Log::error('AI Content draft generation error: ' . $e->getMessage());
-            return ['error' => 'Failed to generate draft. Please try again.'];
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                Log::info("AI Content draft generation attempt {$attempt}/{$maxRetries} for: {$conditionName} using {$this->draftModel}");
+
+                $response = $this->client->generativeModel($this->draftModel)->generateContent(
+                    new TextPart($prompt)
+                );
+
+                Log::info("AI Content draft generation succeeded on attempt {$attempt}");
+                return [
+                    'success' => true,
+                    'condition_name' => $conditionName,
+                    'draft' => $response->text(),
+                ];
+            } catch (\Exception $e) {
+                $lastError = $e->getMessage();
+                Log::warning("AI Content draft generation error on attempt {$attempt}: {$lastError}");
+
+                if ($attempt < $maxRetries) {
+                    sleep($attempt * 2);
+                    continue;
+                }
+            }
         }
+
+        Log::error("AI Content draft generation failed after {$maxRetries} attempts: {$lastError}");
+        return ['error' => 'Failed to generate draft after multiple attempts. Please try again.'];
     }
 
     /**
@@ -134,26 +158,51 @@ class AiContentService
         $careDomains = CareDomain::pluck('name')->toArray();
         $prompt = $this->buildStructurePrompt($conditionName, $approvedDraft, $careDomains);
 
-        try {
-            $response = $this->client->generativeModel('gemini-2.0-flash')->generateContent(
-                new TextPart($prompt)
-            );
+        $maxRetries = 3;
+        $lastError = null;
 
-            $text = $response->text();
-            $structured = $this->parseJsonResponse($text);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                Log::info("AI Content structure attempt {$attempt}/{$maxRetries} for: {$conditionName} using {$this->structureModel}");
 
-            if (isset($structured['error'])) {
-                return $structured;
+                // Use thinking model for deliberate, careful structuring (System 2)
+                $response = $this->client->generativeModel($this->structureModel)->generateContent(
+                    new TextPart($prompt)
+                );
+
+                $text = $response->text();
+                $structured = $this->parseJsonResponse($text);
+
+                if (isset($structured['error'])) {
+                    // JSON parse error - retry might help if AI gave bad format
+                    $lastError = $structured['error'];
+                    Log::warning("AI Content structure parse error on attempt {$attempt}: {$lastError}");
+                    if ($attempt < $maxRetries) {
+                        sleep(2); // Brief pause before retry
+                        continue;
+                    }
+                    return $structured;
+                }
+
+                Log::info("AI Content structure succeeded on attempt {$attempt}");
+                return [
+                    'success' => true,
+                    'structured' => $structured,
+                ];
+            } catch (\Exception $e) {
+                $lastError = $e->getMessage();
+                Log::warning("AI Content structure error on attempt {$attempt}: {$lastError}");
+
+                if ($attempt < $maxRetries) {
+                    // Wait before retry (exponential backoff)
+                    sleep($attempt * 2);
+                    continue;
+                }
             }
-
-            return [
-                'success' => true,
-                'structured' => $structured,
-            ];
-        } catch (\Exception $e) {
-            Log::error('AI Content structure error: ' . $e->getMessage());
-            return ['error' => 'Failed to structure content. Please try again.'];
         }
+
+        Log::error("AI Content structure failed after {$maxRetries} attempts: {$lastError}");
+        return ['error' => 'Failed to structure content after multiple attempts. Please try again.'];
     }
 
     /**

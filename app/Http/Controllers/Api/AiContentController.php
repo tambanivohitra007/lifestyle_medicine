@@ -56,8 +56,8 @@ class AiContentController extends Controller
      */
     public function structureContent(Request $request): JsonResponse
     {
-        // Extend execution time for AI requests
-        set_time_limit(180);
+        // Extend execution time for AI requests (5 minutes for complex structuring)
+        set_time_limit(300);
 
         $validated = $request->validate([
             'condition_name' => 'required|string|max:255',
