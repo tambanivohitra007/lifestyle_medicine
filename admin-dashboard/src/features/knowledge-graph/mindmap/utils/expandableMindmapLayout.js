@@ -1,53 +1,27 @@
 /**
  * Expandable Mindmap Layout Algorithm
- * Creates a hierarchical tree layout with expandable/collapsible nodes.
  *
- * DESIGN PRINCIPLE: Use space generously! Nodes should be well-separated
- * and easy to read. Users can zoom out if needed.
+ * DESIGN: Each master branch gets an exclusive angular SECTOR.
+ * All children of that branch stay within their sector, preventing overlap.
  *
- * Hierarchy:
- * - Level 0: Center condition node
- * - Level 1 (Master): Main categories (Risk Factors, Complications, Solutions by domain)
- * - Level 2: Sub-items within each category
- * - Level 3: Details (recipes linked to interventions, etc.)
+ * Layout:
+ * - Circle divided into sectors (like pizza slices)
+ * - Each master node owns a sector
+ * - Children expand outward within parent's sector only
  */
 
-// Layout configuration - GENEROUS SPACING
+// Layout configuration
 const CONFIG = {
   // Distances from parent (in pixels)
-  masterRadius: 400,       // Distance of master nodes from center
-  level2Radius: 300,       // Distance of level 2 nodes from their parent
-  level3Radius: 200,       // Distance of level 3 nodes from their parent
+  level1Radius: 350,       // Master nodes from center
+  level2Radius: 280,       // Level 2 from master
+  level3Radius: 200,       // Level 3 from level 2
 
-  // Minimum spacing between sibling nodes
-  minNodeSpacing: 120,     // Minimum gap between adjacent nodes
+  // Padding between sectors (degrees)
+  sectorPadding: 8,
 
-  // Node dimensions for calculations
-  nodeWidth: 200,
-  nodeHeight: 100,
-};
-
-// Section configurations with positions (angles in degrees)
-// Spread across the LEFT side of the circle (90° to 270°)
-const SECTION_ANGLES = {
-  riskFactors: -135,       // Top-left quadrant
-  physiology: -165,        // Left side, upper
-  complications: 135,      // Bottom-left quadrant
-  additionalFactors: 165,  // Left side, lower
-  researchIdeas: -105,     // Top-left, closer to top
-};
-
-// Solution domain angles - spread across the RIGHT side (270° to 90°)
-// These represent the care domains for interventions
-const SOLUTION_ANGLES = {
-  'nutrition': -45,
-  'exercise': -25,
-  'hydrotherapy': -5,
-  'spiritual-care': 15,
-  'mental-health': 35,
-  'stress-management': 55,
-  'pharmacotherapy': 75,
-  'natural-remedies': 95,
+  // Minimum sector size (degrees)
+  minSectorSize: 25,
 };
 
 /**
@@ -69,49 +43,39 @@ function polarToCartesian(centerX, centerY, angle, distance) {
 }
 
 /**
- * Calculate appropriate spread based on number of items and distance
- * More items = wider spread, further distance = can have wider spread
+ * Distribute items evenly within a sector
  */
-function calculateSpread(count, distance) {
-  if (count <= 1) return 0;
-
-  // Base spread on item count - ensure minimum 25° between items
-  const minAngleBetweenItems = 25;
-  const desiredSpread = (count - 1) * minAngleBetweenItems;
-
-  // Cap at reasonable maximum based on distance
-  // Closer nodes need narrower spread to avoid crossing center
-  const maxSpread = Math.min(140, distance * 0.4);
-
-  return Math.min(desiredSpread, maxSpread);
-}
-
-/**
- * Distribute items in an arc AWAY from center
- * This ensures children fan out in the same general direction as their parent
- */
-function distributeInArc(count, parentX, parentY, parentAngle, distance) {
+function distributeInSector(count, parentX, parentY, sectorStart, sectorEnd, distance) {
   if (count === 0) return [];
+
+  const sectorSize = sectorEnd - sectorStart;
+
   if (count === 1) {
-    return [polarToCartesian(parentX, parentY, parentAngle, distance)];
+    const midAngle = sectorStart + sectorSize / 2;
+    return [polarToCartesian(parentX, parentY, midAngle, distance)];
   }
 
-  const spread = calculateSpread(count, distance);
   const positions = [];
-  const halfSpread = spread / 2;
-  const angleStep = spread / (count - 1);
+  // Add padding at edges of sector
+  const padding = Math.min(sectorSize * 0.1, 10);
+  const usableStart = sectorStart + padding;
+  const usableEnd = sectorEnd - padding;
+  const usableSize = usableEnd - usableStart;
+  const angleStep = usableSize / (count - 1);
 
   for (let i = 0; i < count; i++) {
-    const itemAngle = parentAngle - halfSpread + i * angleStep;
-    positions.push(polarToCartesian(parentX, parentY, itemAngle, distance));
+    const itemAngle = usableStart + i * angleStep;
+    positions.push({
+      position: polarToCartesian(parentX, parentY, itemAngle, distance),
+      angle: itemAngle,
+    });
   }
 
   return positions;
 }
 
 /**
- * Build the complete node/edge data structure for the mindmap
- * Returns all nodes with their hierarchy info, to be filtered by expansion state
+ * Build the complete mindmap with sector-based layout
  */
 export function buildExpandableMindmap(data, expandedNodes = new Set()) {
   if (!data || !data.condition) {
@@ -120,12 +84,12 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
 
   const nodes = [];
   const edges = [];
-  const hierarchy = {}; // Maps node ID to its children IDs
+  const hierarchy = {};
 
   const centerX = 0;
   const centerY = 0;
 
-  // 1. Create center condition node (always visible)
+  // 1. Create center condition node
   const conditionNodeId = `condition-${data.condition.id}`;
   nodes.push({
     id: conditionNodeId,
@@ -138,210 +102,293 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
       level: 0,
       expandable: true,
       expanded: expandedNodes.has(conditionNodeId),
-      childCount: 0, // Will be updated
+      childCount: 0,
     },
   });
   hierarchy[conditionNodeId] = [];
 
-  const masterNodeIds = [];
-  let sectionIndex = 0;
-  let solutionIndex = 0;
+  // 2. Collect all master branches
+  const masterBranches = [];
 
-  // 2. Create section master nodes (Level 1) - LEFT SIDE
+  // Sections (left side: 90° to 270°)
   const sections = data.sections || {};
-  const sectionKeys = Object.keys(sections).filter(key =>
-    sections[key]?.items?.length > 0
-  );
-
-  // Distribute sections evenly on left side if no predefined angle
-  const sectionBaseAngle = 180; // Left
-  const sectionTotalSpread = 150; // From -75° to +75° around 180°
-
-  sectionKeys.forEach((key) => {
-    const section = sections[key];
-
-    // Use predefined angle or calculate evenly distributed angle
-    let angle = SECTION_ANGLES[key];
-    if (angle === undefined) {
-      const spreadStep = sectionTotalSpread / Math.max(1, sectionKeys.length - 1);
-      angle = sectionBaseAngle - sectionTotalSpread/2 + sectionIndex * spreadStep;
-    }
-    sectionIndex++;
-
-    const masterPos = polarToCartesian(centerX, centerY, angle, CONFIG.masterRadius);
-    const masterId = `master-section-${key}`;
-
-    masterNodeIds.push(masterId);
-    hierarchy[conditionNodeId].push(masterId);
-    hierarchy[masterId] = [];
-
-    const isExpanded = expandedNodes.has(masterId);
-
-    nodes.push({
-      id: masterId,
-      type: 'masterNode',
-      position: masterPos,
-      data: {
-        label: section.label,
-        count: section.items.length,
-        color: section.color,
-        icon: section.icon,
-        sectionType: section.type,
-        level: 1,
-        expandable: section.items.length > 0,
-        expanded: isExpanded,
-        childCount: section.items.length,
-        parentId: conditionNodeId,
-        nodeCategory: 'section',
-        parentAngle: angle,
-      },
-      hidden: !expandedNodes.has(conditionNodeId),
+  Object.entries(sections).forEach(([key, section]) => {
+    if (!section.items || section.items.length === 0) return;
+    masterBranches.push({
+      type: 'section',
+      key,
+      data: section,
+      side: 'left',
+      weight: section.items.length, // More items = bigger sector
     });
-
-    edges.push({
-      id: `edge-center-to-${masterId}`,
-      source: conditionNodeId,
-      target: masterId,
-      type: 'mindmap',
-      data: { color: section.color },
-      hidden: !expandedNodes.has(conditionNodeId),
-    });
-
-    // Level 2: Section items - fan out in same direction
-    if (isExpanded) {
-      const itemPositions = distributeInArc(
-        section.items.length,
-        masterPos.x,
-        masterPos.y,
-        angle, // Continue in same direction
-        CONFIG.level2Radius
-      );
-
-      section.items.forEach((item, index) => {
-        const itemId = `section-item-${item.id}`;
-        hierarchy[masterId].push(itemId);
-
-        nodes.push({
-          id: itemId,
-          type: 'leafNode',
-          position: itemPositions[index],
-          data: {
-            ...item,
-            label: item.title,
-            color: section.color,
-            sectionType: section.type,
-            sectionLabel: section.label,
-            level: 2,
-            expandable: false,
-            parentId: masterId,
-            nodeCategory: 'sectionItem',
-          },
-          hidden: false,
-        });
-
-        edges.push({
-          id: `edge-${masterId}-to-${itemId}`,
-          source: masterId,
-          target: itemId,
-          type: 'mindmap',
-          data: { color: section.color, dashed: true },
-          hidden: false,
-        });
-      });
-    }
   });
 
-  // 3. Create solution master nodes (by care domain) - RIGHT SIDE
+  // Solutions (right side: -90° to 90°)
   const solutions = data.branches?.solutions || {};
-  const solutionKeys = Object.keys(solutions).filter(key => {
-    const sol = solutions[key];
-    return sol?.careDomain && (
-      sol.interventions?.length > 0 ||
-      sol.scriptures?.length > 0 ||
-      sol.egwReferences?.length > 0
-    );
+  Object.entries(solutions).forEach(([key, solutionData]) => {
+    if (!solutionData?.careDomain) return;
+    const childCount = (solutionData.interventions?.length || 0) +
+                       (solutionData.scriptures?.length || 0) +
+                       (solutionData.egwReferences?.length || 0);
+    if (childCount === 0) return;
+
+    masterBranches.push({
+      type: 'solution',
+      key,
+      data: solutionData,
+      side: 'right',
+      weight: childCount,
+    });
   });
 
-  // Distribute solutions evenly on right side if no predefined angle
-  const solutionBaseAngle = 0; // Right
-  const solutionTotalSpread = 150; // From -75° to +75° around 0°
+  // 3. Divide each side into sectors
+  const leftBranches = masterBranches.filter(b => b.side === 'left');
+  const rightBranches = masterBranches.filter(b => b.side === 'right');
 
-  solutionKeys.forEach((key) => {
-    const solutionData = solutions[key];
-    const domain = solutionData.careDomain;
+  // Left side: 100° to 260° (160° total)
+  const leftStart = 100;
+  const leftEnd = 260;
+  const leftSectors = allocateSectors(leftBranches, leftStart, leftEnd);
 
-    // Use predefined angle or calculate evenly distributed angle
-    let angle = SOLUTION_ANGLES[key];
-    if (angle === undefined) {
-      const spreadStep = solutionTotalSpread / Math.max(1, solutionKeys.length - 1);
-      angle = solutionBaseAngle - solutionTotalSpread/2 + solutionIndex * spreadStep;
+  // Right side: -80° to 80° (160° total)
+  const rightStart = -80;
+  const rightEnd = 80;
+  const rightSectors = allocateSectors(rightBranches, rightStart, rightEnd);
+
+  const allSectors = [...leftSectors, ...rightSectors];
+  const masterNodeIds = [];
+
+  // 4. Create master nodes and their children
+  allSectors.forEach((sector) => {
+    const { branch, startAngle, endAngle } = sector;
+    const midAngle = (startAngle + endAngle) / 2;
+
+    if (branch.type === 'section') {
+      createSectionBranch(
+        branch, midAngle, startAngle, endAngle,
+        nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds
+      );
+    } else {
+      createSolutionBranch(
+        branch, midAngle, startAngle, endAngle,
+        nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds
+      );
     }
-    solutionIndex++;
+  });
 
-    const masterPos = polarToCartesian(centerX, centerY, angle, CONFIG.masterRadius);
-    const masterId = `master-solution-${key}`;
+  // Update center node's child count
+  const centerNode = nodes.find(n => n.id === conditionNodeId);
+  if (centerNode) {
+    centerNode.data.childCount = masterNodeIds.length;
+  }
 
-    masterNodeIds.push(masterId);
-    hierarchy[conditionNodeId].push(masterId);
-    hierarchy[masterId] = [];
+  return { nodes, edges, hierarchy };
+}
 
-    const isExpanded = expandedNodes.has(masterId);
-    const totalChildren = (solutionData.interventions?.length || 0) +
-                          (solutionData.scriptures?.length || 0) +
-                          (solutionData.egwReferences?.length || 0);
+/**
+ * Allocate sectors to branches based on their weights
+ */
+function allocateSectors(branches, totalStart, totalEnd) {
+  if (branches.length === 0) return [];
 
-    nodes.push({
-      id: masterId,
-      type: 'masterNode',
-      position: masterPos,
-      data: {
-        label: domain.name,
-        count: solutionData.interventions?.length || 0,
-        color: domain.color || '#6b7280',
-        icon: domain.icon,
-        level: 1,
-        expandable: totalChildren > 0,
-        expanded: isExpanded,
-        childCount: totalChildren,
-        parentId: conditionNodeId,
-        nodeCategory: 'solution',
-        interventionCount: solutionData.interventions?.length || 0,
-        scriptureCount: solutionData.scriptures?.length || 0,
-        egwCount: solutionData.egwReferences?.length || 0,
-        parentAngle: angle,
-      },
-      hidden: !expandedNodes.has(conditionNodeId),
+  const totalSize = totalEnd - totalStart;
+  const totalPadding = CONFIG.sectorPadding * (branches.length + 1);
+  const availableSize = totalSize - totalPadding;
+
+  // Calculate total weight
+  const totalWeight = branches.reduce((sum, b) => sum + Math.sqrt(b.weight), 0);
+
+  // Allocate sectors proportionally
+  const sectors = [];
+  let currentAngle = totalStart + CONFIG.sectorPadding;
+
+  branches.forEach((branch) => {
+    const weight = Math.sqrt(branch.weight);
+    const sectorSize = Math.max(
+      CONFIG.minSectorSize,
+      (weight / totalWeight) * availableSize
+    );
+
+    sectors.push({
+      branch,
+      startAngle: currentAngle,
+      endAngle: currentAngle + sectorSize,
     });
 
-    edges.push({
-      id: `edge-center-to-${masterId}`,
-      source: conditionNodeId,
-      target: masterId,
-      type: 'mindmap',
-      data: { color: domain.color || '#6b7280' },
-      hidden: !expandedNodes.has(conditionNodeId),
+    currentAngle += sectorSize + CONFIG.sectorPadding;
+  });
+
+  return sectors;
+}
+
+/**
+ * Create section branch with children
+ */
+function createSectionBranch(
+  branch, midAngle, sectorStart, sectorEnd,
+  nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds
+) {
+  const section = branch.data;
+  const masterId = `master-section-${branch.key}`;
+  const masterPos = polarToCartesian(0, 0, midAngle, CONFIG.level1Radius);
+
+  masterNodeIds.push(masterId);
+  hierarchy[conditionNodeId].push(masterId);
+  hierarchy[masterId] = [];
+
+  const isExpanded = expandedNodes.has(masterId);
+
+  nodes.push({
+    id: masterId,
+    type: 'masterNode',
+    position: masterPos,
+    data: {
+      label: section.label,
+      count: section.items.length,
+      color: section.color,
+      icon: section.icon,
+      sectionType: section.type,
+      level: 1,
+      expandable: section.items.length > 0,
+      expanded: isExpanded,
+      childCount: section.items.length,
+      parentId: conditionNodeId,
+      nodeCategory: 'section',
+    },
+    hidden: !expandedNodes.has(conditionNodeId),
+  });
+
+  edges.push({
+    id: `edge-center-to-${masterId}`,
+    source: conditionNodeId,
+    target: masterId,
+    type: 'mindmap',
+    data: { color: section.color },
+    hidden: !expandedNodes.has(conditionNodeId),
+  });
+
+  // Level 2: Section items - stay within sector
+  if (isExpanded && section.items.length > 0) {
+    const itemPositions = distributeInSector(
+      section.items.length,
+      masterPos.x, masterPos.y,
+      sectorStart, sectorEnd,
+      CONFIG.level2Radius
+    );
+
+    section.items.forEach((item, index) => {
+      const itemId = `section-item-${item.id}`;
+      hierarchy[masterId].push(itemId);
+
+      nodes.push({
+        id: itemId,
+        type: 'leafNode',
+        position: itemPositions[index].position,
+        data: {
+          ...item,
+          label: item.title,
+          color: section.color,
+          sectionType: section.type,
+          sectionLabel: section.label,
+          level: 2,
+          expandable: false,
+          parentId: masterId,
+          nodeCategory: 'sectionItem',
+        },
+        hidden: false,
+      });
+
+      edges.push({
+        id: `edge-${masterId}-to-${itemId}`,
+        source: masterId,
+        target: itemId,
+        type: 'mindmap',
+        data: { color: section.color, dashed: true },
+        hidden: false,
+      });
     });
+  }
+}
 
-    // Level 2: Interventions, scriptures, EGW references
-    if (isExpanded) {
-      const interventions = solutionData.interventions || [];
-      const scriptures = solutionData.scriptures || [];
-      const egwRefs = solutionData.egwReferences || [];
+/**
+ * Create solution branch with children
+ */
+function createSolutionBranch(
+  branch, midAngle, sectorStart, sectorEnd,
+  nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds
+) {
+  const solutionData = branch.data;
+  const domain = solutionData.careDomain;
+  const masterId = `master-solution-${branch.key}`;
+  const masterPos = polarToCartesian(0, 0, midAngle, CONFIG.level1Radius);
 
-      // Calculate positions for all children - fan out in same direction
-      const allChildrenCount = interventions.length + scriptures.length + egwRefs.length;
-      const allPositions = distributeInArc(
-        allChildrenCount,
-        masterPos.x,
-        masterPos.y,
-        angle,
+  masterNodeIds.push(masterId);
+  hierarchy[conditionNodeId].push(masterId);
+  hierarchy[masterId] = [];
+
+  const isExpanded = expandedNodes.has(masterId);
+  const interventions = solutionData.interventions || [];
+  const scriptures = solutionData.scriptures || [];
+  const egwRefs = solutionData.egwReferences || [];
+  const totalChildren = interventions.length + scriptures.length + egwRefs.length;
+
+  nodes.push({
+    id: masterId,
+    type: 'masterNode',
+    position: masterPos,
+    data: {
+      label: domain.name,
+      count: interventions.length,
+      color: domain.color || '#6b7280',
+      icon: domain.icon,
+      level: 1,
+      expandable: totalChildren > 0,
+      expanded: isExpanded,
+      childCount: totalChildren,
+      parentId: conditionNodeId,
+      nodeCategory: 'solution',
+      interventionCount: interventions.length,
+      scriptureCount: scriptures.length,
+      egwCount: egwRefs.length,
+    },
+    hidden: !expandedNodes.has(conditionNodeId),
+  });
+
+  edges.push({
+    id: `edge-center-to-${masterId}`,
+    source: conditionNodeId,
+    target: masterId,
+    type: 'mindmap',
+    data: { color: domain.color || '#6b7280' },
+    hidden: !expandedNodes.has(conditionNodeId),
+  });
+
+  // Level 2: All children within sector
+  if (isExpanded && totalChildren > 0) {
+    // Divide sector among child types
+    const sectorSize = sectorEnd - sectorStart;
+
+    // Calculate sub-sectors for each type
+    const interventionWeight = interventions.length;
+    const scriptureWeight = scriptures.length;
+    const egwWeight = egwRefs.length;
+    const totalWeight = interventionWeight + scriptureWeight + egwWeight;
+
+    let currentSectorStart = sectorStart;
+
+    // Interventions sub-sector
+    if (interventions.length > 0) {
+      const subSectorSize = (interventionWeight / totalWeight) * sectorSize;
+      const subSectorEnd = currentSectorStart + subSectorSize;
+
+      const positions = distributeInSector(
+        interventions.length,
+        masterPos.x, masterPos.y,
+        currentSectorStart, subSectorEnd,
         CONFIG.level2Radius
       );
 
-      let posIndex = 0;
-
-      // Interventions
-      interventions.forEach((intervention) => {
+      interventions.forEach((intervention, index) => {
         const interventionId = `intervention-${intervention.id}`;
         hierarchy[masterId].push(interventionId);
         hierarchy[interventionId] = [];
@@ -349,16 +396,15 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
         const isInterventionExpanded = expandedNodes.has(interventionId);
         const recipeCount = intervention.recipes?.length || 0;
 
-        // Calculate this intervention's angle for its children
-        const interventionAngle = allChildrenCount > 1
-          ? angle - calculateSpread(allChildrenCount, CONFIG.level2Radius)/2 +
-            posIndex * (calculateSpread(allChildrenCount, CONFIG.level2Radius) / (allChildrenCount - 1))
-          : angle;
+        // Calculate sub-sub-sector for recipes
+        const recipeSectorSize = subSectorSize / interventions.length;
+        const recipeSectorStart = currentSectorStart + index * recipeSectorSize;
+        const recipeSectorEnd = recipeSectorStart + recipeSectorSize;
 
         nodes.push({
           id: interventionId,
           type: 'interventionNode',
-          position: allPositions[posIndex],
+          position: positions[index].position,
           data: {
             ...intervention,
             label: intervention.name,
@@ -369,7 +415,6 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
             childCount: recipeCount,
             parentId: masterId,
             nodeCategory: 'intervention',
-            parentAngle: interventionAngle,
           },
           hidden: false,
         });
@@ -383,13 +428,13 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
           hidden: false,
         });
 
-        // Level 3: Recipes (if intervention is expanded)
+        // Level 3: Recipes
         if (isInterventionExpanded && intervention.recipes?.length > 0) {
-          const recipePositions = distributeInArc(
+          const recipePositions = distributeInSector(
             intervention.recipes.length,
-            allPositions[posIndex].x,
-            allPositions[posIndex].y,
-            interventionAngle,
+            positions[index].position.x,
+            positions[index].position.y,
+            recipeSectorStart, recipeSectorEnd,
             CONFIG.level3Radius
           );
 
@@ -400,7 +445,7 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
             nodes.push({
               id: recipeId,
               type: 'leafNode',
-              position: recipePositions[recipeIdx],
+              position: recipePositions[recipeIdx].position,
               data: {
                 ...recipe,
                 label: recipe.title,
@@ -423,19 +468,31 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
             });
           });
         }
-
-        posIndex++;
       });
 
-      // Scriptures
-      scriptures.forEach((scripture) => {
-        const scriptureId = `scripture-${scripture.id}-${key}`;
+      currentSectorStart = subSectorEnd;
+    }
+
+    // Scriptures sub-sector
+    if (scriptures.length > 0) {
+      const subSectorSize = (scriptureWeight / totalWeight) * sectorSize;
+      const subSectorEnd = currentSectorStart + subSectorSize;
+
+      const positions = distributeInSector(
+        scriptures.length,
+        masterPos.x, masterPos.y,
+        currentSectorStart, subSectorEnd,
+        CONFIG.level2Radius
+      );
+
+      scriptures.forEach((scripture, index) => {
+        const scriptureId = `scripture-${scripture.id}-${branch.key}`;
         hierarchy[masterId].push(scriptureId);
 
         nodes.push({
           id: scriptureId,
           type: 'leafNode',
-          position: allPositions[posIndex],
+          position: positions[index].position,
           data: {
             ...scripture,
             label: scripture.reference,
@@ -456,19 +513,31 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
           data: { color: '#6366f1', dashed: true },
           hidden: false,
         });
-
-        posIndex++;
       });
 
-      // EGW References
-      egwRefs.forEach((egw) => {
-        const egwId = `egw-${egw.id}-${key}`;
+      currentSectorStart = subSectorEnd;
+    }
+
+    // EGW References sub-sector
+    if (egwRefs.length > 0) {
+      const subSectorSize = (egwWeight / totalWeight) * sectorSize;
+      const subSectorEnd = currentSectorStart + subSectorSize;
+
+      const positions = distributeInSector(
+        egwRefs.length,
+        masterPos.x, masterPos.y,
+        currentSectorStart, subSectorEnd,
+        CONFIG.level2Radius
+      );
+
+      egwRefs.forEach((egw, index) => {
+        const egwId = `egw-${egw.id}-${branch.key}`;
         hierarchy[masterId].push(egwId);
 
         nodes.push({
           id: egwId,
           type: 'leafNode',
-          position: allPositions[posIndex],
+          position: positions[index].position,
           data: {
             ...egw,
             label: egw.citation,
@@ -489,23 +558,13 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
           data: { color: '#8b5cf6', dashed: true },
           hidden: false,
         });
-
-        posIndex++;
       });
     }
-  });
-
-  // Update center node's child count
-  const centerNode = nodes.find(n => n.id === conditionNodeId);
-  if (centerNode) {
-    centerNode.data.childCount = masterNodeIds.length;
   }
-
-  return { nodes, edges, hierarchy };
 }
 
 /**
- * Get all descendant node IDs for a given node
+ * Get all descendant node IDs
  */
 export function getDescendants(nodeId, hierarchy) {
   const descendants = [];
@@ -520,21 +579,15 @@ export function getDescendants(nodeId, hierarchy) {
 }
 
 /**
- * Filter nodes and edges based on expansion state
+ * Filter visible nodes and edges based on expansion state
  */
 export function filterVisibleElements(nodes, edges, expandedNodes) {
-  // A node is visible if:
-  // 1. It's the center node, OR
-  // 2. Its parent is expanded
-
   const visibleNodeIds = new Set();
 
   nodes.forEach(node => {
     if (node.data.level === 0) {
-      // Center node always visible
       visibleNodeIds.add(node.id);
     } else if (node.data.parentId && expandedNodes.has(node.data.parentId)) {
-      // Parent is expanded
       visibleNodeIds.add(node.id);
     }
   });
