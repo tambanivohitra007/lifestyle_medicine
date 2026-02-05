@@ -234,7 +234,7 @@ const ConditionMindmapInner = ({
 
   // Update visible nodes when expansion state changes
   useEffect(() => {
-    if (allNodesData.nodes.length === 0) return;
+    if (!data) return;
 
     // Rebuild graph with new expansion state, preserving user-moved positions
     const graphData = buildExpandableMindmap(data, expandedNodes, userMovedPositions.current);
@@ -266,7 +266,8 @@ const ConditionMindmapInner = ({
     // Focus viewport on expanded node and its children
     if (lastExpandedNode.current) {
       const expandedNodeId = lastExpandedNode.current;
-      const childIds = allNodesData.hierarchy[expandedNodeId] || [];
+      // Use graphData.hierarchy (not allNodesData) to avoid stale data
+      const childIds = graphData.hierarchy[expandedNodeId] || [];
 
       // Include the parent node and all its direct children in the focus area
       const nodesToFocus = [expandedNodeId, ...childIds];
@@ -288,7 +289,7 @@ const ConditionMindmapInner = ({
         fitView({ padding: 0.2, duration: 400 });
       }, 50);
     }
-  }, [expandedNodes, data, setNodes, setEdges, fitView, allNodesData.nodes.length, allNodesData.hierarchy]);
+  }, [expandedNodes, data, setNodes, setEdges, fitView]);
 
   // Handle node click - toggle expansion or show details
   const handleNodeClick = useCallback((event, node) => {
