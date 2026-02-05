@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -64,6 +64,26 @@ const ConditionMindmapInner = ({
   const [allNodesData, setAllNodesData] = useState({ nodes: [], edges: [], hierarchy: {} });
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
+  // Track user-moved node positions (persists across re-renders and rebuilds)
+  const userMovedPositions = useRef(new Map());
+
+  // Custom nodes change handler that tracks user-dragged positions
+  const handleNodesChange = useCallback((changes) => {
+    // Process changes to detect user drag operations
+    changes.forEach((change) => {
+      if (change.type === 'position' && change.dragging === false && change.position) {
+        // User finished dragging a node - save its new position
+        userMovedPositions.current.set(change.id, {
+          x: change.position.x,
+          y: change.position.y,
+        });
+      }
+    });
+
+    // Apply the changes as normal
+    onNodesChange(changes);
+  }, [onNodesChange]);
+
   // Fetch mindmap data
   const { data, loading, error, refetch, condition, meta } = useConditionMindmap(conditionId);
 
@@ -76,8 +96,11 @@ const ConditionMindmapInner = ({
     const initialExpanded = new Set([conditionNodeId]);
     setExpandedNodes(initialExpanded);
 
+    // Clear user positions when data changes (new condition loaded)
+    userMovedPositions.current.clear();
+
     // Build the complete graph structure
-    const graphData = buildExpandableMindmap(data, initialExpanded);
+    const graphData = buildExpandableMindmap(data, initialExpanded, userMovedPositions.current);
     setAllNodesData(graphData);
 
     // Filter visible elements
@@ -100,8 +123,8 @@ const ConditionMindmapInner = ({
   useEffect(() => {
     if (allNodesData.nodes.length === 0) return;
 
-    // Rebuild graph with new expansion state
-    const graphData = buildExpandableMindmap(data, expandedNodes);
+    // Rebuild graph with new expansion state, preserving user-moved positions
+    const graphData = buildExpandableMindmap(data, expandedNodes, userMovedPositions.current);
     setAllNodesData(graphData);
 
     // Filter visible elements
@@ -114,10 +137,13 @@ const ConditionMindmapInner = ({
     setNodes(visibleNodes);
     setEdges(visibleEdges);
 
-    // Fit view with animation
-    setTimeout(() => {
-      fitView({ padding: 0.2, duration: 400 });
-    }, 50);
+    // Don't auto-fit view when user has moved nodes - let them control the view
+    // Only fit if no user positions are stored
+    if (userMovedPositions.current.size === 0) {
+      setTimeout(() => {
+        fitView({ padding: 0.2, duration: 400 });
+      }, 50);
+    }
   }, [expandedNodes, data, setNodes, setEdges, fitView, allNodesData.nodes.length]);
 
   // Handle node click - toggle expansion or show details
@@ -291,7 +317,7 @@ const ConditionMindmapInner = ({
       <ReactFlow
         nodes={displayNodes}
         edges={displayEdges}
-        onNodesChange={onNodesChange}
+        onNodesChange={handleNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
         onNodeDoubleClick={handleNodeDoubleClick}

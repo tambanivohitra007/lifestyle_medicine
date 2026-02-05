@@ -3,6 +3,7 @@
  *
  * DESIGN: Nodes stay in their positions once placed.
  * New nodes find available space using collision detection.
+ * User-moved positions are always preserved and respected.
  */
 
 // Layout configuration
@@ -134,8 +135,11 @@ function distributeAngles(count, startAngle, endAngle) {
 
 /**
  * Build the complete mindmap with collision-aware placement
+ * @param {Object} data - The mindmap data
+ * @param {Set} expandedNodes - Set of expanded node IDs
+ * @param {Map} userPositions - Map of nodeId -> {x, y} for user-moved nodes
  */
-export function buildExpandableMindmap(data, expandedNodes = new Set()) {
+export function buildExpandableMindmap(data, expandedNodes = new Set(), userPositions = new Map()) {
   if (!data || !data.condition) {
     return { nodes: [], edges: [], hierarchy: {} };
   }
@@ -148,12 +152,39 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
   const centerX = 0;
   const centerY = 0;
 
+  /**
+   * Get position for a node - use user position if available, otherwise calculate
+   */
+  const getNodePosition = (nodeId, calculatedPos) => {
+    if (userPositions.has(nodeId)) {
+      return userPositions.get(nodeId);
+    }
+    return calculatedPos;
+  };
+
+  /**
+   * Register a position as occupied (for collision detection)
+   */
+  const registerPosition = (nodeId, pos) => {
+    occupiedPositions.push({ x: pos.x, y: pos.y, nodeId });
+  };
+
+  /**
+   * Pre-register all user-moved positions as occupied first
+   * This ensures new nodes won't collide with user-placed nodes
+   */
+  for (const [nodeId, pos] of userPositions.entries()) {
+    occupiedPositions.push({ x: pos.x, y: pos.y, nodeId, isUserMoved: true });
+  }
+
   // 1. Create center condition node
   const conditionNodeId = `condition-${data.condition.id}`;
+  const centerPos = getNodePosition(conditionNodeId, { x: centerX, y: centerY });
+
   nodes.push({
     id: conditionNodeId,
     type: 'centerCondition',
-    position: { x: centerX, y: centerY },
+    position: centerPos,
     data: {
       ...data.condition,
       isCenter: true,
@@ -165,7 +196,11 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
     },
   });
   hierarchy[conditionNodeId] = [];
-  occupiedPositions.push({ x: centerX, y: centerY });
+
+  // Only add to occupied if not already registered from user positions
+  if (!userPositions.has(conditionNodeId)) {
+    registerPosition(conditionNodeId, centerPos);
+  }
 
   // 2. Collect all master branches
   const sectionBranches = [];
@@ -195,11 +230,12 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
   const sectionAngles = distributeAngles(sectionBranches.length, 100, 260);
   sectionBranches.forEach((branch, index) => {
     const preferredAngle = sectionAngles[index];
-    const result = findAvailablePosition(centerX, centerY, preferredAngle, CONFIG.level1Radius, occupiedPositions);
+    const result = findAvailablePosition(centerPos.x, centerPos.y, preferredAngle, CONFIG.level1Radius, occupiedPositions);
 
     createSectionBranch(
       branch, result.position, result.angle,
-      nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds, occupiedPositions
+      nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds, occupiedPositions,
+      userPositions, getNodePosition, registerPosition
     );
   });
 
@@ -207,11 +243,12 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
   const solutionAngles = distributeAngles(solutionBranches.length, -80, 80);
   solutionBranches.forEach((branch, index) => {
     const preferredAngle = solutionAngles[index];
-    const result = findAvailablePosition(centerX, centerY, preferredAngle, CONFIG.level1Radius, occupiedPositions);
+    const result = findAvailablePosition(centerPos.x, centerPos.y, preferredAngle, CONFIG.level1Radius, occupiedPositions);
 
     createSolutionBranch(
       branch, result.position, result.angle,
-      nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds, occupiedPositions
+      nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds, occupiedPositions,
+      userPositions, getNodePosition, registerPosition
     );
   });
 
@@ -228,16 +265,24 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
  * Create section branch with collision-aware child placement
  */
 function createSectionBranch(
-  branch, masterPos, masterAngle,
-  nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds, occupiedPositions
+  branch, calculatedMasterPos, masterAngle,
+  nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds, occupiedPositions,
+  userPositions, getNodePosition, registerPosition
 ) {
   const section = branch.data;
   const masterId = `master-section-${branch.key}`;
 
+  // Use user position if available, otherwise use calculated position
+  const masterPos = getNodePosition(masterId, calculatedMasterPos);
+
   masterNodeIds.push(masterId);
   hierarchy[conditionNodeId].push(masterId);
   hierarchy[masterId] = [];
-  occupiedPositions.push({ x: masterPos.x, y: masterPos.y });
+
+  // Register position if not already from user positions
+  if (!userPositions.has(masterId)) {
+    registerPosition(masterId, masterPos);
+  }
 
   const isExpanded = expandedNodes.has(masterId);
 
@@ -281,22 +326,30 @@ function createSectionBranch(
     );
 
     section.items.forEach((item, index) => {
-      const preferredAngle = childAngles[index];
-      const result = findAvailablePosition(
-        masterPos.x, masterPos.y,
-        preferredAngle,
-        CONFIG.level2Radius,
-        occupiedPositions
-      );
-
       const itemId = `section-item-${item.id}`;
+      let itemPos;
+
+      // Check if user has moved this node
+      if (userPositions.has(itemId)) {
+        itemPos = userPositions.get(itemId);
+      } else {
+        const preferredAngle = childAngles[index];
+        const result = findAvailablePosition(
+          masterPos.x, masterPos.y,
+          preferredAngle,
+          CONFIG.level2Radius,
+          occupiedPositions
+        );
+        itemPos = result.position;
+        registerPosition(itemId, itemPos);
+      }
+
       hierarchy[masterId].push(itemId);
-      occupiedPositions.push({ x: result.position.x, y: result.position.y });
 
       nodes.push({
         id: itemId,
         type: 'leafNode',
-        position: result.position,
+        position: itemPos,
         data: {
           ...item,
           label: item.title,
@@ -327,17 +380,25 @@ function createSectionBranch(
  * Create solution branch with collision-aware child placement
  */
 function createSolutionBranch(
-  branch, masterPos, masterAngle,
-  nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds, occupiedPositions
+  branch, calculatedMasterPos, masterAngle,
+  nodes, edges, hierarchy, conditionNodeId, expandedNodes, masterNodeIds, occupiedPositions,
+  userPositions, getNodePosition, registerPosition
 ) {
   const solutionData = branch.data;
   const domain = solutionData.careDomain;
   const masterId = `master-solution-${branch.key}`;
 
+  // Use user position if available, otherwise use calculated position
+  const masterPos = getNodePosition(masterId, calculatedMasterPos);
+
   masterNodeIds.push(masterId);
   hierarchy[conditionNodeId].push(masterId);
   hierarchy[masterId] = [];
-  occupiedPositions.push({ x: masterPos.x, y: masterPos.y });
+
+  // Register position if not already from user positions
+  if (!userPositions.has(masterId)) {
+    registerPosition(masterId, masterPos);
+  }
 
   const isExpanded = expandedNodes.has(masterId);
   const interventions = solutionData.interventions || [];
@@ -389,18 +450,27 @@ function createSolutionBranch(
 
     // Interventions
     interventions.forEach((intervention) => {
-      const preferredAngle = allChildAngles[angleIndex++];
-      const result = findAvailablePosition(
-        masterPos.x, masterPos.y,
-        preferredAngle,
-        CONFIG.level2Radius,
-        occupiedPositions
-      );
-
       const interventionId = `intervention-${intervention.id}`;
+      let interventionPos;
+      let usedAngle = allChildAngles[angleIndex++];
+
+      // Check if user has moved this node
+      if (userPositions.has(interventionId)) {
+        interventionPos = userPositions.get(interventionId);
+      } else {
+        const result = findAvailablePosition(
+          masterPos.x, masterPos.y,
+          usedAngle,
+          CONFIG.level2Radius,
+          occupiedPositions
+        );
+        interventionPos = result.position;
+        usedAngle = result.angle;
+        registerPosition(interventionId, interventionPos);
+      }
+
       hierarchy[masterId].push(interventionId);
       hierarchy[interventionId] = [];
-      occupiedPositions.push({ x: result.position.x, y: result.position.y });
 
       const isInterventionExpanded = expandedNodes.has(interventionId);
       const recipeCount = intervention.recipes?.length || 0;
@@ -408,7 +478,7 @@ function createSolutionBranch(
       nodes.push({
         id: interventionId,
         type: 'interventionNode',
-        position: result.position,
+        position: interventionPos,
         data: {
           ...intervention,
           label: intervention.name,
@@ -437,27 +507,35 @@ function createSolutionBranch(
         const recipeSpread = Math.min(80, intervention.recipes.length * 30);
         const recipeAngles = distributeAngles(
           intervention.recipes.length,
-          result.angle - recipeSpread / 2,
-          result.angle + recipeSpread / 2
+          usedAngle - recipeSpread / 2,
+          usedAngle + recipeSpread / 2
         );
 
         intervention.recipes.forEach((recipe, recipeIdx) => {
-          const recipeAngle = recipeAngles[recipeIdx];
-          const recipeResult = findAvailablePosition(
-            result.position.x, result.position.y,
-            recipeAngle,
-            CONFIG.level3Radius,
-            occupiedPositions
-          );
-
           const recipeId = `recipe-${recipe.id}-${intervention.id}`;
+          let recipePos;
+
+          // Check if user has moved this node
+          if (userPositions.has(recipeId)) {
+            recipePos = userPositions.get(recipeId);
+          } else {
+            const recipeAngle = recipeAngles[recipeIdx];
+            const recipeResult = findAvailablePosition(
+              interventionPos.x, interventionPos.y,
+              recipeAngle,
+              CONFIG.level3Radius,
+              occupiedPositions
+            );
+            recipePos = recipeResult.position;
+            registerPosition(recipeId, recipePos);
+          }
+
           hierarchy[interventionId].push(recipeId);
-          occupiedPositions.push({ x: recipeResult.position.x, y: recipeResult.position.y });
 
           nodes.push({
             id: recipeId,
             type: 'leafNode',
-            position: recipeResult.position,
+            position: recipePos,
             data: {
               ...recipe,
               label: recipe.title,
@@ -484,22 +562,30 @@ function createSolutionBranch(
 
     // Scriptures
     scriptures.forEach((scripture) => {
-      const preferredAngle = allChildAngles[angleIndex++];
-      const result = findAvailablePosition(
-        masterPos.x, masterPos.y,
-        preferredAngle,
-        CONFIG.level2Radius,
-        occupiedPositions
-      );
-
       const scriptureId = `scripture-${scripture.id}-${branch.key}`;
+      let scripturePos;
+
+      // Check if user has moved this node
+      if (userPositions.has(scriptureId)) {
+        scripturePos = userPositions.get(scriptureId);
+      } else {
+        const preferredAngle = allChildAngles[angleIndex++];
+        const result = findAvailablePosition(
+          masterPos.x, masterPos.y,
+          preferredAngle,
+          CONFIG.level2Radius,
+          occupiedPositions
+        );
+        scripturePos = result.position;
+        registerPosition(scriptureId, scripturePos);
+      }
+
       hierarchy[masterId].push(scriptureId);
-      occupiedPositions.push({ x: result.position.x, y: result.position.y });
 
       nodes.push({
         id: scriptureId,
         type: 'leafNode',
-        position: result.position,
+        position: scripturePos,
         data: {
           ...scripture,
           label: scripture.reference,
@@ -524,22 +610,30 @@ function createSolutionBranch(
 
     // EGW References
     egwRefs.forEach((egw) => {
-      const preferredAngle = allChildAngles[angleIndex++];
-      const result = findAvailablePosition(
-        masterPos.x, masterPos.y,
-        preferredAngle,
-        CONFIG.level2Radius,
-        occupiedPositions
-      );
-
       const egwId = `egw-${egw.id}-${branch.key}`;
+      let egwPos;
+
+      // Check if user has moved this node
+      if (userPositions.has(egwId)) {
+        egwPos = userPositions.get(egwId);
+      } else {
+        const preferredAngle = allChildAngles[angleIndex++];
+        const result = findAvailablePosition(
+          masterPos.x, masterPos.y,
+          preferredAngle,
+          CONFIG.level2Radius,
+          occupiedPositions
+        );
+        egwPos = result.position;
+        registerPosition(egwId, egwPos);
+      }
+
       hierarchy[masterId].push(egwId);
-      occupiedPositions.push({ x: result.position.x, y: result.position.y });
 
       nodes.push({
         id: egwId,
         type: 'leafNode',
-        position: result.position,
+        position: egwPos,
         data: {
           ...egw,
           label: egw.citation,
