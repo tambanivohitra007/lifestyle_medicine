@@ -1,8 +1,9 @@
 import { memo } from 'react';
-import { BaseEdge, getBezierPath } from 'reactflow';
+import { BaseEdge, getSmoothStepPath } from 'reactflow';
 
 /**
- * Mindmap edge - organic curved connector for mindmap branches
+ * Mindmap edge - step/orthogonal connector with rounded corners
+ * Creates clean right-angle paths between nodes
  */
 const MindmapEdge = memo(({
   id,
@@ -19,19 +20,32 @@ const MindmapEdge = memo(({
   const color = data?.color || '#94a3b8';
   const isDashed = data?.dashed;
 
-  // Use bezier path for organic curves
-  const [edgePath] = getBezierPath({
+  // Use smooth step path for orthogonal edges with rounded corners
+  const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
     targetX,
     targetY,
     targetPosition,
-    curvature: 0.25,
+    borderRadius: 12, // Rounded corners at turns
+    offset: 20, // Distance before first turn
   });
 
   return (
     <>
+      {/* Subtle glow/shadow effect */}
+      <path
+        d={edgePath}
+        fill="none"
+        stroke={color}
+        strokeWidth={8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={0.08}
+        style={{ pointerEvents: 'none' }}
+      />
+
       {/* Main edge */}
       <BaseEdge
         id={id}
@@ -40,24 +54,12 @@ const MindmapEdge = memo(({
         style={{
           stroke: color,
           strokeWidth: selected ? 3 : 2,
-          strokeDasharray: isDashed ? '5,5' : undefined,
+          strokeDasharray: isDashed ? '6,4' : undefined,
           strokeLinecap: 'round',
           strokeLinejoin: 'round',
-          filter: selected ? `drop-shadow(0 0 3px ${color})` : undefined,
+          filter: selected ? `drop-shadow(0 0 4px ${color})` : undefined,
           transition: 'stroke-width 0.2s, filter 0.2s',
         }}
-      />
-
-      {/* Subtle glow effect for visual depth */}
-      <path
-        d={edgePath}
-        fill="none"
-        stroke={color}
-        strokeWidth={6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity={0.1}
-        style={{ pointerEvents: 'none' }}
       />
     </>
   );
