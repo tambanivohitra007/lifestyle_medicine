@@ -77,6 +77,9 @@ const ConditionMindmapInner = ({
   // Track user-moved node positions (persists across re-renders and rebuilds)
   const userMovedPositions = useRef(new Map());
 
+  // Track the last expanded node for viewport focus
+  const lastExpandedNode = useRef(null);
+
   // Custom nodes change handler that tracks user-dragged positions
   const handleNodesChange = useCallback((changes) => {
     // Process changes to detect user drag operations
@@ -260,14 +263,32 @@ const ConditionMindmapInner = ({
     setNodes(resolvedNodes);
     setEdges(visibleEdges);
 
-    // Don't auto-fit view when user has moved nodes - let them control the view
-    // Only fit if no user positions are stored
-    if (userMovedPositions.current.size === 0) {
+    // Focus viewport on expanded node and its children
+    if (lastExpandedNode.current) {
+      const expandedNodeId = lastExpandedNode.current;
+      const childIds = allNodesData.hierarchy[expandedNodeId] || [];
+
+      // Include the parent node and all its direct children in the focus area
+      const nodesToFocus = [expandedNodeId, ...childIds];
+
+      setTimeout(() => {
+        fitView({
+          nodes: resolvedNodes.filter(n => nodesToFocus.includes(n.id)),
+          padding: 0.3,
+          duration: 500,
+          maxZoom: 1.2, // Don't zoom in too much
+        });
+      }, 100);
+
+      // Clear the ref after focusing
+      lastExpandedNode.current = null;
+    } else if (userMovedPositions.current.size === 0) {
+      // Only auto-fit if no user positions and no specific expansion
       setTimeout(() => {
         fitView({ padding: 0.2, duration: 400 });
       }, 50);
     }
-  }, [expandedNodes, data, setNodes, setEdges, fitView, allNodesData.nodes.length]);
+  }, [expandedNodes, data, setNodes, setEdges, fitView, allNodesData.nodes.length, allNodesData.hierarchy]);
 
   // Handle node click - toggle expansion or show details
   const handleNodeClick = useCallback((event, node) => {
@@ -275,6 +296,15 @@ const ConditionMindmapInner = ({
     const isExpandClick = node.data.expandable && node.data.childCount > 0;
 
     if (isExpandClick) {
+      const isCurrentlyExpanded = expandedNodes.has(node.id);
+
+      // Track the node being expanded for viewport focus
+      if (!isCurrentlyExpanded) {
+        lastExpandedNode.current = node.id;
+      } else {
+        lastExpandedNode.current = null;
+      }
+
       // Toggle expansion
       setExpandedNodes(prev => {
         const newSet = new Set(prev);
@@ -304,7 +334,7 @@ const ConditionMindmapInner = ({
     if (onNodeClick) {
       onNodeClick(node);
     }
-  }, [onNodeClick, allNodesData.hierarchy]);
+  }, [onNodeClick, allNodesData.hierarchy, expandedNodes]);
 
   // Handle double-click to show details even for expandable nodes
   const handleNodeDoubleClick = useCallback((event, node) => {
@@ -494,6 +524,7 @@ const ConditionMindmapInner = ({
         onNodeMouseLeave={handleNodeMouseLeave}
         nodeTypes={mindmapNodeTypes}
         edgeTypes={mindmapEdgeTypes}
+        nodeOrigin={[0.5, 0.5]}
         fitView
         fitViewOptions={{ padding: 0.3 }}
         minZoom={0.1}
