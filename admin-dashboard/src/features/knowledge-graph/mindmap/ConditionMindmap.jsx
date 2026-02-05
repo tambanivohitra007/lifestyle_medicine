@@ -22,6 +22,10 @@ import {
   Info,
   Expand,
   Minimize,
+  Filter,
+  Eye,
+  EyeOff,
+  X,
 } from 'lucide-react';
 
 import { useConditionMindmap } from './hooks';
@@ -62,6 +66,8 @@ const ConditionMindmapInner = ({
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const [expandedNodes, setExpandedNodes] = useState(new Set());
   const [allNodesData, setAllNodesData] = useState({ nodes: [], edges: [], hierarchy: {} });
+  const [hiddenCategories, setHiddenCategories] = useState(new Set());
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
   // Track user-moved node positions (persists across re-renders and rebuilds)
@@ -86,6 +92,73 @@ const ConditionMindmapInner = ({
 
   // Fetch mindmap data
   const { data, loading, error, refetch, condition, meta } = useConditionMindmap(conditionId);
+
+  // Extract available categories from data for filter panel
+  const availableCategories = useMemo(() => {
+    if (!data) return [];
+
+    const categories = [];
+
+    // Sections (left side)
+    const sections = data.sections || {};
+    Object.entries(sections).forEach(([key, section]) => {
+      if (section.items && section.items.length > 0) {
+        categories.push({
+          id: `master-section-${key}`,
+          key,
+          label: section.label,
+          color: section.color,
+          count: section.items.length,
+          type: 'section',
+        });
+      }
+    });
+
+    // Solutions (right side)
+    const solutions = data.branches?.solutions || {};
+    Object.entries(solutions).forEach(([key, solutionData]) => {
+      if (!solutionData?.careDomain) return;
+      const childCount = (solutionData.interventions?.length || 0) +
+                         (solutionData.scriptures?.length || 0) +
+                         (solutionData.egwReferences?.length || 0);
+      if (childCount > 0) {
+        categories.push({
+          id: `master-solution-${key}`,
+          key,
+          label: solutionData.careDomain.name,
+          color: solutionData.careDomain.color || '#6b7280',
+          count: childCount,
+          type: 'solution',
+        });
+      }
+    });
+
+    return categories;
+  }, [data]);
+
+  // Toggle category visibility
+  const toggleCategory = useCallback((categoryId) => {
+    setHiddenCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // Show all categories
+  const showAllCategories = useCallback(() => {
+    setHiddenCategories(new Set());
+  }, []);
+
+  // Hide all categories
+  const hideAllCategories = useCallback(() => {
+    const allIds = new Set(availableCategories.map(c => c.id));
+    setHiddenCategories(allIds);
+  }, [availableCategories]);
 
   // Build full graph structure when data changes
   useEffect(() => {
@@ -220,21 +293,55 @@ const ConditionMindmapInner = ({
     }
   }, [data?.condition?.id]);
 
-  // Compute display nodes/edges with hover highlighting
+  // Filter nodes by hidden categories and compute display with hover highlighting
   const { displayNodes, displayEdges } = useMemo(() => {
+    // First, filter out hidden categories and their children
+    let filteredNodes = nodes;
+    let filteredEdges = edges;
+
+    if (hiddenCategories.size > 0) {
+      // Build set of all nodes to hide (hidden categories + their descendants)
+      const hiddenNodeIds = new Set();
+
+      // Add hidden master nodes
+      hiddenCategories.forEach(catId => {
+        hiddenNodeIds.add(catId);
+      });
+
+      // Add descendants of hidden categories
+      const addDescendants = (nodeId) => {
+        const children = allNodesData.hierarchy[nodeId] || [];
+        children.forEach(childId => {
+          hiddenNodeIds.add(childId);
+          addDescendants(childId);
+        });
+      };
+
+      hiddenCategories.forEach(catId => {
+        addDescendants(catId);
+      });
+
+      // Filter nodes and edges
+      filteredNodes = nodes.filter(node => !hiddenNodeIds.has(node.id));
+      filteredEdges = edges.filter(edge =>
+        !hiddenNodeIds.has(edge.source) && !hiddenNodeIds.has(edge.target)
+      );
+    }
+
+    // Apply hover highlighting
     if (!hoveredNodeId) {
-      return { displayNodes: nodes, displayEdges: edges };
+      return { displayNodes: filteredNodes, displayEdges: filteredEdges };
     }
 
     // Find connected node IDs
     const connectedIds = new Set([hoveredNodeId]);
-    edges.forEach((edge) => {
+    filteredEdges.forEach((edge) => {
       if (edge.source === hoveredNodeId) connectedIds.add(edge.target);
       if (edge.target === hoveredNodeId) connectedIds.add(edge.source);
     });
 
     // Update node opacity
-    const displayNodes = nodes.map((node) => ({
+    const displayNodes = filteredNodes.map((node) => ({
       ...node,
       style: {
         ...node.style,
@@ -244,7 +351,7 @@ const ConditionMindmapInner = ({
     }));
 
     // Update edge opacity
-    const displayEdges = edges.map((edge) => ({
+    const displayEdges = filteredEdges.map((edge) => ({
       ...edge,
       style: {
         ...edge.style,
@@ -254,7 +361,7 @@ const ConditionMindmapInner = ({
     }));
 
     return { displayNodes, displayEdges };
-  }, [nodes, edges, hoveredNodeId]);
+  }, [nodes, edges, hoveredNodeId, hiddenCategories, allNodesData.hierarchy]);
 
   // Export as PNG
   const handleExport = useCallback(() => {
@@ -403,9 +510,147 @@ const ConditionMindmapInner = ({
           </div>
         </Panel>
 
+        {/* Filter Panel */}
+        {showFilterPanel && (
+          <Panel position="top-right" className="!m-4 !mt-48">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-3 w-64 max-h-80 overflow-y-auto">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm font-semibold text-gray-700">
+                    {t('filterCategories', 'Filter Categories')}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowFilterPanel(false)}
+                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                >
+                  <X className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Quick actions */}
+              <div className="flex gap-2 mb-3">
+                <button
+                  onClick={showAllCategories}
+                  className="flex-1 text-xs px-2 py-1 bg-green-50 text-green-700 rounded hover:bg-green-100 transition-colors"
+                >
+                  {t('showAll', 'Show All')}
+                </button>
+                <button
+                  onClick={hideAllCategories}
+                  className="flex-1 text-xs px-2 py-1 bg-gray-50 text-gray-600 rounded hover:bg-gray-100 transition-colors"
+                >
+                  {t('hideAll', 'Hide All')}
+                </button>
+              </div>
+
+              {/* Sections */}
+              {availableCategories.filter(c => c.type === 'section').length > 0 && (
+                <div className="mb-3">
+                  <div className="text-xs font-medium text-gray-500 uppercase mb-2">
+                    {t('sections', 'Sections')}
+                  </div>
+                  <div className="space-y-1">
+                    {availableCategories
+                      .filter(c => c.type === 'section')
+                      .map(category => (
+                        <button
+                          key={category.id}
+                          onClick={() => toggleCategory(category.id)}
+                          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left text-sm transition-colors ${
+                            hiddenCategories.has(category.id)
+                              ? 'bg-gray-100 text-gray-400'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          {hiddenCategories.has(category.id) ? (
+                            <EyeOff className="w-3.5 h-3.5 text-gray-400" />
+                          ) : (
+                            <Eye className="w-3.5 h-3.5 text-gray-600" />
+                          )}
+                          <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: category.color }}
+                          />
+                          <span className={`flex-1 truncate ${hiddenCategories.has(category.id) ? 'line-through' : ''}`}>
+                            {category.label}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {category.count}
+                          </span>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Solutions */}
+              {availableCategories.filter(c => c.type === 'solution').length > 0 && (
+                <div>
+                  <div className="text-xs font-medium text-gray-500 uppercase mb-2">
+                    {t('solutions', 'Solutions')}
+                  </div>
+                  <div className="space-y-1">
+                    {availableCategories
+                      .filter(c => c.type === 'solution')
+                      .map(category => (
+                        <button
+                          key={category.id}
+                          onClick={() => toggleCategory(category.id)}
+                          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left text-sm transition-colors ${
+                            hiddenCategories.has(category.id)
+                              ? 'bg-gray-100 text-gray-400'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          {hiddenCategories.has(category.id) ? (
+                            <EyeOff className="w-3.5 h-3.5 text-gray-400" />
+                          ) : (
+                            <Eye className="w-3.5 h-3.5 text-gray-600" />
+                          )}
+                          <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: category.color }}
+                          />
+                          <span className={`flex-1 truncate ${hiddenCategories.has(category.id) ? 'line-through' : ''}`}>
+                            {category.label}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {category.count}
+                          </span>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </Panel>
+        )}
+
         {/* Control buttons */}
         <Panel position="bottom-right" className="!m-4">
           <div className="flex flex-col gap-2">
+            {/* Filter toggle */}
+            <button
+              onClick={() => setShowFilterPanel(prev => !prev)}
+              className={`p-2 rounded-lg shadow border transition-colors ${
+                showFilterPanel || hiddenCategories.size > 0
+                  ? 'bg-blue-500 border-blue-500 text-white'
+                  : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-600'
+              }`}
+              title={t('filter', 'Filter Categories')}
+            >
+              <Filter className="w-4 h-4" />
+              {hiddenCategories.size > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {hiddenCategories.size}
+                </span>
+              )}
+            </button>
+
+            <div className="h-px bg-gray-200 my-1" />
+
             {/* Expand/Collapse All */}
             <button
               onClick={handleExpandAll}
