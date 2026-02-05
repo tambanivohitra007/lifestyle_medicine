@@ -413,23 +413,34 @@ const ConditionMindmapInner = ({
     return { displayNodes, displayEdges };
   }, [nodes, edges, hoveredNodeId, hiddenCategories, allNodesData.hierarchy]);
 
-  // Export as PNG
+  // Export as high-resolution PNG
   const handleExport = useCallback(() => {
     const element = document.querySelector('.react-flow');
     if (element) {
       import('html-to-image').then(({ toPng }) => {
         toPng(element, {
           backgroundColor: '#ffffff',
+          pixelRatio: 4, // High resolution (4x for crisp export)
+          quality: 1.0, // Maximum quality
           filter: (node) => {
+            // Exclude UI controls from export
             if (node.classList?.contains('react-flow__minimap')) return false;
             if (node.classList?.contains('react-flow__controls')) return false;
+            if (node.classList?.contains('react-flow__panel')) return false;
+            if (node.classList?.contains('react-flow__attribution')) return false;
             return true;
+          },
+          style: {
+            // Ensure sharp rendering
+            imageRendering: 'crisp-edges',
           },
         }).then((dataUrl) => {
           const link = document.createElement('a');
           link.download = `${condition?.name || 'condition'}-mindmap.png`;
           link.href = dataUrl;
           link.click();
+        }).catch((error) => {
+          console.error('Failed to export mindmap:', error);
         });
       });
     }
