@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Condition extends Model
 {
@@ -91,5 +92,29 @@ class Condition extends Model
     public function infographics()
     {
         return $this->media()->where('type', 'infographic');
+    }
+
+    /**
+     * Get the risk factors for this condition.
+     */
+    public function riskFactors(): HasMany
+    {
+        return $this->hasMany(ConditionRiskFactor::class)->orderBy('order_index');
+    }
+
+    /**
+     * Get the complications for this condition.
+     */
+    public function complications(): HasMany
+    {
+        return $this->hasMany(ConditionComplication::class, 'source_condition_id')->orderBy('order_index');
+    }
+
+    /**
+     * Get conditions that have this condition as a complication.
+     */
+    public function complicationOf(): HasMany
+    {
+        return $this->hasMany(ConditionComplication::class, 'complication_condition_id');
     }
 }

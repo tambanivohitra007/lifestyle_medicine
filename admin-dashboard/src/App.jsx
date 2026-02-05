@@ -37,7 +37,7 @@ import { EgwReferences, EgwReferenceForm } from './features/egw-references';
 import { ContentTags } from './features/content-tags';
 import { Users, UserForm } from './features/users';
 import BibleExplorer from './features/bible/BibleExplorer';
-import { KnowledgeGraphPage, FullGraphPage } from './features/knowledge-graph';
+import { KnowledgeGraphPage, FullGraphPage, ConditionMindmapPage } from './features/knowledge-graph';
 
 // Forbidden Page Component
 const Forbidden = () => {
@@ -125,6 +125,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <KnowledgeGraphPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Condition Mindmap (full-screen) */}
+          <Route
+            path="/conditions/:id/mindmap"
+            element={
+              <ProtectedRoute>
+                <ConditionMindmapPage />
               </ProtectedRoute>
             }
           />

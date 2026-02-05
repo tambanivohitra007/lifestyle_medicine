@@ -14,6 +14,7 @@ import {
   Eye,
   Download,
   Network,
+  GitBranch,
   Image,
   Upload,
 } from 'lucide-react';
@@ -344,6 +345,14 @@ const ConditionDetail = () => {
           >
             <Network className="w-4 h-4" />
             <span className="hidden sm:inline">{t('conditions:detail.graph')}</span>
+          </Link>
+          <Link
+            to={`/conditions/${id}/mindmap`}
+            className="btn-outline flex items-center justify-center gap-2 text-sm touch-manipulation"
+            title={t('conditions:detail.mindmap', 'Mindmap')}
+          >
+            <GitBranch className="w-4 h-4" />
+            <span className="hidden sm:inline">{t('conditions:detail.mindmap', 'Mindmap')}</span>
           </Link>
           <a
             href={`${getApiBaseUrl()}/api/v1/export/conditions/${id}/pdf`}

@@ -95,6 +95,7 @@
     "noResults": "No nodes found",
     "navigationHint": "↑↓ to navigate, Enter to select"
   },
+  "statsLabel": "Statistics",
   "stats": {
     "totalNodes": "Total Nodes",
     "totalEdges": "Total Connections",
