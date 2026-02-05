@@ -2,26 +2,33 @@
  * Expandable Mindmap Layout Algorithm
  *
  * DESIGN: Each master branch gets an exclusive angular SECTOR.
- * All children of that branch stay within their sector, preventing overlap.
+ * Within each sector, nodes are spaced generously to avoid ANY overlap.
  *
- * Layout:
+ * Layout Strategy:
  * - Circle divided into sectors (like pizza slices)
  * - Each master node owns a sector
- * - Children expand outward within parent's sector only
+ * - Children are distributed with GENEROUS spacing
+ * - Minimum angular gap between siblings enforced
  */
 
-// Layout configuration
+// Layout configuration - VERY GENEROUS SPACING
 const CONFIG = {
-  // Distances from parent (in pixels)
-  level1Radius: 350,       // Master nodes from center
-  level2Radius: 280,       // Level 2 from master
-  level3Radius: 200,       // Level 3 from level 2
+  // Distances from parent (in pixels) - INCREASED
+  level1Radius: 400,       // Master nodes from center
+  level2Radius: 350,       // Level 2 from master
+  level3Radius: 280,       // Level 3 from level 2
+
+  // Minimum angular spacing between nodes (degrees)
+  minAngleBetweenNodes: 20,
 
   // Padding between sectors (degrees)
-  sectorPadding: 8,
+  sectorPadding: 15,
 
   // Minimum sector size (degrees)
-  minSectorSize: 25,
+  minSectorSize: 35,
+
+  // Node approximate width for calculations
+  nodeWidth: 200,
 };
 
 /**
@@ -43,7 +50,27 @@ function polarToCartesian(centerX, centerY, angle, distance) {
 }
 
 /**
- * Distribute items evenly within a sector
+ * Calculate required angular space for N nodes at given distance
+ * Based on node width and arc length
+ */
+function calculateRequiredAngle(nodeCount, distance) {
+  if (nodeCount <= 1) return CONFIG.minAngleBetweenNodes;
+
+  // Arc length needed = nodeCount * nodeWidth + gaps
+  const gapSize = CONFIG.nodeWidth * 0.5; // Half node width gap
+  const totalArcLength = nodeCount * CONFIG.nodeWidth + (nodeCount - 1) * gapSize;
+
+  // Convert arc length to angle: angle = arcLength / radius * (180/PI)
+  const angleNeeded = (totalArcLength / distance) * (180 / Math.PI);
+
+  // Also enforce minimum angle between nodes
+  const minByCount = (nodeCount - 1) * CONFIG.minAngleBetweenNodes;
+
+  return Math.max(angleNeeded, minByCount);
+}
+
+/**
+ * Distribute items evenly within a sector with generous spacing
  */
 function distributeInSector(count, parentX, parentY, sectorStart, sectorEnd, distance) {
   if (count === 0) return [];
@@ -52,19 +79,36 @@ function distributeInSector(count, parentX, parentY, sectorStart, sectorEnd, dis
 
   if (count === 1) {
     const midAngle = sectorStart + sectorSize / 2;
-    return [polarToCartesian(parentX, parentY, midAngle, distance)];
+    return [{
+      position: polarToCartesian(parentX, parentY, midAngle, distance),
+      angle: midAngle,
+    }];
   }
 
   const positions = [];
-  // Add padding at edges of sector
-  const padding = Math.min(sectorSize * 0.1, 10);
-  const usableStart = sectorStart + padding;
-  const usableEnd = sectorEnd - padding;
-  const usableSize = usableEnd - usableStart;
-  const angleStep = usableSize / (count - 1);
+
+  // Calculate spacing - ensure minimum angle between nodes
+  const totalRequiredAngle = (count - 1) * CONFIG.minAngleBetweenNodes;
+
+  // If we have enough space, use it all; otherwise use minimum spacing
+  let angleStep;
+  let startOffset;
+
+  if (totalRequiredAngle < sectorSize * 0.8) {
+    // We have extra space - distribute evenly with padding
+    const padding = sectorSize * 0.1;
+    const usableSize = sectorSize - 2 * padding;
+    angleStep = usableSize / (count - 1);
+    startOffset = padding;
+  } else {
+    // Tight fit - use minimum spacing centered in sector
+    angleStep = CONFIG.minAngleBetweenNodes;
+    const totalUsed = (count - 1) * angleStep;
+    startOffset = (sectorSize - totalUsed) / 2;
+  }
 
   for (let i = 0; i < count; i++) {
-    const itemAngle = usableStart + i * angleStep;
+    const itemAngle = sectorStart + startOffset + i * angleStep;
     positions.push({
       position: polarToCartesian(parentX, parentY, itemAngle, distance),
       angle: itemAngle,
@@ -107,23 +151,30 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
   });
   hierarchy[conditionNodeId] = [];
 
-  // 2. Collect all master branches
+  // 2. Collect all master branches with their expanded child counts
   const masterBranches = [];
 
-  // Sections (left side: 90° to 270°)
+  // Sections (left side)
   const sections = data.sections || {};
   Object.entries(sections).forEach(([key, section]) => {
     if (!section.items || section.items.length === 0) return;
+
+    const isExpanded = expandedNodes.has(`master-section-${key}`);
+    // Weight based on expanded children to allocate proper space
+    const expandedWeight = isExpanded ? section.items.length : 1;
+
     masterBranches.push({
       type: 'section',
       key,
       data: section,
       side: 'left',
-      weight: section.items.length, // More items = bigger sector
+      baseWeight: 1,
+      expandedWeight: expandedWeight,
+      childCount: section.items.length,
     });
   });
 
-  // Solutions (right side: -90° to 90°)
+  // Solutions (right side)
   const solutions = data.branches?.solutions || {};
   Object.entries(solutions).forEach(([key, solutionData]) => {
     if (!solutionData?.careDomain) return;
@@ -132,12 +183,17 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
                        (solutionData.egwReferences?.length || 0);
     if (childCount === 0) return;
 
+    const isExpanded = expandedNodes.has(`master-solution-${key}`);
+    const expandedWeight = isExpanded ? childCount : 1;
+
     masterBranches.push({
       type: 'solution',
       key,
       data: solutionData,
       side: 'right',
-      weight: childCount,
+      baseWeight: 1,
+      expandedWeight: expandedWeight,
+      childCount: childCount,
     });
   });
 
@@ -145,15 +201,15 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
   const leftBranches = masterBranches.filter(b => b.side === 'left');
   const rightBranches = masterBranches.filter(b => b.side === 'right');
 
-  // Left side: 100° to 260° (160° total)
-  const leftStart = 100;
-  const leftEnd = 260;
-  const leftSectors = allocateSectors(leftBranches, leftStart, leftEnd);
+  // Left side: 95° to 265° (170° total) - more space
+  const leftStart = 95;
+  const leftEnd = 265;
+  const leftSectors = allocateSectors(leftBranches, leftStart, leftEnd, expandedNodes);
 
-  // Right side: -80° to 80° (160° total)
-  const rightStart = -80;
-  const rightEnd = 80;
-  const rightSectors = allocateSectors(rightBranches, rightStart, rightEnd);
+  // Right side: -85° to 85° (170° total) - more space
+  const rightStart = -85;
+  const rightEnd = 85;
+  const rightSectors = allocateSectors(rightBranches, rightStart, rightEnd, expandedNodes);
 
   const allSectors = [...leftSectors, ...rightSectors];
   const masterNodeIds = [];
@@ -186,28 +242,43 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
 }
 
 /**
- * Allocate sectors to branches based on their weights
+ * Allocate sectors to branches - expanded branches get more space
  */
-function allocateSectors(branches, totalStart, totalEnd) {
+function allocateSectors(branches, totalStart, totalEnd, expandedNodes) {
   if (branches.length === 0) return [];
 
   const totalSize = totalEnd - totalStart;
   const totalPadding = CONFIG.sectorPadding * (branches.length + 1);
   const availableSize = totalSize - totalPadding;
 
-  // Calculate total weight
-  const totalWeight = branches.reduce((sum, b) => sum + Math.sqrt(b.weight), 0);
+  // Calculate weights - expanded branches need more space
+  const totalWeight = branches.reduce((sum, b) => {
+    const masterId = `master-${b.type === 'section' ? 'section' : 'solution'}-${b.key}`;
+    const isExpanded = expandedNodes.has(masterId);
+    // Expanded branches get space proportional to child count
+    // Collapsed branches get minimum space
+    return sum + (isExpanded ? Math.max(2, Math.sqrt(b.childCount) * 2) : 1);
+  }, 0);
 
   // Allocate sectors proportionally
   const sectors = [];
   let currentAngle = totalStart + CONFIG.sectorPadding;
 
   branches.forEach((branch) => {
-    const weight = Math.sqrt(branch.weight);
-    const sectorSize = Math.max(
-      CONFIG.minSectorSize,
-      (weight / totalWeight) * availableSize
-    );
+    const masterId = `master-${branch.type === 'section' ? 'section' : 'solution'}-${branch.key}`;
+    const isExpanded = expandedNodes.has(masterId);
+    const weight = isExpanded ? Math.max(2, Math.sqrt(branch.childCount) * 2) : 1;
+
+    let sectorSize = (weight / totalWeight) * availableSize;
+
+    // Ensure minimum size
+    sectorSize = Math.max(CONFIG.minSectorSize, sectorSize);
+
+    // For expanded sectors, ensure enough space for children
+    if (isExpanded) {
+      const requiredAngle = calculateRequiredAngle(branch.childCount, CONFIG.level2Radius);
+      sectorSize = Math.max(sectorSize, requiredAngle + 20); // Extra padding
+    }
 
     sectors.push({
       branch,
@@ -267,7 +338,7 @@ function createSectionBranch(
     hidden: !expandedNodes.has(conditionNodeId),
   });
 
-  // Level 2: Section items - stay within sector
+  // Level 2: Section items
   if (isExpanded && section.items.length > 0) {
     const itemPositions = distributeInSector(
       section.items.length,
@@ -365,13 +436,12 @@ function createSolutionBranch(
 
   // Level 2: All children within sector
   if (isExpanded && totalChildren > 0) {
-    // Divide sector among child types
     const sectorSize = sectorEnd - sectorStart;
 
-    // Calculate sub-sectors for each type
-    const interventionWeight = interventions.length;
-    const scriptureWeight = scriptures.length;
-    const egwWeight = egwRefs.length;
+    // Calculate sub-sector sizes proportionally
+    const interventionWeight = interventions.length || 0;
+    const scriptureWeight = scriptures.length || 0;
+    const egwWeight = egwRefs.length || 0;
     const totalWeight = interventionWeight + scriptureWeight + egwWeight;
 
     let currentSectorStart = sectorStart;
@@ -396,10 +466,10 @@ function createSolutionBranch(
         const isInterventionExpanded = expandedNodes.has(interventionId);
         const recipeCount = intervention.recipes?.length || 0;
 
-        // Calculate sub-sub-sector for recipes
-        const recipeSectorSize = subSectorSize / interventions.length;
-        const recipeSectorStart = currentSectorStart + index * recipeSectorSize;
-        const recipeSectorEnd = recipeSectorStart + recipeSectorSize;
+        // Calculate this intervention's sub-sector for recipes
+        const interventionSectorSize = subSectorSize / interventions.length;
+        const recipeSectorStart = currentSectorStart + index * interventionSectorSize;
+        const recipeSectorEnd = recipeSectorStart + interventionSectorSize;
 
         nodes.push({
           id: interventionId,
