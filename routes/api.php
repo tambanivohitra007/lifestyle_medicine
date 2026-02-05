@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\EvidenceEntryController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\InterventionController;
+use App\Http\Controllers\Api\ConditionMindmapController;
 use App\Http\Controllers\Api\KnowledgeGraphController;
 use App\Http\Controllers\Api\RecipeController;
 use App\Http\Controllers\Api\ReferenceController;
@@ -93,6 +94,11 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('knowledge-graph/intervention/{intervention}', [KnowledgeGraphController::class, 'interventionGraph']);
     Route::get('egw-references-abbreviations', [EgwReferenceController::class, 'abbreviations']);
 
+    // Condition Mindmap (public read-only)
+    Route::get('conditions/{condition}/mindmap', [ConditionMindmapController::class, 'show']);
+    Route::get('conditions/{condition}/risk-factors', [ConditionMindmapController::class, 'riskFactors']);
+    Route::get('conditions/{condition}/complications', [ConditionMindmapController::class, 'complications']);
+
     // Content Tags
     Route::apiResource('content-tags', ContentTagController::class)->only(['index', 'show']);
 
@@ -159,6 +165,16 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
     Route::delete('conditions/{condition}/recipes/{recipe}', [ConditionController::class, 'detachRecipe']);
     Route::post('conditions/{condition}/egw-references/{egwReference}', [ConditionController::class, 'attachEgwReference']);
     Route::delete('conditions/{condition}/egw-references/{egwReference}', [ConditionController::class, 'detachEgwReference']);
+
+    // Condition Risk Factors CRUD
+    Route::post('conditions/{condition}/risk-factors', [ConditionMindmapController::class, 'storeRiskFactor']);
+    Route::put('conditions/{condition}/risk-factors/{riskFactor}', [ConditionMindmapController::class, 'updateRiskFactor']);
+    Route::delete('conditions/{condition}/risk-factors/{riskFactor}', [ConditionMindmapController::class, 'destroyRiskFactor']);
+
+    // Condition Complications CRUD
+    Route::post('conditions/{condition}/complications', [ConditionMindmapController::class, 'storeComplication']);
+    Route::put('conditions/{condition}/complications/{complication}', [ConditionMindmapController::class, 'updateComplication']);
+    Route::delete('conditions/{condition}/complications/{complication}', [ConditionMindmapController::class, 'destroyComplication']);
 
     // AI Suggestions (for content editors) - rate limited to 10 requests/minute
     Route::middleware('throttle:ai')->group(function () {

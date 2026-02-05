@@ -48,7 +48,7 @@ class Recipe extends Model
     public function interventions(): BelongsToMany
     {
         return $this->belongsToMany(Intervention::class, 'intervention_recipe')
-            ->withPivot(['created_by', 'deleted_by'])
+            ->withPivot(['relevance_note', 'order_index', 'created_by', 'deleted_by'])
             ->withTimestamps();
     }
 
