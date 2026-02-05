@@ -32,6 +32,7 @@ import { useConditionMindmap } from './hooks';
 import { mindmapNodeTypes } from './nodes';
 import { mindmapEdgeTypes } from './edges';
 import { buildExpandableMindmap, filterVisibleElements } from './utils/expandableMindmapLayout';
+import { resolveCollisions } from './utils/resolveCollisions';
 import { NodeDetailsPanel } from './components';
 
 // Node colors for minimap
@@ -89,6 +90,34 @@ const ConditionMindmapInner = ({
     // Apply the changes as normal
     onNodesChange(changes);
   }, [onNodesChange]);
+
+  // Handle node drag stop - resolve collisions after user drags a node
+  const handleNodeDragStop = useCallback(() => {
+    setNodes((currentNodes) => {
+      // Get the center node ID to keep it fixed
+      const centerNodeId = data?.condition?.id ? `condition-${data.condition.id}` : null;
+      const fixedNodeIds = centerNodeId ? new Set([centerNodeId]) : new Set();
+
+      const resolvedNodes = resolveCollisions(currentNodes, {
+        maxIterations: 100,
+        overlapThreshold: 0.5,
+        margin: 20,
+        fixedNodeIds,
+      });
+
+      // Update user positions with resolved positions
+      resolvedNodes.forEach((node) => {
+        if (userMovedPositions.current.has(node.id)) {
+          userMovedPositions.current.set(node.id, {
+            x: node.position.x,
+            y: node.position.y,
+          });
+        }
+      });
+
+      return resolvedNodes;
+    });
+  }, [setNodes, data?.condition?.id]);
 
   // Fetch mindmap data
   const { data, loading, error, refetch, condition, meta } = useConditionMindmap(conditionId);
@@ -183,7 +212,15 @@ const ConditionMindmapInner = ({
       initialExpanded
     );
 
-    setNodes(visibleNodes);
+    // Resolve collisions after initial layout
+    const resolvedNodes = resolveCollisions(visibleNodes, {
+      maxIterations: 100,
+      overlapThreshold: 0.5,
+      margin: 20,
+      fixedNodeIds: new Set([conditionNodeId]),
+    });
+
+    setNodes(resolvedNodes);
     setEdges(visibleEdges);
 
     // Fit view after layout
@@ -207,7 +244,20 @@ const ConditionMindmapInner = ({
       expandedNodes
     );
 
-    setNodes(visibleNodes);
+    // Get fixed node IDs (center node + user-moved nodes)
+    const conditionNodeId = data?.condition?.id ? `condition-${data.condition.id}` : null;
+    const fixedNodeIds = new Set(userMovedPositions.current.keys());
+    if (conditionNodeId) fixedNodeIds.add(conditionNodeId);
+
+    // Resolve collisions after layout, keeping user-moved nodes fixed
+    const resolvedNodes = resolveCollisions(visibleNodes, {
+      maxIterations: 100,
+      overlapThreshold: 0.5,
+      margin: 20,
+      fixedNodeIds,
+    });
+
+    setNodes(resolvedNodes);
     setEdges(visibleEdges);
 
     // Don't auto-fit view when user has moved nodes - let them control the view
@@ -428,6 +478,7 @@ const ConditionMindmapInner = ({
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
         onNodeDoubleClick={handleNodeDoubleClick}
+        onNodeDragStop={handleNodeDragStop}
         onNodeMouseEnter={handleNodeMouseEnter}
         onNodeMouseLeave={handleNodeMouseLeave}
         nodeTypes={mindmapNodeTypes}
