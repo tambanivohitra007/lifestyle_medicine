@@ -1,41 +1,31 @@
 /**
  * Mindmap Layout Algorithm
  * Creates a radial tree layout with the condition at the center,
- * risk factors at the top, complications at the bottom,
- * and solutions radiating around the sides.
+ * condition sections (risk factors, physiology, complications, etc.) positioned around,
+ * and solutions (interventions by care domain) radiating around the sides.
  */
 
-// Branch configuration with angles (in degrees, 0 = right, 90 = bottom, -90 = top)
-const BRANCH_CONFIG = {
-  riskFactors: {
-    angle: -90,      // Top
-    spread: 120,     // Degrees to spread items
-    distance: 280,
-    itemDistance: 180,
-    color: '#f97316'
-  },
-  complications: {
-    angle: 90,       // Bottom
-    spread: 120,
-    distance: 280,
-    itemDistance: 180,
-    color: '#dc2626'
-  },
-  // Solutions positioned around the sides
-  nutrition: { angle: -150, distance: 320, color: '#f59e0b' },
-  exercise: { angle: 150, distance: 320, color: '#22c55e' },
-  hydrotherapy: { angle: -120, distance: 320, color: '#06b6d4' },
-  'spiritual-care': { angle: 0, distance: 320, color: '#6366f1' },
-  'mental-health': { angle: -30, distance: 320, color: '#14b8a6' },
-  'stress-management': { angle: 30, distance: 320, color: '#a855f7' },
-  pharmacotherapy: { angle: 60, distance: 320, color: '#64748b' },
-  'natural-remedies': { angle: 120, distance: 320, color: '#10b981' },
+// Section position configuration
+const SECTION_POSITIONS = {
+  riskFactors: { angle: -90, distance: 280 },      // Top
+  physiology: { angle: -135, distance: 300 },      // Top-left
+  complications: { angle: 90, distance: 280 },     // Bottom
+  solutions: { angle: 0, distance: 300 },          // Right
+  additionalFactors: { angle: 135, distance: 300 },// Bottom-left
+  scripture: { angle: 45, distance: 300 },         // Bottom-right
+  researchIdeas: { angle: -45, distance: 300 },    // Top-right
 };
 
-// Default configuration for unknown solution branches
-const DEFAULT_SOLUTION_CONFIG = {
-  distance: 320,
-  color: '#6b7280'
+// Solution care domain positions (radial around the right side)
+const SOLUTION_ANGLES = {
+  'nutrition': -30,
+  'exercise': -60,
+  'hydrotherapy': 30,
+  'spiritual-care': 0,
+  'mental-health': 60,
+  'stress-management': -15,
+  'pharmacotherapy': 45,
+  'natural-remedies': 15,
 };
 
 /**
@@ -59,22 +49,22 @@ function polarToCartesian(centerX, centerY, angle, distance) {
 /**
  * Distribute items in a fan pattern around a given angle
  */
-function distributeInFan(items, centerX, centerY, config) {
-  const { angle, spread, itemDistance } = config;
-  const count = items.length;
-
+function distributeInFan(count, centerX, centerY, baseAngle, distance, spread = 60) {
   if (count === 0) return [];
   if (count === 1) {
-    return [polarToCartesian(centerX, centerY, angle, itemDistance)];
+    return [polarToCartesian(centerX, centerY, baseAngle, distance)];
   }
 
-  const startAngle = angle - spread / 2;
+  const positions = [];
+  const startAngle = baseAngle - spread / 2;
   const angleStep = spread / (count - 1);
 
-  return items.map((_, index) => {
-    const itemAngle = startAngle + index * angleStep;
-    return polarToCartesian(centerX, centerY, itemAngle, itemDistance);
-  });
+  for (let i = 0; i < count; i++) {
+    const itemAngle = startAngle + i * angleStep;
+    positions.push(polarToCartesian(centerX, centerY, itemAngle, distance));
+  }
+
+  return positions;
 }
 
 /**
@@ -106,123 +96,80 @@ export function buildMindmapGraph(data, options = {}) {
     },
   });
 
-  // 2. Create Risk Factors branch
-  const riskFactors = data.branches?.riskFactors || [];
-  if (riskFactors.length > 0) {
-    const rfConfig = BRANCH_CONFIG.riskFactors;
+  // 2. Create section branches (risk factors, physiology, complications, etc.)
+  const sections = data.sections || {};
+  Object.entries(sections).forEach(([key, section]) => {
+    if (!section.items || section.items.length === 0) return;
 
-    // Branch label node
-    const rfLabelPos = polarToCartesian(centerX, centerY, rfConfig.angle, rfConfig.distance * 0.5);
-    const rfLabelId = 'branch-riskFactors';
+    const posConfig = SECTION_POSITIONS[key] || { angle: 0, distance: 300 };
+
+    // Section branch label
+    const branchPos = polarToCartesian(centerX, centerY, posConfig.angle, posConfig.distance * 0.5);
+    const branchId = `section-${key}`;
+
     nodes.push({
-      id: rfLabelId,
-      type: 'branchLabel',
-      position: rfLabelPos,
+      id: branchId,
+      type: 'sectionBranch',
+      position: branchPos,
       data: {
-        label: 'Risk Factors',
-        count: riskFactors.length,
-        color: rfConfig.color,
-        icon: 'alert-triangle',
+        label: section.label,
+        count: section.items.length,
+        color: section.color,
+        icon: section.icon,
+        sectionType: section.type,
+        items: section.items,
       },
     });
+
     edges.push({
-      id: `edge-center-to-riskFactors`,
+      id: `edge-center-to-${key}`,
       source: conditionNodeId,
-      target: rfLabelId,
+      target: branchId,
       type: 'mindmap',
-      data: { color: rfConfig.color },
+      data: { color: section.color },
     });
 
-    // Risk factor items
-    const rfPositions = distributeInFan(riskFactors, centerX, centerY, rfConfig);
-    riskFactors.forEach((rf, index) => {
-      const nodeId = `riskFactor-${rf.id}`;
+    // Section items (individual sections like "Obesity", "Genetics", etc.)
+    const itemPositions = distributeInFan(
+      section.items.length,
+      centerX, centerY,
+      posConfig.angle,
+      posConfig.distance + 80,
+      Math.min(80, section.items.length * 20)
+    );
+
+    section.items.forEach((item, index) => {
+      const itemId = `section-item-${item.id}`;
       nodes.push({
-        id: nodeId,
-        type: 'riskFactor',
-        position: rfPositions[index],
+        id: itemId,
+        type: 'sectionItem',
+        position: itemPositions[index],
         data: {
-          ...rf,
-          color: rf.severityColor || rfConfig.color,
+          ...item,
+          color: section.color,
+          sectionType: section.type,
+          sectionLabel: section.label,
         },
       });
+
       edges.push({
-        id: `edge-rf-${rf.id}`,
-        source: rfLabelId,
-        target: nodeId,
+        id: `edge-${branchId}-to-${item.id}`,
+        source: branchId,
+        target: itemId,
         type: 'mindmap',
-        data: { color: rf.severityColor || rfConfig.color },
+        data: { color: section.color, dashed: true },
       });
     });
-  }
+  });
 
-  // 3. Create Complications branch
-  const complications = data.branches?.complications || [];
-  if (complications.length > 0) {
-    const compConfig = BRANCH_CONFIG.complications;
-
-    // Branch label node
-    const compLabelPos = polarToCartesian(centerX, centerY, compConfig.angle, compConfig.distance * 0.5);
-    const compLabelId = 'branch-complications';
-    nodes.push({
-      id: compLabelId,
-      type: 'branchLabel',
-      position: compLabelPos,
-      data: {
-        label: 'Complications',
-        count: complications.length,
-        color: compConfig.color,
-        icon: 'alert-circle',
-      },
-    });
-    edges.push({
-      id: `edge-center-to-complications`,
-      source: conditionNodeId,
-      target: compLabelId,
-      type: 'mindmap',
-      data: { color: compConfig.color },
-    });
-
-    // Complication items
-    const compPositions = distributeInFan(complications, centerX, centerY, compConfig);
-    complications.forEach((comp, index) => {
-      const nodeId = `complication-${comp.id}`;
-      nodes.push({
-        id: nodeId,
-        type: 'complication',
-        position: compPositions[index],
-        data: {
-          ...comp,
-          color: comp.likelihoodColor || compConfig.color,
-        },
-      });
-      edges.push({
-        id: `edge-comp-${comp.id}`,
-        source: compLabelId,
-        target: nodeId,
-        type: 'mindmap',
-        data: { color: comp.likelihoodColor || compConfig.color },
-      });
-    });
-  }
-
-  // 4. Create Solution branches
+  // 3. Create Solution branches (interventions by care domain)
   const solutions = data.branches?.solutions || {};
   const solutionKeys = Object.keys(solutions);
 
-  // Calculate angles for solution branches that don't have predefined positions
-  const predefinedKeys = Object.keys(BRANCH_CONFIG).filter(k => !['riskFactors', 'complications'].includes(k));
+  // Calculate base angle for solutions (opposite side from most sections)
+  const solutionBaseAngle = 0; // Right side
 
-  // Distribute custom solution branches in available angles
-  const usedAngles = new Set([-90, 90]); // Risk factors and complications
-  predefinedKeys.forEach(k => {
-    if (BRANCH_CONFIG[k]) usedAngles.add(BRANCH_CONFIG[k].angle);
-  });
-
-  let customAngleIndex = 0;
-  const availableAngles = [-45, 45, -135, 135, -60, 60, -120, 120].filter(a => !usedAngles.has(a));
-
-  solutionKeys.forEach((key) => {
+  solutionKeys.forEach((key, index) => {
     const solutionData = solutions[key];
     if (!solutionData?.careDomain) return;
 
@@ -233,22 +180,13 @@ export function buildMindmapGraph(data, options = {}) {
 
     if (!hasContent) return;
 
-    // Get config for this solution branch
-    let config = BRANCH_CONFIG[key];
-    if (!config) {
-      const angle = availableAngles[customAngleIndex % availableAngles.length] || (customAngleIndex * 30);
-      config = {
-        ...DEFAULT_SOLUTION_CONFIG,
-        angle,
-        color: solutionData.careDomain.color || DEFAULT_SOLUTION_CONFIG.color
-      };
-      customAngleIndex++;
-    }
-
-    const branchColor = solutionData.careDomain.color || config.color;
+    // Calculate angle for this solution branch
+    const angle = SOLUTION_ANGLES[key] ?? (solutionBaseAngle + (index - solutionKeys.length / 2) * 25);
+    const distance = 320;
+    const branchColor = solutionData.careDomain.color || '#6b7280';
 
     // Solution category node
-    const categoryPos = polarToCartesian(centerX, centerY, config.angle, config.distance);
+    const categoryPos = polarToCartesian(centerX, centerY, angle, distance);
     const categoryId = `solution-${key}`;
 
     nodes.push({
@@ -261,7 +199,9 @@ export function buildMindmapGraph(data, options = {}) {
         scriptureCount: solutionData.scriptures?.length || 0,
         egwCount: solutionData.egwReferences?.length || 0,
         color: branchColor,
-        expanded: true,
+        interventions: solutionData.interventions || [],
+        scriptures: solutionData.scriptures || [],
+        egwReferences: solutionData.egwReferences || [],
       },
     });
 
@@ -276,10 +216,9 @@ export function buildMindmapGraph(data, options = {}) {
     // Create intervention sub-nodes
     const interventions = solutionData.interventions || [];
     const subNodeDistance = 120;
-    const subNodeSpread = Math.min(60, 180 / Math.max(interventions.length, 1));
 
-    interventions.forEach((intervention, index) => {
-      const subAngle = config.angle + (index - (interventions.length - 1) / 2) * subNodeSpread * 0.5;
+    interventions.slice(0, 5).forEach((intervention, idx) => {
+      const subAngle = angle + (idx - (Math.min(interventions.length, 5) - 1) / 2) * 18;
       const subPos = polarToCartesian(categoryPos.x, categoryPos.y, subAngle, subNodeDistance);
 
       const interventionId = `intervention-${intervention.id}`;
@@ -290,6 +229,7 @@ export function buildMindmapGraph(data, options = {}) {
         data: {
           ...intervention,
           color: branchColor,
+          label: intervention.name,
         },
       });
 
@@ -301,11 +241,11 @@ export function buildMindmapGraph(data, options = {}) {
         data: { color: branchColor, dashed: true },
       });
 
-      // Create recipe sub-nodes for this intervention
+      // Create recipe sub-nodes for this intervention (max 2)
       const recipes = intervention.recipes || [];
-      recipes.slice(0, 3).forEach((recipe, recipeIndex) => {
-        const recipeAngle = subAngle + (recipeIndex - (Math.min(recipes.length, 3) - 1) / 2) * 20;
-        const recipePos = polarToCartesian(subPos.x, subPos.y, recipeAngle, 80);
+      recipes.slice(0, 2).forEach((recipe, recipeIdx) => {
+        const recipeAngle = subAngle + (recipeIdx - (Math.min(recipes.length, 2) - 1) / 2) * 15;
+        const recipePos = polarToCartesian(subPos.x, subPos.y, recipeAngle, 70);
 
         const recipeId = `recipe-${recipe.id}-${intervention.id}`;
         nodes.push({
@@ -314,6 +254,7 @@ export function buildMindmapGraph(data, options = {}) {
           position: recipePos,
           data: {
             ...recipe,
+            label: recipe.title,
             color: '#f59e0b',
           },
         });
@@ -328,11 +269,11 @@ export function buildMindmapGraph(data, options = {}) {
       });
     });
 
-    // Create scripture sub-nodes
+    // Create scripture sub-nodes (max 3)
     const scriptures = solutionData.scriptures || [];
-    scriptures.slice(0, 4).forEach((scripture, index) => {
-      const subAngle = config.angle + 90 + (index - (Math.min(scriptures.length, 4) - 1) / 2) * 25;
-      const subPos = polarToCartesian(categoryPos.x, categoryPos.y, subAngle, 100);
+    scriptures.slice(0, 3).forEach((scripture, idx) => {
+      const subAngle = angle + 70 + (idx - (Math.min(scriptures.length, 3) - 1) / 2) * 15;
+      const subPos = polarToCartesian(categoryPos.x, categoryPos.y, subAngle, 90);
 
       const scriptureId = `scripture-${scripture.id}-${key}`;
       nodes.push({
@@ -355,11 +296,11 @@ export function buildMindmapGraph(data, options = {}) {
       });
     });
 
-    // Create EGW reference sub-nodes
+    // Create EGW reference sub-nodes (max 3)
     const egwRefs = solutionData.egwReferences || [];
-    egwRefs.slice(0, 4).forEach((egw, index) => {
-      const subAngle = config.angle - 90 + (index - (Math.min(egwRefs.length, 4) - 1) / 2) * 25;
-      const subPos = polarToCartesian(categoryPos.x, categoryPos.y, subAngle, 100);
+    egwRefs.slice(0, 3).forEach((egw, idx) => {
+      const subAngle = angle - 70 + (idx - (Math.min(egwRefs.length, 3) - 1) / 2) * 15;
+      const subPos = polarToCartesian(categoryPos.x, categoryPos.y, subAngle, 90);
 
       const egwId = `egw-${egw.id}-${key}`;
       nodes.push({

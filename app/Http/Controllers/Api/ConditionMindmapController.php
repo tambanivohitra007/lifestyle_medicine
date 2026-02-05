@@ -21,7 +21,11 @@ class ConditionMindmapController extends Controller
      */
     protected const BRANCH_COLORS = [
         'riskFactors' => '#f97316',      // Orange
+        'physiology' => '#3b82f6',        // Blue
         'complications' => '#dc2626',     // Red
+        'solutions' => '#22c55e',         // Green
+        'additionalFactors' => '#8b5cf6', // Purple
+        'scripture' => '#6366f1',         // Indigo
         'nutrition' => '#f59e0b',         // Amber
         'exercise' => '#22c55e',          // Green
         'hydrotherapy' => '#06b6d4',      // Cyan
@@ -33,21 +37,58 @@ class ConditionMindmapController extends Controller
     ];
 
     /**
-     * Severity colors for risk factors.
+     * Section type configurations.
      */
-    protected const SEVERITY_COLORS = [
-        'high' => '#dc2626',
-        'moderate' => '#f59e0b',
-        'low' => '#22c55e',
-    ];
-
-    /**
-     * Likelihood colors for complications.
-     */
-    protected const LIKELIHOOD_COLORS = [
-        'common' => '#dc2626',
-        'occasional' => '#f59e0b',
-        'rare' => '#22c55e',
+    protected const SECTION_CONFIG = [
+        'risk_factors' => [
+            'key' => 'riskFactors',
+            'label' => 'Risk Factors',
+            'color' => '#f97316',
+            'icon' => 'alert-triangle',
+            'position' => 'top',
+        ],
+        'physiology' => [
+            'key' => 'physiology',
+            'label' => 'Physiology & Pathophysiology',
+            'color' => '#3b82f6',
+            'icon' => 'activity',
+            'position' => 'left',
+        ],
+        'complications' => [
+            'key' => 'complications',
+            'label' => 'Complications',
+            'color' => '#dc2626',
+            'icon' => 'alert-circle',
+            'position' => 'bottom',
+        ],
+        'solutions' => [
+            'key' => 'solutions',
+            'label' => 'Lifestyle Solutions',
+            'color' => '#22c55e',
+            'icon' => 'heart-pulse',
+            'position' => 'right',
+        ],
+        'additional_factors' => [
+            'key' => 'additionalFactors',
+            'label' => 'Additional Factors',
+            'color' => '#8b5cf6',
+            'icon' => 'plus-circle',
+            'position' => 'left',
+        ],
+        'scripture' => [
+            'key' => 'scripture',
+            'label' => 'Scripture & SOP',
+            'color' => '#6366f1',
+            'icon' => 'book-open',
+            'position' => 'right',
+        ],
+        'research_ideas' => [
+            'key' => 'researchIdeas',
+            'label' => 'Research Ideas',
+            'color' => '#14b8a6',
+            'icon' => 'lightbulb',
+            'position' => 'bottom',
+        ],
     ];
 
     /**
@@ -57,8 +98,7 @@ class ConditionMindmapController extends Controller
     {
         // Load all relationships needed for the mindmap
         $condition->load([
-            'riskFactors' => fn($q) => $q->orderBy('severity', 'desc')->orderBy('order_index'),
-            'complications.complicationCondition',
+            'sections' => fn($q) => $q->orderBy('order_index'),
             'interventions.careDomain',
             'interventions.recipes',
             'interventions.scriptures',
@@ -68,6 +108,9 @@ class ConditionMindmapController extends Controller
             'recipes',
             'egwReferences',
         ]);
+
+        // Group sections by type
+        $sectionsByType = $this->groupSectionsByType($condition->sections);
 
         // Group interventions by care domain
         $solutionsByDomain = $this->groupInterventionsByDomain($condition);
@@ -80,64 +123,59 @@ class ConditionMindmapController extends Controller
                 'category' => $condition->category,
                 'summary' => $condition->summary,
             ],
+            'sections' => $sectionsByType,
             'branches' => [
-                'riskFactors' => $this->formatRiskFactors($condition->riskFactors),
-                'complications' => $this->formatComplications($condition->complications),
                 'solutions' => $solutionsByDomain,
             ],
             'meta' => [
-                'totalRiskFactors' => $condition->riskFactors->count(),
-                'totalComplications' => $condition->complications->count(),
+                'totalSections' => $condition->sections->count(),
                 'totalInterventions' => $condition->interventions->count(),
                 'totalRecipes' => $this->countUniqueRecipes($condition, $solutionsByDomain),
                 'totalScriptures' => $this->countUniqueScriptures($condition, $solutionsByDomain),
                 'totalEgwReferences' => $this->countUniqueEgwReferences($condition, $solutionsByDomain),
+                'sectionConfig' => self::SECTION_CONFIG,
                 'branchColors' => self::BRANCH_COLORS,
             ],
         ]);
     }
 
     /**
-     * Format risk factors for the mindmap.
+     * Group sections by their type.
      */
-    protected function formatRiskFactors($riskFactors): array
+    protected function groupSectionsByType($sections): array
     {
-        return $riskFactors->map(function ($rf) {
-            return [
-                'id' => $rf->id,
-                'name' => $rf->name,
-                'description' => $rf->description,
-                'riskType' => $rf->risk_type,
-                'riskTypeLabel' => ConditionRiskFactor::getRiskTypes()[$rf->risk_type] ?? $rf->risk_type,
-                'severity' => $rf->severity,
-                'severityColor' => self::SEVERITY_COLORS[$rf->severity] ?? '#9ca3af',
-                'isModifiable' => $rf->isModifiable(),
-            ];
-        })->toArray();
-    }
+        $grouped = [];
 
-    /**
-     * Format complications for the mindmap.
-     */
-    protected function formatComplications($complications): array
-    {
-        return $complications->map(function ($comp) {
-            return [
-                'id' => $comp->id,
-                'name' => $comp->name,
-                'description' => $comp->description,
-                'likelihood' => $comp->likelihood,
-                'likelihoodLabel' => ConditionComplication::getLikelihoodLevels()[$comp->likelihood] ?? $comp->likelihood,
-                'likelihoodColor' => self::LIKELIHOOD_COLORS[$comp->likelihood] ?? '#9ca3af',
-                'timeframe' => $comp->timeframe,
-                'preventable' => $comp->preventable,
-                'linkedConditionId' => $comp->complication_condition_id,
-                'linkedCondition' => $comp->complicationCondition ? [
-                    'id' => $comp->complicationCondition->id,
-                    'name' => $comp->complicationCondition->name,
-                ] : null,
+        foreach ($sections as $section) {
+            $type = $section->section_type;
+            $config = self::SECTION_CONFIG[$type] ?? [
+                'key' => $type,
+                'label' => ucwords(str_replace('_', ' ', $type)),
+                'color' => '#6b7280',
+                'icon' => 'file-text',
+                'position' => 'left',
             ];
-        })->toArray();
+
+            if (!isset($grouped[$config['key']])) {
+                $grouped[$config['key']] = [
+                    'type' => $type,
+                    'label' => $config['label'],
+                    'color' => $config['color'],
+                    'icon' => $config['icon'],
+                    'position' => $config['position'],
+                    'items' => [],
+                ];
+            }
+
+            $grouped[$config['key']]['items'][] = [
+                'id' => $section->id,
+                'title' => $section->title,
+                'body' => $section->body,
+                'orderIndex' => $section->order_index,
+            ];
+        }
+
+        return $grouped;
     }
 
     /**
@@ -150,7 +188,6 @@ class ConditionMindmapController extends Controller
         foreach ($condition->interventions as $intervention) {
             $domain = $intervention->careDomain;
             $domainSlug = $domain ? strtolower(str_replace(' ', '-', $domain->name)) : 'other';
-            $domainId = $domain?->id ?? 'other';
 
             if (!isset($grouped[$domainSlug])) {
                 $grouped[$domainSlug] = [
@@ -314,7 +351,7 @@ class ConditionMindmapController extends Controller
         return count($egwIds);
     }
 
-    // ==================== Risk Factor CRUD ====================
+    // ==================== Risk Factor CRUD (for future use) ====================
 
     /**
      * List risk factors for a condition.
@@ -354,7 +391,6 @@ class ConditionMindmapController extends Controller
      */
     public function updateRiskFactor(Request $request, Condition $condition, ConditionRiskFactor $riskFactor): ConditionRiskFactorResource
     {
-        // Ensure the risk factor belongs to this condition
         if ($riskFactor->condition_id !== $condition->id) {
             abort(404);
         }
@@ -386,7 +422,7 @@ class ConditionMindmapController extends Controller
         return response()->noContent();
     }
 
-    // ==================== Complication CRUD ====================
+    // ==================== Complication CRUD (for future use) ====================
 
     /**
      * List complications for a condition.

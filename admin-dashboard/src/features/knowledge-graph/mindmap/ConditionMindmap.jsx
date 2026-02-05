@@ -26,6 +26,7 @@ import { useConditionMindmap } from './hooks';
 import { mindmapNodeTypes } from './nodes';
 import { mindmapEdgeTypes } from './edges';
 import { buildMindmapGraph } from './utils/mindmapLayout';
+import { NodeDetailsPanel } from './components';
 
 // Node colors for minimap
 const nodeColor = (node) => {
@@ -35,7 +36,9 @@ const nodeColor = (node) => {
     riskFactor: node.data?.color || '#f97316',
     complication: node.data?.color || '#dc2626',
     solutionCategory: node.data?.color || '#3b82f6',
-    intervention: '#f43f5e',
+    sectionBranch: node.data?.color || '#6b7280',
+    sectionItem: node.data?.color || '#6b7280',
+    intervention: node.data?.color || '#f43f5e',
     scripture: '#6366f1',
     recipe: '#f59e0b',
     egwReference: '#8b5cf6',
@@ -54,8 +57,7 @@ const ConditionMindmapInner = ({
   const { t } = useTranslation(['knowledgeGraph']);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  // selectedNode will be used for details panel in future implementation
-  const [, setSelectedNode] = useState(null);
+  const [selectedNode, setSelectedNode] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
@@ -91,6 +93,11 @@ const ConditionMindmapInner = ({
 
   const handleNodeMouseLeave = useCallback(() => {
     setHoveredNodeId(null);
+  }, []);
+
+  // Handle closing the details panel
+  const handleClosePanel = useCallback(() => {
+    setSelectedNode(null);
   }, []);
 
   // Compute display nodes/edges with hover highlighting
@@ -188,7 +195,7 @@ const ConditionMindmapInner = ({
   }
 
   return (
-    <div className={`h-full w-full ${className}`}>
+    <div className={`h-full w-full relative ${className}`}>
       <ReactFlow
         nodes={displayNodes}
         edges={displayEdges}
@@ -247,28 +254,24 @@ const ConditionMindmapInner = ({
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="flex items-center justify-between gap-2 px-2 py-1 bg-orange-50 rounded">
-                <span className="text-orange-700">Risk Factors</span>
-                <span className="font-bold text-orange-800">{meta?.totalRiskFactors || 0}</span>
-              </div>
-              <div className="flex items-center justify-between gap-2 px-2 py-1 bg-red-50 rounded">
-                <span className="text-red-700">Complications</span>
-                <span className="font-bold text-red-800">{meta?.totalComplications || 0}</span>
-              </div>
               <div className="flex items-center justify-between gap-2 px-2 py-1 bg-blue-50 rounded">
-                <span className="text-blue-700">Interventions</span>
-                <span className="font-bold text-blue-800">{meta?.totalInterventions || 0}</span>
+                <span className="text-blue-700">{t('sections', 'Sections')}</span>
+                <span className="font-bold text-blue-800">{meta?.totalSections || 0}</span>
+              </div>
+              <div className="flex items-center justify-between gap-2 px-2 py-1 bg-rose-50 rounded">
+                <span className="text-rose-700">{t('interventions', 'Interventions')}</span>
+                <span className="font-bold text-rose-800">{meta?.totalInterventions || 0}</span>
               </div>
               <div className="flex items-center justify-between gap-2 px-2 py-1 bg-amber-50 rounded">
-                <span className="text-amber-700">Recipes</span>
+                <span className="text-amber-700">{t('recipes', 'Recipes')}</span>
                 <span className="font-bold text-amber-800">{meta?.totalRecipes || 0}</span>
               </div>
               <div className="flex items-center justify-between gap-2 px-2 py-1 bg-indigo-50 rounded">
-                <span className="text-indigo-700">Scriptures</span>
+                <span className="text-indigo-700">{t('scriptures', 'Scriptures')}</span>
                 <span className="font-bold text-indigo-800">{meta?.totalScriptures || 0}</span>
               </div>
               <div className="flex items-center justify-between gap-2 px-2 py-1 bg-purple-50 rounded">
-                <span className="text-purple-700">EGW Refs</span>
+                <span className="text-purple-700">{t('egwRefs', 'EGW Refs')}</span>
                 <span className="font-bold text-purple-800">{meta?.totalEgwReferences || 0}</span>
               </div>
             </div>
@@ -316,6 +319,14 @@ const ConditionMindmapInner = ({
           </div>
         </Panel>
       </ReactFlow>
+
+      {/* Node Details Panel */}
+      {selectedNode && (
+        <NodeDetailsPanel
+          node={selectedNode}
+          onClose={handleClosePanel}
+        />
+      )}
     </div>
   );
 };
