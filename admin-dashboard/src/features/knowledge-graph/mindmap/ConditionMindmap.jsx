@@ -533,7 +533,7 @@ const ConditionMindmapInner = ({
             <div className="flex items-center gap-1 mb-2">
               <Info className="w-4 h-4 text-gray-400" />
               <span className="text-xs font-semibold text-gray-600 uppercase">
-                {t('stats', 'Statistics')}
+                {t('statsLabel', 'Statistics')}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">

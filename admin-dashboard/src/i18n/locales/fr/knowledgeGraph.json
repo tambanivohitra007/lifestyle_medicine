@@ -95,6 +95,7 @@
     "noResults": "Aucun nœud trouvé",
     "navigationHint": "↑↓ pour naviguer, Entrée pour sélectionner"
   },
+  "statsLabel": "Statistiques",
   "stats": {
     "totalNodes": "Total des nœuds",
     "totalEdges": "Total des connexions",
