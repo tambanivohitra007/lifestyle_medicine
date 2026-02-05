@@ -296,20 +296,14 @@ const ConditionMindmapInner = ({
     const isExpandClick = node.data.expandable && node.data.childCount > 0;
 
     if (isExpandClick) {
-      const isCurrentlyExpanded = expandedNodes.has(node.id);
-
-      // Track the node being expanded for viewport focus
-      if (!isCurrentlyExpanded) {
-        lastExpandedNode.current = node.id;
-      } else {
-        lastExpandedNode.current = null;
-      }
-
       // Toggle expansion
       setExpandedNodes(prev => {
         const newSet = new Set(prev);
-        if (newSet.has(node.id)) {
+        const isCurrentlyExpanded = prev.has(node.id);
+
+        if (isCurrentlyExpanded) {
           // Collapse: remove this node and all its descendants
+          lastExpandedNode.current = null;
           newSet.delete(node.id);
           // Also collapse all children
           const collapseDescendants = (nodeId) => {
@@ -321,7 +315,8 @@ const ConditionMindmapInner = ({
           };
           collapseDescendants(node.id);
         } else {
-          // Expand this node
+          // Expand this node - track for viewport focus
+          lastExpandedNode.current = node.id;
           newSet.add(node.id);
         }
         return newSet;
@@ -334,7 +329,7 @@ const ConditionMindmapInner = ({
     if (onNodeClick) {
       onNodeClick(node);
     }
-  }, [onNodeClick, allNodesData.hierarchy, expandedNodes]);
+  }, [onNodeClick, allNodesData.hierarchy]);
 
   // Handle double-click to show details even for expandable nodes
   const handleNodeDoubleClick = useCallback((event, node) => {
