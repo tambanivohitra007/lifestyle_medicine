@@ -71,6 +71,9 @@ const ConditionMindmapInner = ({
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
+  // Fetch mindmap data - must be before callbacks that use it
+  const { data, loading, error, refetch, condition, meta } = useConditionMindmap(conditionId);
+
   // Track user-moved node positions (persists across re-renders and rebuilds)
   const userMovedPositions = useRef(new Map());
 
@@ -118,9 +121,6 @@ const ConditionMindmapInner = ({
       return resolvedNodes;
     });
   }, [setNodes, data?.condition?.id]);
-
-  // Fetch mindmap data
-  const { data, loading, error, refetch, condition, meta } = useConditionMindmap(conditionId);
 
   // Extract available categories from data for filter panel
   const availableCategories = useMemo(() => {
