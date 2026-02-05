@@ -1,9 +1,10 @@
 import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronRight } from 'lucide-react';
 
 /**
  * Center condition node - the main focus of the mindmap
+ * Now with expand/collapse capability
  */
 const CenterConditionNode = memo(({ data, selected }) => {
   return (
@@ -13,6 +14,7 @@ const CenterConditionNode = memo(({ data, selected }) => {
         bg-gradient-to-br from-white via-red-50 to-red-100
         min-w-[200px] max-w-[280px]
         ${selected ? 'shadow-2xl scale-105 border-red-500' : 'border-red-300 hover:shadow-2xl hover:scale-102'}
+        ${data.expanded ? 'ring-4 ring-red-200 ring-offset-2' : ''}
       `}
       style={{ borderWidth: '3px' }}
     >
@@ -83,6 +85,24 @@ const CenterConditionNode = memo(({ data, selected }) => {
       <div className="absolute -top-3 -right-3 w-7 h-7 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
         <div className="w-2.5 h-2.5 bg-white rounded-full" />
       </div>
+
+      {/* Expand/Collapse indicator with child count */}
+      {data.expandable && data.childCount > 0 && (
+        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1">
+          <div
+            className="flex items-center gap-1 px-3 py-1 rounded-full bg-white border-2 border-red-300 shadow-md cursor-pointer hover:scale-105 transition-transform"
+          >
+            {data.expanded ? (
+              <ChevronDown className="w-4 h-4 text-red-500" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-red-500" />
+            )}
+            <span className="text-xs font-bold text-red-600">
+              {data.childCount}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 });

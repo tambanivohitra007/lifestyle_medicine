@@ -7,6 +7,9 @@ import SolutionCategoryNode from './SolutionCategoryNode';
 import SectionBranchNode from './SectionBranchNode';
 import SectionItemNode from './SectionItemNode';
 import InterventionMindmapNode from './InterventionMindmapNode';
+import MasterNode from './MasterNode';
+import ExpandableInterventionNode from './ExpandableInterventionNode';
+import LeafNode from './LeafNode';
 
 // Re-use existing node types from parent knowledge graph
 import {
@@ -25,6 +28,9 @@ export {
   SectionBranchNode,
   SectionItemNode,
   InterventionMindmapNode,
+  MasterNode,
+  ExpandableInterventionNode,
+  LeafNode,
 };
 
 // Create nodeTypes object for React Flow
@@ -39,6 +45,10 @@ export const mindmapNodeTypes = {
   sectionItem: SectionItemNode,
   // Intervention with description
   intervention: InterventionMindmapNode,
+  // Expandable mindmap node types
+  masterNode: MasterNode,
+  interventionNode: ExpandableInterventionNode,
+  leafNode: LeafNode,
   // Re-use existing node types
   scripture: ScriptureNode,
   recipe: RecipeNode,

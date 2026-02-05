@@ -48,12 +48,14 @@ const NodeDetailsPanel = memo(({ node, onClose }) => {
       case 'centerCondition':
         return <ConditionDetails data={data} t={t} />;
       case 'sectionBranch':
-        return <SectionBranchDetails data={data} t={t} />;
+      case 'masterNode':
+        return <MasterNodeDetails data={data} t={t} />;
       case 'sectionItem':
         return <SectionItemDetails data={data} t={t} />;
       case 'solutionCategory':
         return <SolutionCategoryDetails data={data} t={t} />;
       case 'intervention':
+      case 'interventionNode':
         return <InterventionDetails data={data} t={t} />;
       case 'recipe':
         return <RecipeDetails data={data} t={t} />;
@@ -61,6 +63,8 @@ const NodeDetailsPanel = memo(({ node, onClose }) => {
         return <ScriptureDetails data={data} t={t} />;
       case 'egwReference':
         return <EgwReferenceDetails data={data} t={t} />;
+      case 'leafNode':
+        return <LeafNodeDetails data={data} t={t} />;
       default:
         return <GenericDetails data={data} t={t} />;
     }
@@ -505,6 +509,104 @@ const EgwReferenceDetails = ({ data, t }) => (
     </div>
   </div>
 );
+
+/**
+ * Master node details (expandable category nodes)
+ */
+const MasterNodeDetails = ({ data, t }) => (
+  <div className="space-y-4">
+    {/* Category info */}
+    <div className="flex items-center gap-2">
+      <span
+        className="px-3 py-1 rounded-full text-sm font-medium text-white"
+        style={{ backgroundColor: data.color }}
+      >
+        {data.childCount} {t('items', 'items')}
+      </span>
+      {data.nodeCategory && (
+        <span className="text-xs text-gray-500 capitalize">
+          {data.nodeCategory}
+        </span>
+      )}
+    </div>
+
+    {/* Solution domain stats */}
+    {data.nodeCategory === 'solution' && (
+      <div className="grid grid-cols-3 gap-2">
+        {data.interventionCount > 0 && (
+          <div className="p-2 rounded-lg bg-rose-50 text-center">
+            <div className="text-lg font-bold text-rose-600">{data.interventionCount}</div>
+            <div className="text-[10px] text-rose-700">{t('interventions', 'Interventions')}</div>
+          </div>
+        )}
+        {data.scriptureCount > 0 && (
+          <div className="p-2 rounded-lg bg-indigo-50 text-center">
+            <div className="text-lg font-bold text-indigo-600">{data.scriptureCount}</div>
+            <div className="text-[10px] text-indigo-700">{t('scriptures', 'Scriptures')}</div>
+          </div>
+        )}
+        {data.egwCount > 0 && (
+          <div className="p-2 rounded-lg bg-purple-50 text-center">
+            <div className="text-lg font-bold text-purple-600">{data.egwCount}</div>
+            <div className="text-[10px] text-purple-700">{t('egwRefs', 'EGW')}</div>
+          </div>
+        )}
+      </div>
+    )}
+
+    {/* Section items list */}
+    {data.items && data.items.length > 0 && (
+      <div>
+        <h4 className="text-sm font-semibold text-gray-700 mb-3">
+          {t('allItems', 'All Items')}
+        </h4>
+        <div className="space-y-2 max-h-64 overflow-y-auto">
+          {data.items.map((item, index) => (
+            <div
+              key={item.id || index}
+              className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+            >
+              <h5 className="font-medium text-sm text-gray-800">
+                {item.title || item.name}
+              </h5>
+              {item.body && (
+                <p className="mt-1 text-xs text-gray-600 line-clamp-2">
+                  {item.body.replace(/<[^>]*>/g, '')}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Hint about expansion */}
+    <div className="pt-3 border-t border-gray-100">
+      <p className="text-xs text-gray-500 italic">
+        {t('expandHint', 'Click this node on the mindmap to expand/collapse its children.')}
+      </p>
+    </div>
+  </div>
+);
+
+/**
+ * Leaf node details (based on nodeCategory)
+ */
+const LeafNodeDetails = ({ data, t }) => {
+  // Route to appropriate detail view based on nodeCategory
+  switch (data.nodeCategory) {
+    case 'sectionItem':
+      return <SectionItemDetails data={data} t={t} />;
+    case 'recipe':
+      return <RecipeDetails data={data} t={t} />;
+    case 'scripture':
+      return <ScriptureDetails data={data} t={t} />;
+    case 'egwReference':
+      return <EgwReferenceDetails data={data} t={t} />;
+    default:
+      return <GenericDetails data={data} t={t} />;
+  }
+};
 
 /**
  * Generic fallback details

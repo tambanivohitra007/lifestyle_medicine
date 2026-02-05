@@ -20,22 +20,23 @@ import {
   Maximize2,
   Download,
   Info,
+  Expand,
+  Minimize,
 } from 'lucide-react';
 
 import { useConditionMindmap } from './hooks';
 import { mindmapNodeTypes } from './nodes';
 import { mindmapEdgeTypes } from './edges';
-import { buildMindmapGraph } from './utils/mindmapLayout';
+import { buildExpandableMindmap, filterVisibleElements } from './utils/expandableMindmapLayout';
 import { NodeDetailsPanel } from './components';
 
 // Node colors for minimap
 const nodeColor = (node) => {
   const colors = {
     centerCondition: '#ef4444',
-    branchLabel: node.data?.color || '#6b7280',
-    riskFactor: node.data?.color || '#f97316',
-    complication: node.data?.color || '#dc2626',
-    solutionCategory: node.data?.color || '#3b82f6',
+    masterNode: node.data?.color || '#6b7280',
+    interventionNode: node.data?.color || '#f43f5e',
+    leafNode: node.data?.color || '#6b7280',
     sectionBranch: node.data?.color || '#6b7280',
     sectionItem: node.data?.color || '#6b7280',
     intervention: node.data?.color || '#f43f5e',
@@ -59,32 +60,107 @@ const ConditionMindmapInner = ({
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
+  const [expandedNodes, setExpandedNodes] = useState(new Set());
+  const [allNodesData, setAllNodesData] = useState({ nodes: [], edges: [], hierarchy: {} });
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
   // Fetch mindmap data
   const { data, loading, error, refetch, condition, meta } = useConditionMindmap(conditionId);
 
-  // Build graph when data changes
+  // Build full graph structure when data changes
   useEffect(() => {
     if (!data) return;
 
-    const { nodes: graphNodes, edges: graphEdges } = buildMindmapGraph(data);
-    setNodes(graphNodes);
-    setEdges(graphEdges);
+    // Initialize with center node expanded
+    const conditionNodeId = `condition-${data.condition.id}`;
+    const initialExpanded = new Set([conditionNodeId]);
+    setExpandedNodes(initialExpanded);
+
+    // Build the complete graph structure
+    const graphData = buildExpandableMindmap(data, initialExpanded);
+    setAllNodesData(graphData);
+
+    // Filter visible elements
+    const { nodes: visibleNodes, edges: visibleEdges } = filterVisibleElements(
+      graphData.nodes,
+      graphData.edges,
+      initialExpanded
+    );
+
+    setNodes(visibleNodes);
+    setEdges(visibleEdges);
 
     // Fit view after layout
     setTimeout(() => {
-      fitView({ padding: 0.2, duration: 500 });
+      fitView({ padding: 0.3, duration: 500 });
     }, 100);
   }, [data, setNodes, setEdges, fitView]);
 
-  // Handle node click
+  // Update visible nodes when expansion state changes
+  useEffect(() => {
+    if (allNodesData.nodes.length === 0) return;
+
+    // Rebuild graph with new expansion state
+    const graphData = buildExpandableMindmap(data, expandedNodes);
+    setAllNodesData(graphData);
+
+    // Filter visible elements
+    const { nodes: visibleNodes, edges: visibleEdges } = filterVisibleElements(
+      graphData.nodes,
+      graphData.edges,
+      expandedNodes
+    );
+
+    setNodes(visibleNodes);
+    setEdges(visibleEdges);
+
+    // Fit view with animation
+    setTimeout(() => {
+      fitView({ padding: 0.2, duration: 400 });
+    }, 50);
+  }, [expandedNodes, data, setNodes, setEdges, fitView, allNodesData.nodes.length]);
+
+  // Handle node click - toggle expansion or show details
   const handleNodeClick = useCallback((event, node) => {
-    setSelectedNode(node);
+    // Check if click was on the expand/collapse button area
+    const isExpandClick = node.data.expandable && node.data.childCount > 0;
+
+    if (isExpandClick) {
+      // Toggle expansion
+      setExpandedNodes(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(node.id)) {
+          // Collapse: remove this node and all its descendants
+          newSet.delete(node.id);
+          // Also collapse all children
+          const collapseDescendants = (nodeId) => {
+            const children = allNodesData.hierarchy[nodeId] || [];
+            children.forEach(childId => {
+              newSet.delete(childId);
+              collapseDescendants(childId);
+            });
+          };
+          collapseDescendants(node.id);
+        } else {
+          // Expand this node
+          newSet.add(node.id);
+        }
+        return newSet;
+      });
+    } else {
+      // Show details panel for non-expandable nodes or for viewing details
+      setSelectedNode(node);
+    }
+
     if (onNodeClick) {
       onNodeClick(node);
     }
-  }, [onNodeClick]);
+  }, [onNodeClick, allNodesData.hierarchy]);
+
+  // Handle double-click to show details even for expandable nodes
+  const handleNodeDoubleClick = useCallback((event, node) => {
+    setSelectedNode(node);
+  }, []);
 
   // Handle node hover for highlighting
   const handleNodeMouseEnter = useCallback((event, node) => {
@@ -99,6 +175,24 @@ const ConditionMindmapInner = ({
   const handleClosePanel = useCallback(() => {
     setSelectedNode(null);
   }, []);
+
+  // Expand all nodes
+  const handleExpandAll = useCallback(() => {
+    const allExpandableIds = new Set();
+    allNodesData.nodes.forEach(node => {
+      if (node.data.expandable) {
+        allExpandableIds.add(node.id);
+      }
+    });
+    setExpandedNodes(allExpandableIds);
+  }, [allNodesData.nodes]);
+
+  // Collapse all (except center)
+  const handleCollapseAll = useCallback(() => {
+    if (data?.condition?.id) {
+      setExpandedNodes(new Set([`condition-${data.condition.id}`]));
+    }
+  }, [data?.condition?.id]);
 
   // Compute display nodes/edges with hover highlighting
   const { displayNodes, displayEdges } = useMemo(() => {
@@ -138,14 +232,12 @@ const ConditionMindmapInner = ({
 
   // Export as PNG
   const handleExport = useCallback(() => {
-    // Use html-to-image library if available
     const element = document.querySelector('.react-flow');
     if (element) {
       import('html-to-image').then(({ toPng }) => {
         toPng(element, {
           backgroundColor: '#ffffff',
           filter: (node) => {
-            // Filter out minimap and controls
             if (node.classList?.contains('react-flow__minimap')) return false;
             if (node.classList?.contains('react-flow__controls')) return false;
             return true;
@@ -202,12 +294,13 @@ const ConditionMindmapInner = ({
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
+        onNodeDoubleClick={handleNodeDoubleClick}
         onNodeMouseEnter={handleNodeMouseEnter}
         onNodeMouseLeave={handleNodeMouseLeave}
         nodeTypes={mindmapNodeTypes}
         edgeTypes={mindmapEdgeTypes}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ padding: 0.3 }}
         minZoom={0.1}
         maxZoom={2}
         attributionPosition="bottom-left"
@@ -240,6 +333,12 @@ const ConditionMindmapInner = ({
                   </span>
                 )}
               </div>
+            </div>
+            {/* Instructions */}
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500">
+                {t('clickToExpand', 'Click nodes to expand/collapse. Double-click for details.')}
+              </p>
             </div>
           </div>
         </Panel>
@@ -281,6 +380,25 @@ const ConditionMindmapInner = ({
         {/* Control buttons */}
         <Panel position="bottom-right" className="!m-4">
           <div className="flex flex-col gap-2">
+            {/* Expand/Collapse All */}
+            <button
+              onClick={handleExpandAll}
+              className="p-2 bg-white rounded-lg shadow border border-gray-200 hover:bg-gray-50 transition-colors"
+              title={t('expandAll', 'Expand All')}
+            >
+              <Expand className="w-4 h-4 text-gray-600" />
+            </button>
+            <button
+              onClick={handleCollapseAll}
+              className="p-2 bg-white rounded-lg shadow border border-gray-200 hover:bg-gray-50 transition-colors"
+              title={t('collapseAll', 'Collapse All')}
+            >
+              <Minimize className="w-4 h-4 text-gray-600" />
+            </button>
+
+            <div className="h-px bg-gray-200 my-1" />
+
+            {/* Zoom controls */}
             <button
               onClick={() => zoomIn({ duration: 300 })}
               className="p-2 bg-white rounded-lg shadow border border-gray-200 hover:bg-gray-50 transition-colors"
@@ -302,6 +420,10 @@ const ConditionMindmapInner = ({
             >
               <Maximize2 className="w-4 h-4 text-gray-600" />
             </button>
+
+            <div className="h-px bg-gray-200 my-1" />
+
+            {/* Other controls */}
             <button
               onClick={handleExport}
               className="p-2 bg-white rounded-lg shadow border border-gray-200 hover:bg-gray-50 transition-colors"
