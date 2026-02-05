@@ -2,6 +2,9 @@
  * Expandable Mindmap Layout Algorithm
  * Creates a hierarchical tree layout with expandable/collapsible nodes.
  *
+ * DESIGN PRINCIPLE: Use space generously! Nodes should be well-separated
+ * and easy to read. Users can zoom out if needed.
+ *
  * Hierarchy:
  * - Level 0: Center condition node
  * - Level 1 (Master): Main categories (Risk Factors, Complications, Solutions by domain)
@@ -9,40 +12,42 @@
  * - Level 3: Details (recipes linked to interventions, etc.)
  */
 
-// Layout configuration
+// Layout configuration - GENEROUS SPACING
 const CONFIG = {
-  // Spacing
-  masterRadius: 200,      // Distance of master nodes from center
-  level2Radius: 140,      // Distance of level 2 nodes from their parent
-  level3Radius: 100,      // Distance of level 3 nodes from their parent
+  // Distances from parent (in pixels)
+  masterRadius: 400,       // Distance of master nodes from center
+  level2Radius: 300,       // Distance of level 2 nodes from their parent
+  level3Radius: 200,       // Distance of level 3 nodes from their parent
 
-  // Angular spread for children
-  childSpread: 50,        // Degrees spread for child nodes
+  // Minimum spacing between sibling nodes
+  minNodeSpacing: 120,     // Minimum gap between adjacent nodes
 
-  // Node dimensions (for collision avoidance)
-  nodeWidth: 180,
-  nodeHeight: 80,
+  // Node dimensions for calculations
+  nodeWidth: 200,
+  nodeHeight: 100,
 };
 
 // Section configurations with positions (angles in degrees)
+// Spread across the LEFT side of the circle (90° to 270°)
 const SECTION_ANGLES = {
-  riskFactors: -120,       // Top-left
-  physiology: -150,        // Left-top
-  complications: 120,      // Bottom-left
-  additionalFactors: 150,  // Left-bottom
-  researchIdeas: -60,      // Top-right
+  riskFactors: -135,       // Top-left quadrant
+  physiology: -165,        // Left side, upper
+  complications: 135,      // Bottom-left quadrant
+  additionalFactors: 165,  // Left side, lower
+  researchIdeas: -105,     // Top-left, closer to top
 };
 
-// Solution domain angles (right side)
+// Solution domain angles - spread across the RIGHT side (270° to 90°)
+// These represent the care domains for interventions
 const SOLUTION_ANGLES = {
-  'nutrition': -30,
-  'exercise': -15,
-  'hydrotherapy': 0,
+  'nutrition': -45,
+  'exercise': -25,
+  'hydrotherapy': -5,
   'spiritual-care': 15,
-  'mental-health': 30,
-  'stress-management': 45,
-  'pharmacotherapy': 60,
-  'natural-remedies': 75,
+  'mental-health': 35,
+  'stress-management': 55,
+  'pharmacotherapy': 75,
+  'natural-remedies': 95,
 };
 
 /**
@@ -64,20 +69,40 @@ function polarToCartesian(centerX, centerY, angle, distance) {
 }
 
 /**
- * Distribute items in a fan pattern around a given angle
+ * Calculate appropriate spread based on number of items and distance
+ * More items = wider spread, further distance = can have wider spread
  */
-function distributeInFan(count, parentX, parentY, baseAngle, distance, spread = CONFIG.childSpread) {
+function calculateSpread(count, distance) {
+  if (count <= 1) return 0;
+
+  // Base spread on item count - ensure minimum 25° between items
+  const minAngleBetweenItems = 25;
+  const desiredSpread = (count - 1) * minAngleBetweenItems;
+
+  // Cap at reasonable maximum based on distance
+  // Closer nodes need narrower spread to avoid crossing center
+  const maxSpread = Math.min(140, distance * 0.4);
+
+  return Math.min(desiredSpread, maxSpread);
+}
+
+/**
+ * Distribute items in an arc AWAY from center
+ * This ensures children fan out in the same general direction as their parent
+ */
+function distributeInArc(count, parentX, parentY, parentAngle, distance) {
   if (count === 0) return [];
   if (count === 1) {
-    return [polarToCartesian(parentX, parentY, baseAngle, distance)];
+    return [polarToCartesian(parentX, parentY, parentAngle, distance)];
   }
 
+  const spread = calculateSpread(count, distance);
   const positions = [];
   const halfSpread = spread / 2;
   const angleStep = spread / (count - 1);
 
   for (let i = 0; i < count; i++) {
-    const itemAngle = baseAngle - halfSpread + i * angleStep;
+    const itemAngle = parentAngle - halfSpread + i * angleStep;
     positions.push(polarToCartesian(parentX, parentY, itemAngle, distance));
   }
 
@@ -118,16 +143,30 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
   });
   hierarchy[conditionNodeId] = [];
 
-  let masterAngleIndex = 0;
   const masterNodeIds = [];
+  let sectionIndex = 0;
+  let solutionIndex = 0;
 
-  // 2. Create section master nodes (Level 1)
+  // 2. Create section master nodes (Level 1) - LEFT SIDE
   const sections = data.sections || {};
-  Object.entries(sections).forEach(([key, section]) => {
-    if (!section.items || section.items.length === 0) return;
+  const sectionKeys = Object.keys(sections).filter(key =>
+    sections[key]?.items?.length > 0
+  );
 
-    const angle = SECTION_ANGLES[key] ?? (-180 + masterAngleIndex * 30);
-    masterAngleIndex++;
+  // Distribute sections evenly on left side if no predefined angle
+  const sectionBaseAngle = 180; // Left
+  const sectionTotalSpread = 150; // From -75° to +75° around 180°
+
+  sectionKeys.forEach((key) => {
+    const section = sections[key];
+
+    // Use predefined angle or calculate evenly distributed angle
+    let angle = SECTION_ANGLES[key];
+    if (angle === undefined) {
+      const spreadStep = sectionTotalSpread / Math.max(1, sectionKeys.length - 1);
+      angle = sectionBaseAngle - sectionTotalSpread/2 + sectionIndex * spreadStep;
+    }
+    sectionIndex++;
 
     const masterPos = polarToCartesian(centerX, centerY, angle, CONFIG.masterRadius);
     const masterId = `master-section-${key}`;
@@ -154,6 +193,7 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
         childCount: section.items.length,
         parentId: conditionNodeId,
         nodeCategory: 'section',
+        parentAngle: angle,
       },
       hidden: !expandedNodes.has(conditionNodeId),
     });
@@ -167,14 +207,14 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
       hidden: !expandedNodes.has(conditionNodeId),
     });
 
-    // Level 2: Section items
+    // Level 2: Section items - fan out in same direction
     if (isExpanded) {
-      const itemPositions = distributeInFan(
+      const itemPositions = distributeInArc(
         section.items.length,
-        masterPos.x, masterPos.y,
-        angle,
-        CONFIG.level2Radius,
-        Math.min(80, section.items.length * 15)
+        masterPos.x,
+        masterPos.y,
+        angle, // Continue in same direction
+        CONFIG.level2Radius
       );
 
       section.items.forEach((item, index) => {
@@ -211,7 +251,7 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
     }
   });
 
-  // 3. Create solution master nodes (by care domain)
+  // 3. Create solution master nodes (by care domain) - RIGHT SIDE
   const solutions = data.branches?.solutions || {};
   const solutionKeys = Object.keys(solutions).filter(key => {
     const sol = solutions[key];
@@ -222,11 +262,22 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
     );
   });
 
-  solutionKeys.forEach((key, index) => {
+  // Distribute solutions evenly on right side if no predefined angle
+  const solutionBaseAngle = 0; // Right
+  const solutionTotalSpread = 150; // From -75° to +75° around 0°
+
+  solutionKeys.forEach((key) => {
     const solutionData = solutions[key];
     const domain = solutionData.careDomain;
 
-    const angle = SOLUTION_ANGLES[key] ?? (index * 20);
+    // Use predefined angle or calculate evenly distributed angle
+    let angle = SOLUTION_ANGLES[key];
+    if (angle === undefined) {
+      const spreadStep = solutionTotalSpread / Math.max(1, solutionKeys.length - 1);
+      angle = solutionBaseAngle - solutionTotalSpread/2 + solutionIndex * spreadStep;
+    }
+    solutionIndex++;
+
     const masterPos = polarToCartesian(centerX, centerY, angle, CONFIG.masterRadius);
     const masterId = `master-solution-${key}`;
 
@@ -257,6 +308,7 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
         interventionCount: solutionData.interventions?.length || 0,
         scriptureCount: solutionData.scriptures?.length || 0,
         egwCount: solutionData.egwReferences?.length || 0,
+        parentAngle: angle,
       },
       hidden: !expandedNodes.has(conditionNodeId),
     });
@@ -276,14 +328,14 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
       const scriptures = solutionData.scriptures || [];
       const egwRefs = solutionData.egwReferences || [];
 
-      // Calculate positions for all children
+      // Calculate positions for all children - fan out in same direction
       const allChildrenCount = interventions.length + scriptures.length + egwRefs.length;
-      const allPositions = distributeInFan(
+      const allPositions = distributeInArc(
         allChildrenCount,
-        masterPos.x, masterPos.y,
+        masterPos.x,
+        masterPos.y,
         angle,
-        CONFIG.level2Radius,
-        Math.min(100, allChildrenCount * 12)
+        CONFIG.level2Radius
       );
 
       let posIndex = 0;
@@ -296,6 +348,12 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
 
         const isInterventionExpanded = expandedNodes.has(interventionId);
         const recipeCount = intervention.recipes?.length || 0;
+
+        // Calculate this intervention's angle for its children
+        const interventionAngle = allChildrenCount > 1
+          ? angle - calculateSpread(allChildrenCount, CONFIG.level2Radius)/2 +
+            posIndex * (calculateSpread(allChildrenCount, CONFIG.level2Radius) / (allChildrenCount - 1))
+          : angle;
 
         nodes.push({
           id: interventionId,
@@ -311,6 +369,7 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
             childCount: recipeCount,
             parentId: masterId,
             nodeCategory: 'intervention',
+            parentAngle: interventionAngle,
           },
           hidden: false,
         });
@@ -326,12 +385,12 @@ export function buildExpandableMindmap(data, expandedNodes = new Set()) {
 
         // Level 3: Recipes (if intervention is expanded)
         if (isInterventionExpanded && intervention.recipes?.length > 0) {
-          const recipePositions = distributeInFan(
+          const recipePositions = distributeInArc(
             intervention.recipes.length,
-            allPositions[posIndex].x, allPositions[posIndex].y,
-            angle + (posIndex - interventions.length / 2) * 10,
-            CONFIG.level3Radius,
-            Math.min(60, intervention.recipes.length * 20)
+            allPositions[posIndex].x,
+            allPositions[posIndex].y,
+            interventionAngle,
+            CONFIG.level3Radius
           );
 
           intervention.recipes.forEach((recipe, recipeIdx) => {
