@@ -123,4 +123,67 @@ class Intervention extends Model
     {
         return $this->hasMany(InterventionOutcome::class)->orderBy('order_index');
     }
+
+    /**
+     * Get the effectiveness ratings for this intervention across conditions.
+     */
+    public function effectivenessRatings(): HasMany
+    {
+        return $this->hasMany(InterventionEffectiveness::class);
+    }
+
+    /**
+     * Get evidence summaries for this intervention.
+     */
+    public function evidenceSummaries(): HasMany
+    {
+        return $this->hasMany(EvidenceSummary::class);
+    }
+
+    /**
+     * Get relationships where this intervention is the first one.
+     */
+    public function relationshipsAsA(): HasMany
+    {
+        return $this->hasMany(InterventionRelationship::class, 'intervention_a_id');
+    }
+
+    /**
+     * Get relationships where this intervention is the second one.
+     */
+    public function relationshipsAsB(): HasMany
+    {
+        return $this->hasMany(InterventionRelationship::class, 'intervention_b_id');
+    }
+
+    /**
+     * Get all relationships involving this intervention.
+     */
+    public function getAllRelationships()
+    {
+        return InterventionRelationship::where('intervention_a_id', $this->id)
+            ->orWhere('intervention_b_id', $this->id)
+            ->with(['interventionA', 'interventionB'])
+            ->get();
+    }
+
+    /**
+     * Get synergistic interventions.
+     */
+    public function getSynergisticInterventions()
+    {
+        return $this->getAllRelationships()
+            ->filter(fn($r) => $r->isPositive())
+            ->map(fn($r) => $r->getOtherIntervention($this->id));
+    }
+
+    /**
+     * Get conflicting interventions.
+     */
+    public function getConflictingInterventions()
+    {
+        return $this->getAllRelationships()
+            ->filter(fn($r) => $r->isNegative())
+            ->map(fn($r) => $r->getOtherIntervention($this->id));
+    }
 }

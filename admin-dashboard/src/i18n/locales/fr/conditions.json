@@ -84,6 +84,7 @@
     "icd10CodePlaceholder": "ex: E11",
     "lookupSnomed": "Rechercher des codes SNOMED",
     "lookupIcd10": "Rechercher des codes CIM-10",
+    "bodySystemHelp": "Classer cette condition par le système corporel principal qu'elle affecte",
     "prevalence": "Prévalence",
     "symptoms": "Symptômes",
     "causes": "Causes",

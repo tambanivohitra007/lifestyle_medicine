@@ -274,4 +274,30 @@ export const apiEndpoints = {
   analyticsEvidenceQuality: '/admin/analytics/evidence-quality',
   analyticsContentCompleteness: '/admin/analytics/content-completeness',
   analyticsExport: '/admin/analytics/export',
+
+  // Body Systems (Knowledge Graph)
+  bodySystems: '/body-systems',
+  bodySystem: (id) => `/body-systems/${id}`,
+  bodySystemCategories: (id) => `/body-systems/${id}/categories`,
+  bodySystemsAdmin: '/admin/body-systems',
+  bodySystemAdmin: (id) => `/admin/body-systems/${id}`,
+  bodySystemCategoryAdmin: (systemId) => `/admin/body-systems/${systemId}/categories`,
+  conditionCategoryAdmin: (id) => `/admin/condition-categories/${id}`,
+
+  // Intervention Effectiveness (Knowledge Graph)
+  effectiveness: '/effectiveness',
+  conditionEffectiveness: (id) => `/conditions/${id}/effectiveness`,
+  interventionEffectiveness: (id) => `/interventions/${id}/effectiveness`,
+  effectivenessPair: (conditionId, interventionId) =>
+    `/conditions/${conditionId}/interventions/${interventionId}/effectiveness`,
+  effectivenessAdmin: '/admin/effectiveness',
+  effectivenessAdminItem: (id) => `/admin/effectiveness/${id}`,
+
+  // Intervention Relationships (Knowledge Graph)
+  interventionRelationships: '/intervention-relationships',
+  interventionRelationshipsFor: (id) => `/interventions/${id}/relationships`,
+  interventionSynergies: (id) => `/interventions/${id}/synergies`,
+  interventionConflicts: (id) => `/interventions/${id}/conflicts`,
+  interventionRelationshipsAdmin: '/admin/intervention-relationships',
+  interventionRelationshipAdmin: (id) => `/admin/intervention-relationships/${id}`,
 };

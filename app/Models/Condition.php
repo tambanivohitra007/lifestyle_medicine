@@ -7,6 +7,7 @@ use App\Models\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,10 +20,19 @@ class Condition extends Model
     protected $fillable = [
         'name',
         'category',
+        'body_system_id',
         'summary',
         'snomed_code',
         'icd10_code',
     ];
+
+    /**
+     * Get the body system this condition belongs to.
+     */
+    public function bodySystem(): BelongsTo
+    {
+        return $this->belongsTo(BodySystem::class);
+    }
 
     /**
      * Get the sections for this condition.
@@ -118,5 +128,21 @@ class Condition extends Model
     public function complicationOf(): HasMany
     {
         return $this->hasMany(ConditionComplication::class, 'complication_condition_id');
+    }
+
+    /**
+     * Get the effectiveness ratings for interventions linked to this condition.
+     */
+    public function effectivenessRatings(): HasMany
+    {
+        return $this->hasMany(InterventionEffectiveness::class);
+    }
+
+    /**
+     * Get evidence summaries for this condition.
+     */
+    public function evidenceSummaries(): HasMany
+    {
+        return $this->hasMany(EvidenceSummary::class);
     }
 }

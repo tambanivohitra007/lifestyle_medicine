@@ -629,10 +629,16 @@ Route::prefix('v1')->group(function () {
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 4.1 | Create body systems hierarchy | Pending |
-| 4.2 | Add effectiveness ratings | Pending |
-| 4.3 | Implement intervention relationships | Pending |
-| 4.4 | Update knowledge graph visualization | Pending |
+| 4.1 | Create body systems hierarchy | ✅ Complete |
+| 4.2 | Add effectiveness ratings | ✅ Complete |
+| 4.3 | Implement intervention relationships | ✅ Complete |
+| 4.4 | Create Laravel models and API resources | ✅ Complete |
+| 4.5 | Add frontend API endpoints | ✅ Complete |
+| 4.6 | Create effectiveness rating editor UI | ✅ Complete |
+| 4.7 | Create intervention relationship editor UI | ✅ Complete |
+| 4.8 | Add body system selector to condition form | ✅ Complete |
+| 4.9 | Add translations (EN/FR) | ✅ Complete |
+| 4.10 | Update knowledge graph visualization | Pending |
 
 ### Phase 5: Export & API
 

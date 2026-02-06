@@ -59,7 +59,7 @@ class ConditionController extends Controller
 
     public function show(Condition $condition): ConditionResource
     {
-        $condition->load(['sections', 'interventions.careDomain', 'creator', 'updater']);
+        $condition->load(['sections', 'interventions.careDomain', 'bodySystem', 'creator', 'updater']);
 
         return new ConditionResource($condition);
     }
@@ -80,6 +80,7 @@ class ConditionController extends Controller
             'recipes',
             'egwReferences',
             'media' => fn($q) => $q->orderBy('order_index'),
+            'bodySystem',
             'creator',
             'updater',
         ]);
@@ -129,11 +130,12 @@ class ConditionController extends Controller
             'summary' => 'nullable|string',
             'snomed_code' => 'nullable|string|max:20',
             'icd10_code' => 'nullable|string|max:20',
+            'body_system_id' => 'nullable|uuid|exists:body_systems,id',
         ]);
 
         $condition = Condition::create($validated);
 
-        return new ConditionResource($condition);
+        return new ConditionResource($condition->load('bodySystem'));
     }
 
     public function update(Request $request, Condition $condition): ConditionResource
@@ -149,11 +151,12 @@ class ConditionController extends Controller
             'summary' => 'nullable|string',
             'snomed_code' => 'nullable|string|max:20',
             'icd10_code' => 'nullable|string|max:20',
+            'body_system_id' => 'nullable|uuid|exists:body_systems,id',
         ]);
 
         $condition->update($validated);
 
-        return new ConditionResource($condition);
+        return new ConditionResource($condition->load('bodySystem'));
     }
 
     public function destroy(Condition $condition): Response

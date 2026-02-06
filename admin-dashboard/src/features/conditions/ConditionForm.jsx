@@ -4,10 +4,10 @@ import { Save, Loader2, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
-import Breadcrumbs from '../../components/shared/Breadcrumbs';
+import { Breadcrumbs, BodySystemSelect } from '../../components/shared';
 
 const ConditionForm = () => {
-  const { t } = useTranslation(['conditions', 'common']);
+  const { t } = useTranslation(['conditions', 'common', 'knowledgeGraph']);
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -18,6 +18,7 @@ const ConditionForm = () => {
     summary: '',
     snomed_code: '',
     icd10_code: '',
+    body_system_id: null,
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -40,6 +41,7 @@ const ConditionForm = () => {
         summary: condition.summary || '',
         snomed_code: condition.snomed_code || '',
         icd10_code: condition.icd10_code || '',
+        body_system_id: condition.body_system_id || null,
       });
     } catch (error) {
       console.error('Error fetching condition:', error);
@@ -161,6 +163,20 @@ const ConditionForm = () => {
             {errors.category && (
               <p className="mt-1 text-sm text-red-500">{errors.category}</p>
             )}
+          </div>
+
+          {/* Body System */}
+          <div>
+            <label htmlFor="body_system_id" className="label">
+              {t('knowledgeGraph:bodySystems.title')}
+            </label>
+            <BodySystemSelect
+              value={formData.body_system_id}
+              onChange={(value) => setFormData((prev) => ({ ...prev, body_system_id: value }))}
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              {t('conditions:form.bodySystemHelp')}
+            </p>
           </div>
 
           {/* Summary */}

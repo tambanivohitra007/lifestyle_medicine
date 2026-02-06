@@ -13,6 +13,9 @@ use App\Http\Controllers\Api\EgwReferenceController;
 use App\Http\Controllers\Api\EvidenceEntryController;
 use App\Http\Controllers\Api\EvidenceSummaryController;
 use App\Http\Controllers\Api\ExportController;
+use App\Http\Controllers\Api\BodySystemController;
+use App\Http\Controllers\Api\InterventionEffectivenessController;
+use App\Http\Controllers\Api\InterventionRelationshipController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\InterventionController;
 use App\Http\Controllers\Api\InterventionProtocolController;
@@ -61,6 +64,11 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     // Care Domains
     Route::apiResource('care-domains', CareDomainController::class)->only(['index', 'show']);
 
+    // Body Systems (medical ontology)
+    Route::get('body-systems', [BodySystemController::class, 'index']);
+    Route::get('body-systems/{bodySystem}', [BodySystemController::class, 'show']);
+    Route::get('body-systems/{bodySystem}/categories', [BodySystemController::class, 'categories']);
+
     // Conditions
     Route::apiResource('conditions', ConditionController::class)->only(['index', 'show']);
     Route::get('conditions/{condition}/complete', [ConditionController::class, 'complete']); // All data in one request
@@ -81,6 +89,18 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('interventions/{intervention}/protocol', [InterventionProtocolController::class, 'show']);
     Route::get('interventions/{intervention}/contraindications', [InterventionProtocolController::class, 'contraindications']);
     Route::get('interventions/{intervention}/outcomes', [InterventionProtocolController::class, 'outcomes']);
+
+    // Intervention Effectiveness (read-only)
+    Route::get('effectiveness', [InterventionEffectivenessController::class, 'index']);
+    Route::get('conditions/{condition}/effectiveness', [InterventionEffectivenessController::class, 'forCondition']);
+    Route::get('interventions/{intervention}/effectiveness', [InterventionEffectivenessController::class, 'forIntervention']);
+    Route::get('conditions/{condition}/interventions/{intervention}/effectiveness', [InterventionEffectivenessController::class, 'forPair']);
+
+    // Intervention Relationships (read-only)
+    Route::get('intervention-relationships', [InterventionRelationshipController::class, 'index']);
+    Route::get('interventions/{intervention}/relationships', [InterventionRelationshipController::class, 'forIntervention']);
+    Route::get('interventions/{intervention}/synergies', [InterventionRelationshipController::class, 'synergies']);
+    Route::get('interventions/{intervention}/conflicts', [InterventionRelationshipController::class, 'conflicts']);
 
     // Evidence & References
     Route::apiResource('evidence-entries', EvidenceEntryController::class)->only(['index', 'show']);
@@ -133,6 +153,22 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
 
     // Care Domains
     Route::apiResource('care-domains', CareDomainController::class)->except(['index', 'show']);
+
+    // Body Systems
+    Route::apiResource('body-systems', BodySystemController::class)->except(['index', 'show']);
+    Route::post('body-systems/{bodySystem}/categories', [BodySystemController::class, 'storeCategory']);
+    Route::put('condition-categories/{category}', [BodySystemController::class, 'updateCategory']);
+    Route::delete('condition-categories/{category}', [BodySystemController::class, 'destroyCategory']);
+
+    // Intervention Effectiveness
+    Route::post('effectiveness', [InterventionEffectivenessController::class, 'store']);
+    Route::put('effectiveness/{effectiveness}', [InterventionEffectivenessController::class, 'update']);
+    Route::delete('effectiveness/{effectiveness}', [InterventionEffectivenessController::class, 'destroy']);
+
+    // Intervention Relationships
+    Route::post('intervention-relationships', [InterventionRelationshipController::class, 'store']);
+    Route::put('intervention-relationships/{relationship}', [InterventionRelationshipController::class, 'update']);
+    Route::delete('intervention-relationships/{relationship}', [InterventionRelationshipController::class, 'destroy']);
 
     // Conditions
     Route::apiResource('conditions', ConditionController::class)->except(['index', 'show']);
