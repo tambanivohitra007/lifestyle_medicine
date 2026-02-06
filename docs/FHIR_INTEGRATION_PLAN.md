@@ -638,7 +638,11 @@ Route::prefix('v1')->group(function () {
 | 4.7 | Create intervention relationship editor UI | ✅ Complete |
 | 4.8 | Add body system selector to condition form | ✅ Complete |
 | 4.9 | Add translations (EN/FR) | ✅ Complete |
-| 4.10 | Update knowledge graph visualization | Pending |
+| 4.10 | Update knowledge graph visualization | ✅ Complete |
+| 4.11 | Add intervention relationship edges | ✅ Complete |
+| 4.12 | Add effectiveness data to condition-intervention edges | ✅ Complete |
+| 4.13 | Update node details panel with body system/medical codes | ✅ Complete |
+| 4.14 | Add relationship legend to graph | ✅ Complete |
 
 ### Phase 5: Export & API
 

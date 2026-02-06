@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Condition;
 use App\Models\Intervention;
+use App\Models\InterventionRelationship;
+use App\Models\InterventionEffectiveness;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,6 +24,29 @@ class KnowledgeGraphController extends Controller
         'recipe' => '#f59e0b',         // Amber
         'evidenceEntry' => '#10b981',  // Emerald
         'reference' => '#64748b',      // Slate
+        'bodySystem' => '#0ea5e9',     // Sky blue
+    ];
+
+    /**
+     * Intervention relationship type colors.
+     */
+    protected const RELATIONSHIP_COLORS = [
+        'synergy' => '#10b981',        // Emerald - positive
+        'complementary' => '#22c55e',  // Green - positive
+        'neutral' => '#94a3b8',        // Slate - neutral
+        'caution' => '#f59e0b',        // Amber - warning
+        'conflict' => '#ef4444',       // Red - negative
+    ];
+
+    /**
+     * Effectiveness rating colors.
+     */
+    protected const EFFECTIVENESS_COLORS = [
+        'very_high' => '#059669',      // Emerald-600
+        'high' => '#16a34a',           // Green-600
+        'moderate' => '#ca8a04',       // Yellow-600
+        'low' => '#ea580c',            // Orange-600
+        'uncertain' => '#64748b',      // Slate-500
     ];
 
     /**
@@ -57,9 +82,17 @@ class KnowledgeGraphController extends Controller
             'scriptures',
             'recipes',
             'egwReferences',
+            'bodySystem',
+            'effectivenessRatings.intervention',
         ]);
 
         // Level 1: Direct relationships
+
+        // Build effectiveness lookup for quick access
+        $effectivenessLookup = [];
+        foreach ($condition->effectivenessRatings as $rating) {
+            $effectivenessLookup[$rating->intervention_id] = $rating;
+        }
 
         // Interventions
         foreach ($condition->interventions as $intervention) {
@@ -70,7 +103,9 @@ class KnowledgeGraphController extends Controller
                 $nodeIds[$interventionNodeId] = true;
             }
 
-            $edges[] = $this->createConditionInterventionEdge($condition, $intervention);
+            // Include effectiveness data if available
+            $effectiveness = $effectivenessLookup[$intervention->id] ?? null;
+            $edges[] = $this->createConditionInterventionEdge($condition, $intervention, $effectiveness);
 
             if ($depth >= 2) {
                 // Care Domain
@@ -205,12 +240,17 @@ class KnowledgeGraphController extends Controller
         // Load relationships
         $intervention->load([
             'careDomain',
-            'conditions',
+            'conditions.effectivenessRatings',
             'evidenceEntries.references',
             'scriptures',
             'recipes',
             'egwReferences',
         ]);
+
+        // Load intervention relationships (synergies and conflicts)
+        $relationships = InterventionRelationship::involving($intervention->id)
+            ->with(['interventionA', 'interventionB'])
+            ->get();
 
         // Care Domain
         if ($intervention->careDomain) {
@@ -230,10 +270,33 @@ class KnowledgeGraphController extends Controller
         foreach ($intervention->conditions as $condition) {
             $conditionNodeId = "condition-{$condition->id}";
             if (!isset($nodeIds[$conditionNodeId])) {
+                // Load body system for condition node
+                $condition->load('bodySystem');
                 $nodes[] = $this->createConditionNode($condition);
                 $nodeIds[$conditionNodeId] = true;
             }
-            $edges[] = $this->createConditionInterventionEdge($condition, $intervention);
+            // Find effectiveness rating for this condition-intervention pair
+            $effectiveness = $condition->effectivenessRatings
+                ->where('intervention_id', $intervention->id)
+                ->first();
+            $edges[] = $this->createConditionInterventionEdge($condition, $intervention, $effectiveness);
+        }
+
+        // Intervention Relationships (synergies, conflicts, etc.)
+        foreach ($relationships as $relationship) {
+            // Get the other intervention in the relationship
+            $otherIntervention = $relationship->intervention_a_id === $intervention->id
+                ? $relationship->interventionB
+                : $relationship->interventionA;
+
+            if (!$otherIntervention) continue;
+
+            $otherNodeId = "intervention-{$otherIntervention->id}";
+            if (!isset($nodeIds[$otherNodeId])) {
+                $nodes[] = $this->createInterventionNode($otherIntervention);
+                $nodeIds[$otherNodeId] = true;
+            }
+            $edges[] = $this->createInterventionRelationshipEdge($relationship);
         }
 
         // Evidence Entries
@@ -584,6 +647,14 @@ class KnowledgeGraphController extends Controller
                 'entityId' => $condition->id,
                 'category' => $condition->category,
                 'summary' => $condition->summary,
+                'snomedCode' => $condition->snomed_code,
+                'icd10Code' => $condition->icd10_code,
+                'bodySystem' => $condition->bodySystem ? [
+                    'id' => $condition->bodySystem->id,
+                    'name' => $condition->bodySystem->name,
+                    'icon' => $condition->bodySystem->icon,
+                    'color' => $condition->bodySystem->color,
+                ] : null,
                 'isCenter' => $isCenter,
                 'color' => self::NODE_COLORS['condition'],
             ],
@@ -711,22 +782,68 @@ class KnowledgeGraphController extends Controller
 
     // ==================== Edge Creators ====================
 
-    protected function createConditionInterventionEdge($condition, $intervention): array
+    protected function createConditionInterventionEdge($condition, $intervention, $effectiveness = null): array
     {
         $pivot = $intervention->pivot;
         $strength = $pivot?->strength_of_evidence ?? 'emerging';
         $recommendation = $pivot?->recommendation_level ?? 'optional';
+
+        // Get effectiveness rating if available
+        $effectivenessData = null;
+        if ($effectiveness) {
+            $effectivenessData = [
+                'rating' => $effectiveness->effectiveness_rating,
+                'evidenceGrade' => $effectiveness->evidence_grade,
+                'isPrimary' => $effectiveness->is_primary,
+                'score' => $effectiveness->effectiveness_score,
+            ];
+        }
 
         return [
             'id' => "edge-cond-int-{$condition->id}-{$intervention->id}",
             'source' => "condition-{$condition->id}",
             'target' => "intervention-{$intervention->id}",
             'type' => 'condition-intervention', // Custom edge type with metadata display
-            'animated' => $strength === 'high',
+            'animated' => $strength === 'high' || ($effectiveness && $effectiveness->effectiveness_rating === 'very_high'),
             'data' => [
                 'strengthOfEvidence' => $strength,
                 'recommendationLevel' => $recommendation,
                 'clinicalNotes' => $pivot?->clinical_notes,
+                'effectiveness' => $effectivenessData,
+            ],
+            'style' => $effectivenessData ? [
+                'stroke' => self::EFFECTIVENESS_COLORS[$effectiveness->effectiveness_rating] ?? '#94a3b8',
+                'strokeWidth' => $effectiveness->is_primary ? 3 : 2,
+            ] : null,
+        ];
+    }
+
+    /**
+     * Create an edge for intervention relationships (synergies/conflicts).
+     */
+    protected function createInterventionRelationshipEdge($relationship): array
+    {
+        $type = $relationship->relationship_type;
+        $isPositive = in_array($type, ['synergy', 'complementary']);
+        $isNegative = in_array($type, ['caution', 'conflict']);
+
+        return [
+            'id' => "edge-int-rel-{$relationship->id}",
+            'source' => "intervention-{$relationship->intervention_a_id}",
+            'target' => "intervention-{$relationship->intervention_b_id}",
+            'type' => 'intervention-relationship',
+            'animated' => $type === 'synergy',
+            'data' => [
+                'relationshipType' => $type,
+                'isPositive' => $isPositive,
+                'isNegative' => $isNegative,
+                'description' => $relationship->description,
+                'clinicalNotes' => $relationship->clinical_notes,
+            ],
+            'style' => [
+                'stroke' => self::RELATIONSHIP_COLORS[$type] ?? '#94a3b8',
+                'strokeWidth' => ($type === 'synergy' || $type === 'conflict') ? 3 : 2,
+                'strokeDasharray' => $isNegative ? '5,5' : null,
             ],
         ];
     }

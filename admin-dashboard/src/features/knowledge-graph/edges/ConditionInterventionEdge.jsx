@@ -38,6 +38,14 @@ const RECOMMENDATION_CONFIG = {
   optional: { label: 'Optional', color: '#9ca3af', bg: 'bg-gray-100' },
 };
 
+const EFFECTIVENESS_CONFIG = {
+  very_high: { label: 'Very High', color: '#059669', bg: 'bg-emerald-100', icon: '★★★★★' },
+  high: { label: 'High', color: '#16a34a', bg: 'bg-green-100', icon: '★★★★☆' },
+  moderate: { label: 'Moderate', color: '#ca8a04', bg: 'bg-yellow-100', icon: '★★★☆☆' },
+  low: { label: 'Low', color: '#ea580c', bg: 'bg-orange-100', icon: '★★☆☆☆' },
+  uncertain: { label: 'Uncertain', color: '#64748b', bg: 'bg-slate-100', icon: '?' },
+};
+
 const ConditionInterventionEdge = memo(({
   id,
   sourceX,
@@ -55,9 +63,17 @@ const ConditionInterventionEdge = memo(({
   const strength = data?.strengthOfEvidence || 'emerging';
   const recommendation = data?.recommendationLevel || 'optional';
   const clinicalNotes = data?.clinicalNotes;
+  const effectiveness = data?.effectiveness;
 
   const config = STRENGTH_CONFIG[strength] || STRENGTH_CONFIG.emerging;
   const recConfig = RECOMMENDATION_CONFIG[recommendation] || RECOMMENDATION_CONFIG.optional;
+  const effConfig = effectiveness ? (EFFECTIVENESS_CONFIG[effectiveness.rating] || EFFECTIVENESS_CONFIG.uncertain) : null;
+
+  // Use effectiveness color if available and significant
+  const displayConfig = effConfig && ['very_high', 'high'].includes(effectiveness.rating) ? {
+    ...config,
+    color: effConfig.color,
+  } : config;
 
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
@@ -77,23 +93,34 @@ const ConditionInterventionEdge = memo(({
         path={edgePath}
         markerEnd={markerEnd}
         style={{
-          stroke: config.color,
-          strokeWidth: selected ? config.strokeWidth + 1 : config.strokeWidth,
+          stroke: displayConfig.color,
+          strokeWidth: selected ? displayConfig.strokeWidth + 1 : displayConfig.strokeWidth,
           filter: selected ? 'drop-shadow(0 0 4px rgba(0,0,0,0.3))' : undefined,
         }}
-        className={config.animated ? 'animated-edge' : ''}
+        className={displayConfig.animated ? 'animated-edge' : ''}
       />
 
-      {/* Animated dash overlay for high strength */}
-      {config.animated && (
+      {/* Animated dash overlay for high strength or very high effectiveness */}
+      {(displayConfig.animated || (effectiveness?.rating === 'very_high')) && (
         <path
           d={edgePath}
           fill="none"
-          stroke={config.color}
-          strokeWidth={config.strokeWidth}
+          stroke={displayConfig.color}
+          strokeWidth={displayConfig.strokeWidth}
           strokeDasharray="5,5"
           className="animate-dash"
           style={{ opacity: 0.6 }}
+        />
+      )}
+
+      {/* Primary intervention indicator */}
+      {effectiveness?.isPrimary && (
+        <path
+          d={edgePath}
+          fill="none"
+          stroke={displayConfig.color}
+          strokeWidth={displayConfig.strokeWidth + 2}
+          strokeOpacity={0.3}
         />
       )}
 
@@ -116,18 +143,20 @@ const ConditionInterventionEdge = memo(({
               bg-white shadow-md border-2 cursor-pointer transition-all
               hover:scale-110 hover:shadow-lg
               ${selected ? 'ring-2 ring-offset-1' : ''}
+              ${effectiveness?.isPrimary ? 'ring-2 ring-purple-400' : ''}
             `}
             style={{
-              borderColor: config.color,
-              color: config.color,
-              ringColor: config.color,
+              borderColor: displayConfig.color,
+              color: displayConfig.color,
+              ringColor: displayConfig.color,
             }}
           >
+            {effectiveness?.isPrimary && <span className="text-purple-500">★</span>}
             <span
               className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: config.color }}
+              style={{ backgroundColor: displayConfig.color }}
             />
-            {config.label}
+            {effConfig ? effConfig.label : config.label}
           </div>
 
           {/* Tooltip */}
@@ -166,6 +195,34 @@ const ConditionInterventionEdge = memo(({
                     {recConfig.label}
                   </span>
                 </div>
+
+                {/* Effectiveness (if available) */}
+                {effConfig && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-gray-500">Effectiveness:</span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${effConfig.bg}`}
+                        style={{ color: effConfig.color }}
+                      >
+                        {effConfig.label}
+                      </span>
+                    </div>
+                    {effectiveness?.isPrimary && (
+                      <div className="flex items-center gap-1 text-[10px] text-purple-600 font-medium">
+                        <span>★</span> Primary Intervention
+                      </div>
+                    )}
+                    {effectiveness?.evidenceGrade && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-gray-500">GRADE:</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-700">
+                          Grade {effectiveness.evidenceGrade}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
 
                 {/* Clinical Notes */}
                 {clinicalNotes && (

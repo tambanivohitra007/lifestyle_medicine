@@ -12,6 +12,13 @@ const LEGEND_ITEMS_CONFIG = [
   { type: 'reference', labelKey: 'knowledgeGraph:nodes.reference', color: '#64748b' },
 ];
 
+const RELATIONSHIP_LEGEND = [
+  { type: 'synergy', labelKey: 'knowledgeGraph:relationships.types.synergy', color: '#10b981', icon: '⚡' },
+  { type: 'complementary', labelKey: 'knowledgeGraph:relationships.types.complementary', color: '#22c55e', icon: '✓' },
+  { type: 'caution', labelKey: 'knowledgeGraph:relationships.types.caution', color: '#f59e0b', icon: '⚠' },
+  { type: 'conflict', labelKey: 'knowledgeGraph:relationships.types.conflict', color: '#ef4444', icon: '✕' },
+];
+
 /**
  * Interactive legend that allows toggling visibility of node types.
  * Click on an item to toggle its visibility.
@@ -58,6 +65,25 @@ const InteractiveLegend = memo(({ hiddenTypes = [], onToggleType }) => {
           {t('knowledgeGraph:legend.typesHidden', { count: hiddenTypes.length })}
         </div>
       )}
+
+      {/* Relationship Legend */}
+      <div className="mt-3 pt-3 border-t border-gray-100">
+        <div className="text-[10px] font-medium text-gray-600 mb-1.5">
+          {t('knowledgeGraph:relationships.title')}
+        </div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[9px]">
+          {RELATIONSHIP_LEGEND.map((item) => (
+            <div key={item.type} className="flex items-center gap-1.5">
+              <span className="text-xs">{item.icon}</span>
+              <div
+                className="w-6 h-0.5 rounded"
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="text-gray-600">{t(item.labelKey)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 });

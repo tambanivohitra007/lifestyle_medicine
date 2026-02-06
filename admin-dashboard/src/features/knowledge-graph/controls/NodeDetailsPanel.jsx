@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { X, ExternalLink, AlertCircle, Pill, BookOpen, UtensilsCrossed, FileText, Quote, FlaskConical, Heart } from 'lucide-react';
+import { X, ExternalLink, AlertCircle, Pill, BookOpen, UtensilsCrossed, FileText, Quote, FlaskConical, Heart, Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const NODE_TYPE_CONFIG = {
@@ -67,6 +67,50 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
     <>
       {data.category && (
         <DetailRow label={t('knowledgeGraph:details.category')} value={data.category} />
+      )}
+      {data.bodySystem && (
+        <div className="flex items-center justify-between py-2 border-b border-gray-50">
+          <span className="text-xs text-gray-500">{t('knowledgeGraph:bodySystems.title')}</span>
+          <span
+            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full"
+            style={{
+              backgroundColor: data.bodySystem.color ? `${data.bodySystem.color}20` : '#f1f5f9',
+              color: data.bodySystem.color || '#475569',
+            }}
+          >
+            {data.bodySystem.icon && <span>{data.bodySystem.icon}</span>}
+            {data.bodySystem.name}
+          </span>
+        </div>
+      )}
+      {(data.snomedCode || data.icd10Code) && (
+        <div className="py-2 border-b border-gray-50">
+          <div className="text-xs text-gray-500 mb-1">Medical Codes</div>
+          <div className="flex flex-wrap gap-1">
+            {data.snomedCode && (
+              <a
+                href={`https://browser.ihtsdotools.org/?perspective=full&conceptId1=${data.snomedCode}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
+              >
+                SNOMED: {data.snomedCode}
+                <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            )}
+            {data.icd10Code && (
+              <a
+                href={`https://www.icd10data.com/ICD10CM/Codes/${data.icd10Code}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors"
+              >
+                ICD-10: {data.icd10Code}
+                <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            )}
+          </div>
+        </div>
       )}
       {data.summary && (
         <DetailSection label={t('knowledgeGraph:details.summary')} value={data.summary} />
