@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Save, Loader2 } from 'lucide-react';
+import { Save, Loader2, ExternalLink } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
@@ -163,36 +163,81 @@ const ReferenceForm = () => {
             />
           </div>
 
-          {/* DOI */}
-          <div>
-            <label htmlFor="doi" className="label">
-              DOI
-            </label>
-            <input
-              type="text"
-              id="doi"
-              name="doi"
-              value={formData.doi}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="e.g., 10.1000/xyz123"
-            />
-          </div>
+          {/* DOI & PMID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* DOI */}
+            <div>
+              <label htmlFor="doi" className="label">
+                DOI
+              </label>
+              <input
+                type="text"
+                id="doi"
+                name="doi"
+                value={formData.doi}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., 10.1000/xyz123"
+              />
+              <div className="mt-1 flex items-center gap-3">
+                {formData.doi && (
+                  <a
+                    href={`https://doi.org/${formData.doi}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700"
+                  >
+                    View article
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+                <a
+                  href="https://www.doi.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+                >
+                  What is DOI?
+                </a>
+              </div>
+            </div>
 
-          {/* PMID */}
-          <div>
-            <label htmlFor="pmid" className="label">
-              PubMed ID (PMID)
-            </label>
-            <input
-              type="text"
-              id="pmid"
-              name="pmid"
-              value={formData.pmid}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="e.g., 12345678"
-            />
+            {/* PMID */}
+            <div>
+              <label htmlFor="pmid" className="label">
+                PubMed ID (PMID)
+              </label>
+              <input
+                type="text"
+                id="pmid"
+                name="pmid"
+                value={formData.pmid}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., 12345678"
+              />
+              <div className="mt-1 flex items-center gap-3">
+                {formData.pmid && (
+                  <a
+                    href={`https://pubmed.ncbi.nlm.nih.gov/${formData.pmid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700"
+                  >
+                    View on PubMed
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+                <a
+                  href="https://pubmed.ncbi.nlm.nih.gov/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+                >
+                  Search PubMed
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* URL */}

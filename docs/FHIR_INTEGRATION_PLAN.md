@@ -600,8 +600,8 @@ Route::prefix('v1')->group(function () {
 | 1.2 | Add SNOMED field to interventions table | ✅ Complete |
 | 1.3 | Update condition form with code fields | ✅ Complete |
 | 1.4 | Update intervention form with code field | ✅ Complete |
-| 1.5 | Add DOI/PubMed fields to evidence | Pending |
-| 1.6 | Create SNOMED code lookup helper | Pending |
+| 1.5 | Add DOI/PubMed fields to evidence | ✅ Complete |
+| 1.6 | Create SNOMED code lookup helper | ✅ Complete (external links) |
 
 ### Phase 2: Structured Protocols
 

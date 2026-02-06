@@ -18,9 +18,14 @@ class EvidenceEntry extends Model
         'intervention_id',
         'study_type',
         'population',
+        'sample_size',
         'quality_rating',
         'summary',
         'notes',
+    ];
+
+    protected $casts = [
+        'sample_size' => 'integer',
     ];
 
     /**

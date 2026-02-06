@@ -54,8 +54,9 @@ class EvidenceEntryController extends Controller
     {
         $validated = $request->validate([
             'intervention_id' => 'required|exists:interventions,id',
-            'study_type' => 'required|in:rct,meta_analysis,systematic_review,observational,case_series,expert_opinion',
+            'study_type' => 'required|in:meta_analysis,systematic_review,rct,cohort,case_control,cross_sectional,case_series,case_report,observational,expert_opinion',
             'population' => 'nullable|string|max:255',
+            'sample_size' => 'nullable|integer|min:1',
             'quality_rating' => 'nullable|in:A,B,C,D',
             'summary' => 'required|string',
             'notes' => 'nullable|string',
@@ -79,8 +80,9 @@ class EvidenceEntryController extends Controller
     {
         $validated = $request->validate([
             'intervention_id' => 'sometimes|required|exists:interventions,id',
-            'study_type' => 'sometimes|required|in:rct,meta_analysis,systematic_review,observational,case_series,expert_opinion',
+            'study_type' => 'sometimes|required|in:meta_analysis,systematic_review,rct,cohort,case_control,cross_sectional,case_series,case_report,observational,expert_opinion',
             'population' => 'nullable|string|max:255',
+            'sample_size' => 'nullable|integer|min:1',
             'quality_rating' => 'nullable|in:A,B,C,D',
             'summary' => 'sometimes|required|string',
             'notes' => 'nullable|string',

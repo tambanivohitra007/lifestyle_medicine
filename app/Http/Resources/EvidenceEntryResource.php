@@ -15,6 +15,7 @@ class EvidenceEntryResource extends JsonResource
             'intervention' => new InterventionResource($this->whenLoaded('intervention')),
             'study_type' => $this->study_type,
             'population' => $this->population,
+            'sample_size' => $this->sample_size,
             'quality_rating' => $this->quality_rating,
             'summary' => $this->summary,
             'notes' => $this->notes,

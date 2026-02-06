@@ -61,7 +61,11 @@
     "citationRequired": "Citation is required"
   },
   "labels": {
-    "link": "Link"
+    "link": "Link",
+    "viewArticle": "View article",
+    "viewOnPubMed": "View on PubMed",
+    "searchPubMed": "Search PubMed",
+    "whatIsDoi": "What is DOI?"
   },
   "types": {
     "journal": "Journal Article",

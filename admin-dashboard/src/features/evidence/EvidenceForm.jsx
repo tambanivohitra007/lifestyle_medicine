@@ -6,12 +6,16 @@ import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const STUDY_TYPES = [
-  { value: 'rct', label: 'Randomized Controlled Trial' },
-  { value: 'meta_analysis', label: 'Meta-Analysis' },
-  { value: 'systematic_review', label: 'Systematic Review' },
-  { value: 'observational', label: 'Observational Study' },
-  { value: 'case_series', label: 'Case Series' },
-  { value: 'expert_opinion', label: 'Expert Opinion' },
+  { value: 'meta_analysis', label: 'Meta-Analysis', tier: 1 },
+  { value: 'systematic_review', label: 'Systematic Review', tier: 1 },
+  { value: 'rct', label: 'Randomized Controlled Trial', tier: 2 },
+  { value: 'cohort', label: 'Cohort Study', tier: 3 },
+  { value: 'case_control', label: 'Case-Control Study', tier: 3 },
+  { value: 'cross_sectional', label: 'Cross-Sectional Study', tier: 3 },
+  { value: 'observational', label: 'Observational Study', tier: 3 },
+  { value: 'case_series', label: 'Case Series', tier: 4 },
+  { value: 'case_report', label: 'Case Report', tier: 4 },
+  { value: 'expert_opinion', label: 'Expert Opinion', tier: 5 },
 ];
 
 const QUALITY_RATINGS = [
@@ -30,6 +34,7 @@ const EvidenceForm = () => {
     intervention_id: '',
     study_type: '',
     population: '',
+    sample_size: '',
     quality_rating: '',
     summary: '',
     notes: '',
@@ -69,6 +74,7 @@ const EvidenceForm = () => {
         intervention_id: evidence.intervention_id || '',
         study_type: evidence.study_type || '',
         population: evidence.population || '',
+        sample_size: evidence.sample_size || '',
         quality_rating: evidence.quality_rating || '',
         summary: evidence.summary || '',
         notes: evidence.notes || '',
@@ -222,20 +228,37 @@ const EvidenceForm = () => {
             </div>
           </div>
 
-          {/* Population */}
-          <div>
-            <label htmlFor="population" className="label">
-              Study Population
-            </label>
-            <input
-              type="text"
-              id="population"
-              name="population"
-              value={formData.population}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="e.g., Adults with Type 2 Diabetes"
-            />
+          {/* Population & Sample Size */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <label htmlFor="population" className="label">
+                Study Population
+              </label>
+              <input
+                type="text"
+                id="population"
+                name="population"
+                value={formData.population}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., Adults with Type 2 Diabetes"
+              />
+            </div>
+            <div>
+              <label htmlFor="sample_size" className="label">
+                Sample Size (n)
+              </label>
+              <input
+                type="number"
+                id="sample_size"
+                name="sample_size"
+                value={formData.sample_size}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g., 500"
+                min="1"
+              />
+            </div>
           </div>
 
           {/* Summary */}
