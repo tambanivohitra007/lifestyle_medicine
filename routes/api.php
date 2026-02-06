@@ -145,6 +145,11 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         // CSV Exports (public)
         Route::get('export/evidence/csv', [ExportController::class, 'evidenceCsv']);
         Route::get('export/references/csv', [ExportController::class, 'referencesCsv']);
+
+        // FHIR R4 Exports (public)
+        Route::get('export/fhir/metadata', [ExportController::class, 'fhirCapabilityStatement']);
+        Route::get('export/fhir/PlanDefinition/{condition}', [ExportController::class, 'conditionFhir']);
+        Route::get('export/fhir/ActivityDefinition/{intervention}', [ExportController::class, 'interventionFhir']);
     });
 });
 

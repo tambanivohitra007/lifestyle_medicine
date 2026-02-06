@@ -141,6 +141,80 @@
             background: #fee2e2;
             color: #991b1b;
         }
+        .badge-effectiveness {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .badge-effectiveness-very_high { background: #d1fae5; color: #065f46; }
+        .badge-effectiveness-high { background: #dcfce7; color: #166534; }
+        .badge-effectiveness-moderate { background: #fef3c7; color: #92400e; }
+        .badge-effectiveness-low { background: #ffedd5; color: #9a3412; }
+        .badge-effectiveness-uncertain { background: #f1f5f9; color: #475569; }
+        .badge-primary {
+            background: #f3e8ff;
+            color: #7c3aed;
+            font-size: 8px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        .medical-codes {
+            margin-top: 10px;
+            padding: 8px;
+            background: #f8fafc;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+        .medical-codes span {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 8px;
+            color: #475569;
+        }
+        .protocol-steps {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0fdf4;
+            border-radius: 6px;
+            border: 1px solid #bbf7d0;
+        }
+        .protocol-step {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .protocol-step:before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: #16a34a;
+            font-size: 10px;
+        }
+        .protocol-step-title {
+            font-weight: bold;
+            font-size: 11px;
+            color: #166534;
+        }
+        .contraindication-box {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+            padding: 8px 12px;
+            margin-top: 10px;
+            font-size: 10px;
+        }
+        .outcome-item {
+            background: #eff6ff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 10px;
+        }
         .domain-header {
             background: #fef2f2;
             padding: 10px 15px;
@@ -300,9 +374,22 @@
             @if($condition->category)
                 <div class="category">{{ $condition->category }}</div>
             @endif
+            @if($condition->bodySystem)
+                <div class="category" style="margin-left: 5px;">{{ $condition->bodySystem->icon ?? '' }} {{ $condition->bodySystem->name }}</div>
+            @endif
         </div>
         @if($condition->summary)
             <div class="summary">{{ strip_tags($condition->summary) }}</div>
+        @endif
+        @if($condition->snomed_code || $condition->icd10_code)
+            <div class="medical-codes" style="margin-top: 12px; background: rgba(255,255,255,0.15); padding: 8px; border-radius: 4px;">
+                @if($condition->snomed_code)
+                    <span style="background: rgba(255,255,255,0.2); color: white;">SNOMED: {{ $condition->snomed_code }}</span>
+                @endif
+                @if($condition->icd10_code)
+                    <span style="background: rgba(255,255,255,0.2); color: white;">ICD-10: {{ $condition->icd10_code }}</span>
+                @endif
+            </div>
         @endif
     </div>
 
@@ -380,9 +467,22 @@
                 <div class="domain-header">{{ $domainName }}</div>
 
                 @foreach($interventions as $intervention)
+                    @php
+                        $effectiveness = isset($effectivenessLookup) ? $effectivenessLookup->get($intervention->id) : null;
+                    @endphp
                     <div class="intervention-item">
                         <div class="card">
-                            <div class="card-title">{{ $intervention->name }}</div>
+                            <div class="card-title">
+                                {{ $intervention->name }}
+                                @if($effectiveness)
+                                    <span class="badge-effectiveness badge-effectiveness-{{ $effectiveness->effectiveness_rating }}">
+                                        {{ ucwords(str_replace('_', ' ', $effectiveness->effectiveness_rating)) }}
+                                    </span>
+                                    @if($effectiveness->is_primary)
+                                        <span class="badge-primary">★ Primary</span>
+                                    @endif
+                                @endif
+                            </div>
 
                             @if($intervention->description)
                                 <div class="card-content" style="margin-top: 10px;">
@@ -394,6 +494,67 @@
                                 <div style="margin-top: 10px;">
                                     <strong style="font-size: 11px; color: #374151;">Mechanism of Action:</strong>
                                     <div class="card-content">{{ $intervention->mechanism }}</div>
+                                </div>
+                            @endif
+
+                            {{-- Protocol Steps --}}
+                            @if($intervention->protocol && $intervention->protocol->steps && $intervention->protocol->steps->count() > 0)
+                                <div class="protocol-steps">
+                                    <strong style="font-size: 11px; color: #166534;">Protocol Steps:</strong>
+                                    @if($intervention->protocol->duration_weeks)
+                                        <span style="font-size: 9px; color: #16a34a; margin-left: 10px;">
+                                            Duration: {{ $intervention->protocol->duration_weeks }} weeks
+                                        </span>
+                                    @endif
+                                    @foreach($intervention->protocol->steps->sortBy('step_number') as $step)
+                                        <div class="protocol-step" data-step="{{ $step->step_number }}.">
+                                            <div class="protocol-step-title">{{ $step->title }}</div>
+                                            @if($step->description)
+                                                <div style="font-size: 10px; color: #4b5563;">{{ $step->description }}</div>
+                                            @endif
+                                            @if($step->duration_minutes)
+                                                <div style="font-size: 9px; color: #6b7280;">Duration: {{ $step->duration_minutes }} min</div>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            {{-- Expected Outcomes --}}
+                            @if($intervention->outcomes && $intervention->outcomes->count() > 0)
+                                <div style="margin-top: 10px;">
+                                    <strong style="font-size: 11px; color: #1e40af;">Expected Outcomes:</strong>
+                                    @foreach($intervention->outcomes as $outcome)
+                                        <div class="outcome-item">
+                                            <strong>{{ $outcome->outcome_measure }}</strong>
+                                            @if($outcome->expected_change)
+                                                : {{ $outcome->expected_change }}
+                                            @endif
+                                            @if($outcome->timeline_weeks)
+                                                <span style="color: #3b82f6;">({{ $outcome->timeline_weeks }} weeks)</span>
+                                            @endif
+                                            @if($outcome->evidence_grade)
+                                                <span class="badge badge-quality-{{ $outcome->evidence_grade }}" style="margin-left: 5px;">
+                                                    Grade {{ $outcome->evidence_grade }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            {{-- Contraindications --}}
+                            @if($intervention->contraindications && $intervention->contraindications->count() > 0)
+                                <div class="contraindication-box">
+                                    <strong style="color: #dc2626;">⚠ Contraindications:</strong>
+                                    @foreach($intervention->contraindications as $contra)
+                                        <div style="margin-top: 5px;">
+                                            <span style="font-weight: bold; text-transform: uppercase; font-size: 8px; color: {{ $contra->severity === 'absolute' ? '#dc2626' : ($contra->severity === 'relative' ? '#f59e0b' : '#6b7280') }};">
+                                                [{{ $contra->severity }}]
+                                            </span>
+                                            {{ $contra->description }}
+                                        </div>
+                                    @endforeach
                                 </div>
                             @endif
 
