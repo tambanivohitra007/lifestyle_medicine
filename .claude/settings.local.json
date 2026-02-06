@@ -60,7 +60,10 @@
       "Bash(node:*)",
       "Bash(git checkout:*)",
       "WebFetch(domain:reactflow.dev)",
-      "Bash(git merge feature/condition-mindmap --no-ff -m \"$\\(cat <<''EOF''\nMerge branch ''feature/condition-mindmap''\n\nNotebookLM-style expandable mindmap for health conditions featuring:\n- Hierarchical expand/collapse nodes \\(master categories -> sections -> items\\)\n- Node collision resolution using ReactFlow patterns\n- User-dragged node positions preserved across expansions\n- Category filter panel to show/hide sections and solutions\n- Step/orthogonal edges with rounded corners\n- High-resolution PNG export \\(4x pixel ratio\\)\n- Viewport auto-focus on expanded nodes\n- Node origin centering for better alignment\n- Side panel for node details on double-click\nEOF\n\\)\")"
+      "Bash(git merge feature/condition-mindmap --no-ff -m \"$\\(cat <<''EOF''\nMerge branch ''feature/condition-mindmap''\n\nNotebookLM-style expandable mindmap for health conditions featuring:\n- Hierarchical expand/collapse nodes \\(master categories -> sections -> items\\)\n- Node collision resolution using ReactFlow patterns\n- User-dragged node positions preserved across expansions\n- Category filter panel to show/hide sections and solutions\n- Step/orthogonal edges with rounded corners\n- High-resolution PNG export \\(4x pixel ratio\\)\n- Viewport auto-focus on expanded nodes\n- Node origin centering for better alignment\n- Side panel for node details on double-click\nEOF\n\\)\")",
+      "WebFetch(domain:www.fhir.org)",
+      "WebFetch(domain:registry.fhir.org)",
+      "WebFetch(domain:build.fhir.org)"
     ]
   }
 }

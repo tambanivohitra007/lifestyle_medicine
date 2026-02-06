@@ -59,6 +59,7 @@ class InterventionController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'mechanism' => 'nullable|string',
+            'snomed_code' => 'nullable|string|max:20',
             'tag_ids' => 'nullable|array',
             'tag_ids.*' => 'exists:content_tags,id',
         ]);
@@ -82,6 +83,7 @@ class InterventionController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'mechanism' => 'nullable|string',
+            'snomed_code' => 'nullable|string|max:20',
             'tag_ids' => 'nullable|array',
             'tag_ids.*' => 'exists:content_tags,id',
         ]);

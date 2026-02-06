@@ -20,6 +20,8 @@ class Condition extends Model
         'name',
         'category',
         'summary',
+        'snomed_code',
+        'icd10_code',
     ];
 
     /**

@@ -19,6 +19,8 @@ class ConditionResource extends JsonResource
             'name' => $this->name,
             'category' => $this->category,
             'summary' => $this->summary,
+            'snomed_code' => $this->snomed_code,
+            'icd10_code' => $this->icd10_code,
             'sections' => ConditionSectionResource::collection($this->whenLoaded('sections')),
             'interventions' => InterventionResource::collection($this->whenLoaded('interventions')),
             'scriptures' => ScriptureResource::collection($this->whenLoaded('scriptures')),

@@ -16,6 +16,7 @@ class InterventionResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'mechanism' => $this->mechanism,
+            'snomed_code' => $this->snomed_code,
             'evidence_entries' => EvidenceEntryResource::collection($this->whenLoaded('evidenceEntries')),
             'tags' => ContentTagResource::collection($this->whenLoaded('tags')),
             'media' => MediaResource::collection($this->whenLoaded('media')),

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Save, Loader2 } from 'lucide-react';
+import { Save, Loader2, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
@@ -16,6 +16,8 @@ const ConditionForm = () => {
     name: '',
     category: '',
     summary: '',
+    snomed_code: '',
+    icd10_code: '',
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -36,6 +38,8 @@ const ConditionForm = () => {
         name: condition.name || '',
         category: condition.category || '',
         summary: condition.summary || '',
+        snomed_code: condition.snomed_code || '',
+        icd10_code: condition.icd10_code || '',
       });
     } catch (error) {
       console.error('Error fetching condition:', error);
@@ -176,6 +180,70 @@ const ConditionForm = () => {
             {errors.summary && (
               <p className="mt-1 text-sm text-red-500">{errors.summary}</p>
             )}
+          </div>
+
+          {/* Medical Codes Section */}
+          <div className="pt-4 border-t border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">
+              {t('conditions:form.medicalCodes')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* SNOMED CT Code */}
+              <div>
+                <label htmlFor="snomed_code" className="label">
+                  {t('conditions:form.snomedCode')}
+                </label>
+                <input
+                  type="text"
+                  id="snomed_code"
+                  name="snomed_code"
+                  value={formData.snomed_code}
+                  onChange={handleChange}
+                  className={`input-field ${errors.snomed_code ? 'border-red-500' : ''}`}
+                  placeholder={t('conditions:form.snomedCodePlaceholder')}
+                />
+                <a
+                  href="https://browser.ihtsdotools.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700"
+                >
+                  {t('conditions:form.lookupSnomed')}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+                {errors.snomed_code && (
+                  <p className="mt-1 text-sm text-red-500">{errors.snomed_code}</p>
+                )}
+              </div>
+
+              {/* ICD-10 Code */}
+              <div>
+                <label htmlFor="icd10_code" className="label">
+                  {t('conditions:form.icd10Code')}
+                </label>
+                <input
+                  type="text"
+                  id="icd10_code"
+                  name="icd10_code"
+                  value={formData.icd10_code}
+                  onChange={handleChange}
+                  className={`input-field ${errors.icd10_code ? 'border-red-500' : ''}`}
+                  placeholder={t('conditions:form.icd10CodePlaceholder')}
+                />
+                <a
+                  href="https://www.icd10data.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700"
+                >
+                  {t('conditions:form.lookupIcd10')}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+                {errors.icd10_code && (
+                  <p className="mt-1 text-sm text-red-500">{errors.icd10_code}</p>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Actions */}

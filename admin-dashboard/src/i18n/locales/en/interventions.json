@@ -66,7 +66,11 @@
     "dosage": "Dosage/Frequency",
     "duration": "Duration",
     "evidenceLevel": "Evidence Level",
-    "status": "Status"
+    "status": "Status",
+    "medicalCoding": "Medical Coding",
+    "snomedCode": "SNOMED CT Code",
+    "snomedCodePlaceholder": "e.g., 229065009",
+    "lookupSnomed": "Look up SNOMED codes"
   },
   "types": {
     "dietary": "Dietary",

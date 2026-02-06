@@ -127,6 +127,8 @@ class ConditionController extends Controller
             ],
             'category' => 'nullable|string|max:255',
             'summary' => 'nullable|string',
+            'snomed_code' => 'nullable|string|max:20',
+            'icd10_code' => 'nullable|string|max:20',
         ]);
 
         $condition = Condition::create($validated);
@@ -145,6 +147,8 @@ class ConditionController extends Controller
             ],
             'category' => 'nullable|string|max:255',
             'summary' => 'nullable|string',
+            'snomed_code' => 'nullable|string|max:20',
+            'icd10_code' => 'nullable|string|max:20',
         ]);
 
         $condition->update($validated);

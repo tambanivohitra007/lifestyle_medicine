@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Save, Loader2, Image } from 'lucide-react';
+import { Save, Loader2, Image, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
@@ -18,6 +18,7 @@ const InterventionForm = () => {
     name: '',
     description: '',
     mechanism: '',
+    snomed_code: '',
   });
   const [media, setMedia] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
@@ -56,6 +57,7 @@ const InterventionForm = () => {
         name: intervention.name || '',
         description: intervention.description || '',
         mechanism: intervention.mechanism || '',
+        snomed_code: intervention.snomed_code || '',
       });
       setMedia(intervention.media || []);
     } catch (error) {
@@ -241,6 +243,41 @@ const InterventionForm = () => {
                 {Array.isArray(errors.mechanism) ? errors.mechanism[0] : errors.mechanism}
               </p>
             )}
+          </div>
+
+          {/* SNOMED CT Code */}
+          <div className="pt-4 border-t border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">
+              {t('interventions:form.medicalCoding')}
+            </h3>
+            <div className="max-w-xs">
+              <label htmlFor="snomed_code" className="label">
+                {t('interventions:form.snomedCode')}
+              </label>
+              <input
+                type="text"
+                id="snomed_code"
+                name="snomed_code"
+                value={formData.snomed_code}
+                onChange={handleChange}
+                className={`input-field ${errors.snomed_code ? 'border-red-500' : ''}`}
+                placeholder={t('interventions:form.snomedCodePlaceholder')}
+              />
+              <a
+                href="https://browser.ihtsdotools.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700"
+              >
+                {t('interventions:form.lookupSnomed')}
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              {errors.snomed_code && (
+                <p className="mt-1 text-sm text-red-500">
+                  {Array.isArray(errors.snomed_code) ? errors.snomed_code[0] : errors.snomed_code}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Media - Only show when editing */}

@@ -21,6 +21,7 @@ class Intervention extends Model
         'name',
         'description',
         'mechanism',
+        'snomed_code',
     ];
 
     /**
