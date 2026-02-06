@@ -239,6 +239,20 @@ export const apiEndpoints = {
   bibleHealthTheme: (themeKey) => `/bible/health-themes/${themeKey}`,
   bibleSearchHealth: '/bible/search-health',
 
+  // Intervention Protocols
+  interventionProtocol: (id) => `/interventions/${id}/protocol`,
+  interventionProtocolAdmin: (id) => `/admin/interventions/${id}/protocol`,
+  interventionProtocolSteps: (id) => `/admin/interventions/${id}/protocol/steps`,
+  interventionProtocolStepsReorder: (id) => `/admin/interventions/${id}/protocol/steps/reorder`,
+  protocolStep: (stepId) => `/admin/protocol-steps/${stepId}`,
+  interventionContraindications: (id) => `/interventions/${id}/contraindications`,
+  interventionContraindicationsAdmin: (id) => `/admin/interventions/${id}/contraindications`,
+  contraindication: (id) => `/admin/contraindications/${id}`,
+  interventionOutcomes: (id) => `/interventions/${id}/outcomes`,
+  interventionOutcomesAdmin: (id) => `/admin/interventions/${id}/outcomes`,
+  interventionOutcomesReorder: (id) => `/admin/interventions/${id}/outcomes/reorder`,
+  outcome: (id) => `/admin/outcomes/${id}`,
+
   // Analytics
   analyticsOverview: '/admin/analytics/overview',
   analyticsConditionsByCategory: '/admin/analytics/conditions-by-category',

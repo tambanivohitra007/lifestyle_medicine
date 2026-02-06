@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\EvidenceEntryController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\InterventionController;
+use App\Http\Controllers\Api\InterventionProtocolController;
 use App\Http\Controllers\Api\ConditionMindmapController;
 use App\Http\Controllers\Api\KnowledgeGraphController;
 use App\Http\Controllers\Api\RecipeController;
@@ -74,6 +75,11 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('interventions/{intervention}/evidence', [InterventionController::class, 'evidence']);
     Route::get('interventions/{intervention}/conditions', [InterventionController::class, 'conditions']);
     Route::get('interventions/{intervention}/media', [MediaController::class, 'index']);
+
+    // Intervention Protocols (read-only)
+    Route::get('interventions/{intervention}/protocol', [InterventionProtocolController::class, 'show']);
+    Route::get('interventions/{intervention}/contraindications', [InterventionProtocolController::class, 'contraindications']);
+    Route::get('interventions/{intervention}/outcomes', [InterventionProtocolController::class, 'outcomes']);
 
     // Evidence & References
     Route::apiResource('evidence-entries', EvidenceEntryController::class)->only(['index', 'show']);
@@ -138,6 +144,27 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
     Route::put('conditions/{condition}/media/{medium}', [ConditionMediaController::class, 'update']);
     Route::post('conditions/{condition}/media/reorder', [ConditionMediaController::class, 'reorder']);
     Route::delete('conditions/{condition}/media/{medium}', [ConditionMediaController::class, 'destroy']);
+
+    // Intervention Protocols
+    Route::put('interventions/{intervention}/protocol', [InterventionProtocolController::class, 'storeOrUpdateProtocol']);
+    Route::delete('interventions/{intervention}/protocol', [InterventionProtocolController::class, 'destroyProtocol']);
+
+    // Protocol Steps
+    Route::post('interventions/{intervention}/protocol/steps', [InterventionProtocolController::class, 'storeStep']);
+    Route::post('interventions/{intervention}/protocol/steps/reorder', [InterventionProtocolController::class, 'reorderSteps']);
+    Route::put('protocol-steps/{step}', [InterventionProtocolController::class, 'updateStep']);
+    Route::delete('protocol-steps/{step}', [InterventionProtocolController::class, 'destroyStep']);
+
+    // Intervention Contraindications
+    Route::post('interventions/{intervention}/contraindications', [InterventionProtocolController::class, 'storeContraindication']);
+    Route::put('contraindications/{contraindication}', [InterventionProtocolController::class, 'updateContraindication']);
+    Route::delete('contraindications/{contraindication}', [InterventionProtocolController::class, 'destroyContraindication']);
+
+    // Intervention Outcomes
+    Route::post('interventions/{intervention}/outcomes', [InterventionProtocolController::class, 'storeOutcome']);
+    Route::post('interventions/{intervention}/outcomes/reorder', [InterventionProtocolController::class, 'reorderOutcomes']);
+    Route::put('outcomes/{outcome}', [InterventionProtocolController::class, 'updateOutcome']);
+    Route::delete('outcomes/{outcome}', [InterventionProtocolController::class, 'destroyOutcome']);
 
     // Evidence & References
     Route::apiResource('evidence-entries', EvidenceEntryController::class)->except(['index', 'show']);

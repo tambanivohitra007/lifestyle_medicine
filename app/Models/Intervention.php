@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Intervention extends Model
@@ -97,5 +98,29 @@ class Intervention extends Model
         return $this->belongsToMany(EgwReference::class, 'intervention_egw_reference')
             ->withPivot(['created_by', 'deleted_by'])
             ->withTimestamps();
+    }
+
+    /**
+     * Get the protocol for this intervention.
+     */
+    public function protocol(): HasOne
+    {
+        return $this->hasOne(InterventionProtocol::class);
+    }
+
+    /**
+     * Get the contraindications for this intervention.
+     */
+    public function contraindications(): HasMany
+    {
+        return $this->hasMany(InterventionContraindication::class);
+    }
+
+    /**
+     * Get the expected outcomes for this intervention.
+     */
+    public function outcomes(): HasMany
+    {
+        return $this->hasMany(InterventionOutcome::class)->orderBy('order_index');
     }
 }

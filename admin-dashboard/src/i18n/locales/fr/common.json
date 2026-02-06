@@ -245,5 +245,15 @@
   },
   "validation": {
     "required": "{{field}} est requis"
+  },
+  "units": {
+    "week": "semaine",
+    "weeks": "semaines",
+    "day": "jour",
+    "days": "jours",
+    "hour": "heure",
+    "hours": "heures",
+    "minute": "minute",
+    "minutes": "minutes"
   }
 }

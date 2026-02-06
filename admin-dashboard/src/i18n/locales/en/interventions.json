@@ -118,5 +118,126 @@
   },
   "confirm": {
     "delete": "Are you sure you want to delete this intervention?"
+  },
+  "protocol": {
+    "title": "Protocol",
+    "overview": "Protocol Overview",
+    "overviewPlaceholder": "Describe the overall protocol approach...",
+    "version": "Version",
+    "versionPlaceholder": "e.g., 1.0",
+    "durationWeeks": "Duration (weeks)",
+    "frequencyPerWeek": "Frequency per week",
+    "intensityLevel": "Intensity Level",
+    "prerequisites": "Prerequisites",
+    "prerequisitesPlaceholder": "What is required before starting...",
+    "equipmentNeeded": "Equipment Needed",
+    "equipmentNeededPlaceholder": "List any equipment or materials needed...",
+    "noProtocol": "No protocol defined yet",
+    "createProtocol": "Create Protocol",
+    "editProtocol": "Edit Protocol",
+    "deleteProtocol": "Delete Protocol",
+    "intensity": {
+      "low": "Low",
+      "moderate": "Moderate",
+      "high": "High",
+      "variable": "Variable"
+    },
+    "steps": {
+      "title": "Protocol Steps",
+      "addStep": "Add Step",
+      "editStep": "Edit Step",
+      "noSteps": "No steps defined yet",
+      "stepNumber": "Step Number",
+      "phaseName": "Phase Name",
+      "phaseNamePlaceholder": "e.g., Introduction, Maintenance",
+      "stepTitle": "Step Title",
+      "stepTitlePlaceholder": "What is this step about?",
+      "stepDescription": "Description",
+      "stepDescriptionPlaceholder": "Detailed description of this step...",
+      "durationMinutes": "Duration (minutes)",
+      "weekStart": "Start Week",
+      "weekEnd": "End Week",
+      "frequency": "Frequency",
+      "frequencyPlaceholder": "e.g., Daily, 3x per week",
+      "instructions": "Instructions",
+      "instructionsPlaceholder": "Step-by-step instructions...",
+      "tips": "Tips",
+      "tipsPlaceholder": "Helpful tips for this step..."
+    },
+    "toast": {
+      "created": "Protocol created successfully",
+      "updated": "Protocol updated successfully",
+      "deleted": "Protocol deleted successfully",
+      "stepCreated": "Step added successfully",
+      "stepUpdated": "Step updated successfully",
+      "stepDeleted": "Step deleted successfully",
+      "stepsReordered": "Steps reordered successfully",
+      "saveError": "Failed to save protocol",
+      "deleteError": "Failed to delete protocol"
+    }
+  },
+  "contraindications": {
+    "title": "Contraindications",
+    "addNew": "Add Contraindication",
+    "edit": "Edit Contraindication",
+    "noItems": "No contraindications defined yet",
+    "contraindicationTitle": "Title",
+    "titlePlaceholder": "e.g., Pregnancy, Acute Infection",
+    "description": "Description",
+    "descriptionPlaceholder": "Explain why this is contraindicated...",
+    "severity": "Severity",
+    "linkedCondition": "Linked Condition",
+    "selectCondition": "Select a condition (optional)",
+    "alternativeRecommendation": "Alternative Recommendation",
+    "alternativePlaceholder": "What should be done instead?",
+    "severityLevels": {
+      "absolute": "Absolute",
+      "relative": "Relative",
+      "caution": "Caution"
+    },
+    "severityDescriptions": {
+      "absolute": "Must never be used",
+      "relative": "Use with caution under medical supervision",
+      "caution": "Monitor closely"
+    },
+    "toast": {
+      "created": "Contraindication added successfully",
+      "updated": "Contraindication updated successfully",
+      "deleted": "Contraindication deleted successfully",
+      "saveError": "Failed to save contraindication",
+      "deleteError": "Failed to delete contraindication"
+    }
+  },
+  "outcomes": {
+    "title": "Expected Outcomes",
+    "addNew": "Add Outcome",
+    "edit": "Edit Outcome",
+    "noItems": "No expected outcomes defined yet",
+    "outcomeMeasure": "Outcome Measure",
+    "measurePlaceholder": "e.g., Blood Pressure, HbA1c, Weight",
+    "expectedChange": "Expected Change",
+    "expectedChangePlaceholder": "e.g., -10%, Improved, Normalized",
+    "direction": "Direction",
+    "directionPlaceholder": "e.g., Decrease, Increase, Stabilize",
+    "timelineWeeks": "Timeline (weeks)",
+    "evidenceGrade": "Evidence Grade",
+    "measurementMethod": "Measurement Method",
+    "measurementPlaceholder": "How is this measured?",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes...",
+    "gradeDescriptions": {
+      "A": "High quality evidence",
+      "B": "Moderate quality evidence",
+      "C": "Low quality evidence",
+      "D": "Very low quality evidence"
+    },
+    "toast": {
+      "created": "Outcome added successfully",
+      "updated": "Outcome updated successfully",
+      "deleted": "Outcome deleted successfully",
+      "reordered": "Outcomes reordered successfully",
+      "saveError": "Failed to save outcome",
+      "deleteError": "Failed to delete outcome"
+    }
   }
 }

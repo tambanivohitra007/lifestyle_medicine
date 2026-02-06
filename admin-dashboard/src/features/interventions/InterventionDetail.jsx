@@ -12,6 +12,7 @@ import {
   Download,
   ExternalLink,
   Network,
+  ClipboardList,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
@@ -19,6 +20,7 @@ import { toast, confirmDelete } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AuditInfo from '../../components/shared/AuditInfo';
 import { useAuth } from '../../contexts/AuthContext';
+import ProtocolEditor from './components/ProtocolEditor';
 
 const QUALITY_RATING = {
   A: { labelKey: 'evidence:quality.high', color: 'bg-green-100 text-green-700' },
@@ -110,6 +112,7 @@ const InterventionDetail = () => {
   const mediaItems = intervention.media || [];
   const tabs = [
     { id: 'details', labelKey: 'common:labels.details', icon: Stethoscope },
+    { id: 'protocol', labelKey: 'interventions:protocol.title', icon: ClipboardList },
     { id: 'evidence', labelKey: 'evidence:title', icon: FileText, count: evidence.length },
     { id: 'conditions', labelKey: 'conditions:title', icon: HeartPulse, count: conditions.length },
     { id: 'media', labelKey: 'common:labels.media', icon: Image, count: mediaItems.length },
@@ -232,6 +235,13 @@ const InterventionDetail = () => {
                 </Link>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Protocol Tab */}
+        {activeTab === 'protocol' && (
+          <div className="card">
+            <ProtocolEditor interventionId={id} />
           </div>
         )}
 

@@ -118,5 +118,126 @@
   },
   "confirm": {
     "delete": "Êtes-vous sûr de vouloir supprimer cette intervention?"
+  },
+  "protocol": {
+    "title": "Protocole",
+    "overview": "Aperçu du protocole",
+    "overviewPlaceholder": "Décrivez l'approche générale du protocole...",
+    "version": "Version",
+    "versionPlaceholder": "ex: 1.0",
+    "durationWeeks": "Durée (semaines)",
+    "frequencyPerWeek": "Fréquence par semaine",
+    "intensityLevel": "Niveau d'intensité",
+    "prerequisites": "Prérequis",
+    "prerequisitesPlaceholder": "Ce qui est requis avant de commencer...",
+    "equipmentNeeded": "Équipement nécessaire",
+    "equipmentNeededPlaceholder": "Listez l'équipement ou le matériel nécessaire...",
+    "noProtocol": "Aucun protocole défini",
+    "createProtocol": "Créer un protocole",
+    "editProtocol": "Modifier le protocole",
+    "deleteProtocol": "Supprimer le protocole",
+    "intensity": {
+      "low": "Faible",
+      "moderate": "Modéré",
+      "high": "Élevé",
+      "variable": "Variable"
+    },
+    "steps": {
+      "title": "Étapes du protocole",
+      "addStep": "Ajouter une étape",
+      "editStep": "Modifier l'étape",
+      "noSteps": "Aucune étape définie",
+      "stepNumber": "Numéro d'étape",
+      "phaseName": "Nom de la phase",
+      "phaseNamePlaceholder": "ex: Introduction, Maintien",
+      "stepTitle": "Titre de l'étape",
+      "stepTitlePlaceholder": "De quoi s'agit-il?",
+      "stepDescription": "Description",
+      "stepDescriptionPlaceholder": "Description détaillée de cette étape...",
+      "durationMinutes": "Durée (minutes)",
+      "weekStart": "Semaine de début",
+      "weekEnd": "Semaine de fin",
+      "frequency": "Fréquence",
+      "frequencyPlaceholder": "ex: Quotidien, 3x par semaine",
+      "instructions": "Instructions",
+      "instructionsPlaceholder": "Instructions étape par étape...",
+      "tips": "Conseils",
+      "tipsPlaceholder": "Conseils utiles pour cette étape..."
+    },
+    "toast": {
+      "created": "Protocole créé avec succès",
+      "updated": "Protocole mis à jour avec succès",
+      "deleted": "Protocole supprimé avec succès",
+      "stepCreated": "Étape ajoutée avec succès",
+      "stepUpdated": "Étape mise à jour avec succès",
+      "stepDeleted": "Étape supprimée avec succès",
+      "stepsReordered": "Étapes réorganisées avec succès",
+      "saveError": "Échec de l'enregistrement du protocole",
+      "deleteError": "Échec de la suppression du protocole"
+    }
+  },
+  "contraindications": {
+    "title": "Contre-indications",
+    "addNew": "Ajouter une contre-indication",
+    "edit": "Modifier la contre-indication",
+    "noItems": "Aucune contre-indication définie",
+    "contraindicationTitle": "Titre",
+    "titlePlaceholder": "ex: Grossesse, Infection aiguë",
+    "description": "Description",
+    "descriptionPlaceholder": "Expliquez pourquoi c'est contre-indiqué...",
+    "severity": "Sévérité",
+    "linkedCondition": "Condition liée",
+    "selectCondition": "Sélectionner une condition (optionnel)",
+    "alternativeRecommendation": "Recommandation alternative",
+    "alternativePlaceholder": "Que faire à la place?",
+    "severityLevels": {
+      "absolute": "Absolue",
+      "relative": "Relative",
+      "caution": "Précaution"
+    },
+    "severityDescriptions": {
+      "absolute": "Ne jamais utiliser",
+      "relative": "Utiliser avec prudence sous supervision médicale",
+      "caution": "Surveiller de près"
+    },
+    "toast": {
+      "created": "Contre-indication ajoutée avec succès",
+      "updated": "Contre-indication mise à jour avec succès",
+      "deleted": "Contre-indication supprimée avec succès",
+      "saveError": "Échec de l'enregistrement de la contre-indication",
+      "deleteError": "Échec de la suppression de la contre-indication"
+    }
+  },
+  "outcomes": {
+    "title": "Résultats attendus",
+    "addNew": "Ajouter un résultat",
+    "edit": "Modifier le résultat",
+    "noItems": "Aucun résultat attendu défini",
+    "outcomeMeasure": "Mesure du résultat",
+    "measurePlaceholder": "ex: Pression artérielle, HbA1c, Poids",
+    "expectedChange": "Changement attendu",
+    "expectedChangePlaceholder": "ex: -10%, Amélioré, Normalisé",
+    "direction": "Direction",
+    "directionPlaceholder": "ex: Diminution, Augmentation, Stabilisation",
+    "timelineWeeks": "Délai (semaines)",
+    "evidenceGrade": "Grade de preuve",
+    "measurementMethod": "Méthode de mesure",
+    "measurementPlaceholder": "Comment est-ce mesuré?",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes supplémentaires...",
+    "gradeDescriptions": {
+      "A": "Preuves de haute qualité",
+      "B": "Preuves de qualité modérée",
+      "C": "Preuves de faible qualité",
+      "D": "Preuves de très faible qualité"
+    },
+    "toast": {
+      "created": "Résultat ajouté avec succès",
+      "updated": "Résultat mis à jour avec succès",
+      "deleted": "Résultat supprimé avec succès",
+      "reordered": "Résultats réorganisés avec succès",
+      "saveError": "Échec de l'enregistrement du résultat",
+      "deleteError": "Échec de la suppression du résultat"
+    }
   }
 }
