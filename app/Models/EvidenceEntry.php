@@ -20,6 +20,7 @@ class EvidenceEntry extends Model
         'population',
         'sample_size',
         'quality_rating',
+        'recommendation_strength',
         'summary',
         'notes',
     ];

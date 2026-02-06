@@ -152,5 +152,69 @@
   },
   "confirm": {
     "delete": "Are you sure you want to delete this evidence?"
+  },
+  "recommendation": {
+    "title": "Recommendation Strength",
+    "strong": "Strong",
+    "weak": "Weak",
+    "strongDescription": "Most patients should receive this intervention",
+    "weakDescription": "Consider based on individual circumstances"
+  },
+  "summary": {
+    "title": "Evidence Summaries",
+    "subtitle": "Summarized evidence for condition-intervention pairs",
+    "addNew": "Add Evidence Summary",
+    "edit": "Edit Evidence Summary",
+    "noSummaries": "No evidence summaries available",
+    "createSummary": "Create Summary",
+    "overallQuality": "Overall Quality",
+    "recommendationStrength": "Recommendation Strength",
+    "keyFindings": "Key Findings",
+    "keyFindingsPlaceholder": "Bullet points of key findings...",
+    "summaryText": "Summary",
+    "summaryTextPlaceholder": "Comprehensive summary of the evidence...",
+    "lastReviewed": "Last Reviewed",
+    "nextReviewDue": "Next Review Due",
+    "reviewerNotes": "Reviewer Notes",
+    "reviewerNotesPlaceholder": "Internal notes for reviewers...",
+    "totalStudies": "Total Studies",
+    "totalParticipants": "Total Participants",
+    "needsReview": "Needs Review",
+    "upToDate": "Up to Date",
+    "markReviewed": "Mark as Reviewed",
+    "viewSummaries": "View Summaries",
+    "forCondition": "Evidence summaries for this condition",
+    "forIntervention": "Evidence summaries for this intervention",
+    "toast": {
+      "created": "Evidence summary created successfully",
+      "updated": "Evidence summary updated successfully",
+      "deleted": "Evidence summary deleted successfully",
+      "reviewed": "Evidence summary marked as reviewed",
+      "saveError": "Failed to save evidence summary",
+      "deleteError": "Failed to delete evidence summary"
+    }
+  },
+  "grade": {
+    "title": "GRADE Assessment",
+    "quality": {
+      "A": "High",
+      "B": "Moderate",
+      "C": "Low",
+      "D": "Very Low"
+    },
+    "qualityDescription": {
+      "A": "Further research unlikely to change confidence in the estimate",
+      "B": "Further research likely to have an important impact on confidence",
+      "C": "Further research very likely to have an important impact",
+      "D": "Any estimate of effect is very uncertain"
+    },
+    "recommendation": {
+      "strong": "Strong",
+      "weak": "Weak"
+    },
+    "recommendationDescription": {
+      "strong": "Benefits clearly outweigh risks for most patients",
+      "weak": "Benefits and risks closely balanced, consider individual values"
+    }
   }
 }

@@ -1,31 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Save, Loader2 } from 'lucide-react';
+import { Save, Loader2, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
 const STUDY_TYPES = [
-  { value: 'meta_analysis', label: 'Meta-Analysis', tier: 1 },
-  { value: 'systematic_review', label: 'Systematic Review', tier: 1 },
-  { value: 'rct', label: 'Randomized Controlled Trial', tier: 2 },
-  { value: 'cohort', label: 'Cohort Study', tier: 3 },
-  { value: 'case_control', label: 'Case-Control Study', tier: 3 },
-  { value: 'cross_sectional', label: 'Cross-Sectional Study', tier: 3 },
-  { value: 'observational', label: 'Observational Study', tier: 3 },
-  { value: 'case_series', label: 'Case Series', tier: 4 },
-  { value: 'case_report', label: 'Case Report', tier: 4 },
-  { value: 'expert_opinion', label: 'Expert Opinion', tier: 5 },
+  { value: 'meta_analysis', labelKey: 'meta_analysis_full', tier: 1 },
+  { value: 'systematic_review', labelKey: 'systematic_review_full', tier: 1 },
+  { value: 'rct', labelKey: 'rct_full', tier: 2 },
+  { value: 'cohort', labelKey: 'cohort_full', tier: 3 },
+  { value: 'case_control', labelKey: 'case_control_full', tier: 3 },
+  { value: 'cross_sectional', labelKey: 'cross_sectional_full', tier: 3 },
+  { value: 'observational', labelKey: 'observational_full', tier: 3 },
+  { value: 'case_series', labelKey: 'case_series_full', tier: 4 },
+  { value: 'case_report', labelKey: 'case_report_full', tier: 4 },
+  { value: 'expert_opinion', labelKey: 'expert_opinion_full', tier: 5 },
 ];
 
 const QUALITY_RATINGS = [
-  { value: 'A', label: 'A - High Quality' },
-  { value: 'B', label: 'B - Good Quality' },
-  { value: 'C', label: 'C - Moderate Quality' },
-  { value: 'D', label: 'D - Low Quality' },
+  { value: 'A', labelKey: 'A_full' },
+  { value: 'B', labelKey: 'B_full' },
+  { value: 'C', labelKey: 'C_full' },
+  { value: 'D', labelKey: 'D_full' },
+];
+
+const RECOMMENDATION_STRENGTHS = [
+  { value: 'strong', labelKey: 'strong', descKey: 'strongDescription' },
+  { value: 'weak', labelKey: 'weak', descKey: 'weakDescription' },
 ];
 
 const EvidenceForm = () => {
+  const { t } = useTranslation(['evidence', 'common']);
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -36,6 +43,7 @@ const EvidenceForm = () => {
     population: '',
     sample_size: '',
     quality_rating: '',
+    recommendation_strength: '',
     summary: '',
     notes: '',
   });
@@ -76,6 +84,7 @@ const EvidenceForm = () => {
         population: evidence.population || '',
         sample_size: evidence.sample_size || '',
         quality_rating: evidence.quality_rating || '',
+        recommendation_strength: evidence.recommendation_strength || '',
         summary: evidence.summary || '',
         notes: evidence.notes || '',
       });
@@ -186,45 +195,84 @@ const EvidenceForm = () => {
             )}
           </div>
 
-          {/* Study Type & Quality Rating */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="study_type" className="label">
-                Study Type
-              </label>
-              <select
-                id="study_type"
-                name="study_type"
-                value={formData.study_type}
-                onChange={handleChange}
-                className="input-field"
-              >
-                <option value="">Select type</option>
-                {STUDY_TYPES.map(({ value, label }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+          {/* Study Type */}
+          <div>
+            <label htmlFor="study_type" className="label">
+              {t('evidence:form.studyType')}
+            </label>
+            <select
+              id="study_type"
+              name="study_type"
+              value={formData.study_type}
+              onChange={handleChange}
+              className="input-field"
+            >
+              <option value="">{t('evidence:form.selectStudyType')}</option>
+              {STUDY_TYPES.map(({ value, labelKey }) => (
+                <option key={value} value={value}>
+                  {t(`evidence:studyTypes.${labelKey}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* GRADE Assessment */}
+          <div className="p-4 bg-gray-50 rounded-lg space-y-4">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-medium text-gray-700">{t('evidence:grade.title')}</h3>
+              <Info className="w-4 h-4 text-gray-400" />
             </div>
-            <div>
-              <label htmlFor="quality_rating" className="label">
-                Quality Rating
-              </label>
-              <select
-                id="quality_rating"
-                name="quality_rating"
-                value={formData.quality_rating}
-                onChange={handleChange}
-                className="input-field"
-              >
-                <option value="">Select rating</option>
-                {QUALITY_RATINGS.map(({ value, label }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="quality_rating" className="label">
+                  {t('evidence:form.qualityRating')}
+                </label>
+                <select
+                  id="quality_rating"
+                  name="quality_rating"
+                  value={formData.quality_rating}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  <option value="">{t('evidence:form.selectQualityRating')}</option>
+                  {QUALITY_RATINGS.map(({ value, labelKey }) => (
+                    <option key={value} value={value}>
+                      {t(`evidence:quality.${labelKey}`)}
+                    </option>
+                  ))}
+                </select>
+                {formData.quality_rating && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    {t(`evidence:grade.qualityDescription.${formData.quality_rating}`)}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="recommendation_strength" className="label">
+                  {t('evidence:recommendation.title')}
+                </label>
+                <select
+                  id="recommendation_strength"
+                  name="recommendation_strength"
+                  value={formData.recommendation_strength}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  <option value="">-</option>
+                  {RECOMMENDATION_STRENGTHS.map(({ value, labelKey }) => (
+                    <option key={value} value={value}>
+                      {t(`evidence:recommendation.${labelKey}`)}
+                    </option>
+                  ))}
+                </select>
+                {formData.recommendation_strength && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    {t(`evidence:recommendation.${formData.recommendation_strength}Description`)}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -232,7 +280,7 @@ const EvidenceForm = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2">
               <label htmlFor="population" className="label">
-                Study Population
+                {t('evidence:form.population')}
               </label>
               <input
                 type="text"
@@ -241,12 +289,12 @@ const EvidenceForm = () => {
                 value={formData.population}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="e.g., Adults with Type 2 Diabetes"
+                placeholder={t('evidence:form.populationPlaceholder')}
               />
             </div>
             <div>
               <label htmlFor="sample_size" className="label">
-                Sample Size (n)
+                {t('evidence:form.sampleSize')}
               </label>
               <input
                 type="number"
@@ -255,7 +303,7 @@ const EvidenceForm = () => {
                 value={formData.sample_size}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="e.g., 500"
+                placeholder={t('evidence:form.sampleSizePlaceholder')}
                 min="1"
               />
             </div>
@@ -264,7 +312,7 @@ const EvidenceForm = () => {
           {/* Summary */}
           <div>
             <label htmlFor="summary" className="label">
-              Summary
+              {t('evidence:form.summary')}
             </label>
             <textarea
               id="summary"
@@ -273,14 +321,14 @@ const EvidenceForm = () => {
               onChange={handleChange}
               rows={4}
               className="input-field"
-              placeholder="Key findings and conclusions..."
+              placeholder={t('evidence:form.summaryPlaceholder')}
             />
           </div>
 
           {/* Notes */}
           <div>
             <label htmlFor="notes" className="label">
-              Notes
+              {t('evidence:form.notes')}
             </label>
             <textarea
               id="notes"
@@ -289,7 +337,7 @@ const EvidenceForm = () => {
               onChange={handleChange}
               rows={3}
               className="input-field"
-              placeholder="Additional notes or comments..."
+              placeholder={t('evidence:form.notesPlaceholder')}
             />
           </div>
 
@@ -305,10 +353,10 @@ const EvidenceForm = () => {
               ) : (
                 <Save className="w-5 h-5" />
               )}
-              {saving ? 'Saving...' : 'Save Evidence'}
+              {saving ? t('common:buttons.saving') : t('evidence:form.saveEvidence')}
             </button>
             <Link to="/evidence" className="btn-outline">
-              Cancel
+              {t('common:buttons.cancel')}
             </Link>
           </div>
         </div>

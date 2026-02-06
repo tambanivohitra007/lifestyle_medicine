@@ -152,5 +152,69 @@
   },
   "confirm": {
     "delete": "Êtes-vous sûr de vouloir supprimer cette preuve?"
+  },
+  "recommendation": {
+    "title": "Force de la recommandation",
+    "strong": "Forte",
+    "weak": "Faible",
+    "strongDescription": "La plupart des patients devraient recevoir cette intervention",
+    "weakDescription": "À considérer selon les circonstances individuelles"
+  },
+  "summary": {
+    "title": "Résumés des preuves",
+    "subtitle": "Preuves résumées pour les paires condition-intervention",
+    "addNew": "Ajouter un résumé",
+    "edit": "Modifier le résumé",
+    "noSummaries": "Aucun résumé de preuves disponible",
+    "createSummary": "Créer un résumé",
+    "overallQuality": "Qualité globale",
+    "recommendationStrength": "Force de la recommandation",
+    "keyFindings": "Conclusions principales",
+    "keyFindingsPlaceholder": "Points clés des conclusions...",
+    "summaryText": "Résumé",
+    "summaryTextPlaceholder": "Résumé complet des preuves...",
+    "lastReviewed": "Dernière révision",
+    "nextReviewDue": "Prochaine révision prévue",
+    "reviewerNotes": "Notes du réviseur",
+    "reviewerNotesPlaceholder": "Notes internes pour les réviseurs...",
+    "totalStudies": "Nombre d'études",
+    "totalParticipants": "Nombre de participants",
+    "needsReview": "Révision nécessaire",
+    "upToDate": "À jour",
+    "markReviewed": "Marquer comme révisé",
+    "viewSummaries": "Voir les résumés",
+    "forCondition": "Résumés des preuves pour cette condition",
+    "forIntervention": "Résumés des preuves pour cette intervention",
+    "toast": {
+      "created": "Résumé des preuves créé avec succès",
+      "updated": "Résumé des preuves mis à jour avec succès",
+      "deleted": "Résumé des preuves supprimé avec succès",
+      "reviewed": "Résumé des preuves marqué comme révisé",
+      "saveError": "Échec de l'enregistrement du résumé des preuves",
+      "deleteError": "Échec de la suppression du résumé des preuves"
+    }
+  },
+  "grade": {
+    "title": "Évaluation GRADE",
+    "quality": {
+      "A": "Élevée",
+      "B": "Modérée",
+      "C": "Faible",
+      "D": "Très faible"
+    },
+    "qualityDescription": {
+      "A": "Une recherche supplémentaire ne changera probablement pas la confiance dans l'estimation",
+      "B": "Une recherche supplémentaire aura probablement un impact important sur la confiance",
+      "C": "Une recherche supplémentaire aura très probablement un impact important",
+      "D": "Toute estimation de l'effet est très incertaine"
+    },
+    "recommendation": {
+      "strong": "Forte",
+      "weak": "Faible"
+    },
+    "recommendationDescription": {
+      "strong": "Les avantages l'emportent clairement sur les risques pour la plupart des patients",
+      "weak": "Avantages et risques étroitement équilibrés, considérer les valeurs individuelles"
+    }
   }
 }

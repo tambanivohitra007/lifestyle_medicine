@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ConditionSectionController;
 use App\Http\Controllers\Api\ContentTagController;
 use App\Http\Controllers\Api\EgwReferenceController;
 use App\Http\Controllers\Api\EvidenceEntryController;
+use App\Http\Controllers\Api\EvidenceSummaryController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\InterventionController;
@@ -84,6 +85,13 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     // Evidence & References
     Route::apiResource('evidence-entries', EvidenceEntryController::class)->only(['index', 'show']);
     Route::apiResource('references', ReferenceController::class)->only(['index', 'show']);
+
+    // Evidence Summaries (public read-only)
+    Route::get('evidence-summaries', [EvidenceSummaryController::class, 'index']);
+    Route::get('evidence-summaries/{evidenceSummary}', [EvidenceSummaryController::class, 'show']);
+    Route::get('conditions/{condition}/evidence-summaries', [EvidenceSummaryController::class, 'forCondition']);
+    Route::get('interventions/{intervention}/evidence-summaries', [EvidenceSummaryController::class, 'forIntervention']);
+    Route::get('conditions/{condition}/interventions/{intervention}/evidence-summary', [EvidenceSummaryController::class, 'forPair']);
 
     // Scriptures & Recipes
     Route::apiResource('scriptures', ScriptureController::class)->only(['index', 'show']);
@@ -169,6 +177,11 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
     // Evidence & References
     Route::apiResource('evidence-entries', EvidenceEntryController::class)->except(['index', 'show']);
     Route::apiResource('references', ReferenceController::class)->except(['index', 'show']);
+
+    // Evidence Summaries (CRUD)
+    Route::apiResource('evidence-summaries', EvidenceSummaryController::class)->except(['index', 'show']);
+    Route::get('evidence-summaries/needs-review', [EvidenceSummaryController::class, 'needingReview']);
+    Route::post('evidence-summaries/{evidenceSummary}/mark-reviewed', [EvidenceSummaryController::class, 'markReviewed']);
 
     // Scriptures & Recipes
     Route::apiResource('scriptures', ScriptureController::class)->except(['index', 'show']);

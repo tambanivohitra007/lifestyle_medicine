@@ -618,10 +618,12 @@ Route::prefix('v1')->group(function () {
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.1 | Add GRADE quality fields | Pending |
-| 3.2 | Create evidence summary table | Pending |
-| 3.3 | Build evidence grading UI | Pending |
-| 3.4 | Implement citation auto-linking | Pending |
+| 3.1 | Add GRADE recommendation strength field | ✅ Complete |
+| 3.2 | Create evidence summaries table | ✅ Complete |
+| 3.3 | Create Laravel model and API for evidence summaries | ✅ Complete |
+| 3.4 | Build evidence grading UI | ✅ Complete |
+| 3.5 | Update evidence form with GRADE fields | ✅ Complete |
+| 3.6 | Citation auto-linking (DOI/PubMed) | ✅ Complete (Phase 1) |
 
 ### Phase 4: Knowledge Graph
 

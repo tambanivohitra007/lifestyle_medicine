@@ -17,6 +17,7 @@ class EvidenceEntryResource extends JsonResource
             'population' => $this->population,
             'sample_size' => $this->sample_size,
             'quality_rating' => $this->quality_rating,
+            'recommendation_strength' => $this->recommendation_strength,
             'summary' => $this->summary,
             'notes' => $this->notes,
             'references' => ReferenceResource::collection($this->whenLoaded('references')),
