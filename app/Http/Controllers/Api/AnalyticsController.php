@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\CareDomain;
 use App\Models\Condition;
-use App\Models\Intervention;
-use App\Models\Scripture;
-use App\Models\Recipe;
 use App\Models\EgwReference;
 use App\Models\EvidenceEntry;
+use App\Models\Intervention;
+use App\Models\Recipe;
+use App\Models\Scripture;
 use App\Models\User;
-use App\Models\CareDomain;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class AnalyticsController extends Controller
 {
@@ -70,7 +70,7 @@ class AnalyticsController extends Controller
                 ->groupBy('category')
                 ->orderByDesc('count')
                 ->get()
-                ->map(fn($item) => [
+                ->map(fn ($item) => [
                     'category' => $item->category,
                     'count' => (int) $item->count,
                 ]);
@@ -90,7 +90,7 @@ class AnalyticsController extends Controller
                 ->groupBy('care_domains.id', 'care_domains.name')
                 ->orderByDesc('count')
                 ->get()
-                ->map(fn($item) => [
+                ->map(fn ($item) => [
                     'domain' => $item->domain,
                     'count' => (int) $item->count,
                 ]);
@@ -173,7 +173,7 @@ class AnalyticsController extends Controller
                 ->orderByDesc('created_at')
                 ->limit($limit)
                 ->get()
-                ->map(fn($item) => [
+                ->map(fn ($item) => [
                     'id' => $item->id,
                     'type' => $config['type'],
                     'name' => $item->{$config['name_field']},
@@ -192,7 +192,7 @@ class AnalyticsController extends Controller
                 ->orderByDesc('updated_at')
                 ->limit($limit)
                 ->get()
-                ->map(fn($item) => [
+                ->map(fn ($item) => [
                     'id' => $item->id,
                     'type' => $config['type'],
                     'name' => $item->{$config['name_field']},
@@ -265,72 +265,102 @@ class AnalyticsController extends Controller
         $data = Cache::remember('analytics.content_completeness', 600, function () {
             $result = [];
 
-            // Conditions completeness
-            $conditions = Condition::all();
+            // Conditions completeness — use withCount to avoid N+1 queries
+            $conditions = Condition::withCount(['sections', 'interventions'])->get();
             $conditionScores = $conditions->map(function ($condition) {
                 $score = 0;
                 $maxScore = 5;
 
-                if (!empty($condition->name)) $score++;
-                if (!empty($condition->summary)) $score++;
-                if (!empty($condition->category)) $score++;
-                if ($condition->sections()->count() > 0) $score++;
-                if ($condition->interventions()->count() > 0) $score++;
+                if (! empty($condition->name)) {
+                    $score++;
+                }
+                if (! empty($condition->summary)) {
+                    $score++;
+                }
+                if (! empty($condition->category)) {
+                    $score++;
+                }
+                if ($condition->sections_count > 0) {
+                    $score++;
+                }
+                if ($condition->interventions_count > 0) {
+                    $score++;
+                }
 
                 return ($score / $maxScore) * 100;
             });
 
             $result['conditions'] = [
                 'total' => $conditions->count(),
-                'complete' => $conditionScores->filter(fn($s) => $s >= 80)->count(),
-                'partial' => $conditionScores->filter(fn($s) => $s >= 40 && $s < 80)->count(),
-                'incomplete' => $conditionScores->filter(fn($s) => $s < 40)->count(),
+                'complete' => $conditionScores->filter(fn ($s) => $s >= 80)->count(),
+                'partial' => $conditionScores->filter(fn ($s) => $s >= 40 && $s < 80)->count(),
+                'incomplete' => $conditionScores->filter(fn ($s) => $s < 40)->count(),
                 'average_score' => round($conditionScores->avg() ?? 0, 1),
             ];
 
-            // Interventions completeness
-            $interventions = Intervention::all();
+            // Interventions completeness — use withCount to avoid N+1 queries
+            $interventions = Intervention::withCount(['evidenceEntries', 'conditions'])->get();
             $interventionScores = $interventions->map(function ($intervention) {
                 $score = 0;
                 $maxScore = 5;
 
-                if (!empty($intervention->name)) $score++;
-                if (!empty($intervention->description)) $score++;
-                if (!empty($intervention->care_domain_id)) $score++;
-                if ($intervention->evidenceEntries()->count() > 0) $score++;
-                if ($intervention->conditions()->count() > 0) $score++;
+                if (! empty($intervention->name)) {
+                    $score++;
+                }
+                if (! empty($intervention->description)) {
+                    $score++;
+                }
+                if (! empty($intervention->care_domain_id)) {
+                    $score++;
+                }
+                if ($intervention->evidence_entries_count > 0) {
+                    $score++;
+                }
+                if ($intervention->conditions_count > 0) {
+                    $score++;
+                }
 
                 return ($score / $maxScore) * 100;
             });
 
             $result['interventions'] = [
                 'total' => $interventions->count(),
-                'complete' => $interventionScores->filter(fn($s) => $s >= 80)->count(),
-                'partial' => $interventionScores->filter(fn($s) => $s >= 40 && $s < 80)->count(),
-                'incomplete' => $interventionScores->filter(fn($s) => $s < 40)->count(),
+                'complete' => $interventionScores->filter(fn ($s) => $s >= 80)->count(),
+                'partial' => $interventionScores->filter(fn ($s) => $s >= 40 && $s < 80)->count(),
+                'incomplete' => $interventionScores->filter(fn ($s) => $s < 40)->count(),
                 'average_score' => round($interventionScores->avg() ?? 0, 1),
             ];
 
-            // Recipes completeness
-            $recipes = Recipe::all();
+            // Recipes completeness — use withCount to avoid N+1 queries
+            $recipes = Recipe::withCount(['conditions'])->get();
             $recipeScores = $recipes->map(function ($recipe) {
                 $score = 0;
                 $maxScore = 5;
 
-                if (!empty($recipe->title)) $score++;
-                if (!empty($recipe->description)) $score++;
-                if (!empty($recipe->ingredients)) $score++;
-                if (!empty($recipe->instructions)) $score++;
-                if ($recipe->conditions()->count() > 0) $score++;
+                if (! empty($recipe->title)) {
+                    $score++;
+                }
+                if (! empty($recipe->description)) {
+                    $score++;
+                }
+                if (! empty($recipe->ingredients)) {
+                    $score++;
+                }
+                if (! empty($recipe->instructions)) {
+                    $score++;
+                }
+                if ($recipe->conditions_count > 0) {
+                    $score++;
+                }
 
                 return ($score / $maxScore) * 100;
             });
 
             $result['recipes'] = [
                 'total' => $recipes->count(),
-                'complete' => $recipeScores->filter(fn($s) => $s >= 80)->count(),
-                'partial' => $recipeScores->filter(fn($s) => $s >= 40 && $s < 80)->count(),
-                'incomplete' => $recipeScores->filter(fn($s) => $s < 40)->count(),
+                'complete' => $recipeScores->filter(fn ($s) => $s >= 80)->count(),
+                'partial' => $recipeScores->filter(fn ($s) => $s >= 40 && $s < 80)->count(),
+                'incomplete' => $recipeScores->filter(fn ($s) => $s < 40)->count(),
                 'average_score' => round($recipeScores->avg() ?? 0, 1),
             ];
 
@@ -356,7 +386,7 @@ class AnalyticsController extends Controller
 
         return response()->json([
             'data' => $report,
-            'filename' => 'analytics_report_' . Carbon::now()->format('Y-m-d_His') . '.json',
+            'filename' => 'analytics_report_'.Carbon::now()->format('Y-m-d_His').'.json',
         ]);
     }
 

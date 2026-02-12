@@ -21,8 +21,11 @@ use Illuminate\Support\Facades\Log;
 class AiContentService
 {
     protected ?Client $client = null;
+
     protected ?string $apiKey = null;
+
     protected string $draftModel;
+
     protected string $structureModel;
 
     /**
@@ -88,8 +91,10 @@ class AiContentService
                 'connect_timeout' => 30,
             ];
 
-            // Disable SSL verification on Windows local environment
-            if (config('app.env') === 'local' && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // SSL verification can be disabled via GEMINI_VERIFY_SSL=false in .env
+            // This is blocked in production regardless of config
+            $verifySsl = config('services.gemini.verify_ssl', true);
+            if (! $verifySsl && config('app.env') !== 'production') {
                 $guzzleOptions['verify'] = false;
             }
 
@@ -108,7 +113,7 @@ class AiContentService
      */
     public function generateDraft(string $conditionName, string $context = ''): array
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return ['error' => 'Gemini API is not configured. Please add GEMINI_API_KEY to your .env file.'];
         }
 
@@ -126,6 +131,7 @@ class AiContentService
                 );
 
                 Log::info("AI Content draft generation succeeded on attempt {$attempt}");
+
                 return [
                     'success' => true,
                     'condition_name' => $conditionName,
@@ -137,12 +143,14 @@ class AiContentService
 
                 if ($attempt < $maxRetries) {
                     sleep($attempt * 2);
+
                     continue;
                 }
             }
         }
 
         Log::error("AI Content draft generation failed after {$maxRetries} attempts: {$lastError}");
+
         return ['error' => 'Failed to generate draft after multiple attempts. Please try again.'];
     }
 
@@ -151,7 +159,7 @@ class AiContentService
      */
     public function structureContent(string $conditionName, string $approvedDraft): array
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return ['error' => 'Gemini API is not configured.'];
         }
 
@@ -179,12 +187,15 @@ class AiContentService
                     Log::warning("AI Content structure parse error on attempt {$attempt}: {$lastError}");
                     if ($attempt < $maxRetries) {
                         sleep(2); // Brief pause before retry
+
                         continue;
                     }
+
                     return $structured;
                 }
 
                 Log::info("AI Content structure succeeded on attempt {$attempt}");
+
                 return [
                     'success' => true,
                     'structured' => $structured,
@@ -196,12 +207,14 @@ class AiContentService
                 if ($attempt < $maxRetries) {
                     // Wait before retry (exponential backoff)
                     sleep($attempt * 2);
+
                     continue;
                 }
             }
         }
 
         Log::error("AI Content structure failed after {$maxRetries} attempts: {$lastError}");
+
         return ['error' => 'Failed to structure content after multiple attempts. Please try again.'];
     }
 
@@ -228,9 +241,9 @@ class AiContentService
         ];
 
         // Log the incoming structured data for debugging
-        Log::info('AI Content Import - Incoming data keys: ' . implode(', ', array_keys($structured)));
-        Log::info('AI Content Import - Sections count: ' . count($structured['condition_sections'] ?? []));
-        Log::info('AI Content Import - Interventions count: ' . count($structured['interventions'] ?? []));
+        Log::info('AI Content Import - Incoming data keys: '.implode(', ', array_keys($structured)));
+        Log::info('AI Content Import - Sections count: '.count($structured['condition_sections'] ?? []));
+        Log::info('AI Content Import - Interventions count: '.count($structured['interventions'] ?? []));
 
         DB::beginTransaction();
 
@@ -249,7 +262,7 @@ class AiContentService
                     $condition = $existingCondition;
                     $results['condition'] = $condition->id;
                     $results['condition_existed'] = true;
-                    Log::info('AI Content Import - Using existing condition: ' . $condition->id);
+                    Log::info('AI Content Import - Using existing condition: '.$condition->id);
                 } else {
                     $condition = Condition::create([
                         'name' => $conditionName,
@@ -258,17 +271,17 @@ class AiContentService
                     ]);
                     $results['condition'] = $condition->id;
                     $results['condition_existed'] = false;
-                    Log::info('AI Content Import - Condition created: ' . $condition->id);
+                    Log::info('AI Content Import - Condition created: '.$condition->id);
                 }
             }
 
-            if (!$results['condition']) {
+            if (! $results['condition']) {
                 throw new \Exception('Condition is required');
             }
 
             // 2. Create condition sections
             if (isset($structured['condition_sections']) && is_array($structured['condition_sections'])) {
-                Log::info('AI Content Import - Processing ' . count($structured['condition_sections']) . ' sections');
+                Log::info('AI Content Import - Processing '.count($structured['condition_sections']).' sections');
                 foreach ($structured['condition_sections'] as $index => $sectionData) {
                     try {
                         $section = ConditionSection::create([
@@ -279,9 +292,9 @@ class AiContentService
                             'order_index' => $sectionData['order_index'] ?? $index,
                         ]);
                         $results['condition_sections'][] = $section->id;
-                        Log::info('AI Content Import - Section created: ' . $section->section_type);
+                        Log::info('AI Content Import - Section created: '.$section->section_type);
                     } catch (\Exception $e) {
-                        Log::error('AI Content Import - Section error: ' . $e->getMessage());
+                        Log::error('AI Content Import - Section error: '.$e->getMessage());
                         $results['errors'][] = "Section error: {$e->getMessage()}";
                     }
                 }
@@ -300,13 +313,14 @@ class AiContentService
             // 4. Create interventions and link to condition
             $interventionMap = []; // name => id mapping
             if (isset($structured['interventions']) && is_array($structured['interventions'])) {
-                Log::info('AI Content Import - Processing ' . count($structured['interventions']) . ' interventions');
+                Log::info('AI Content Import - Processing '.count($structured['interventions']).' interventions');
                 foreach ($structured['interventions'] as $index => $intData) {
                     // Find care domain
                     $careDomain = CareDomain::where('name', $intData['care_domain'])->first();
-                    if (!$careDomain) {
-                        Log::warning('AI Content Import - Care domain not found: ' . ($intData['care_domain'] ?? 'unknown'));
+                    if (! $careDomain) {
+                        Log::warning('AI Content Import - Care domain not found: '.($intData['care_domain'] ?? 'unknown'));
                         $results['errors'][] = "Care domain not found: {$intData['care_domain']}";
+
                         continue;
                     }
 
@@ -318,7 +332,7 @@ class AiContentService
                     if ($existingIntervention) {
                         $intervention = $existingIntervention;
                         $results['interventions_reused']++;
-                        Log::info('AI Content Import - Using existing intervention: ' . $intervention->name);
+                        Log::info('AI Content Import - Using existing intervention: '.$intervention->name);
                     } else {
                         $intervention = Intervention::create([
                             'care_domain_id' => $careDomain->id,
@@ -326,7 +340,7 @@ class AiContentService
                             'description' => $intData['description'] ?? null,
                             'mechanism' => $intData['mechanism'] ?? null,
                         ]);
-                        Log::info('AI Content Import - Intervention created: ' . $intervention->name);
+                        Log::info('AI Content Import - Intervention created: '.$intervention->name);
                     }
 
                     $interventionMap[$intData['name']] = $intervention->id;
@@ -337,7 +351,7 @@ class AiContentService
                     $condition = Condition::find($results['condition']);
 
                     // Check if already attached
-                    if (!$condition->interventions()->where('intervention_id', $intervention->id)->exists()) {
+                    if (! $condition->interventions()->where('intervention_id', $intervention->id)->exists()) {
                         $condition->interventions()->attach($intervention->id, [
                             'strength_of_evidence' => $pivot['strength_of_evidence'] ?? 'emerging',
                             'recommendation_level' => $pivot['recommendation_level'] ?? 'optional',
@@ -352,8 +366,9 @@ class AiContentService
             if (isset($structured['evidence_entries'])) {
                 foreach ($structured['evidence_entries'] as $evData) {
                     $interventionId = $interventionMap[$evData['intervention_name']] ?? null;
-                    if (!$interventionId) {
+                    if (! $interventionId) {
                         $results['errors'][] = "Intervention not found for evidence: {$evData['intervention_name']}";
+
                         continue;
                     }
 
@@ -396,19 +411,19 @@ class AiContentService
                     if ($existingScripture) {
                         $scripture = $existingScripture;
                         $results['scriptures_reused']++;
-                        Log::info('AI Content Import - Using existing scripture: ' . $scripture->reference);
+                        Log::info('AI Content Import - Using existing scripture: '.$scripture->reference);
                     } else {
                         $scripture = Scripture::create([
                             'reference' => $scrData['reference'],
                             'text' => $scrData['text'],
                             'theme' => $scrData['theme'] ?? null,
                         ]);
-                        Log::info('AI Content Import - Scripture created: ' . $scripture->reference);
+                        Log::info('AI Content Import - Scripture created: '.$scripture->reference);
                     }
 
                     $results['scriptures'][] = $scripture->id;
 
-                    if (!$condition->scriptures()->where('scripture_id', $scripture->id)->exists()) {
+                    if (! $condition->scriptures()->where('scripture_id', $scripture->id)->exists()) {
                         $condition->scriptures()->attach($scripture->id);
                     }
                 }
@@ -425,7 +440,7 @@ class AiContentService
                     $existingEgw = EgwReference::whereRaw('LOWER(book) = ?', [strtolower($egwData['book'])])
                         ->where(function ($query) use ($egwData, $quotePrefix) {
                             // Match by page if available, otherwise by quote prefix
-                            if (!empty($egwData['page_start'])) {
+                            if (! empty($egwData['page_start'])) {
                                 $query->where('page_start', $egwData['page_start']);
                             } else {
                                 $query->whereRaw('LOWER(SUBSTRING(quote, 1, 100)) = ?', [strtolower($quotePrefix)]);
@@ -436,7 +451,7 @@ class AiContentService
                     if ($existingEgw) {
                         $egw = $existingEgw;
                         $results['egw_references_reused']++;
-                        Log::info('AI Content Import - Using existing EGW reference: ' . $egw->id);
+                        Log::info('AI Content Import - Using existing EGW reference: '.$egw->id);
                     } else {
                         $egw = EgwReference::create([
                             'book' => $egwData['book'],
@@ -449,13 +464,13 @@ class AiContentService
                             'topic' => $egwData['topic'] ?? null,
                             'context' => $egwData['context'] ?? null,
                         ]);
-                        Log::info('AI Content Import - EGW reference created: ' . $egw->id);
+                        Log::info('AI Content Import - EGW reference created: '.$egw->id);
                     }
 
                     $results['egw_references'][] = $egw->id;
 
                     // Only attach if not already linked
-                    if (!$condition->egwReferences()->where('egw_reference_id', $egw->id)->exists()) {
+                    if (! $condition->egwReferences()->where('egw_reference_id', $egw->id)->exists()) {
                         $condition->egwReferences()->attach($egw->id);
                     }
                 }
@@ -464,12 +479,12 @@ class AiContentService
             // 8. Create or find recipes and link to condition
             // All AI-generated recipes must be vegetarian
             // Match by title (case-insensitive)
-            if (isset($structured['recipes']) && !empty($structured['recipes'])) {
+            if (isset($structured['recipes']) && ! empty($structured['recipes'])) {
                 $condition = Condition::find($results['condition']);
                 foreach ($structured['recipes'] as $recData) {
                     // Ensure vegetarian tag is present
                     $dietaryTags = $recData['dietary_tags'] ?? [];
-                    if (is_array($dietaryTags) && !in_array('vegetarian', array_map('strtolower', $dietaryTags))) {
+                    if (is_array($dietaryTags) && ! in_array('vegetarian', array_map('strtolower', $dietaryTags))) {
                         $dietaryTags[] = 'vegetarian';
                     }
 
@@ -481,11 +496,11 @@ class AiContentService
                         $results['recipes_reused']++;
                         // Merge dietary tags if the existing recipe doesn't have vegetarian
                         $existingTags = $existingRecipe->dietary_tags ?? [];
-                        if (is_array($existingTags) && !in_array('vegetarian', array_map('strtolower', $existingTags))) {
+                        if (is_array($existingTags) && ! in_array('vegetarian', array_map('strtolower', $existingTags))) {
                             $existingTags[] = 'vegetarian';
                             $existingRecipe->update(['dietary_tags' => $existingTags]);
                         }
-                        Log::info('AI Content Import - Using existing recipe: ' . $recipe->id);
+                        Log::info('AI Content Import - Using existing recipe: '.$recipe->id);
                     } else {
                         $recipe = Recipe::create([
                             'title' => $recData['title'],
@@ -497,13 +512,13 @@ class AiContentService
                             'prep_time_minutes' => $recData['prep_time_minutes'] ?? null,
                             'cook_time_minutes' => $recData['cook_time_minutes'] ?? null,
                         ]);
-                        Log::info('AI Content Import - Recipe created: ' . $recipe->id);
+                        Log::info('AI Content Import - Recipe created: '.$recipe->id);
                     }
 
                     $results['recipes'][] = $recipe->id;
 
                     // Only attach if not already linked
-                    if (!$condition->recipes()->where('recipe_id', $recipe->id)->exists()) {
+                    if (! $condition->recipes()->where('recipe_id', $recipe->id)->exists()) {
                         $condition->recipes()->attach($recipe->id);
                     }
                 }
@@ -517,9 +532,10 @@ class AiContentService
             ];
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('AI Content import error: ' . $e->getMessage());
+            Log::error('AI Content import error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
             return [
-                'error' => 'Failed to import content: ' . $e->getMessage(),
+                'error' => 'Failed to import content. Please try again.',
                 'results' => $results,
             ];
         }
@@ -742,34 +758,41 @@ PROMPT;
 
         // Check aliases
         if (isset(self::STUDY_TYPE_ALIASES[$normalized])) {
-            Log::info("AI Content Import - Mapped study type '{$studyType}' to '" . self::STUDY_TYPE_ALIASES[$normalized] . "'");
+            Log::info("AI Content Import - Mapped study type '{$studyType}' to '".self::STUDY_TYPE_ALIASES[$normalized]."'");
+
             return self::STUDY_TYPE_ALIASES[$normalized];
         }
 
         // Try partial matching for common patterns
         if (str_contains($normalized, 'rct') || str_contains($normalized, 'randomized') || str_contains($normalized, 'randomised')) {
             Log::info("AI Content Import - Mapped study type '{$studyType}' to 'rct' (pattern match)");
+
             return 'rct';
         }
         if (str_contains($normalized, 'meta') || str_contains($normalized, 'analysis')) {
             Log::info("AI Content Import - Mapped study type '{$studyType}' to 'meta_analysis' (pattern match)");
+
             return 'meta_analysis';
         }
         if (str_contains($normalized, 'systematic') || str_contains($normalized, 'review')) {
             Log::info("AI Content Import - Mapped study type '{$studyType}' to 'systematic_review' (pattern match)");
+
             return 'systematic_review';
         }
         if (str_contains($normalized, 'cohort') || str_contains($normalized, 'longitudinal') || str_contains($normalized, 'observ') || str_contains($normalized, 'cross')) {
             Log::info("AI Content Import - Mapped study type '{$studyType}' to 'observational' (pattern match)");
+
             return 'observational';
         }
         if (str_contains($normalized, 'case')) {
             Log::info("AI Content Import - Mapped study type '{$studyType}' to 'case_series' (pattern match)");
+
             return 'case_series';
         }
 
         // Default fallback
         Log::warning("AI Content Import - Unknown study type '{$studyType}', defaulting to 'observational'");
+
         return 'observational';
     }
 
@@ -786,8 +809,9 @@ PROMPT;
         $decoded = json_decode($text, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::warning('Failed to parse AI JSON response: ' . json_last_error_msg());
-            Log::debug('Raw response: ' . substr($text, 0, 500));
+            Log::warning('Failed to parse AI JSON response: '.json_last_error_msg());
+            Log::debug('Raw response: '.substr($text, 0, 500));
+
             return ['error' => 'Failed to parse structured content. The AI response was not valid JSON.'];
         }
 

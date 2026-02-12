@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Condition;
 use App\Models\Intervention;
 use App\Models\InterventionRelationship;
-use App\Models\InterventionEffectiveness;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -98,7 +97,7 @@ class KnowledgeGraphController extends Controller
         foreach ($condition->interventions as $intervention) {
             $interventionNodeId = "intervention-{$intervention->id}";
 
-            if (!isset($nodeIds[$interventionNodeId])) {
+            if (! isset($nodeIds[$interventionNodeId])) {
                 $nodes[] = $this->createInterventionNode($intervention);
                 $nodeIds[$interventionNodeId] = true;
             }
@@ -111,7 +110,7 @@ class KnowledgeGraphController extends Controller
                 // Care Domain
                 if ($intervention->careDomain) {
                     $domainNodeId = "careDomain-{$intervention->careDomain->id}";
-                    if (!isset($nodeIds[$domainNodeId])) {
+                    if (! isset($nodeIds[$domainNodeId])) {
                         $nodes[] = $this->createCareDomainNode($intervention->careDomain);
                         $nodeIds[$domainNodeId] = true;
                     }
@@ -127,7 +126,7 @@ class KnowledgeGraphController extends Controller
                 // Evidence Entries
                 foreach ($intervention->evidenceEntries as $evidence) {
                     $evidenceNodeId = "evidence-{$evidence->id}";
-                    if (!isset($nodeIds[$evidenceNodeId])) {
+                    if (! isset($nodeIds[$evidenceNodeId])) {
                         $nodes[] = $this->createEvidenceNode($evidence);
                         $nodeIds[$evidenceNodeId] = true;
                     }
@@ -143,7 +142,7 @@ class KnowledgeGraphController extends Controller
                         // References
                         foreach ($evidence->references as $reference) {
                             $refNodeId = "reference-{$reference->id}";
-                            if (!isset($nodeIds[$refNodeId])) {
+                            if (! isset($nodeIds[$refNodeId])) {
                                 $nodes[] = $this->createReferenceNode($reference);
                                 $nodeIds[$refNodeId] = true;
                             }
@@ -163,7 +162,7 @@ class KnowledgeGraphController extends Controller
         // Scriptures
         foreach ($condition->scriptures as $scripture) {
             $scriptureNodeId = "scripture-{$scripture->id}";
-            if (!isset($nodeIds[$scriptureNodeId])) {
+            if (! isset($nodeIds[$scriptureNodeId])) {
                 $nodes[] = $this->createScriptureNode($scripture);
                 $nodeIds[$scriptureNodeId] = true;
             }
@@ -179,7 +178,7 @@ class KnowledgeGraphController extends Controller
         // Recipes
         foreach ($condition->recipes as $recipe) {
             $recipeNodeId = "recipe-{$recipe->id}";
-            if (!isset($nodeIds[$recipeNodeId])) {
+            if (! isset($nodeIds[$recipeNodeId])) {
                 $nodes[] = $this->createRecipeNode($recipe);
                 $nodeIds[$recipeNodeId] = true;
             }
@@ -195,7 +194,7 @@ class KnowledgeGraphController extends Controller
         // EGW References
         foreach ($condition->egwReferences as $egwRef) {
             $egwNodeId = "egwReference-{$egwRef->id}";
-            if (!isset($nodeIds[$egwNodeId])) {
+            if (! isset($nodeIds[$egwNodeId])) {
                 $nodes[] = $this->createEgwReferenceNode($egwRef);
                 $nodeIds[$egwNodeId] = true;
             }
@@ -269,7 +268,7 @@ class KnowledgeGraphController extends Controller
         // Conditions
         foreach ($intervention->conditions as $condition) {
             $conditionNodeId = "condition-{$condition->id}";
-            if (!isset($nodeIds[$conditionNodeId])) {
+            if (! isset($nodeIds[$conditionNodeId])) {
                 // Load body system for condition node
                 $condition->load('bodySystem');
                 $nodes[] = $this->createConditionNode($condition);
@@ -289,10 +288,12 @@ class KnowledgeGraphController extends Controller
                 ? $relationship->interventionB
                 : $relationship->interventionA;
 
-            if (!$otherIntervention) continue;
+            if (! $otherIntervention) {
+                continue;
+            }
 
             $otherNodeId = "intervention-{$otherIntervention->id}";
-            if (!isset($nodeIds[$otherNodeId])) {
+            if (! isset($nodeIds[$otherNodeId])) {
                 $nodes[] = $this->createInterventionNode($otherIntervention);
                 $nodeIds[$otherNodeId] = true;
             }
@@ -315,7 +316,7 @@ class KnowledgeGraphController extends Controller
             if ($depth >= 2) {
                 foreach ($evidence->references as $reference) {
                     $refNodeId = "reference-{$reference->id}";
-                    if (!isset($nodeIds[$refNodeId])) {
+                    if (! isset($nodeIds[$refNodeId])) {
                         $nodes[] = $this->createReferenceNode($reference);
                         $nodeIds[$refNodeId] = true;
                     }
@@ -333,7 +334,7 @@ class KnowledgeGraphController extends Controller
         // Scriptures
         foreach ($intervention->scriptures as $scripture) {
             $scriptureNodeId = "scripture-{$scripture->id}";
-            if (!isset($nodeIds[$scriptureNodeId])) {
+            if (! isset($nodeIds[$scriptureNodeId])) {
                 $nodes[] = $this->createScriptureNode($scripture);
                 $nodeIds[$scriptureNodeId] = true;
             }
@@ -349,7 +350,7 @@ class KnowledgeGraphController extends Controller
         // Recipes
         foreach ($intervention->recipes as $recipe) {
             $recipeNodeId = "recipe-{$recipe->id}";
-            if (!isset($nodeIds[$recipeNodeId])) {
+            if (! isset($nodeIds[$recipeNodeId])) {
                 $nodes[] = $this->createRecipeNode($recipe);
                 $nodeIds[$recipeNodeId] = true;
             }
@@ -365,7 +366,7 @@ class KnowledgeGraphController extends Controller
         // EGW References
         foreach ($intervention->egwReferences as $egwRef) {
             $egwNodeId = "egwReference-{$egwRef->id}";
-            if (!isset($nodeIds[$egwNodeId])) {
+            if (! isset($nodeIds[$egwNodeId])) {
                 $nodes[] = $this->createEgwReferenceNode($egwRef);
                 $nodeIds[$egwNodeId] = true;
             }
@@ -395,146 +396,180 @@ class KnowledgeGraphController extends Controller
      * Get full knowledge graph with pagination.
      * Supports filtering by node type and cursor-based pagination for lazy loading.
      */
+    /**
+     * Valid node types for the knowledge graph.
+     */
+    protected const VALID_NODE_TYPES = ['condition', 'intervention', 'careDomain', 'scripture', 'recipe', 'egwReference'];
+
     public function fullGraph(Request $request): JsonResponse
     {
         $limit = min((int) $request->get('limit', 50), 100);
         $page = max((int) $request->get('page', 1), 1);
-        $nodeTypes = $request->get('types') ? explode(',', $request->get('types')) : null;
         $includeEdges = $request->boolean('edges', true);
+
+        // Validate types parameter against allowlist
+        $nodeTypes = null;
+        if ($request->get('types')) {
+            $nodeTypes = array_values(array_intersect(
+                explode(',', $request->get('types')),
+                self::VALID_NODE_TYPES
+            ));
+            if (empty($nodeTypes)) {
+                $nodeTypes = null;
+            }
+        }
 
         $nodes = [];
         $edges = [];
         $nodeIds = [];
+
+        // Helper to check if type is requested
+        $shouldInclude = fn ($type) => $nodeTypes === null || in_array($type, $nodeTypes);
+
+        // Get counts via efficient COUNT queries (not loading all records)
         $stats = [
-            'conditions' => 0,
-            'interventions' => 0,
-            'careDomains' => 0,
-            'scriptures' => 0,
-            'recipes' => 0,
-            'egwReferences' => 0,
+            'conditions' => $shouldInclude('condition') ? Condition::count() : 0,
+            'interventions' => $shouldInclude('intervention') ? Intervention::count() : 0,
+            'careDomains' => $shouldInclude('careDomain') ? \App\Models\CareDomain::count() : 0,
+            'scriptures' => $shouldInclude('scripture') ? \App\Models\Scripture::count() : 0,
+            'recipes' => $shouldInclude('recipe') ? \App\Models\Recipe::count() : 0,
+            'egwReferences' => $shouldInclude('egwReference') ? \App\Models\EgwReference::count() : 0,
             'evidenceEntries' => 0,
             'references' => 0,
         ];
 
-        // Helper to check if type is requested
-        $shouldInclude = fn($type) => $nodeTypes === null || in_array($type, $nodeTypes);
-
-        // Calculate offset for pagination
+        // Calculate offset for cross-type pagination
         $offset = ($page - 1) * $limit;
         $remaining = $limit;
         $currentOffset = 0;
 
-        // Fetch conditions
+        // Fetch conditions — database-level pagination
         if ($shouldInclude('condition') && $remaining > 0) {
-            $conditions = Condition::query()
-                ->orderBy('name')
-                ->get();
+            $skipForType = max(0, $offset - $currentOffset);
+            if ($skipForType < $stats['conditions']) {
+                $conditions = Condition::query()
+                    ->orderBy('name')
+                    ->skip($skipForType)
+                    ->take($remaining)
+                    ->get();
 
-            $stats['conditions'] = $conditions->count();
-
-            foreach ($conditions as $condition) {
-                if ($currentOffset >= $offset && $remaining > 0) {
+                foreach ($conditions as $condition) {
                     $nodes[] = $this->createConditionNode($condition);
                     $nodeIds["condition-{$condition->id}"] = true;
                     $remaining--;
                 }
-                $currentOffset++;
             }
+            $currentOffset += $stats['conditions'];
         }
 
-        // Fetch interventions
+        // Fetch interventions — database-level pagination
         if ($shouldInclude('intervention') && $remaining > 0) {
-            $interventions = Intervention::with('careDomain')
-                ->orderBy('name')
-                ->get();
+            $skipForType = max(0, $offset - $currentOffset);
+            if ($skipForType < $stats['interventions']) {
+                $interventions = Intervention::with('careDomain')
+                    ->orderBy('name')
+                    ->skip($skipForType)
+                    ->take($remaining)
+                    ->get();
 
-            $stats['interventions'] = $interventions->count();
-
-            foreach ($interventions as $intervention) {
-                if ($currentOffset >= $offset && $remaining > 0) {
+                foreach ($interventions as $intervention) {
                     $nodes[] = $this->createInterventionNode($intervention);
                     $nodeIds["intervention-{$intervention->id}"] = true;
                     $remaining--;
                 }
-                $currentOffset++;
             }
+            $currentOffset += $stats['interventions'];
         }
 
-        // Fetch care domains
+        // Fetch care domains — database-level pagination
         if ($shouldInclude('careDomain') && $remaining > 0) {
-            $careDomains = \App\Models\CareDomain::orderBy('name')->get();
-            $stats['careDomains'] = $careDomains->count();
+            $skipForType = max(0, $offset - $currentOffset);
+            if ($skipForType < $stats['careDomains']) {
+                $careDomains = \App\Models\CareDomain::orderBy('name')
+                    ->skip($skipForType)
+                    ->take($remaining)
+                    ->get();
 
-            foreach ($careDomains as $domain) {
-                if ($currentOffset >= $offset && $remaining > 0) {
+                foreach ($careDomains as $domain) {
                     $nodes[] = $this->createCareDomainNode($domain);
                     $nodeIds["careDomain-{$domain->id}"] = true;
                     $remaining--;
                 }
-                $currentOffset++;
             }
+            $currentOffset += $stats['careDomains'];
         }
 
-        // Fetch scriptures
+        // Fetch scriptures — database-level pagination
         if ($shouldInclude('scripture') && $remaining > 0) {
-            $scriptures = \App\Models\Scripture::orderBy('reference')->get();
-            $stats['scriptures'] = $scriptures->count();
+            $skipForType = max(0, $offset - $currentOffset);
+            if ($skipForType < $stats['scriptures']) {
+                $scriptures = \App\Models\Scripture::orderBy('reference')
+                    ->skip($skipForType)
+                    ->take($remaining)
+                    ->get();
 
-            foreach ($scriptures as $scripture) {
-                if ($currentOffset >= $offset && $remaining > 0) {
+                foreach ($scriptures as $scripture) {
                     $nodes[] = $this->createScriptureNode($scripture);
                     $nodeIds["scripture-{$scripture->id}"] = true;
                     $remaining--;
                 }
-                $currentOffset++;
             }
+            $currentOffset += $stats['scriptures'];
         }
 
-        // Fetch recipes
+        // Fetch recipes — database-level pagination
         if ($shouldInclude('recipe') && $remaining > 0) {
-            $recipes = \App\Models\Recipe::orderBy('title')->get();
-            $stats['recipes'] = $recipes->count();
+            $skipForType = max(0, $offset - $currentOffset);
+            if ($skipForType < $stats['recipes']) {
+                $recipes = \App\Models\Recipe::orderBy('title')
+                    ->skip($skipForType)
+                    ->take($remaining)
+                    ->get();
 
-            foreach ($recipes as $recipe) {
-                if ($currentOffset >= $offset && $remaining > 0) {
+                foreach ($recipes as $recipe) {
                     $nodes[] = $this->createRecipeNode($recipe);
                     $nodeIds["recipe-{$recipe->id}"] = true;
                     $remaining--;
                 }
-                $currentOffset++;
             }
+            $currentOffset += $stats['recipes'];
         }
 
-        // Fetch EGW references
+        // Fetch EGW references — database-level pagination
         if ($shouldInclude('egwReference') && $remaining > 0) {
-            $egwRefs = \App\Models\EgwReference::orderBy('citation')->get();
-            $stats['egwReferences'] = $egwRefs->count();
+            $skipForType = max(0, $offset - $currentOffset);
+            if ($skipForType < $stats['egwReferences']) {
+                $egwRefs = \App\Models\EgwReference::orderBy('citation')
+                    ->skip($skipForType)
+                    ->take($remaining)
+                    ->get();
 
-            foreach ($egwRefs as $egwRef) {
-                if ($currentOffset >= $offset && $remaining > 0) {
+                foreach ($egwRefs as $egwRef) {
                     $nodes[] = $this->createEgwReferenceNode($egwRef);
                     $nodeIds["egwReference-{$egwRef->id}"] = true;
                     $remaining--;
                 }
-                $currentOffset++;
             }
+            $currentOffset += $stats['egwReferences'];
         }
 
-        // Fetch edges only for visible nodes (if requested)
+        // Fetch edges only for visible nodes (scoped queries, not full table scans)
         if ($includeEdges && count($nodeIds) > 0) {
-            // Condition-Intervention edges
-            $conditionInterventions = \DB::table('condition_interventions')
-                ->get();
+            // Extract entity IDs by type from visible nodes
+            $visibleIds = $this->extractVisibleIds($nodeIds);
 
-            foreach ($conditionInterventions as $pivot) {
-                $sourceId = "condition-{$pivot->condition_id}";
-                $targetId = "intervention-{$pivot->intervention_id}";
+            // Condition-Intervention edges (only for visible nodes)
+            if (! empty($visibleIds['condition']) && ! empty($visibleIds['intervention'])) {
+                $conditionInterventions = \DB::table('condition_interventions')
+                    ->whereIn('condition_id', $visibleIds['condition'])
+                    ->whereIn('intervention_id', $visibleIds['intervention'])
+                    ->get();
 
-                if (isset($nodeIds[$sourceId]) && isset($nodeIds[$targetId])) {
+                foreach ($conditionInterventions as $pivot) {
                     $edges[] = [
                         'id' => "edge-cond-int-{$pivot->condition_id}-{$pivot->intervention_id}",
-                        'source' => $sourceId,
-                        'target' => $targetId,
+                        'source' => "condition-{$pivot->condition_id}",
+                        'target' => "intervention-{$pivot->intervention_id}",
                         'type' => 'condition-intervention',
                         'animated' => $pivot->strength_of_evidence === 'high',
                         'data' => [
@@ -546,68 +581,72 @@ class KnowledgeGraphController extends Controller
                 }
             }
 
-            // Intervention-CareDomain edges
-            $interventions = Intervention::whereNotNull('care_domain_id')->get();
-            foreach ($interventions as $intervention) {
-                $sourceId = "careDomain-{$intervention->care_domain_id}";
-                $targetId = "intervention-{$intervention->id}";
+            // Intervention-CareDomain edges (only for visible nodes)
+            if (! empty($visibleIds['intervention']) && ! empty($visibleIds['careDomain'])) {
+                $interventionsWithDomain = Intervention::whereIn('id', $visibleIds['intervention'])
+                    ->whereIn('care_domain_id', $visibleIds['careDomain'])
+                    ->whereNotNull('care_domain_id')
+                    ->get(['id', 'care_domain_id']);
 
-                if (isset($nodeIds[$sourceId]) && isset($nodeIds[$targetId])) {
+                foreach ($interventionsWithDomain as $intervention) {
                     $edges[] = [
                         'id' => "edge-domain-int-{$intervention->care_domain_id}-{$intervention->id}",
-                        'source' => $sourceId,
-                        'target' => $targetId,
+                        'source' => "careDomain-{$intervention->care_domain_id}",
+                        'target' => "intervention-{$intervention->id}",
                         'type' => 'default',
                         'style' => ['stroke' => self::NODE_COLORS['careDomain'], 'strokeWidth' => 2],
                     ];
                 }
             }
 
-            // Scripture relationships
-            $conditionScriptures = \DB::table('condition_scripture')->get();
-            foreach ($conditionScriptures as $pivot) {
-                $sourceId = "condition-{$pivot->condition_id}";
-                $targetId = "scripture-{$pivot->scripture_id}";
+            // Scripture relationships (only for visible nodes)
+            if (! empty($visibleIds['condition']) && ! empty($visibleIds['scripture'])) {
+                $conditionScriptures = \DB::table('condition_scripture')
+                    ->whereIn('condition_id', $visibleIds['condition'])
+                    ->whereIn('scripture_id', $visibleIds['scripture'])
+                    ->get();
 
-                if (isset($nodeIds[$sourceId]) && isset($nodeIds[$targetId])) {
+                foreach ($conditionScriptures as $pivot) {
                     $edges[] = [
                         'id' => "edge-cond-scr-{$pivot->condition_id}-{$pivot->scripture_id}",
-                        'source' => $sourceId,
-                        'target' => $targetId,
+                        'source' => "condition-{$pivot->condition_id}",
+                        'target' => "scripture-{$pivot->scripture_id}",
                         'type' => 'default',
                         'style' => ['stroke' => self::NODE_COLORS['scripture'], 'strokeWidth' => 1, 'strokeDasharray' => '5,5'],
                     ];
                 }
             }
 
-            // Recipe relationships
-            $conditionRecipes = \DB::table('condition_recipe')->get();
-            foreach ($conditionRecipes as $pivot) {
-                $sourceId = "condition-{$pivot->condition_id}";
-                $targetId = "recipe-{$pivot->recipe_id}";
+            // Recipe relationships (only for visible nodes)
+            if (! empty($visibleIds['condition']) && ! empty($visibleIds['recipe'])) {
+                $conditionRecipes = \DB::table('condition_recipe')
+                    ->whereIn('condition_id', $visibleIds['condition'])
+                    ->whereIn('recipe_id', $visibleIds['recipe'])
+                    ->get();
 
-                if (isset($nodeIds[$sourceId]) && isset($nodeIds[$targetId])) {
+                foreach ($conditionRecipes as $pivot) {
                     $edges[] = [
                         'id' => "edge-cond-rec-{$pivot->condition_id}-{$pivot->recipe_id}",
-                        'source' => $sourceId,
-                        'target' => $targetId,
+                        'source' => "condition-{$pivot->condition_id}",
+                        'target' => "recipe-{$pivot->recipe_id}",
                         'type' => 'default',
                         'style' => ['stroke' => self::NODE_COLORS['recipe'], 'strokeWidth' => 1, 'strokeDasharray' => '5,5'],
                     ];
                 }
             }
 
-            // EGW Reference relationships
-            $conditionEgw = \DB::table('condition_egw_reference')->get();
-            foreach ($conditionEgw as $pivot) {
-                $sourceId = "condition-{$pivot->condition_id}";
-                $targetId = "egwReference-{$pivot->egw_reference_id}";
+            // EGW Reference relationships (only for visible nodes)
+            if (! empty($visibleIds['condition']) && ! empty($visibleIds['egwReference'])) {
+                $conditionEgw = \DB::table('condition_egw_reference')
+                    ->whereIn('condition_id', $visibleIds['condition'])
+                    ->whereIn('egw_reference_id', $visibleIds['egwReference'])
+                    ->get();
 
-                if (isset($nodeIds[$sourceId]) && isset($nodeIds[$targetId])) {
+                foreach ($conditionEgw as $pivot) {
                     $edges[] = [
                         'id' => "edge-cond-egw-{$pivot->condition_id}-{$pivot->egw_reference_id}",
-                        'source' => $sourceId,
-                        'target' => $targetId,
+                        'source' => "condition-{$pivot->condition_id}",
+                        'target' => "egwReference-{$pivot->egw_reference_id}",
                         'type' => 'default',
                         'style' => ['stroke' => self::NODE_COLORS['egwReference'], 'strokeWidth' => 1, 'strokeDasharray' => '5,5'],
                     ];
@@ -617,7 +656,7 @@ class KnowledgeGraphController extends Controller
 
         // Calculate totals
         $totalNodes = array_sum($stats);
-        $totalPages = ceil($totalNodes / $limit);
+        $totalPages = $totalNodes > 0 ? (int) ceil($totalNodes / $limit) : 1;
 
         return response()->json([
             'nodes' => $nodes,
@@ -632,6 +671,33 @@ class KnowledgeGraphController extends Controller
                 'stats' => $stats,
             ],
         ]);
+    }
+
+    /**
+     * Extract entity IDs by type from the visible nodeIds map.
+     */
+    protected function extractVisibleIds(array $nodeIds): array
+    {
+        $visibleIds = [];
+        $prefixMap = [
+            'condition-' => 'condition',
+            'intervention-' => 'intervention',
+            'careDomain-' => 'careDomain',
+            'scripture-' => 'scripture',
+            'recipe-' => 'recipe',
+            'egwReference-' => 'egwReference',
+        ];
+
+        foreach (array_keys($nodeIds) as $nodeId) {
+            foreach ($prefixMap as $prefix => $type) {
+                if (str_starts_with($nodeId, $prefix)) {
+                    $visibleIds[$type][] = substr($nodeId, strlen($prefix));
+                    break;
+                }
+            }
+        }
+
+        return $visibleIds;
     }
 
     // ==================== Node Creators ====================

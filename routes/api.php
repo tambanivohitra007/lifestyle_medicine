@@ -5,29 +5,29 @@ use App\Http\Controllers\Api\AiSuggestionController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BibleController;
+use App\Http\Controllers\Api\BodySystemController;
 use App\Http\Controllers\Api\CareDomainController;
 use App\Http\Controllers\Api\ConditionController;
+use App\Http\Controllers\Api\ConditionMediaController;
+use App\Http\Controllers\Api\ConditionMindmapController;
 use App\Http\Controllers\Api\ConditionSectionController;
 use App\Http\Controllers\Api\ContentTagController;
 use App\Http\Controllers\Api\EgwReferenceController;
 use App\Http\Controllers\Api\EvidenceEntryController;
 use App\Http\Controllers\Api\EvidenceSummaryController;
 use App\Http\Controllers\Api\ExportController;
-use App\Http\Controllers\Api\BodySystemController;
-use App\Http\Controllers\Api\InterventionEffectivenessController;
-use App\Http\Controllers\Api\InterventionRelationshipController;
 use App\Http\Controllers\Api\ImportController;
+use App\Http\Controllers\Api\InfographicController;
 use App\Http\Controllers\Api\InterventionController;
+use App\Http\Controllers\Api\InterventionEffectivenessController;
 use App\Http\Controllers\Api\InterventionProtocolController;
-use App\Http\Controllers\Api\ConditionMindmapController;
+use App\Http\Controllers\Api\InterventionRelationshipController;
 use App\Http\Controllers\Api\KnowledgeGraphController;
+use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\RecipeController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ScriptureController;
 use App\Http\Controllers\Api\SearchController;
-use App\Http\Controllers\Api\MediaController;
-use App\Http\Controllers\Api\ConditionMediaController;
-use App\Http\Controllers\Api\InfographicController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -288,6 +288,9 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin'])->group(fun
         Route::post('conditions/{condition}/infographics/generate', [InfographicController::class, 'generate']);
         Route::post('infographics/{infographic}/retry', [InfographicController::class, 'retry']);
     });
+
+    // AI request status polling (not rate limited, for polling)
+    Route::get('ai/requests/{aiRequest}/status', [AiContentController::class, 'requestStatus']);
 
     // Infographic status endpoints - not rate limited (for polling)
     Route::get('infographics/status', [InfographicController::class, 'status']);

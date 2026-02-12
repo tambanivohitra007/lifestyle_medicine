@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 class GeminiService
 {
     protected ?Client $client = null;
+
     protected ?string $apiKey = null;
 
     public function __construct()
@@ -19,15 +20,11 @@ class GeminiService
         if ($this->apiKey) {
             $httpClient = null;
 
-            // SSL verification can be disabled via explicit environment variable
-            // ONLY use this for local development when you cannot configure CA bundle
-            // NEVER disable in production - set GEMINI_VERIFY_SSL=true in production .env
+            // SSL verification can be disabled via GEMINI_VERIFY_SSL=false in .env
+            // This is blocked in production regardless of config
             $verifySsl = config('services.gemini.verify_ssl', true);
-
-            if (!$verifySsl && config('app.env') === 'local') {
-                $httpClient = new GuzzleClient([
-                    'verify' => false,
-                ]);
+            if (! $verifySsl && config('app.env') !== 'production') {
+                $httpClient = new GuzzleClient(['verify' => false]);
             }
 
             $this->client = new Client($this->apiKey, $httpClient);
@@ -50,13 +47,13 @@ class GeminiService
      */
     public function generateText(string $systemInstruction, string $userPrompt): string
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             // Throw exception so caller can handle appropriately with context-aware fallback
             throw new \RuntimeException('Gemini API is not configured.');
         }
 
         // Combine instructions since the wrapper usually handles single prompts best
-        $fullPrompt = $systemInstruction . "\n\nTask: " . $userPrompt;
+        $fullPrompt = $systemInstruction."\n\nTask: ".$userPrompt;
 
         try {
             // Use gemini-2.5-flash for speed
@@ -73,7 +70,7 @@ class GeminiService
 
             return $text;
         } catch (\Exception $e) {
-            Log::error('Gemini text generation error: ' . $e->getMessage());
+            Log::error('Gemini text generation error: '.$e->getMessage());
             // Re-throw so caller can use context-aware fallback
             throw $e;
         }
@@ -84,7 +81,7 @@ class GeminiService
      */
     public function suggestScriptures(string $topic, string $context = ''): array
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return ['error' => 'Gemini API is not configured. Please add GEMINI_API_KEY to your .env file.'];
         }
 
@@ -97,9 +94,11 @@ class GeminiService
             );
 
             $text = $response->text();
+
             return $this->parseScriptureSuggestions($text);
         } catch (\Exception $e) {
-            Log::error('Gemini Scripture suggestion error: ' . $e->getMessage());
+            Log::error('Gemini Scripture suggestion error: '.$e->getMessage());
+
             return ['error' => 'Failed to generate suggestions. Please try again.'];
         }
     }
@@ -109,7 +108,7 @@ class GeminiService
      */
     public function suggestEgwReferences(string $topic, string $context = ''): array
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return ['error' => 'Gemini API is not configured. Please add GEMINI_API_KEY to your .env file.'];
         }
 
@@ -122,9 +121,11 @@ class GeminiService
             );
 
             $text = $response->text();
+
             return $this->parseEgwSuggestions($text);
         } catch (\Exception $e) {
-            Log::error('Gemini EGW suggestion error: ' . $e->getMessage());
+            Log::error('Gemini EGW suggestion error: '.$e->getMessage());
+
             return ['error' => 'Failed to generate suggestions. Please try again.'];
         }
     }
@@ -222,7 +223,8 @@ PROMPT;
         $decoded = json_decode($text, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::warning('Failed to parse Scripture suggestions: ' . json_last_error_msg());
+            Log::warning('Failed to parse Scripture suggestions: '.json_last_error_msg());
+
             return ['error' => 'Failed to parse suggestions. The AI response was not in the expected format.'];
         }
 
@@ -242,7 +244,8 @@ PROMPT;
         $decoded = json_decode($text, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::warning('Failed to parse EGW suggestions: ' . json_last_error_msg());
+            Log::warning('Failed to parse EGW suggestions: '.json_last_error_msg());
+
             return ['error' => 'Failed to parse suggestions. The AI response was not in the expected format.'];
         }
 

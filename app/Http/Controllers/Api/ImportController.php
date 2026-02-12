@@ -7,6 +7,7 @@ use App\Imports\ConditionsImport;
 use App\Imports\InterventionsImport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ImportController extends Controller
@@ -21,7 +22,7 @@ class ImportController extends Controller
         ]);
 
         try {
-            $import = new ConditionsImport();
+            $import = new ConditionsImport;
             Excel::import($import, $request->file('file'));
 
             $errors = collect($import->errors())->map(function ($error) {
@@ -38,8 +39,10 @@ class ImportController extends Controller
                 'errors' => $errors,
             ]);
         } catch (\Exception $e) {
+            Log::error('Import failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
             return response()->json([
-                'message' => 'Import failed: ' . $e->getMessage(),
+                'message' => 'Import failed. Please check the file format and try again.',
             ], 422);
         }
     }
@@ -54,7 +57,7 @@ class ImportController extends Controller
         ]);
 
         try {
-            $import = new InterventionsImport();
+            $import = new InterventionsImport;
             Excel::import($import, $request->file('file'));
 
             $errors = collect($import->errors())->map(function ($error) {
@@ -71,8 +74,10 @@ class ImportController extends Controller
                 'errors' => $errors,
             ]);
         } catch (\Exception $e) {
+            Log::error('Import failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
             return response()->json([
-                'message' => 'Import failed: ' . $e->getMessage(),
+                'message' => 'Import failed. Please check the file format and try again.',
             ], 422);
         }
     }
