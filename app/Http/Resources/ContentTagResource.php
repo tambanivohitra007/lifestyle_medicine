@@ -15,6 +15,7 @@ class ContentTagResource extends JsonResource
             'interventions_count' => $this->whenCounted('interventions'),
             'recipes_count' => $this->whenCounted('recipes'),
             'scriptures_count' => $this->whenCounted('scriptures'),
+            'egw_references_count' => $this->whenCounted('egwReferences'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

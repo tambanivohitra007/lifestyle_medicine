@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ContentTag extends Model
 {
-    use HasFactory, SoftDeletes, HasAuditFields;
+    use HasAuditFields, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'tag',
@@ -42,6 +42,16 @@ class ContentTag extends Model
     public function scriptures(): BelongsToMany
     {
         return $this->belongsToMany(Scripture::class, 'scripture_tag')
+            ->withPivot(['created_by', 'deleted_by'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the EGW references with this tag.
+     */
+    public function egwReferences(): BelongsToMany
+    {
+        return $this->belongsToMany(EgwReference::class, 'egw_reference_tag')
             ->withPivot(['created_by', 'deleted_by'])
             ->withTimestamps();
     }

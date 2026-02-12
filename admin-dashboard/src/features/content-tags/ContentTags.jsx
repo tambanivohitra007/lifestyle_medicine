@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Search, Tag, Edit, Trash2, Loader2, X, Check, Activity, ChefHat, Book } from 'lucide-react';
+import { Plus, Search, Tag, Edit, Trash2, Loader2, X, Check, Activity, ChefHat, Book, BookMarked } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 
@@ -82,7 +82,7 @@ const ContentTags = () => {
 
   const startEditing = (tag) => {
     setEditingId(tag.id);
-    setEditValue(tag.name || tag.tag);
+    setEditValue(tag.tag);
   };
 
   const cancelEditing = () => {
@@ -91,7 +91,7 @@ const ContentTags = () => {
   };
 
   const filteredTags = tags.filter((tag) =>
-    (tag.name || tag.tag || '').toLowerCase().includes(searchTerm.toLowerCase())
+    (tag.tag || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -112,7 +112,7 @@ const ContentTags = () => {
             type="text"
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleCreate()}
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
             className="input-field flex-1"
             placeholder="Enter a new tag..."
           />
@@ -176,7 +176,7 @@ const ContentTags = () => {
                       type="text"
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleUpdate(tag.id)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleUpdate(tag.id)}
                       className="input-field flex-1"
                       autoFocus
                     />
@@ -199,7 +199,7 @@ const ContentTags = () => {
                     <div className="flex items-center gap-3 flex-1">
                       <Tag className="w-5 h-5 text-gray-400 flex-shrink-0" />
                       <div>
-                        <span className="font-medium text-gray-900">{tag.name || tag.tag}</span>
+                        <span className="font-medium text-gray-900">{tag.tag}</span>
                         {/* Usage counts */}
                         <div className="flex flex-wrap gap-3 mt-1">
                           {tag.interventions_count !== undefined && (
@@ -220,6 +220,12 @@ const ContentTags = () => {
                               {tag.scriptures_count} scriptures
                             </span>
                           )}
+                          {tag.egw_references_count !== undefined && (
+                            <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                              <BookMarked className="w-3 h-3" />
+                              {tag.egw_references_count} EGW references
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -232,7 +238,7 @@ const ContentTags = () => {
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
-                        onClick={() => handleDelete(tag.id, tag.name || tag.tag)}
+                        onClick={() => handleDelete(tag.id, tag.tag)}
                         className="action-btn hover:bg-red-50 active:bg-red-100"
                         title="Delete"
                       >
