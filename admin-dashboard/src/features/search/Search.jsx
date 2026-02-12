@@ -12,12 +12,16 @@ import {
   X,
   Clock,
   ArrowRight,
-  Command,
   CornerDownLeft,
   ChevronUp,
   ChevronDown,
   Sparkles,
   Zap,
+  Bookmark,
+  Layers,
+  Tag,
+  ClipboardList,
+  Waypoints,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
@@ -25,11 +29,16 @@ import api, { apiEndpoints } from '../../lib/api';
 const ENTITY_TYPES = [
   { key: 'conditions', labelKey: 'search:types.conditions', icon: Heart, color: 'text-rose-600', bgColor: 'bg-rose-50', borderColor: 'border-rose-200' },
   { key: 'interventions', labelKey: 'search:types.interventions', icon: Activity, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
+  { key: 'care_domains', labelKey: 'search:types.careDomains', icon: Bookmark, color: 'text-teal-600', bgColor: 'bg-teal-50', borderColor: 'border-teal-200' },
   { key: 'scriptures', labelKey: 'search:types.scriptures', icon: Book, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' },
   { key: 'egw_references', labelKey: 'search:types.egwReferences', icon: BookMarked, color: 'text-violet-600', bgColor: 'bg-violet-50', borderColor: 'border-violet-200' },
   { key: 'recipes', labelKey: 'search:types.recipes', icon: ChefHat, color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-200' },
   { key: 'evidence', labelKey: 'search:types.evidence', icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' },
   { key: 'references', labelKey: 'search:types.references', icon: Library, color: 'text-slate-600', bgColor: 'bg-slate-50', borderColor: 'border-slate-200' },
+  { key: 'condition_sections', labelKey: 'search:types.conditionSections', icon: Layers, color: 'text-pink-600', bgColor: 'bg-pink-50', borderColor: 'border-pink-200' },
+  { key: 'tags', labelKey: 'search:types.tags', icon: Tag, color: 'text-lime-600', bgColor: 'bg-lime-50', borderColor: 'border-lime-200' },
+  { key: 'protocols', labelKey: 'search:types.protocols', icon: ClipboardList, color: 'text-cyan-600', bgColor: 'bg-cyan-50', borderColor: 'border-cyan-200' },
+  { key: 'body_systems', labelKey: 'search:types.bodySystems', icon: Waypoints, color: 'text-indigo-600', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200' },
 ];
 
 const RECENT_SEARCHES_KEY = 'lm_recent_searches';
@@ -165,7 +174,7 @@ const Search = () => {
         const item = allResults[selectedIndex];
         if (item) {
           saveRecentSearch(query);
-          navigate(getEntityLink(item.type, item.id));
+          navigate(getEntityLink(item.type, item.id, item));
         }
       } else if (e.key === 'Escape') {
         inputRef.current?.blur();
@@ -198,7 +207,7 @@ const Search = () => {
     );
   };
 
-  const getEntityLink = (type, id) => {
+  const getEntityLink = (type, id, item) => {
     const routes = {
       condition: `/conditions/${id}`,
       intervention: `/interventions/${id}`,
@@ -207,26 +216,36 @@ const Search = () => {
       recipe: `/recipes/${id}`,
       evidence: `/evidence/${id}/edit`,
       reference: `/references/${id}/edit`,
+      care_domain: `/care-domains/${id}/edit`,
+      condition_section: `/conditions/${item?.condition_id}`,
+      tag: `/tags`,
+      protocol: `/interventions/${item?.intervention_id}`,
+      body_system: `/conditions`,
     };
     return routes[type] || '#';
   };
 
   const getEntityConfig = (type) => {
-    const configs = {
-      condition: ENTITY_TYPES.find((e) => e.key === 'conditions'),
-      intervention: ENTITY_TYPES.find((e) => e.key === 'interventions'),
-      scripture: ENTITY_TYPES.find((e) => e.key === 'scriptures'),
-      egw_reference: ENTITY_TYPES.find((e) => e.key === 'egw_references'),
-      recipe: ENTITY_TYPES.find((e) => e.key === 'recipes'),
-      evidence: ENTITY_TYPES.find((e) => e.key === 'evidence'),
-      reference: ENTITY_TYPES.find((e) => e.key === 'references'),
+    const typeToKey = {
+      condition: 'conditions',
+      intervention: 'interventions',
+      scripture: 'scriptures',
+      egw_reference: 'egw_references',
+      recipe: 'recipes',
+      evidence: 'evidence',
+      reference: 'references',
+      care_domain: 'care_domains',
+      condition_section: 'condition_sections',
+      tag: 'tags',
+      protocol: 'protocols',
+      body_system: 'body_systems',
     };
-    return configs[type] || ENTITY_TYPES[0];
+    return ENTITY_TYPES.find((e) => e.key === typeToKey[type]) || ENTITY_TYPES[0];
   };
 
   const handleResultClick = (item) => {
     saveRecentSearch(query);
-    navigate(getEntityLink(item.type, item.id));
+    navigate(getEntityLink(item.type, item.id, item));
   };
 
   const handleRecentClick = (searchTerm) => {
@@ -415,8 +434,8 @@ const Search = () => {
                   const config = getEntityConfig(item.type);
                   const Icon = config.icon;
                   const isSelected = idx === selectedIndex;
-                  const displayText = item.name || item.title || item.reference || item.citation || item.summary;
-                  const secondaryText = item.description || item.text || item.summary;
+                  const displayText = item.name || item.title || item.reference || item.citation || item.summary || item.overview;
+                  const secondaryText = item.description || item.text || item.summary || item.overview;
 
                   return (
                     <div
@@ -441,6 +460,18 @@ const Search = () => {
                           )}
                           {item.care_domain && (
                             <span className="text-[10px] text-gray-400">• {item.care_domain}</span>
+                          )}
+                          {item.condition_name && (
+                            <span className="text-[10px] text-gray-400">• {item.condition_name}</span>
+                          )}
+                          {item.intervention_name && (
+                            <span className="text-[10px] text-gray-400">• {item.intervention_name}</span>
+                          )}
+                          {item.section_type && (
+                            <span className="text-[10px] text-gray-400">• {item.section_type.replace(/_/g, ' ')}</span>
+                          )}
+                          {item.intensity_level && (
+                            <span className="text-[10px] text-gray-400">• {item.intensity_level}</span>
                           )}
                         </div>
                         <h4 className="font-medium text-gray-900 truncate">

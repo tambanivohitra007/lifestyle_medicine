@@ -11,11 +11,16 @@
   "types": {
     "conditions": "Conditions",
     "interventions": "Interventions",
+    "careDomains": "Care Domains",
     "scriptures": "Scriptures",
     "egwReferences": "EGW Writings",
     "recipes": "Recipes",
     "evidence": "Evidence",
-    "references": "References"
+    "references": "References",
+    "conditionSections": "Sections",
+    "tags": "Tags",
+    "protocols": "Protocols",
+    "bodySystems": "Body Systems"
   },
   "filters": {
     "clear": "Clear"

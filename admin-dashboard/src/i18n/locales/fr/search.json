@@ -11,11 +11,16 @@
   "types": {
     "conditions": "Conditions",
     "interventions": "Interventions",
+    "careDomains": "Domaines de soins",
     "scriptures": "Écritures",
     "egwReferences": "Écrits d'EGW",
     "recipes": "Recettes",
     "evidence": "Preuves",
-    "references": "Références"
+    "references": "Références",
+    "conditionSections": "Sections",
+    "tags": "Étiquettes",
+    "protocols": "Protocoles",
+    "bodySystems": "Systèmes corporels"
   },
   "filters": {
     "clear": "Effacer"
