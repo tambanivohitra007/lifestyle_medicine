@@ -1,45 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Plus, Search, BookMarked, Edit, Trash2, Filter, Save, Loader2, HelpCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Search, BookMarked, Edit, Trash2, Filter } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import { SkeletonList } from '../../components/skeleton';
 import { useAuth } from '../../contexts/AuthContext';
-import SlideOver from '../../components/shared/SlideOver';
-
-const COMMON_BOOKS = [
-  { abbr: 'MH', name: 'Ministry of Healing' },
-  { abbr: 'CD', name: 'Counsels on Diet and Foods' },
-  { abbr: 'CH', name: 'Counsels on Health' },
-  { abbr: 'MM', name: 'Medical Ministry' },
-  { abbr: 'Te', name: 'Temperance' },
-  { abbr: 'Ed', name: 'Education' },
-  { abbr: 'CG', name: 'Child Guidance' },
-  { abbr: 'AH', name: 'Adventist Home' },
-  { abbr: 'SC', name: 'Steps to Christ' },
-  { abbr: 'DA', name: 'Desire of Ages' },
-  { abbr: 'GC', name: 'Great Controversy' },
-  { abbr: 'PP', name: 'Patriarchs and Prophets' },
-  { abbr: 'COL', name: "Christ's Object Lessons" },
-  { abbr: 'MB', name: 'Thoughts from the Mount of Blessing' },
-];
-
-const COMMON_TOPICS = [
-  'Diet & Nutrition',
-  'Exercise & Physical Activity',
-  'Rest & Sleep',
-  'Water & Hydration',
-  'Fresh Air & Sunlight',
-  'Temperance',
-  'Trust in God',
-  'Mental Health',
-  'Natural Remedies',
-  'Disease Prevention',
-  'Healing',
-  'Health Reform',
-];
 
 const EgwReferences = () => {
   const { canEdit } = useAuth();
+  const navigate = useNavigate();
   const [references, setReferences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,25 +17,6 @@ const EgwReferences = () => {
   const [books, setBooks] = useState([]);
   const [topics, setTopics] = useState([]);
   const [pagination, setPagination] = useState({});
-
-  // Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({
-    book: '',
-    book_abbreviation: '',
-    chapter: '',
-    page_start: '',
-    page_end: '',
-    paragraph: '',
-    quote: '',
-    topic: '',
-    context: '',
-  });
-  const [formLoading, setFormLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [showAbbreviations, setShowAbbreviations] = useState(false);
 
   useEffect(() => {
     fetchFilters();
@@ -131,130 +81,6 @@ const EgwReferences = () => {
 
   const hasFilters = searchTerm || bookFilter || topicFilter;
 
-  // Modal functions
-  const openCreateModal = () => {
-    setEditingId(null);
-    setFormData({
-      book: '',
-      book_abbreviation: '',
-      chapter: '',
-      page_start: '',
-      page_end: '',
-      paragraph: '',
-      quote: '',
-      topic: '',
-      context: '',
-    });
-    setErrors({});
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = async (id) => {
-    setEditingId(id);
-    setErrors({});
-    setIsModalOpen(true);
-    setFormLoading(true);
-
-    try {
-      const response = await api.get(`${apiEndpoints.egwReferences}/${id}`);
-      const ref = response.data.data;
-      setFormData({
-        book: ref.book || '',
-        book_abbreviation: ref.book_abbreviation || '',
-        chapter: ref.chapter || '',
-        page_start: ref.page_start || '',
-        page_end: ref.page_end || '',
-        paragraph: ref.paragraph || '',
-        quote: ref.quote || '',
-        topic: ref.topic || '',
-        context: ref.context || '',
-      });
-    } catch (error) {
-      console.error('Error fetching reference:', error);
-      toast.error('Failed to load reference');
-      setIsModalOpen(false);
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingId(null);
-    setFormData({
-      book: '',
-      book_abbreviation: '',
-      chapter: '',
-      page_start: '',
-      page_end: '',
-      paragraph: '',
-      quote: '',
-      topic: '',
-      context: '',
-    });
-    setErrors({});
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.book.trim()) newErrors.book = 'Book is required';
-    if (!formData.quote.trim()) newErrors.quote = 'Quote is required';
-    if (formData.page_end && formData.page_start && parseInt(formData.page_end) < parseInt(formData.page_start)) {
-      newErrors.page_end = 'End page must be greater than start page';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    try {
-      setSaving(true);
-      const payload = {
-        ...formData,
-        page_start: formData.page_start ? parseInt(formData.page_start) : null,
-        page_end: formData.page_end ? parseInt(formData.page_end) : null,
-      };
-
-      if (editingId) {
-        await api.put(`${apiEndpoints.egwReferencesAdmin}/${editingId}`, payload);
-        toast.success('Reference updated');
-      } else {
-        await api.post(apiEndpoints.egwReferencesAdmin, payload);
-        toast.success('Reference created');
-      }
-      closeModal();
-      fetchReferences();
-    } catch (error) {
-      console.error('Error saving reference:', error);
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        toast.error('Failed to save reference');
-      }
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
-    }
-  };
-
-  const handleBookSelect = (book) => {
-    setFormData((prev) => ({
-      ...prev,
-      book: book.name,
-      book_abbreviation: book.abbr,
-    }));
-  };
-
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -267,7 +93,7 @@ const EgwReferences = () => {
         </div>
         {canEdit && (
           <button
-            onClick={openCreateModal}
+            onClick={() => navigate('/egw-references/new')}
             className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Plus className="w-5 h-5" />
@@ -348,7 +174,7 @@ const EgwReferences = () => {
           </p>
           {!hasFilters && canEdit && (
             <button
-              onClick={openCreateModal}
+              onClick={() => navigate('/egw-references/new')}
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
@@ -384,7 +210,7 @@ const EgwReferences = () => {
                 {canEdit && (
                   <div className="flex gap-1 self-end sm:self-start flex-shrink-0">
                     <button
-                      onClick={() => openEditModal(reference.id)}
+                      onClick={() => navigate(`/egw-references/${reference.id}/edit`)}
                       className="action-btn"
                       title="Edit"
                     >
@@ -430,271 +256,6 @@ const EgwReferences = () => {
         </div>
       )}
 
-      {/* SlideOver Modal for Create/Edit */}
-      <SlideOver
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title={editingId ? 'Edit EGW Reference' : 'New EGW Reference'}
-        subtitle={editingId ? 'Update the reference details' : 'Add a new Ellen G. White reference'}
-        size="lg"
-      >
-        {formLoading ? (
-          <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Source Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Source Information</h3>
-
-              {/* Quick Book Selection */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Quick Select Book
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowAbbreviations(!showAbbreviations)}
-                    className="text-xs text-primary-600 hover:text-primary-700 flex items-center gap-1"
-                  >
-                    <HelpCircle className="w-3 h-3" />
-                    {showAbbreviations ? 'Hide' : 'Show'} abbreviations
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {COMMON_BOOKS.map((book) => (
-                    <button
-                      key={book.abbr}
-                      type="button"
-                      onClick={() => handleBookSelect(book)}
-                      className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                        formData.book === book.name
-                          ? 'bg-primary-100 border-primary-500 text-primary-700'
-                          : 'border-gray-300 hover:border-primary-300 hover:bg-gray-50'
-                      }`}
-                      title={book.name}
-                    >
-                      {showAbbreviations ? book.abbr : book.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Book Name */}
-                <div>
-                  <label htmlFor="book" className="label">
-                    Book Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="book"
-                    name="book"
-                    value={formData.book}
-                    onChange={handleChange}
-                    className={`input-field ${errors.book ? 'border-red-500' : ''}`}
-                    placeholder="e.g., Ministry of Healing"
-                  />
-                  {errors.book && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {Array.isArray(errors.book) ? errors.book[0] : errors.book}
-                    </p>
-                  )}
-                </div>
-
-                {/* Abbreviation */}
-                <div>
-                  <label htmlFor="book_abbreviation" className="label">
-                    Book Abbreviation
-                  </label>
-                  <input
-                    type="text"
-                    id="book_abbreviation"
-                    name="book_abbreviation"
-                    value={formData.book_abbreviation}
-                    onChange={handleChange}
-                    className="input-field"
-                    placeholder="e.g., MH"
-                  />
-                </div>
-
-                {/* Chapter */}
-                <div>
-                  <label htmlFor="chapter" className="label">
-                    Chapter
-                  </label>
-                  <input
-                    type="text"
-                    id="chapter"
-                    name="chapter"
-                    value={formData.chapter}
-                    onChange={handleChange}
-                    className="input-field"
-                    placeholder="e.g., Chapter 1 or 'The True Remedies'"
-                  />
-                </div>
-
-                {/* Topic */}
-                <div>
-                  <label htmlFor="topic" className="label">
-                    Topic
-                  </label>
-                  <input
-                    type="text"
-                    id="topic"
-                    name="topic"
-                    value={formData.topic}
-                    onChange={handleChange}
-                    className="input-field"
-                    placeholder="e.g., Diet & Nutrition"
-                    list="topics"
-                  />
-                  <datalist id="topics">
-                    {COMMON_TOPICS.map((topic) => (
-                      <option key={topic} value={topic} />
-                    ))}
-                  </datalist>
-                </div>
-              </div>
-
-              {/* Page References */}
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label htmlFor="page_start" className="label">
-                    Page Start
-                  </label>
-                  <input
-                    type="number"
-                    id="page_start"
-                    name="page_start"
-                    value={formData.page_start}
-                    onChange={handleChange}
-                    className="input-field"
-                    placeholder="127"
-                    min="1"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="page_end" className="label">
-                    Page End
-                  </label>
-                  <input
-                    type="number"
-                    id="page_end"
-                    name="page_end"
-                    value={formData.page_end}
-                    onChange={handleChange}
-                    className={`input-field ${errors.page_end ? 'border-red-500' : ''}`}
-                    placeholder="130"
-                    min="1"
-                  />
-                  {errors.page_end && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {Array.isArray(errors.page_end) ? errors.page_end[0] : errors.page_end}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="paragraph" className="label">
-                    Paragraph
-                  </label>
-                  <input
-                    type="text"
-                    id="paragraph"
-                    name="paragraph"
-                    value={formData.paragraph}
-                    onChange={handleChange}
-                    className="input-field"
-                    placeholder="2"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Quote Content */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Quote Content</h3>
-
-              <div>
-                <label htmlFor="quote" className="label">
-                  Quote <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="quote"
-                  name="quote"
-                  value={formData.quote}
-                  onChange={handleChange}
-                  rows={5}
-                  className={`input-field resize-y ${errors.quote ? 'border-red-500' : ''}`}
-                  placeholder="Enter the quote from Ellen G. White's writings..."
-                />
-                {errors.quote && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {Array.isArray(errors.quote) ? errors.quote[0] : errors.quote}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="context" className="label">
-                  Context / Notes
-                </label>
-                <textarea
-                  id="context"
-                  name="context"
-                  value={formData.context}
-                  onChange={handleChange}
-                  rows={3}
-                  className="input-field resize-y"
-                  placeholder="Additional context or application notes..."
-                />
-              </div>
-            </div>
-
-            {/* Preview */}
-            {formData.book && formData.quote && (
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-purple-700 mb-2">Preview</h3>
-                <p className="text-gray-800 italic">"{formData.quote}"</p>
-                <p className="text-purple-600 text-sm mt-2 font-medium">
-                  — {formData.book_abbreviation || formData.book}
-                  {formData.chapter && `, ${formData.chapter}`}
-                  {formData.page_start && (
-                    formData.book_abbreviation
-                      ? ` ${formData.page_start}${formData.page_end && formData.page_end !== formData.page_start ? `-${formData.page_end}` : ''}${formData.paragraph ? `.${formData.paragraph}` : ''}`
-                      : `, ${formData.page_end && formData.page_end !== formData.page_start ? `pp. ${formData.page_start}-${formData.page_end}` : `p. ${formData.page_start}`}`
-                  )}
-                </p>
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
-              <button
-                type="submit"
-                disabled={saving}
-                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
-              >
-                {saving ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Save className="w-5 h-5" />
-                )}
-                {saving ? 'Saving...' : 'Save Reference'}
-              </button>
-              <button
-                type="button"
-                onClick={closeModal}
-                className="btn-outline w-full sm:w-auto"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
-      </SlideOver>
     </div>
   );
 };
