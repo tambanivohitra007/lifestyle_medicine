@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, Loader2, ChevronDown, ChevronUp, Plus, AlertCircle } from 'lucide-react';
+import { Sparkles, Loader2, ChevronDown, ChevronUp, Plus, AlertCircle, ExternalLink } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 
 const AiSuggestions = ({ type, topic, context, onSelect }) => {
@@ -75,7 +75,7 @@ const AiSuggestions = ({ type, topic, context, onSelect }) => {
           <p className="text-sm text-purple-700">
             {type === 'scripture'
               ? 'Get AI-powered Bible verse suggestions related to your topic.'
-              : 'Get AI-powered Ellen G. White quotation suggestions for your topic.'}
+              : 'Get AI-powered Ellen G. White quotation suggestions sourced from egwwritings.org.'}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -181,6 +181,17 @@ const AiSuggestions = ({ type, topic, context, onSelect }) => {
                             <p className="text-gray-500 text-xs">
                               {suggestion.context}
                             </p>
+                          )}
+                          {suggestion.source_url && (
+                            <a
+                              href={suggestion.source_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 mt-2 text-xs text-purple-600 hover:text-purple-800 hover:underline"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              Verify on egwwritings.org
+                            </a>
                           )}
                         </div>
                         <button

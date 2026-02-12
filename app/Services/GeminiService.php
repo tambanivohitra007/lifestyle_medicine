@@ -174,6 +174,10 @@ PROMPT;
         You are an expert in Ellen G. White's writings, particularly her health-related works.
         Suggest 5 relevant quotes from Ellen G. White that relate to the following health topic or condition.
 
+        IMPORTANT: Only suggest quotes that are verifiable on the official Ellen G. White Writings website (https://egwwritings.org/).
+        Every quote you provide MUST be an actual, real quote from Ellen White's published writings — do NOT paraphrase, fabricate, or approximate.
+        If you are not confident a quote is accurate, do not include it.
+
         Topic: {$topic}{$contextText}
 
         Focus on quotes from these health-focused books:
@@ -189,10 +193,11 @@ PROMPT;
         For each quote, provide:
         1. The book name
         2. The book abbreviation
-        3. The approximate page number (if known, otherwise estimate)
-        4. The actual quote (be accurate to Ellen White's actual writings)
+        3. The page number where this quote appears
+        4. The exact quote from Ellen White's writings
         5. A topic/theme tag
         6. Brief context about application
+        7. A source_url linking to the quote on egwwritings.org (format: https://egwwritings.org/?ref=en_MH.127.1 where MH is the book abbreviation, 127 is the page, and 1 is the paragraph)
 
         Format your response as JSON array with this structure:
         [
@@ -202,11 +207,12 @@ PROMPT;
             "page_start": 127,
             "quote": "Pure air, sunlight, abstemiousness, rest, exercise, proper diet, the use of water, trust in divine power—these are the true remedies.",
             "topic": "Natural Remedies",
-            "context": "The foundational eight laws of health."
+            "context": "The foundational eight laws of health.",
+            "source_url": "https://egwwritings.org/?ref=en_MH.127.1"
         }
         ]
 
-        Only return valid JSON, no additional text or markdown formatting. Use actual Ellen White quotes when possible.
+        Only return valid JSON, no additional text or markdown formatting.
 PROMPT;
     }
 
