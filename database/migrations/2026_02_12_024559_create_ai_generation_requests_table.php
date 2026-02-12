@@ -19,7 +19,7 @@ return new class extends Migration
             $table->json('input_data')->nullable();
             $table->json('output_data')->nullable();
             $table->text('error_message')->nullable();
-            $table->foreignUuid('requested_by')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('requested_by')->constrained('users')->cascadeOnDelete();
             $table->unsignedInteger('attempts')->default(0);
             $table->timestamps();
 
