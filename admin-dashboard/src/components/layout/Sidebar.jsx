@@ -55,44 +55,44 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
   // Role labels for display - now using i18n
   const getRoleLabel = (role) => t(`navigation:user.roles.${role}`, { defaultValue: 'User' });
 
-  // Mobile navigation sections with gradients
+  // Mobile navigation sections
   const mobileSections = [
     {
       titleKey: 'sections.main',
       items: [
-        { to: '/', icon: LayoutDashboard, labelKey: 'menu.dashboard', gradient: 'from-blue-500 to-blue-600' },
-        { to: '/search', icon: Search, labelKey: 'menu.search', gradient: 'from-slate-500 to-slate-600' },
-        { to: '/knowledge-graph', icon: Network, labelKey: 'menu.graph', gradient: 'from-cyan-500 to-teal-600' },
+        { to: '/', icon: LayoutDashboard, labelKey: 'menu.dashboard' },
+        { to: '/search', icon: Search, labelKey: 'menu.search' },
+        { to: '/knowledge-graph', icon: Network, labelKey: 'menu.graph' },
       ],
     },
     {
       titleKey: 'sections.content',
       items: [
-        { to: '/conditions', icon: HeartPulse, labelKey: 'menu.conditions', gradient: 'from-rose-500 to-red-600' },
-        { to: '/interventions', icon: Activity, labelKey: 'menu.interventions', gradient: 'from-emerald-500 to-green-600' },
-        { to: '/care-domains', icon: Bookmark, labelKey: 'menu.careDomains', gradient: 'from-violet-500 to-purple-600' },
+        { to: '/conditions', icon: HeartPulse, labelKey: 'menu.conditions' },
+        { to: '/interventions', icon: Activity, labelKey: 'menu.interventions' },
+        { to: '/care-domains', icon: Bookmark, labelKey: 'menu.careDomains' },
       ],
     },
     {
       titleKey: 'sections.resources',
       items: [
-        { to: '/bible', icon: BookOpen, labelKey: 'menu.bible', gradient: 'from-indigo-500 to-indigo-600' },
-        { to: '/scriptures', icon: Book, labelKey: 'menu.scriptures', gradient: 'from-sky-500 to-cyan-600' },
-        { to: '/egw-references', icon: BookMarked, labelKey: 'menu.egwWritings', gradient: 'from-purple-500 to-violet-600' },
-        { to: '/evidence', icon: TestTube, labelKey: 'menu.evidence', gradient: 'from-teal-500 to-teal-600' },
-        { to: '/references', icon: Library, labelKey: 'menu.references', gradient: 'from-amber-500 to-orange-600' },
-        { to: '/recipes', icon: ChefHat, labelKey: 'menu.recipes', gradient: 'from-orange-500 to-red-500' },
+        { to: '/bible', icon: BookOpen, labelKey: 'menu.bible' },
+        { to: '/scriptures', icon: Book, labelKey: 'menu.scriptures' },
+        { to: '/egw-references', icon: BookMarked, labelKey: 'menu.egwWritings' },
+        { to: '/evidence', icon: TestTube, labelKey: 'menu.evidence' },
+        { to: '/references', icon: Library, labelKey: 'menu.references' },
+        { to: '/recipes', icon: ChefHat, labelKey: 'menu.recipes' },
       ],
     },
     {
       titleKey: 'sections.administration',
       roles: [ROLES.ADMIN],
       items: [
-        { to: '/analytics', icon: BarChart3, labelKey: 'menu.analytics', gradient: 'from-cyan-500 to-blue-600', roles: [ROLES.ADMIN] },
-        { to: '/users', icon: Users, labelKey: 'menu.users', gradient: 'from-pink-500 to-rose-600', roles: [ROLES.ADMIN] },
-        { to: '/tags', icon: Tag, labelKey: 'menu.tags', gradient: 'from-lime-500 to-green-600', roles: [ROLES.ADMIN] },
-        { to: '/import', icon: Upload, labelKey: 'menu.import', gradient: 'from-emerald-500 to-teal-600', roles: [ROLES.ADMIN] },
-        { to: '/ai-generator', icon: Sparkles, labelKey: 'menu.aiGenerator', gradient: 'from-fuchsia-500 to-pink-600', roles: [ROLES.ADMIN] },
+        { to: '/analytics', icon: BarChart3, labelKey: 'menu.analytics', roles: [ROLES.ADMIN] },
+        { to: '/users', icon: Users, labelKey: 'menu.users', roles: [ROLES.ADMIN] },
+        { to: '/tags', icon: Tag, labelKey: 'menu.tags', roles: [ROLES.ADMIN] },
+        { to: '/import', icon: Upload, labelKey: 'menu.import', roles: [ROLES.ADMIN] },
+        { to: '/ai-generator', icon: Sparkles, labelKey: 'menu.aiGenerator', roles: [ROLES.ADMIN] },
       ],
     },
   ];
@@ -168,142 +168,110 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         />
       )}
 
-      {/* Mobile Menu - Elegant Bottom Sheet */}
+      {/* Mobile Menu - Clean Bottom Sheet */}
       <div
         className={`
           lg:hidden fixed inset-x-0 bottom-0 z-50
-          bg-gradient-to-b from-white to-gray-50 rounded-t-[2rem] shadow-2xl
+          bg-white rounded-t-2xl shadow-2xl
           transform transition-all duration-300 ease-out
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}
         `}
-        style={{ maxHeight: '90vh' }}
+        style={{ maxHeight: '85vh' }}
       >
         {/* Handle Bar */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+        <div className="flex justify-center pt-3 pb-2">
+          <div className="w-10 h-1 bg-gray-200 rounded-full" />
         </div>
 
-        {/* Header - User Profile Card */}
-        <div className="mx-4 mt-2 mb-4 p-4 bg-gradient-to-r from-secondary-800 to-secondary-900 rounded-2xl shadow-lg">
+        {/* Header - Minimal User Profile */}
+        <div className="mx-4 mb-3 pb-3 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-md">
-                <User className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-full bg-secondary-100 flex items-center justify-center">
+                <User className="w-5 h-5 text-secondary-600" />
               </div>
               <div>
-                <p className="text-base font-semibold text-white">{user?.name || 'User'}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                    user?.role === 'admin'
-                      ? 'bg-purple-500/30 text-purple-200'
-                      : user?.role === 'editor'
-                      ? 'bg-blue-500/30 text-blue-200'
-                      : 'bg-gray-500/30 text-gray-200'
-                  }`}>
-                    {user?.role === 'admin' && <Shield className="w-2.5 h-2.5" />}
-                    {getRoleLabel(user?.role)}
-                  </span>
-                </div>
+                <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
+                <span className={`inline-flex items-center gap-1 text-xs ${
+                  user?.role === 'admin'
+                    ? 'text-primary-600'
+                    : user?.role === 'editor'
+                    ? 'text-blue-600'
+                    : 'text-gray-500'
+                }`}>
+                  {user?.role === 'admin' && <Shield className="w-3 h-3" />}
+                  {getRoleLabel(user?.role)}
+                </span>
               </div>
             </div>
             <NavLink
               to="/profile"
               onClick={onClose}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors touch-manipulation"
+              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
             >
-              <Settings className="w-5 h-5 text-white" />
+              <Settings className="w-5 h-5" />
             </NavLink>
           </div>
         </div>
 
-        {/* Scrollable Menu */}
-        <div className="overflow-y-auto overscroll-contain px-4 pb-2" style={{ maxHeight: 'calc(90vh - 220px)' }}>
+        {/* Scrollable Menu - Clean List Layout */}
+        <div className="overflow-y-auto overscroll-contain px-4 pb-2" style={{ maxHeight: 'calc(85vh - 180px)' }}>
           {filteredMobileSections.map((section, sectionIndex) => (
-            <div key={section.titleKey} className={sectionIndex > 0 ? 'mt-5' : ''}>
+            <div key={section.titleKey} className={sectionIndex > 0 ? 'mt-4' : ''}>
               {/* Section Title */}
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-2 px-1">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 mb-1 px-3">
                 {t(`navigation:${section.titleKey}`)}
               </p>
 
-              {/* Section Items - Horizontal scroll for Resources, Grid for others */}
-              {section.items.length > 4 ? (
-                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
-                  {section.items.map((item) => (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      end={item.to === '/'}
-                      onClick={onClose}
-                      className={({ isActive }) =>
-                        `flex-shrink-0 flex flex-col items-center justify-center w-[72px] py-3 rounded-2xl transition-all duration-200 touch-manipulation ${
+              {/* Section Items - Vertical List */}
+              <div className="space-y-0.5">
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === '/'}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 touch-manipulation ${
+                        isActive
+                          ? 'bg-primary-50 text-primary-700'
+                          : 'text-gray-600 hover:bg-gray-50 active:bg-gray-100'
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                           isActive
-                            ? 'bg-primary-50 shadow-md shadow-primary-100'
-                            : 'bg-white shadow-sm hover:shadow-md active:scale-95'
-                        }`
-                      }
-                    >
-                      {({ isActive }) => (
-                        <>
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-2 shadow-sm bg-gradient-to-br ${
-                            isActive ? 'from-primary-500 to-primary-600' : item.gradient
-                          }`}>
-                            <item.icon className="w-5 h-5 text-white" />
-                          </div>
-                          <span className={`text-[10px] font-medium text-center leading-tight ${
-                            isActive ? 'text-primary-700' : 'text-gray-600'
-                          }`}>
-                            {t(`navigation:${item.labelKey}`)}
-                          </span>
-                        </>
-                      )}
-                    </NavLink>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-4 gap-2">
-                  {section.items.map((item) => (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      end={item.to === '/'}
-                      onClick={onClose}
-                      className={({ isActive }) =>
-                        `flex flex-col items-center justify-center py-3 rounded-2xl transition-all duration-200 touch-manipulation ${
-                          isActive
-                            ? 'bg-primary-50 shadow-md shadow-primary-100'
-                            : 'bg-white shadow-sm hover:shadow-md active:scale-95'
-                        }`
-                      }
-                    >
-                      {({ isActive }) => (
-                        <>
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-2 shadow-sm bg-gradient-to-br ${
-                            isActive ? 'from-primary-500 to-primary-600' : item.gradient
-                          }`}>
-                            <item.icon className="w-5 h-5 text-white" />
-                          </div>
-                          <span className={`text-[10px] font-medium text-center leading-tight ${
-                            isActive ? 'text-primary-700' : 'text-gray-600'
-                          }`}>
-                            {t(`navigation:${item.labelKey}`)}
-                          </span>
-                        </>
-                      )}
-                    </NavLink>
-                  ))}
-                </div>
-              )}
+                            ? 'bg-primary-100 text-primary-600'
+                            : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <item.icon className="w-4.5 h-4.5" />
+                        </div>
+                        <span className={`text-sm font-medium ${
+                          isActive ? 'text-primary-700' : 'text-gray-700'
+                        }`}>
+                          {t(`navigation:${item.labelKey}`)}
+                        </span>
+                        {isActive && (
+                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
             </div>
           ))}
         </div>
 
         {/* Bottom Actions */}
-        <div className="border-t border-gray-200 p-4 bg-white safe-area-bottom">
+        <div className="border-t border-gray-100 px-4 py-3 safe-area-bottom">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-medium text-sm shadow-lg shadow-red-200 hover:shadow-xl hover:shadow-red-300 active:scale-[0.98] transition-all duration-200 touch-manipulation"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 active:bg-red-200 font-medium text-sm transition-colors duration-150 touch-manipulation"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
             {t('navigation:user.signOut')}
           </button>
         </div>
