@@ -109,7 +109,7 @@ const RecipeList = ({ recipes, onDelete, canEdit }) => {
                       </Link>
                       <button
                         onClick={() => onDelete(recipe.id, recipe.title)}
-                        className="action-btn p-2 touch-manipulation hover:bg-red-50 active:bg-red-100"
+                        className="action-btn-danger"
                         title={t('common:buttons.delete')}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />

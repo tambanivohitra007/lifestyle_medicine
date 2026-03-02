@@ -54,6 +54,10 @@
   .action-btn {
     @apply p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation;
   }
+
+  .action-btn-danger {
+    @apply p-2 rounded-lg hover:bg-red-50 active:bg-red-200 active:scale-95 transition-all touch-manipulation;
+  }
 }
 
 /* Rich Text Editor Styles */

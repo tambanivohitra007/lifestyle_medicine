@@ -385,7 +385,7 @@ const Evidence = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(entry.id, entry.summary)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100"
+                        className="action-btn-danger"
                         title={t('common:buttons.delete')}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />

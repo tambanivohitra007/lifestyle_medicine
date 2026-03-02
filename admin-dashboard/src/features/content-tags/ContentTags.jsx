@@ -239,7 +239,7 @@ const ContentTags = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(tag.id, tag.tag)}
-                        className="action-btn hover:bg-red-50 active:bg-red-100"
+                        className="action-btn-danger"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />

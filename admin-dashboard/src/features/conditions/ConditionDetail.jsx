@@ -488,7 +488,7 @@ const ConditionDetail = () => {
                             </Link>
                             <button
                               onClick={() => handleDeleteSection(section.id, section.title)}
-                              className="action-btn hover:bg-red-50 active:bg-red-100"
+                              className="action-btn-danger"
                               title="Delete"
                             >
                               <Trash2 className="w-4 h-4 text-red-500" />
@@ -585,7 +585,7 @@ const ConditionDetail = () => {
                           {canEdit && (
                             <button
                               onClick={() => handleDetachScripture(scripture.id, scripture.reference)}
-                              className="action-btn hover:bg-red-50 active:bg-red-100"
+                              className="action-btn-danger"
                               title="Remove"
                             >
                               <Trash2 className="w-4 h-4 text-red-500" />
@@ -657,7 +657,7 @@ const ConditionDetail = () => {
                         {canEdit && (
                           <button
                             onClick={() => handleDetachEgwReference(egwRef.id, egwRef.citation)}
-                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            className="action-btn-danger"
                             title="Remove"
                           >
                             <Trash2 className="w-4 h-4 text-red-500" />
@@ -719,7 +719,7 @@ const ConditionDetail = () => {
                         {canEdit && (
                           <button
                             onClick={() => handleDetachRecipe(recipe.id, recipe.title)}
-                            className="action-btn hover:bg-red-50 active:bg-red-100"
+                            className="action-btn-danger"
                             title="Remove"
                           >
                             <Trash2 className="w-4 h-4 text-red-500" />

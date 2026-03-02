@@ -414,7 +414,7 @@ const Conditions = () => {
                         </button>
                         <button
                           onClick={() => handleDelete(condition.id, condition.name)}
-                          className="action-btn hover:bg-red-50 active:bg-red-100"
+                          className="action-btn-danger"
                           title={t('common:buttons.delete')}
                         >
                           <Trash2 className="w-4 h-4 text-red-600" />

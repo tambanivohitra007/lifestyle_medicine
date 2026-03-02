@@ -370,7 +370,7 @@ const MediaUploader = ({
                       </button>
                       <button
                         onClick={() => handleDelete(item)}
-                        className="action-btn hover:bg-red-50"
+                        className="action-btn-danger"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
