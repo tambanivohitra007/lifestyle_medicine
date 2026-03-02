@@ -1,4 +1,4 @@
-import { Eye, Edit, Trash2, HeartPulse } from 'lucide-react';
+import { Edit, Trash2, HeartPulse } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
@@ -18,11 +18,12 @@ const ConditionList = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
       {conditions.map((condition) => (
         <div
           key={condition.id}
-          className="card hover:shadow-md transition-shadow duration-200"
+          className="card hover:shadow-md active:bg-gray-50 transition-all duration-200 cursor-pointer touch-manipulation"
+          onClick={() => onView(condition.id)}
         >
           <div className="flex items-start gap-3 sm:gap-4">
             {/* Icon */}
-            <div className="p-2 rounded-lg bg-primary-100 flex-shrink-0">
+            <div className="p-2 rounded-lg bg-primary-100 shrink-0">
               <HeartPulse className="w-5 h-5 text-primary-600" />
             </div>
 
@@ -46,33 +47,24 @@ const ConditionList = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-0.5 sm:gap-1 flex-shrink-0 -mr-1">
-                  <button
-                    onClick={() => onView(condition.id)}
-                    className="action-btn p-2 touch-manipulation"
-                    title="View Details"
-                  >
-                    <Eye className="w-4 h-4 text-gray-600" />
-                  </button>
-                  {canEdit && (
-                    <>
-                      <button
-                        onClick={() => onEdit(condition.id)}
-                        className="action-btn p-2 touch-manipulation"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </button>
-                      <button
-                        onClick={() => onDelete(condition.id, condition.name)}
-                        className="action-btn p-2 touch-manipulation hover:bg-red-50 active:bg-red-100"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
-                    </>
-                  )}
-                </div>
+                {canEdit && (
+                  <div className="flex gap-0.5 sm:gap-1 shrink-0 -mr-1" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => onEdit(condition.id)}
+                      className="action-btn p-2 touch-manipulation"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => onDelete(condition.id, condition.name)}
+                      className="action-btn p-2 touch-manipulation hover:bg-red-50 active:bg-red-100"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Footer */}

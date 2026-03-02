@@ -19,7 +19,11 @@ const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
       {/* Mobile Card Layout */}
       <div className="sm:hidden space-y-3">
         {conditions.map((condition) => (
-          <div key={condition.id} className="card">
+          <div
+            key={condition.id}
+            className="card active:bg-gray-50 transition-colors touch-manipulation cursor-pointer"
+            onClick={() => onView(condition.id)}
+          >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-gray-900 text-sm truncate">
@@ -31,33 +35,24 @@ const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1">
-                <button
-                  onClick={() => onView(condition.id)}
-                  className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
-                  title="View"
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
-                {canEdit && (
-                  <>
-                    <button
-                      onClick={() => onEdit(condition.id)}
-                      className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
-                      title="Edit"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => onDelete(condition.id, condition.name)}
-                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </>
-                )}
-              </div>
+              {canEdit && (
+                <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={() => onEdit(condition.id)}
+                    className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
+                    title="Edit"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onDelete(condition.id, condition.name)}
+                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
             {condition.summary && (
               <div className="mt-2 pt-2 border-t border-gray-100">
