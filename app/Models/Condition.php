@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasAuditFields;
 use App\Models\Traits\HasMedia;
+use App\Models\Traits\HasPublishingStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,11 +12,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Condition extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, HasMedia;
+    use HasAuditFields, HasFactory, HasMedia, HasPublishingStatus, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -24,6 +24,7 @@ class Condition extends Model
         'summary',
         'snomed_code',
         'icd10_code',
+        'status',
     ];
 
     /**

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasAuditFields;
 use App\Models\Traits\HasMedia;
+use App\Models\Traits\HasPublishingStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Intervention extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, HasMedia;
+    use HasAuditFields, HasFactory, HasMedia, HasPublishingStatus, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'care_domain_id',
@@ -23,6 +24,7 @@ class Intervention extends Model
         'description',
         'mechanism',
         'snomed_code',
+        'status',
     ];
 
     /**
@@ -173,8 +175,8 @@ class Intervention extends Model
     public function getSynergisticInterventions()
     {
         return $this->getAllRelationships()
-            ->filter(fn($r) => $r->isPositive())
-            ->map(fn($r) => $r->getOtherIntervention($this->id));
+            ->filter(fn ($r) => $r->isPositive())
+            ->map(fn ($r) => $r->getOtherIntervention($this->id));
     }
 
     /**
@@ -183,7 +185,7 @@ class Intervention extends Model
     public function getConflictingInterventions()
     {
         return $this->getAllRelationships()
-            ->filter(fn($r) => $r->isNegative())
-            ->map(fn($r) => $r->getOtherIntervention($this->id));
+            ->filter(fn ($r) => $r->isNegative())
+            ->map(fn ($r) => $r->getOtherIntervention($this->id));
     }
 }

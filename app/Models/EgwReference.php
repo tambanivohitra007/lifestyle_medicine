@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasAuditFields;
+use App\Models\Traits\HasPublishingStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EgwReference extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, HasAuditFields;
+    use HasAuditFields, HasFactory, HasPublishingStatus, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'book',
@@ -23,6 +24,7 @@ class EgwReference extends Model
         'quote',
         'topic',
         'context',
+        'status',
     ];
 
     protected $casts = [
@@ -53,18 +55,18 @@ class EgwReference extends Model
                 // Short format: MH 127 or MH 127-130
                 $pageRef = $this->page_start;
                 if ($this->page_end && $this->page_end !== $this->page_start) {
-                    $pageRef .= '-' . $this->page_end;
+                    $pageRef .= '-'.$this->page_end;
                 }
                 if ($this->paragraph) {
-                    $pageRef .= '.' . $this->paragraph;
+                    $pageRef .= '.'.$this->paragraph;
                 }
                 $parts[] = $pageRef;
             } else {
                 // Long format: p. 127 or pp. 127-130
                 if ($this->page_end && $this->page_end !== $this->page_start) {
-                    $parts[] = 'pp. ' . $this->page_start . '-' . $this->page_end;
+                    $parts[] = 'pp. '.$this->page_start.'-'.$this->page_end;
                 } else {
-                    $parts[] = 'p. ' . $this->page_start;
+                    $parts[] = 'p. '.$this->page_start;
                 }
             }
         }
