@@ -172,7 +172,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
       <div
         className={`
           lg:hidden fixed inset-x-0 bottom-0 z-50
-          bg-white rounded-t-2xl shadow-2xl
+          bg-secondary-900 rounded-t-2xl shadow-2xl
           transform transition-all duration-300 ease-out
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}
         `}
@@ -180,24 +180,24 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
       >
         {/* Handle Bar */}
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 bg-gray-200 rounded-full" />
+          <div className="w-10 h-1 bg-secondary-700 rounded-full" />
         </div>
 
         {/* Header - Minimal User Profile */}
-        <div className="mx-4 mb-3 pb-3 border-b border-gray-100">
+        <div className="mx-4 mb-3 pb-3 border-b border-secondary-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-secondary-100 flex items-center justify-center">
-                <User className="w-5 h-5 text-secondary-600" />
+              <div className="w-10 h-10 rounded-full bg-secondary-700 flex items-center justify-center">
+                <User className="w-5 h-5 text-gray-300" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
+                <p className="text-sm font-semibold text-white">{user?.name || 'User'}</p>
                 <span className={`inline-flex items-center gap-1 text-xs ${
                   user?.role === 'admin'
-                    ? 'text-primary-600'
+                    ? 'text-purple-300'
                     : user?.role === 'editor'
-                    ? 'text-blue-600'
-                    : 'text-gray-500'
+                    ? 'text-blue-300'
+                    : 'text-gray-400'
                 }`}>
                   {user?.role === 'admin' && <Shield className="w-3 h-3" />}
                   {getRoleLabel(user?.role)}
@@ -207,7 +207,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
             <NavLink
               to="/profile"
               onClick={onClose}
-              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-secondary-700 active:bg-secondary-600 transition-colors touch-manipulation"
             >
               <Settings className="w-5 h-5" />
             </NavLink>
@@ -219,7 +219,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
           {filteredMobileSections.map((section, sectionIndex) => (
             <div key={section.titleKey} className={sectionIndex > 0 ? 'mt-4' : ''}>
               {/* Section Title */}
-              <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 mb-1 px-3">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500 mb-1 px-3">
                 {t(`navigation:${section.titleKey}`)}
               </p>
 
@@ -234,8 +234,8 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 touch-manipulation ${
                         isActive
-                          ? 'bg-primary-50 text-primary-700'
-                          : 'text-gray-600 hover:bg-gray-50 active:bg-gray-100'
+                          ? 'bg-primary-600 text-white'
+                          : 'text-gray-300 hover:bg-secondary-800 active:bg-secondary-700'
                       }`
                     }
                   >
@@ -243,18 +243,18 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
                       <>
                         <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                           isActive
-                            ? 'bg-primary-100 text-primary-600'
-                            : 'bg-gray-100 text-gray-500'
+                            ? 'bg-primary-500 text-white'
+                            : 'bg-secondary-700 text-gray-400'
                         }`}>
                           <item.icon className="w-4.5 h-4.5" />
                         </div>
                         <span className={`text-sm font-medium ${
-                          isActive ? 'text-primary-700' : 'text-gray-700'
+                          isActive ? 'text-white' : 'text-gray-300'
                         }`}>
                           {t(`navigation:${item.labelKey}`)}
                         </span>
                         {isActive && (
-                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />
+                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white" />
                         )}
                       </>
                     )}
@@ -266,10 +266,10 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         </div>
 
         {/* Bottom Actions */}
-        <div className="border-t border-gray-100 px-4 py-3 safe-area-bottom">
+        <div className="border-t border-secondary-700 px-4 py-3 safe-area-bottom">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 active:bg-red-200 font-medium text-sm transition-colors duration-150 touch-manipulation"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-400 bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 font-medium text-sm transition-colors duration-150 touch-manipulation"
           >
             <LogOut className="w-4 h-4" />
             {t('navigation:user.signOut')}
