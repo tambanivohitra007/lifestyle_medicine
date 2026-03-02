@@ -1,0 +1,44 @@
+High Impact — Core Knowledge Platform Gaps
+1. Public-facing frontend / Patient portal
+You only have an admin dashboard. There's no way for patients, students, health practitioners, or the general public to browse the knowledge base. A read-only portal (or even a simple API-powered site) would multiply the platform's reach.
+
+2. Content publishing workflow (Draft → Review → Published)
+Medical content needs a review process. Right now, any editor can create and it's immediately "live." A status field (draft/in-review/published/archived) with optional reviewer approval would add trust and quality control.
+
+3. Content versioning / change history
+There's no audit trail for what changed in content (only created_by/updated_by timestamps). For a medical knowledge base, being able to see revision history ("who changed the mechanism of action, and when?") is critical for accountability.
+
+4. Bookmarks / Favorites
+Users can't save frequently-accessed conditions, interventions, or scriptures. A simple user-bookmarks system would make daily use much smoother — especially on mobile.
+
+Medium Impact — Knowledge Discovery & Education
+5. Clinical decision support / Recommendation engine
+The data model is rich (conditions → interventions with evidence levels), but there's no "I have a patient with X — what should I recommend?" flow. A guided lookup where you select symptoms/conditions and get ranked intervention recommendations based on evidence strength would be powerful.
+
+6. Learning paths / Educational modules
+The platform is a reference tool, but not a teaching tool. Structured courses like "Introduction to NEWSTART+" or "Lifestyle Interventions for Diabetes" — pulling from existing conditions, interventions, scriptures, and protocols — would serve students and practitioners.
+
+7. Glossary / Medical terminology
+No centralized medical dictionary. Terms like "SNOMED," "HbA1c," or "mechanism of action" are used throughout but never defined. A glossary with auto-linking would help non-medical users.
+
+8. Content relationship suggestions (AI-powered)
+You already have Gemini integration for drafts and scripture suggestions. The next step: AI that suggests "This intervention might relate to Condition X" or "This scripture is thematically similar to these 3 others." Automated relationship discovery.
+
+Lower Impact — Operational & Technical
+9. Multilingual content (not just UI)
+The i18next setup handles UI translation, but the actual medical content (condition descriptions, intervention mechanisms, scriptures) is English-only. For a global platform, content translation matters.
+
+10. Offline / PWA support
+For field missionaries or practitioners in low-connectivity areas, offline access to conditions and protocols would be valuable. The Capacitor setup is there but no service worker caching.
+
+11. Commenting / Discussion threads
+No way for editors to discuss a condition's content, flag issues, or leave notes for other editors. A simple per-entity comment system would improve collaboration.
+
+12. Content completeness dashboard
+The analytics page has intervention completeness, but no global "content health" view — e.g., "42 conditions have no scriptures linked," "15 interventions have no protocol." This would guide content curation efforts.
+
+My top 3 recommendations if I had to pick:
+
+Public-facing frontend — the platform's value is locked behind an admin login
+Publishing workflow — essential for medical content trust
+Clinical decision support — this is what makes a knowledge base actionable
