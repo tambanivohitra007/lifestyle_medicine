@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
-import { SkeletonCard } from '../../components/skeleton';
+import { SkeletonCard, SkeletonTable, SkeletonList } from '../../components/skeleton';
 import ViewModeToggle from '../../components/ui/ViewModeToggle';
 import InterventionTable from './components/InterventionTable';
 import InterventionList from './components/InterventionList';
@@ -278,11 +278,17 @@ const Interventions = () => {
 
       {/* Interventions Content */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonCard key={index} />
-          ))}
-        </div>
+        viewMode === 'table' ? (
+          <SkeletonTable rows={6} />
+        ) : viewMode === 'list' ? (
+          <SkeletonList items={6} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        )
       ) : interventions.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
           <Stethoscope className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
