@@ -271,11 +271,12 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
     Route::delete('conditions/{condition}/complications/{complication}', [ConditionMindmapController::class, 'destroyComplication']);
 
     // Content Revisions (version history)
+    // Note: specific routes (detail, compare) must come BEFORE wildcard {type}/{id} to avoid matching
     Route::prefix('revisions')->group(function () {
-        Route::get('{type}/{id}', [ContentRevisionController::class, 'index']);
         Route::get('detail/{revision}', [ContentRevisionController::class, 'show']);
-        Route::post('{type}/{id}/restore/{revision}', [ContentRevisionController::class, 'restore']);
         Route::get('compare/{revisionA}/{revisionB}', [ContentRevisionController::class, 'compare']);
+        Route::get('{type}/{id}', [ContentRevisionController::class, 'index']);
+        Route::post('{type}/{id}/restore/{revision}', [ContentRevisionController::class, 'restore']);
     });
 
     // AI Suggestions (for content editors) - rate limited to 10 requests/minute

@@ -59,13 +59,14 @@ trait HasRevisions
 
     public function pruneOldRevisions(int $keep = 50): void
     {
-        $revisionIds = $this->revisions()
+        $keepIds = $this->revisions()
             ->orderBy('version_number', 'desc')
-            ->skip($keep)
+            ->take($keep)
             ->pluck('id');
 
-        if ($revisionIds->isNotEmpty()) {
-            ContentRevision::whereIn('id', $revisionIds)->delete();
-        }
+        ContentRevision::where('revisionable_type', get_class($this))
+            ->where('revisionable_id', $this->id)
+            ->whereNotIn('id', $keepIds)
+            ->delete();
     }
 }
