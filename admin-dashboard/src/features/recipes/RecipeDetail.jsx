@@ -17,6 +17,7 @@ import AuditInfo from '../../components/shared/AuditInfo';
 import { useAuth } from '../../contexts/AuthContext';
 import StatusBadge from '../../components/shared/StatusBadge';
 import PublishActions from '../../components/shared/PublishActions';
+import RevisionHistory from '../../components/shared/RevisionHistory';
 
 const RecipeDetail = () => {
   const { t } = useTranslation(['recipes', 'common']);
@@ -291,6 +292,18 @@ const RecipeDetail = () => {
             </Link>
           </div>
         )}
+
+      {/* Revision History */}
+      {canEdit && (
+        <div className="card">
+          <RevisionHistory
+            entityType="recipes"
+            entityId={id}
+            canRestore={canEdit}
+            onRestored={fetchRecipe}
+          />
+        </div>
+      )}
     </div>
   );
 };

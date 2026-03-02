@@ -16,6 +16,7 @@ import {
   Loader2,
   Image,
   ExternalLink,
+  History,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../../lib/api';
@@ -32,6 +33,7 @@ import {
 import InfographicGenerator from '../../ai-generator/components/InfographicGenerator';
 import StatusBadge from '../../../components/shared/StatusBadge';
 import PublishActions from '../../../components/shared/PublishActions';
+import RevisionHistory from '../../../components/shared/RevisionHistory';
 
 const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDelete }) => {
   const { t } = useTranslation(['conditions', 'common']);
@@ -227,6 +229,7 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
     { id: 'egw', labelKey: 'conditions:detail.egwShort', icon: BookMarked, count: egwReferences.length },
     { id: 'recipes', labelKey: 'recipes:title', icon: ChefHat, count: recipes.length },
     { id: 'infographics', labelKey: 'common:labels.images', icon: Image, count: infographics.length },
+    { id: 'history', labelKey: 'common:revisions.title', icon: History },
   ];
 
   return (
@@ -633,6 +636,16 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* History Tab */}
+              {activeTab === 'history' && (
+                <RevisionHistory
+                  entityType="conditions"
+                  entityId={conditionId}
+                  canRestore={canEdit}
+                  onRestored={fetchConditionData}
+                />
               )}
             </div>
           </div>

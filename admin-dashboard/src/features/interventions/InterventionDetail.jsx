@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Network,
   ClipboardList,
+  History,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
@@ -22,6 +23,7 @@ import AuditInfo from '../../components/shared/AuditInfo';
 import { useAuth } from '../../contexts/AuthContext';
 import StatusBadge from '../../components/shared/StatusBadge';
 import PublishActions from '../../components/shared/PublishActions';
+import RevisionHistory from '../../components/shared/RevisionHistory';
 import ProtocolEditor from './components/ProtocolEditor';
 
 const QUALITY_RATING = {
@@ -143,6 +145,7 @@ const InterventionDetail = () => {
     { id: 'evidence', labelKey: 'evidence:title', icon: FileText, count: evidence.length },
     { id: 'conditions', labelKey: 'conditions:title', icon: HeartPulse, count: conditions.length },
     { id: 'media', labelKey: 'common:labels.media', icon: Image, count: mediaItems.length },
+    { id: 'history', labelKey: 'common:revisions.title', icon: History },
   ];
 
   return (
@@ -484,6 +487,18 @@ const InterventionDetail = () => {
                 )}
               </>
             )}
+          </div>
+        )}
+
+        {/* History Tab */}
+        {activeTab === 'history' && (
+          <div className="card">
+            <RevisionHistory
+              entityType="interventions"
+              entityId={id}
+              canRestore={canEdit}
+              onRestored={fetchData}
+            />
           </div>
         )}
       </div>

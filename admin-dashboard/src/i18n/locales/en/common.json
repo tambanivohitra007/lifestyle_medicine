@@ -261,6 +261,18 @@
   "statusFilter": {
     "allStatuses": "All Statuses"
   },
+  "revisions": {
+    "title": "Revision History",
+    "version": "Version",
+    "noRevisions": "No revisions yet",
+    "noData": "No data in this revision",
+    "viewRevision": "View revision",
+    "restoreRevision": "Restore to this version",
+    "confirmRestore": "Are you sure you want to restore to version {{version}}? This will update the current content.",
+    "restoreSuccess": "Restored to version {{version}}",
+    "restoreError": "Failed to restore revision",
+    "loadError": "Failed to load revision history"
+  },
   "units": {
     "week": "week",
     "weeks": "weeks",

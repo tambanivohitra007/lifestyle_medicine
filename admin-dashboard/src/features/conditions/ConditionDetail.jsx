@@ -17,6 +17,7 @@ import {
   GitBranch,
   Image,
   Upload,
+  History,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints, getApiBaseUrl } from '../../lib/api';
@@ -35,6 +36,7 @@ import InfographicGenerator from '../ai-generator/components/InfographicGenerato
 import MediaUploader from '../../components/shared/MediaUploader';
 import StatusBadge from '../../components/shared/StatusBadge';
 import PublishActions from '../../components/shared/PublishActions';
+import RevisionHistory from '../../components/shared/RevisionHistory';
 import ConditionPreviewModal from './ConditionPreviewModal';
 
 const SECTION_TYPES = {
@@ -332,6 +334,7 @@ const ConditionDetail = () => {
     { id: 'recipes', labelKey: 'recipes:title', icon: ChefHat, count: recipes.length },
     { id: 'media', labelKey: 'common:labels.media', icon: Upload, count: media.length },
     { id: 'infographics', labelKey: 'conditions:detail.infographics', icon: Image, count: infographics.length },
+    { id: 'history', labelKey: 'common:revisions.title', icon: History },
   ];
 
   return (
@@ -901,6 +904,18 @@ const ConditionDetail = () => {
                 <p className="text-gray-600">{t('conditions:detail.noInfographics')}</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* History Tab */}
+        {activeTab === 'history' && (
+          <div className="card">
+            <RevisionHistory
+              entityType="conditions"
+              entityId={id}
+              canRestore={canEdit}
+              onRestored={fetchConditionData}
+            />
           </div>
         )}
       </div>
