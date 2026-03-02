@@ -9,5 +9,4 @@ export { default as AttachRecipe } from './AttachRecipe';
 export { default as AttachEgwReference } from './AttachEgwReference';
 
 // View components
-export { default as ConditionList } from './components/ConditionList';
 export { default as ConditionTable } from './components/ConditionTable';

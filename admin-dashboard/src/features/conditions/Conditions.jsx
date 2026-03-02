@@ -8,7 +8,6 @@ import SortableHeader from '../../components/ui/SortableHeader';
 import { SkeletonCard, SkeletonTable, SkeletonList } from '../../components/skeleton';
 import ViewModeToggle from '../../components/ui/ViewModeToggle';
 import ConditionTable from './components/ConditionTable';
-import ConditionList from './components/ConditionList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
 import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
@@ -447,13 +446,8 @@ const Conditions = () => {
             </div>
           )}
 
-          {/* List View */}
-          {viewMode === 'list' && (
-            <ConditionList conditions={conditions} onDelete={handleDelete} onEdit={openEditModal} onView={openDetailSlideOver} canEdit={canEdit} />
-          )}
-
-          {/* Table View */}
-          {viewMode === 'table' && (
+          {/* List / Table View */}
+          {(viewMode === 'list' || viewMode === 'table') && (
             <ConditionTable conditions={conditions} onDelete={handleDelete} onEdit={openEditModal} onView={openDetailSlideOver} canEdit={canEdit} />
           )}
 
