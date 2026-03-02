@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\HasSorting;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -13,14 +14,25 @@ use Illuminate\Http\Response;
 class RecipeController extends Controller
 {
     use HasSorting;
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Recipe::with('tags');
 
+        // Publishing status filtering
+        $user = auth('sanctum')->user();
+        if ($user && in_array($user->role, ['admin', 'editor'])) {
+            if ($request->has('status')) {
+                $query->withStatus($request->status);
+            }
+        } else {
+            $query->published();
+        }
+
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -45,9 +57,42 @@ class RecipeController extends Controller
 
     public function show(Recipe $recipe): RecipeResource
     {
+        $user = auth('sanctum')->user();
+        if (! ($user && in_array($user->role, ['admin', 'editor'])) && ! $recipe->isPublished()) {
+            abort(404);
+        }
+
         $recipe->load(['conditions', 'interventions', 'tags', 'creator', 'updater']);
 
         return new RecipeResource($recipe);
+    }
+
+    public function publish(Recipe $recipe): JsonResponse
+    {
+        $recipe->publish();
+
+        return response()->json(['message' => 'Recipe published successfully']);
+    }
+
+    public function submitForReview(Recipe $recipe): JsonResponse
+    {
+        $recipe->submitForReview();
+
+        return response()->json(['message' => 'Recipe submitted for review']);
+    }
+
+    public function archive(Recipe $recipe): JsonResponse
+    {
+        $recipe->archive();
+
+        return response()->json(['message' => 'Recipe archived successfully']);
+    }
+
+    public function returnToDraft(Recipe $recipe): JsonResponse
+    {
+        $recipe->returnToDraft();
+
+        return response()->json(['message' => 'Recipe returned to draft']);
     }
 
     public function store(Request $request): RecipeResource
@@ -70,7 +115,7 @@ class RecipeController extends Controller
 
         $recipe = Recipe::create($validated);
 
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $recipe->tags()->attach($tagIds);
         }
 

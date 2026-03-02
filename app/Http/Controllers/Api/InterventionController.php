@@ -8,6 +8,7 @@ use App\Http\Resources\ConditionResource;
 use App\Http\Resources\EvidenceEntryResource;
 use App\Http\Resources\InterventionResource;
 use App\Models\Intervention;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -15,9 +16,20 @@ use Illuminate\Http\Response;
 class InterventionController extends Controller
 {
     use HasSorting;
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Intervention::with(['careDomain', 'tags']);
+
+        // Publishing status filtering
+        $user = auth('sanctum')->user();
+        if ($user && in_array($user->role, ['admin', 'editor'])) {
+            if ($request->has('status')) {
+                $query->withStatus($request->status);
+            }
+        } else {
+            $query->published();
+        }
 
         if ($request->has('care_domain_id')) {
             $query->where('care_domain_id', $request->care_domain_id);
@@ -31,8 +43,8 @@ class InterventionController extends Controller
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -47,9 +59,42 @@ class InterventionController extends Controller
 
     public function show(Intervention $intervention): InterventionResource
     {
+        $user = auth('sanctum')->user();
+        if (! ($user && in_array($user->role, ['admin', 'editor'])) && ! $intervention->isPublished()) {
+            abort(404);
+        }
+
         $intervention->load(['careDomain', 'evidenceEntries.references', 'tags', 'media', 'creator', 'updater']);
 
         return new InterventionResource($intervention);
+    }
+
+    public function publish(Intervention $intervention): JsonResponse
+    {
+        $intervention->publish();
+
+        return response()->json(['message' => 'Intervention published successfully']);
+    }
+
+    public function submitForReview(Intervention $intervention): JsonResponse
+    {
+        $intervention->submitForReview();
+
+        return response()->json(['message' => 'Intervention submitted for review']);
+    }
+
+    public function archive(Intervention $intervention): JsonResponse
+    {
+        $intervention->archive();
+
+        return response()->json(['message' => 'Intervention archived successfully']);
+    }
+
+    public function returnToDraft(Intervention $intervention): JsonResponse
+    {
+        $intervention->returnToDraft();
+
+        return response()->json(['message' => 'Intervention returned to draft']);
     }
 
     public function store(Request $request): InterventionResource
@@ -69,7 +114,7 @@ class InterventionController extends Controller
 
         $intervention = Intervention::create($validated);
 
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $intervention->tags()->attach($tagIds);
         }
 

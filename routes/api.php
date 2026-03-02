@@ -234,6 +234,18 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
     // Content Tags
     Route::apiResource('content-tags', ContentTagController::class)->except(['index', 'show']);
 
+    // Publishing status actions (editor can submit for review and return to draft)
+    Route::post('conditions/{condition}/submit-for-review', [ConditionController::class, 'submitForReview']);
+    Route::post('conditions/{condition}/return-to-draft', [ConditionController::class, 'returnToDraft']);
+    Route::post('interventions/{intervention}/submit-for-review', [InterventionController::class, 'submitForReview']);
+    Route::post('interventions/{intervention}/return-to-draft', [InterventionController::class, 'returnToDraft']);
+    Route::post('recipes/{recipe}/submit-for-review', [RecipeController::class, 'submitForReview']);
+    Route::post('recipes/{recipe}/return-to-draft', [RecipeController::class, 'returnToDraft']);
+    Route::post('scriptures/{scripture}/submit-for-review', [ScriptureController::class, 'submitForReview']);
+    Route::post('scriptures/{scripture}/return-to-draft', [ScriptureController::class, 'returnToDraft']);
+    Route::post('egw-references/{egwReference}/submit-for-review', [EgwReferenceController::class, 'submitForReview']);
+    Route::post('egw-references/{egwReference}/return-to-draft', [EgwReferenceController::class, 'returnToDraft']);
+
     // Relationship management endpoints
     // Note: reorder route must come BEFORE parameterized routes to avoid 'reorder' being matched as {intervention}
     Route::post('conditions/{condition}/interventions/reorder', [ConditionController::class, 'reorderInterventions']);
@@ -266,6 +278,18 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
 
 // Admin API routes - Admin Only (user management, import, AI generator, analytics)
 Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
+
+    // Publishing status actions (admin only: publish and archive)
+    Route::post('conditions/{condition}/publish', [ConditionController::class, 'publish']);
+    Route::post('conditions/{condition}/archive', [ConditionController::class, 'archive']);
+    Route::post('interventions/{intervention}/publish', [InterventionController::class, 'publish']);
+    Route::post('interventions/{intervention}/archive', [InterventionController::class, 'archive']);
+    Route::post('recipes/{recipe}/publish', [RecipeController::class, 'publish']);
+    Route::post('recipes/{recipe}/archive', [RecipeController::class, 'archive']);
+    Route::post('scriptures/{scripture}/publish', [ScriptureController::class, 'publish']);
+    Route::post('scriptures/{scripture}/archive', [ScriptureController::class, 'archive']);
+    Route::post('egw-references/{egwReference}/publish', [EgwReferenceController::class, 'publish']);
+    Route::post('egw-references/{egwReference}/archive', [EgwReferenceController::class, 'archive']);
 
     // Data Import (admin only)
     Route::post('import/conditions', [ImportController::class, 'importConditions']);

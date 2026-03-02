@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\HasSorting;
 use App\Http\Resources\ScriptureResource;
 use App\Models\Scripture;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -13,9 +14,20 @@ use Illuminate\Http\Response;
 class ScriptureController extends Controller
 {
     use HasSorting;
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Scripture::with('tags');
+
+        // Publishing status filtering
+        $user = auth('sanctum')->user();
+        if ($user && in_array($user->role, ['admin', 'editor'])) {
+            if ($request->has('status')) {
+                $query->withStatus($request->status);
+            }
+        } else {
+            $query->published();
+        }
 
         if ($request->has('theme')) {
             $query->where('theme', $request->theme);
@@ -29,9 +41,9 @@ class ScriptureController extends Controller
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('reference', 'like', '%' . $request->search . '%')
-                  ->orWhere('text', 'like', '%' . $request->search . '%')
-                  ->orWhere('theme', 'like', '%' . $request->search . '%');
+                $q->where('reference', 'like', '%'.$request->search.'%')
+                    ->orWhere('text', 'like', '%'.$request->search.'%')
+                    ->orWhere('theme', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -46,9 +58,42 @@ class ScriptureController extends Controller
 
     public function show(Scripture $scripture): ScriptureResource
     {
+        $user = auth('sanctum')->user();
+        if (! ($user && in_array($user->role, ['admin', 'editor'])) && ! $scripture->isPublished()) {
+            abort(404);
+        }
+
         $scripture->load(['conditions', 'interventions', 'tags', 'creator', 'updater']);
 
         return new ScriptureResource($scripture);
+    }
+
+    public function publish(Scripture $scripture): JsonResponse
+    {
+        $scripture->publish();
+
+        return response()->json(['message' => 'Scripture published successfully']);
+    }
+
+    public function submitForReview(Scripture $scripture): JsonResponse
+    {
+        $scripture->submitForReview();
+
+        return response()->json(['message' => 'Scripture submitted for review']);
+    }
+
+    public function archive(Scripture $scripture): JsonResponse
+    {
+        $scripture->archive();
+
+        return response()->json(['message' => 'Scripture archived successfully']);
+    }
+
+    public function returnToDraft(Scripture $scripture): JsonResponse
+    {
+        $scripture->returnToDraft();
+
+        return response()->json(['message' => 'Scripture returned to draft']);
     }
 
     public function store(Request $request): ScriptureResource
@@ -66,7 +111,7 @@ class ScriptureController extends Controller
 
         $scripture = Scripture::create($validated);
 
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $scripture->tags()->attach($tagIds);
         }
 

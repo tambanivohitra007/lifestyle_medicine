@@ -16,6 +16,7 @@ class ConditionResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'status' => $this->status,
             'name' => $this->name,
             'category' => $this->category,
             'summary' => $this->summary,

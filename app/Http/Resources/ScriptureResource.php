@@ -11,6 +11,7 @@ class ScriptureResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'status' => $this->status,
             'reference' => $this->reference,
             'text' => $this->text,
             'theme' => $this->theme,

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\HasSorting;
 use App\Http\Resources\EgwReferenceResource;
 use App\Models\EgwReference;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -13,17 +14,28 @@ use Illuminate\Http\Response;
 class EgwReferenceController extends Controller
 {
     use HasSorting;
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = EgwReference::with('tags');
 
+        // Publishing status filtering
+        $user = auth('sanctum')->user();
+        if ($user && in_array($user->role, ['admin', 'editor'])) {
+            if ($request->has('status')) {
+                $query->withStatus($request->status);
+            }
+        } else {
+            $query->published();
+        }
+
         // Search across book, quote, topic
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('book', 'like', '%' . $request->search . '%')
-                  ->orWhere('quote', 'like', '%' . $request->search . '%')
-                  ->orWhere('topic', 'like', '%' . $request->search . '%')
-                  ->orWhere('context', 'like', '%' . $request->search . '%');
+                $q->where('book', 'like', '%'.$request->search.'%')
+                    ->orWhere('quote', 'like', '%'.$request->search.'%')
+                    ->orWhere('topic', 'like', '%'.$request->search.'%')
+                    ->orWhere('context', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -55,9 +67,42 @@ class EgwReferenceController extends Controller
 
     public function show(EgwReference $egwReference): EgwReferenceResource
     {
+        $user = auth('sanctum')->user();
+        if (! ($user && in_array($user->role, ['admin', 'editor'])) && ! $egwReference->isPublished()) {
+            abort(404);
+        }
+
         $egwReference->load(['conditions', 'interventions', 'tags', 'creator', 'updater']);
 
         return new EgwReferenceResource($egwReference);
+    }
+
+    public function publish(EgwReference $egwReference): JsonResponse
+    {
+        $egwReference->publish();
+
+        return response()->json(['message' => 'EGW reference published successfully']);
+    }
+
+    public function submitForReview(EgwReference $egwReference): JsonResponse
+    {
+        $egwReference->submitForReview();
+
+        return response()->json(['message' => 'EGW reference submitted for review']);
+    }
+
+    public function archive(EgwReference $egwReference): JsonResponse
+    {
+        $egwReference->archive();
+
+        return response()->json(['message' => 'EGW reference archived successfully']);
+    }
+
+    public function returnToDraft(EgwReference $egwReference): JsonResponse
+    {
+        $egwReference->returnToDraft();
+
+        return response()->json(['message' => 'EGW reference returned to draft']);
     }
 
     public function store(Request $request): EgwReferenceResource
@@ -81,7 +126,7 @@ class EgwReferenceController extends Controller
 
         $egwReference = EgwReference::create($validated);
 
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $egwReference->tags()->attach($tagIds);
         }
 

@@ -11,6 +11,7 @@ class EgwReferenceResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'status' => $this->status,
             'book' => $this->book,
             'book_abbreviation' => $this->book_abbreviation,
             'chapter' => $this->chapter,

@@ -14,9 +14,9 @@ use App\Models\EgwReference;
 use App\Models\Intervention;
 use App\Models\Recipe;
 use App\Models\Scripture;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
@@ -26,14 +26,24 @@ class ConditionController extends Controller
     {
         $query = Condition::query();
 
+        // Publishing status filtering
+        $user = auth('sanctum')->user();
+        if ($user && in_array($user->role, ['admin', 'editor'])) {
+            if ($request->has('status')) {
+                $query->withStatus($request->status);
+            }
+        } else {
+            $query->published();
+        }
+
         if ($request->has('category')) {
             $query->where('category', $request->category);
         }
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('summary', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('summary', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -43,7 +53,7 @@ class ConditionController extends Controller
 
         // Validate sort column to prevent SQL injection
         $allowedSortColumns = ['name', 'category', 'created_at', 'updated_at'];
-        if (!in_array($sortBy, $allowedSortColumns)) {
+        if (! in_array($sortBy, $allowedSortColumns)) {
             $sortBy = 'created_at';
         }
 
@@ -59,9 +69,42 @@ class ConditionController extends Controller
 
     public function show(Condition $condition): ConditionResource
     {
+        $user = auth('sanctum')->user();
+        if (! ($user && in_array($user->role, ['admin', 'editor'])) && ! $condition->isPublished()) {
+            abort(404);
+        }
+
         $condition->load(['sections', 'interventions.careDomain', 'bodySystem', 'creator', 'updater']);
 
         return new ConditionResource($condition);
+    }
+
+    public function publish(Condition $condition): JsonResponse
+    {
+        $condition->publish();
+
+        return response()->json(['message' => 'Condition published successfully']);
+    }
+
+    public function submitForReview(Condition $condition): JsonResponse
+    {
+        $condition->submitForReview();
+
+        return response()->json(['message' => 'Condition submitted for review']);
+    }
+
+    public function archive(Condition $condition): JsonResponse
+    {
+        $condition->archive();
+
+        return response()->json(['message' => 'Condition archived successfully']);
+    }
+
+    public function returnToDraft(Condition $condition): JsonResponse
+    {
+        $condition->returnToDraft();
+
+        return response()->json(['message' => 'Condition returned to draft']);
     }
 
     /**
@@ -70,16 +113,21 @@ class ConditionController extends Controller
      */
     public function complete(Condition $condition): JsonResponse
     {
+        $user = auth('sanctum')->user();
+        if (! ($user && in_array($user->role, ['admin', 'editor'])) && ! $condition->isPublished()) {
+            abort(404);
+        }
+
         // Load all relationships in one query
         $condition->load([
-            'sections' => fn($q) => $q->orderBy('order_index'),
-            'interventions' => fn($q) => $q->with('careDomain')
+            'sections' => fn ($q) => $q->orderBy('order_index'),
+            'interventions' => fn ($q) => $q->with('careDomain')
                 ->withPivot(['strength_of_evidence', 'recommendation_level', 'clinical_notes', 'order_index'])
                 ->orderBy('condition_interventions.order_index'),
             'scriptures',
             'recipes',
             'egwReferences',
-            'media' => fn($q) => $q->orderBy('order_index'),
+            'media' => fn ($q) => $q->orderBy('order_index'),
             'bodySystem',
             'creator',
             'updater',
@@ -89,7 +137,7 @@ class ConditionController extends Controller
         $infographics = $condition->media->where('type', 'infographic');
         $otherMedia = $condition->media->whereIn('type', ['image', 'document']);
 
-        $formatMedia = fn($media) => [
+        $formatMedia = fn ($media) => [
             'id' => $media->id,
             'url' => $media->url,
             'filename' => $media->filename,
@@ -241,7 +289,7 @@ class ConditionController extends Controller
                 ->where('intervention_id', $intervention->id)
                 ->withPivot(['strength_of_evidence', 'recommendation_level', 'clinical_notes', 'order_index'])
                 ->first()
-                ->pivot
+                ->pivot,
         ]);
     }
 

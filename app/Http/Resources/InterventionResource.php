@@ -11,6 +11,7 @@ class InterventionResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'status' => $this->status,
             'care_domain_id' => $this->care_domain_id,
             'care_domain' => new CareDomainResource($this->whenLoaded('careDomain')),
             'name' => $this->name,
