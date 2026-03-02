@@ -74,14 +74,16 @@ const Login = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
+        {/* Large Blended Logo */}
+        <div className="absolute top-8 inset-x-0 flex justify-center pointer-events-none">
+          <img src="/lifestyle.png" alt="" className="w-56 h-56 object-contain opacity-10" />
+        </div>
+
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
           {/* Top - Logo */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <img src="/lifestyle.png" alt="Logo" className="w-10 h-10 object-contain" />
-              </div>
               <div>
                 <h2 className="text-xl font-bold">{t('branding.title')}</h2>
                 <p className="text-white/70 text-sm">{t('branding.subtitle')}</p>
