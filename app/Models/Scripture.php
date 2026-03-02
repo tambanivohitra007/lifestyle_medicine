@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasAuditFields;
 use App\Models\Traits\HasPublishingStatus;
+use App\Models\Traits\HasRevisions;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Scripture extends Model
 {
-    use HasAuditFields, HasFactory, HasPublishingStatus, HasUuids, SoftDeletes;
+    use HasAuditFields, HasFactory, HasPublishingStatus, HasRevisions, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'reference',
