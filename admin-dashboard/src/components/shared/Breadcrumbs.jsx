@@ -41,12 +41,12 @@ const Breadcrumbs = ({ items = [], showBackButton = true, backTo, backLabel }) =
   const computedBackLabel = backLabel || (items.length > 0 ? items[0].label : t('buttons.back'));
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 bg-rose-700 px-4 py-2 rounded-xl">
       {/* Back Button - hidden on mobile (appbar already has one), visible on sm+ */}
       {showBackButton && (
         <button
           onClick={handleBack}
-          className="hidden sm:inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-1.5 -ml-2 rounded-lg hover:bg-gray-100 active:bg-gray-200"
+          className="hidden sm:inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors px-3 py-1.5 -ml-2 rounded-lg hover:bg-white/10 active:bg-white/20"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{computedBackLabel}</span>
@@ -60,7 +60,7 @@ const Breadcrumbs = ({ items = [], showBackButton = true, backTo, backLabel }) =
           <li className="flex items-center">
             <Link
               to="/"
-              className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded hover:bg-gray-100"
+              className="text-white/70 hover:text-white transition-colors p-1 rounded hover:bg-white/10"
               title="Dashboard"
             >
               <Home className="w-4 h-4" />
@@ -74,18 +74,18 @@ const Breadcrumbs = ({ items = [], showBackButton = true, backTo, backLabel }) =
 
             return (
               <li key={index} className="flex items-center">
-                <ChevronRight className="w-4 h-4 text-gray-400 mx-1 flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-white/40 mx-1 flex-shrink-0" />
                 {hasLink ? (
                   <Link
                     to={item.href}
-                    className="text-gray-500 hover:text-gray-700 transition-colors px-1 py-0.5 rounded hover:bg-gray-100 truncate max-w-[200px]"
+                    className="text-white/70 hover:text-white transition-colors px-1 py-0.5 rounded hover:bg-white/10 truncate max-w-[200px]"
                     title={item.label}
                   >
                     {item.label}
                   </Link>
                 ) : (
                   <span
-                    className="text-gray-900 font-medium truncate max-w-[200px]"
+                    className="text-white font-medium truncate max-w-[200px]"
                     title={item.label}
                   >
                     {item.label}
@@ -98,7 +98,7 @@ const Breadcrumbs = ({ items = [], showBackButton = true, backTo, backLabel }) =
       </nav>
 
       {/* Mobile: Show current page title */}
-      <div className="sm:hidden text-xs text-gray-500">
+      <div className="sm:hidden text-xs text-white/70">
         {items.length > 0 && items[items.length - 1].label}
       </div>
     </div>
