@@ -96,7 +96,9 @@
     "description": "Get started by creating your first recipe",
     "action": "Add Recipe",
     "noAvailable": "No available recipes",
-    "allLinkedOrNoMatch": "All recipes are already linked or none match your search."
+    "allLinkedOrNoMatch": "All recipes are already linked or none match your search.",
+    "noResultsTitle": "No matching recipes",
+    "noResultsDescription": "Try adjusting your search or filters"
   },
   "toast": {
     "created": "Recipe created successfully",

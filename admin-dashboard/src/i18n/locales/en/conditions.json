@@ -116,7 +116,9 @@
     "title": "No conditions found",
     "description": "Get started by creating your first condition",
     "action": "Add Condition",
-    "noSummary": "No summary available"
+    "noSummary": "No summary available",
+    "noResultsTitle": "No matching conditions",
+    "noResultsDescription": "Try adjusting your search or filters"
   },
   "toast": {
     "created": "Condition created successfully",

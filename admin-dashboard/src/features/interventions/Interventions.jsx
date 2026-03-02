@@ -291,21 +291,35 @@ const Interventions = () => {
         )
       ) : interventions.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
-          <Stethoscope className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {t('interventions:empty.title')}
-          </h3>
-          <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            {t('interventions:empty.description')}
-          </p>
-          {canEdit && (
-            <button
-              onClick={openCreateModal}
-              className="btn-primary inline-flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              {t('interventions:empty.action')}
-            </button>
+          {searchTerm || domainFilter || tagFilter ? (
+            <>
+              <Search className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('interventions:empty.noResultsTitle')}
+              </h3>
+              <p className="text-gray-600 mb-6 text-sm sm:text-base">
+                {t('interventions:empty.noResultsDescription')}
+              </p>
+            </>
+          ) : (
+            <>
+              <Stethoscope className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('interventions:empty.title')}
+              </h3>
+              <p className="text-gray-600 mb-6 text-sm sm:text-base">
+                {t('interventions:empty.description')}
+              </p>
+              {canEdit && (
+                <button
+                  onClick={openCreateModal}
+                  className="btn-primary inline-flex items-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  {t('interventions:empty.action')}
+                </button>
+              )}
+            </>
           )}
         </div>
       ) : (

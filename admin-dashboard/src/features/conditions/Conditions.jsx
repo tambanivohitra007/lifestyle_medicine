@@ -357,21 +357,35 @@ const Conditions = () => {
         )
       ) : conditions.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
-          <ShieldAlert className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {t('conditions:empty.title')}
-          </h3>
-          <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            {t('conditions:empty.description')}
-          </p>
-          {canEdit && (
-            <button
-              onClick={openCreateModal}
-              className="btn-primary inline-flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              {t('conditions:empty.action')}
-            </button>
+          {searchTerm || categoryFilter ? (
+            <>
+              <Search className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('conditions:empty.noResultsTitle')}
+              </h3>
+              <p className="text-gray-600 mb-6 text-sm sm:text-base">
+                {t('conditions:empty.noResultsDescription')}
+              </p>
+            </>
+          ) : (
+            <>
+              <ShieldAlert className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('conditions:empty.title')}
+              </h3>
+              <p className="text-gray-600 mb-6 text-sm sm:text-base">
+                {t('conditions:empty.description')}
+              </p>
+              {canEdit && (
+                <button
+                  onClick={openCreateModal}
+                  className="btn-primary inline-flex items-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  {t('conditions:empty.action')}
+                </button>
+              )}
+            </>
           )}
         </div>
       ) : (

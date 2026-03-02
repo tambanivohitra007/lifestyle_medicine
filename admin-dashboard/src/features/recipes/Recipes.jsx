@@ -185,18 +185,32 @@ const Recipes = () => {
         )
       ) : recipes.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
-          <ChefHat className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {t('recipes:empty.title')}
-          </h3>
-          <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            {t('recipes:empty.description')}
-          </p>
-          {canEdit && (
-            <Link to="/recipes/new" className="btn-primary inline-flex items-center gap-2">
-              <Plus className="w-5 h-5" />
-              {t('recipes:empty.action')}
-            </Link>
+          {searchTerm || tagFilter || contentTagFilter ? (
+            <>
+              <Search className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('recipes:empty.noResultsTitle')}
+              </h3>
+              <p className="text-gray-600 mb-6 text-sm sm:text-base">
+                {t('recipes:empty.noResultsDescription')}
+              </p>
+            </>
+          ) : (
+            <>
+              <ChefHat className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('recipes:empty.title')}
+              </h3>
+              <p className="text-gray-600 mb-6 text-sm sm:text-base">
+                {t('recipes:empty.description')}
+              </p>
+              {canEdit && (
+                <Link to="/recipes/new" className="btn-primary inline-flex items-center gap-2">
+                  <Plus className="w-5 h-5" />
+                  {t('recipes:empty.action')}
+                </Link>
+              )}
+            </>
           )}
         </div>
       ) : (

@@ -87,7 +87,9 @@
     "title": "No interventions found",
     "description": "Get started by creating your first intervention",
     "action": "Add Intervention",
-    "noResults": "No available interventions found"
+    "noResults": "No available interventions found",
+    "noResultsTitle": "No matching interventions",
+    "noResultsDescription": "Try adjusting your search or filters"
   },
   "mapping": {
     "strengthOfEvidence": "Strength of Evidence",
