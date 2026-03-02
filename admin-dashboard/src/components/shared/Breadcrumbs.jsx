@@ -42,15 +42,14 @@ const Breadcrumbs = ({ items = [], showBackButton = true, backTo, backLabel }) =
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
-      {/* Back Button - prominent on mobile */}
+      {/* Back Button - hidden on mobile (appbar already has one), visible on sm+ */}
       {showBackButton && (
         <button
           onClick={handleBack}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors px-2 py-1.5 -ml-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 sm:px-3 sm:py-1.5"
+          className="hidden sm:inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-1.5 -ml-2 rounded-lg hover:bg-gray-100 active:bg-gray-200"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="sm:hidden">{t('buttons.back')}</span>
-          <span className="hidden sm:inline">{computedBackLabel}</span>
+          <span>{computedBackLabel}</span>
         </button>
       )}
 
