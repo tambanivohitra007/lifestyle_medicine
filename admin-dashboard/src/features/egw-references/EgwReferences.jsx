@@ -5,6 +5,7 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 import { SkeletonList } from '../../components/skeleton';
 import { useAuth } from '../../contexts/AuthContext';
+import StatusBadge from '../../components/shared/StatusBadge';
 
 const EgwReferences = () => {
   const { canEdit } = useAuth();
@@ -14,6 +15,7 @@ const EgwReferences = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [bookFilter, setBookFilter] = useState('');
   const [topicFilter, setTopicFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [books, setBooks] = useState([]);
   const [topics, setTopics] = useState([]);
   const [pagination, setPagination] = useState({});
@@ -24,7 +26,7 @@ const EgwReferences = () => {
 
   useEffect(() => {
     fetchReferences();
-  }, [searchTerm, bookFilter, topicFilter]);
+  }, [searchTerm, bookFilter, topicFilter, statusFilter]);
 
   const fetchFilters = async () => {
     try {
@@ -47,6 +49,7 @@ const EgwReferences = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (bookFilter) params.append('book', bookFilter);
       if (topicFilter) params.append('topic', topicFilter);
+      if (statusFilter) params.append('status', statusFilter);
 
       const response = await api.get(`${apiEndpoints.egwReferences}?${params.toString()}`);
       setReferences(response.data.data);
@@ -77,9 +80,10 @@ const EgwReferences = () => {
     setSearchTerm('');
     setBookFilter('');
     setTopicFilter('');
+    setStatusFilter('');
   };
 
-  const hasFilters = searchTerm || bookFilter || topicFilter;
+  const hasFilters = searchTerm || bookFilter || topicFilter || statusFilter;
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -145,6 +149,21 @@ const EgwReferences = () => {
             ))}
           </select>
 
+          {/* Status Filter */}
+          {canEdit && (
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input-field"
+            >
+              <option value="">All Statuses</option>
+              <option value="draft">Draft</option>
+              <option value="in_review">In Review</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          )}
+
           {/* Clear Filters */}
           {hasFilters && (
             <button
@@ -192,6 +211,9 @@ const EgwReferences = () => {
                     <h3 className="font-semibold text-gray-900">
                       {reference.citation}
                     </h3>
+                    {reference.status && reference.status !== 'published' && (
+                      <StatusBadge status={reference.status} />
+                    )}
                     {reference.topic && (
                       <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
                         {reference.topic}

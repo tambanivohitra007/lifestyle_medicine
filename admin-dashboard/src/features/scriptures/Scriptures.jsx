@@ -6,6 +6,7 @@ import { toast, confirmDelete } from '../../lib/swal';
 import Pagination from '../../components/ui/Pagination';
 import { SkeletonList } from '../../components/skeleton';
 import { useAuth } from '../../contexts/AuthContext';
+import StatusBadge from '../../components/shared/StatusBadge';
 import SlideOver from '../../components/shared/SlideOver';
 
 const Scriptures = () => {
@@ -17,6 +18,7 @@ const Scriptures = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [themeFilter, setThemeFilter] = useState('');
   const [tagFilter, setTagFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
 
@@ -34,11 +36,11 @@ const Scriptures = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, themeFilter, tagFilter]);
+  }, [searchTerm, themeFilter, tagFilter, statusFilter]);
 
   useEffect(() => {
     fetchScriptures();
-  }, [searchTerm, themeFilter, tagFilter, currentPage]);
+  }, [searchTerm, themeFilter, tagFilter, statusFilter, currentPage]);
 
   const fetchContentTags = async () => {
     try {
@@ -56,6 +58,7 @@ const Scriptures = () => {
       if (searchTerm) params.search = searchTerm;
       if (themeFilter) params.theme = themeFilter;
       if (tagFilter) params.tag_id = tagFilter;
+      if (statusFilter) params.status = statusFilter;
 
       const response = await api.get(apiEndpoints.scriptures, { params });
       setScriptures(response.data.data);
@@ -230,6 +233,21 @@ const Scriptures = () => {
               </option>
             ))}
           </select>
+
+          {/* Status Filter */}
+          {canEdit && (
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input-field"
+            >
+              <option value="">{t('common:statusFilter.allStatuses')}</option>
+              <option value="draft">{t('common:status.draft')}</option>
+              <option value="in_review">{t('common:status.in_review')}</option>
+              <option value="published">{t('common:status.published')}</option>
+              <option value="archived">{t('common:status.archived')}</option>
+            </select>
+          )}
         </div>
       </div>
 
@@ -291,11 +309,16 @@ const Scriptures = () => {
                   {scripture.reference}
                 </h3>
 
-                {scripture.theme && (
-                  <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full mb-3">
-                    {scripture.theme}
-                  </span>
-                )}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {scripture.status && scripture.status !== 'published' && (
+                    <StatusBadge status={scripture.status} />
+                  )}
+                  {scripture.theme && (
+                    <span className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full">
+                      {scripture.theme}
+                    </span>
+                  )}
+                </div>
 
                 {scripture.tags && scripture.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-3">

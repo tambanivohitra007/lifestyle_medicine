@@ -246,6 +246,21 @@
   "validation": {
     "required": "{{field}} is required"
   },
+  "status": {
+    "draft": "Draft",
+    "in_review": "In Review",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "actions": {
+    "publish": "Publish",
+    "submitForReview": "Submit for Review",
+    "archive": "Archive",
+    "returnToDraft": "Return to Draft"
+  },
+  "statusFilter": {
+    "allStatuses": "All Statuses"
+  },
   "units": {
     "week": "week",
     "weeks": "weeks",

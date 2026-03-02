@@ -293,6 +293,34 @@ export const apiEndpoints = {
   effectivenessAdmin: '/admin/effectiveness',
   effectivenessAdminItem: (id) => `/admin/effectiveness/${id}`,
 
+  // Publishing Status Actions
+  publishCondition: (id) => `/admin/conditions/${id}/publish`,
+  archiveCondition: (id) => `/admin/conditions/${id}/archive`,
+  submitConditionForReview: (id) => `/admin/conditions/${id}/submit-for-review`,
+  returnConditionToDraft: (id) => `/admin/conditions/${id}/return-to-draft`,
+  publishIntervention: (id) => `/admin/interventions/${id}/publish`,
+  archiveIntervention: (id) => `/admin/interventions/${id}/archive`,
+  submitInterventionForReview: (id) => `/admin/interventions/${id}/submit-for-review`,
+  returnInterventionToDraft: (id) => `/admin/interventions/${id}/return-to-draft`,
+  publishRecipe: (id) => `/admin/recipes/${id}/publish`,
+  archiveRecipe: (id) => `/admin/recipes/${id}/archive`,
+  submitRecipeForReview: (id) => `/admin/recipes/${id}/submit-for-review`,
+  returnRecipeToDraft: (id) => `/admin/recipes/${id}/return-to-draft`,
+  publishScripture: (id) => `/admin/scriptures/${id}/publish`,
+  archiveScripture: (id) => `/admin/scriptures/${id}/archive`,
+  submitScriptureForReview: (id) => `/admin/scriptures/${id}/submit-for-review`,
+  returnScriptureToDraft: (id) => `/admin/scriptures/${id}/return-to-draft`,
+  publishEgwReference: (id) => `/admin/egw-references/${id}/publish`,
+  archiveEgwReference: (id) => `/admin/egw-references/${id}/archive`,
+  submitEgwReferenceForReview: (id) => `/admin/egw-references/${id}/submit-for-review`,
+  returnEgwReferenceToDraft: (id) => `/admin/egw-references/${id}/return-to-draft`,
+
+  // Content Revisions
+  revisions: (type, id) => `/admin/revisions/${type}/${id}`,
+  revisionDetail: (id) => `/admin/revisions/detail/${id}`,
+  revisionRestore: (type, id, revisionId) => `/admin/revisions/${type}/${id}/restore/${revisionId}`,
+  revisionCompare: (revisionAId, revisionBId) => `/admin/revisions/compare/${revisionAId}/${revisionBId}`,
+
   // Intervention Relationships (Knowledge Graph)
   interventionRelationships: '/intervention-relationships',
   interventionRelationshipsFor: (id) => `/interventions/${id}/relationships`,

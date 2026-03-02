@@ -9,6 +9,7 @@ import { SkeletonCard, SkeletonTable, SkeletonList } from '../../components/skel
 import ViewModeToggle from '../../components/ui/ViewModeToggle';
 import ConditionTable from './components/ConditionTable';
 import RichTextPreview from '../../components/shared/RichTextPreview';
+import StatusBadge from '../../components/shared/StatusBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 import ConditionDetailSlideOver from './components/ConditionDetailSlideOver';
@@ -20,6 +21,7 @@ const Conditions = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
   const [sortBy, setSortBy] = useState('created_at');
@@ -42,11 +44,11 @@ const Conditions = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, categoryFilter, sortBy, sortOrder]);
+  }, [searchTerm, categoryFilter, statusFilter, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchConditions();
-  }, [searchTerm, categoryFilter, currentPage, sortBy, sortOrder]);
+  }, [searchTerm, categoryFilter, statusFilter, currentPage, sortBy, sortOrder]);
 
   const fetchConditions = async () => {
     try {
@@ -58,6 +60,7 @@ const Conditions = () => {
       };
       if (searchTerm) params.search = searchTerm;
       if (categoryFilter) params.category = categoryFilter;
+      if (statusFilter) params.status = statusFilter;
 
       const response = await api.get(apiEndpoints.conditions, { params });
       setConditions(response.data.data);
@@ -227,7 +230,7 @@ const Conditions = () => {
 
       {/* Filters */}
       <div className="card">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -253,6 +256,21 @@ const Conditions = () => {
               </option>
             ))}
           </select>
+
+          {/* Status Filter */}
+          {canEdit && (
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input-field"
+            >
+              <option value="">{t('common:statusFilter.allStatuses')}</option>
+              <option value="draft">{t('common:status.draft')}</option>
+              <option value="in_review">{t('common:status.in_review')}</option>
+              <option value="published">{t('common:status.published')}</option>
+              <option value="archived">{t('common:status.archived')}</option>
+            </select>
+          )}
         </div>
       </div>
 
@@ -357,7 +375,7 @@ const Conditions = () => {
         )
       ) : conditions.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
-          {searchTerm || categoryFilter ? (
+          {searchTerm || categoryFilter || statusFilter ? (
             <>
               <Search className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -427,11 +445,16 @@ const Conditions = () => {
                     {condition.name}
                   </h3>
 
-                  {condition.category && (
-                    <span className="inline-block px-3 py-1 bg-secondary-100 text-secondary-700 text-xs font-medium rounded-full mb-3">
-                      {condition.category}
-                    </span>
-                  )}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {condition.status && condition.status !== 'published' && (
+                      <StatusBadge status={condition.status} />
+                    )}
+                    {condition.category && (
+                      <span className="inline-block px-2 py-0.5 bg-secondary-100 text-secondary-700 text-xs font-medium rounded-full">
+                        {condition.category}
+                      </span>
+                    )}
+                  </div>
 
                   <RichTextPreview
                     content={condition.summary}

@@ -3,6 +3,7 @@ import { Eye, Edit, Trash2, Layers, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
+import StatusBadge from '../../../components/shared/StatusBadge';
 
 /**
  * Table view for interventions
@@ -26,6 +27,9 @@ const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
                 <h3 className="font-medium text-gray-900 text-sm truncate">
                   {intervention.name}
                 </h3>
+                {intervention.status && intervention.status !== 'published' && (
+                  <StatusBadge status={intervention.status} />
+                )}
                 {intervention.care_domain && (
                   <div className="flex items-center gap-1 mt-1">
                     <Layers className="w-3 h-3 text-secondary-500" />
@@ -127,8 +131,13 @@ const InterventionTable = ({ interventions, onDelete, onEdit, canEdit }) => {
               {interventions.map((intervention) => (
                 <tr key={intervention.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {intervention.name}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-900">
+                        {intervention.name}
+                      </span>
+                      {intervention.status && intervention.status !== 'published' && (
+                        <StatusBadge status={intervention.status} />
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

@@ -10,6 +10,7 @@ import ViewModeToggle from '../../components/ui/ViewModeToggle';
 import RecipeTable from './components/RecipeTable';
 import RecipeList from './components/RecipeList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
+import StatusBadge from '../../components/shared/StatusBadge';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Recipes = () => {
@@ -22,6 +23,7 @@ const Recipes = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [tagFilter, setTagFilter] = useState('');
   const [contentTagFilter, setContentTagFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
   const [viewMode, setViewMode] = useState(() => {
@@ -34,11 +36,11 @@ const Recipes = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, tagFilter, contentTagFilter]);
+  }, [searchTerm, tagFilter, contentTagFilter, statusFilter]);
 
   useEffect(() => {
     fetchRecipes();
-  }, [searchTerm, tagFilter, contentTagFilter, currentPage]);
+  }, [searchTerm, tagFilter, contentTagFilter, statusFilter, currentPage]);
 
   const fetchContentTags = async () => {
     try {
@@ -56,6 +58,7 @@ const Recipes = () => {
       if (searchTerm) params.search = searchTerm;
       if (tagFilter) params.dietary_tag = tagFilter;
       if (contentTagFilter) params.tag_id = contentTagFilter;
+      if (statusFilter) params.status = statusFilter;
 
       const response = await api.get(apiEndpoints.recipes, { params });
       setRecipes(response.data.data);
@@ -159,6 +162,21 @@ const Recipes = () => {
               </option>
             ))}
           </select>
+
+          {/* Status Filter */}
+          {canEdit && (
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input-field"
+            >
+              <option value="">{t('common:statusFilter.allStatuses')}</option>
+              <option value="draft">{t('common:status.draft')}</option>
+              <option value="in_review">{t('common:status.in_review')}</option>
+              <option value="published">{t('common:status.published')}</option>
+              <option value="archived">{t('common:status.archived')}</option>
+            </select>
+          )}
         </div>
       </div>
 
@@ -185,7 +203,7 @@ const Recipes = () => {
         )
       ) : recipes.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
-          {searchTerm || tagFilter || contentTagFilter ? (
+          {searchTerm || tagFilter || contentTagFilter || statusFilter ? (
             <>
               <Search className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -251,6 +269,12 @@ const Recipes = () => {
                   <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
                     {recipe.title}
                   </h3>
+
+                  {recipe.status && recipe.status !== 'published' && (
+                    <div className="mb-3">
+                      <StatusBadge status={recipe.status} />
+                    </div>
+                  )}
 
                   {recipe.dietary_tags && recipe.dietary_tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-3">

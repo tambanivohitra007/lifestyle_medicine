@@ -2,6 +2,7 @@ import { Eye, Edit, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
+import StatusBadge from '../../../components/shared/StatusBadge';
 
 /**
  * Table view for conditions list
@@ -29,11 +30,16 @@ const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
                 <h3 className="font-medium text-gray-900 text-sm truncate">
                   {condition.name}
                 </h3>
-                {condition.category && (
-                  <span className="inline-flex mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-primary-100 text-primary-800">
-                    {condition.category}
-                  </span>
-                )}
+                <div className="flex flex-wrap items-center gap-1 mt-1">
+                  {condition.status && condition.status !== 'published' && (
+                    <StatusBadge status={condition.status} />
+                  )}
+                  {condition.category && (
+                    <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-primary-100 text-primary-800">
+                      {condition.category}
+                    </span>
+                  )}
+                </div>
               </div>
               {canEdit && (
                 <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1" onClick={(e) => e.stopPropagation()}>
@@ -99,8 +105,13 @@ const ConditionTable = ({ conditions, onDelete, onEdit, onView, canEdit }) => {
               {conditions.map((condition) => (
                 <tr key={condition.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {condition.name}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-900">
+                        {condition.name}
+                      </span>
+                      {condition.status && condition.status !== 'published' && (
+                        <StatusBadge status={condition.status} />
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

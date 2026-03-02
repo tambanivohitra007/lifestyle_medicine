@@ -3,6 +3,7 @@ import { Eye, Edit, Trash2, Clock, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
+import StatusBadge from '../../../components/shared/StatusBadge';
 
 /**
  * Table view for recipes
@@ -26,6 +27,9 @@ const RecipeTable = ({ recipes, onDelete, canEdit }) => {
                 <h3 className="font-medium text-gray-900 text-sm truncate">
                   {recipe.title}
                 </h3>
+                {recipe.status && recipe.status !== 'published' && (
+                  <StatusBadge status={recipe.status} />
+                )}
                 {(recipe.prep_time_minutes || recipe.cook_time_minutes) && (
                   <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
                     <Clock className="w-3 h-3" />
@@ -128,8 +132,13 @@ const RecipeTable = ({ recipes, onDelete, canEdit }) => {
               {recipes.map((recipe) => (
                 <tr key={recipe.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {recipe.title}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-900">
+                        {recipe.title}
+                      </span>
+                      {recipe.status && recipe.status !== 'published' && (
+                        <StatusBadge status={recipe.status} />
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4">

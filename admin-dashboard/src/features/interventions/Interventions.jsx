@@ -10,6 +10,7 @@ import ViewModeToggle from '../../components/ui/ViewModeToggle';
 import InterventionTable from './components/InterventionTable';
 import InterventionList from './components/InterventionList';
 import RichTextPreview from '../../components/shared/RichTextPreview';
+import StatusBadge from '../../components/shared/StatusBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 import MediaUploader from '../../components/shared/MediaUploader';
@@ -25,6 +26,7 @@ const Interventions = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [domainFilter, setDomainFilter] = useState('');
   const [tagFilter, setTagFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, lastPage: 1, perPage: 20 });
   const [viewMode, setViewMode] = useState(() => {
@@ -51,11 +53,11 @@ const Interventions = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, domainFilter, tagFilter]);
+  }, [searchTerm, domainFilter, tagFilter, statusFilter]);
 
   useEffect(() => {
     fetchInterventions();
-  }, [searchTerm, domainFilter, tagFilter, currentPage]);
+  }, [searchTerm, domainFilter, tagFilter, statusFilter, currentPage]);
 
   const fetchData = async () => {
     try {
@@ -77,6 +79,7 @@ const Interventions = () => {
       if (searchTerm) params.search = searchTerm;
       if (domainFilter) params.care_domain_id = domainFilter;
       if (tagFilter) params.tag_id = tagFilter;
+      if (statusFilter) params.status = statusFilter;
 
       const response = await api.get(apiEndpoints.interventions, { params });
       setInterventions(response.data.data);
@@ -265,6 +268,21 @@ const Interventions = () => {
               </option>
             ))}
           </select>
+
+          {/* Status Filter */}
+          {canEdit && (
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input-field"
+            >
+              <option value="">{t('common:statusFilter.allStatuses')}</option>
+              <option value="draft">{t('common:status.draft')}</option>
+              <option value="in_review">{t('common:status.in_review')}</option>
+              <option value="published">{t('common:status.published')}</option>
+              <option value="archived">{t('common:status.archived')}</option>
+            </select>
+          )}
         </div>
       </div>
 
@@ -291,7 +309,7 @@ const Interventions = () => {
         )
       ) : interventions.length === 0 ? (
         <div className="card text-center py-8 sm:py-12">
-          {searchTerm || domainFilter || tagFilter ? (
+          {searchTerm || domainFilter || tagFilter || statusFilter ? (
             <>
               <Search className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -360,6 +378,12 @@ const Interventions = () => {
                   <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
                     {intervention.name}
                   </h3>
+
+                  {intervention.status && intervention.status !== 'published' && (
+                    <div className="mb-3">
+                      <StatusBadge status={intervention.status} />
+                    </div>
+                  )}
 
                   {intervention.care_domain && (
                     <div className="flex items-center gap-2 mb-3">

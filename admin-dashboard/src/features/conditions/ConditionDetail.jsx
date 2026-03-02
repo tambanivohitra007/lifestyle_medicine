@@ -33,6 +33,8 @@ import {
 } from '../../components/relationships';
 import InfographicGenerator from '../ai-generator/components/InfographicGenerator';
 import MediaUploader from '../../components/shared/MediaUploader';
+import StatusBadge from '../../components/shared/StatusBadge';
+import PublishActions from '../../components/shared/PublishActions';
 import ConditionPreviewModal from './ConditionPreviewModal';
 
 const SECTION_TYPES = {
@@ -110,6 +112,7 @@ const ConditionDetail = () => {
   const [media, setMedia] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statusLoading, setStatusLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('sections');
   const [workflowExpanded, setWorkflowExpanded] = useState(false);
 
@@ -161,6 +164,29 @@ const ConditionDetail = () => {
     } catch (error) {
       console.error('Error deleting condition:', error);
       toast.error(t('conditions:toast.deleteError'));
+    }
+  };
+
+  const handleStatusAction = async (actionKey) => {
+    const endpointMap = {
+      'publish': apiEndpoints.publishCondition,
+      'submit-for-review': apiEndpoints.submitConditionForReview,
+      'archive': apiEndpoints.archiveCondition,
+      'return-to-draft': apiEndpoints.returnConditionToDraft,
+    };
+    const endpoint = endpointMap[actionKey];
+    if (!endpoint) return;
+
+    try {
+      setStatusLoading(true);
+      const response = await api.post(endpoint(id));
+      setCondition((prev) => ({ ...prev, status: response.data.data.status }));
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error(t('common:messages.error.general'));
+    } finally {
+      setStatusLoading(false);
     }
   };
 
@@ -383,6 +409,20 @@ const ConditionDetail = () => {
           )}
         </div>
       </div>
+
+      {/* Status & Publishing Actions */}
+      {condition.status && (
+        <div className="flex flex-wrap items-center gap-3">
+          <StatusBadge status={condition.status} size="md" />
+          {canEdit && (
+            <PublishActions
+              status={condition.status}
+              onAction={handleStatusAction}
+              loading={statusLoading}
+            />
+          )}
+        </div>
+      )}
 
       {/* Summary */}
       {condition.summary && (

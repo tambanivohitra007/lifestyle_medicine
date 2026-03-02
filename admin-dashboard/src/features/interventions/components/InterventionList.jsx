@@ -3,6 +3,7 @@ import { Eye, Edit, Trash2, Stethoscope, Layers, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
+import StatusBadge from '../../../components/shared/StatusBadge';
 
 /**
  * Compact list view for interventions
@@ -34,6 +35,11 @@ const InterventionList = ({ interventions, onDelete, onEdit, canEdit }) => {
                   <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 truncate">
                     {intervention.name}
                   </h3>
+                  {intervention.status && intervention.status !== 'published' && (
+                    <div className="mb-1">
+                      <StatusBadge status={intervention.status} />
+                    </div>
+                  )}
 
                   {/* Care Domain */}
                   {intervention.care_domain && (

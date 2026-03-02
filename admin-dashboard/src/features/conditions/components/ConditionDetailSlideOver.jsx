@@ -30,6 +30,8 @@ import {
   SortableInterventionList,
 } from '../../../components/relationships';
 import InfographicGenerator from '../../ai-generator/components/InfographicGenerator';
+import StatusBadge from '../../../components/shared/StatusBadge';
+import PublishActions from '../../../components/shared/PublishActions';
 
 const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDelete }) => {
   const { t } = useTranslation(['conditions', 'common']);
@@ -53,6 +55,8 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
   const [infographics, setInfographics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
+
+  const [statusLoading, setStatusLoading] = useState(false);
 
   // Modal states
   const [attachModalType, setAttachModalType] = useState(null);
@@ -81,6 +85,29 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
       toast.error(t('conditions:toast.loadFailed'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusAction = async (actionKey) => {
+    const endpointMap = {
+      'publish': apiEndpoints.publishCondition,
+      'submit-for-review': apiEndpoints.submitConditionForReview,
+      'archive': apiEndpoints.archiveCondition,
+      'return-to-draft': apiEndpoints.returnConditionToDraft,
+    };
+    const endpoint = endpointMap[actionKey];
+    if (!endpoint) return;
+
+    try {
+      setStatusLoading(true);
+      const response = await api.post(endpoint(conditionId));
+      setCondition((prev) => ({ ...prev, status: response.data.data.status }));
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error(t('common:messages.error.general'));
+    } finally {
+      setStatusLoading(false);
     }
   };
 
@@ -274,6 +301,20 @@ const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDele
                 </>
               )}
             </div>
+
+            {/* Status & Publishing Actions */}
+            {condition.status && (
+              <div className="flex flex-wrap items-center gap-3">
+                <StatusBadge status={condition.status} size="md" />
+                {canEdit && (
+                  <PublishActions
+                    status={condition.status}
+                    onAction={handleStatusAction}
+                    loading={statusLoading}
+                  />
+                )}
+              </div>
+            )}
 
             {/* Summary */}
             {condition.summary && (

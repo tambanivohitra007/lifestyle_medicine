@@ -3,6 +3,7 @@ import { Eye, Edit, Trash2, ChefHat, Clock, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import RichTextPreview from '../../../components/shared/RichTextPreview';
+import StatusBadge from '../../../components/shared/StatusBadge';
 
 /**
  * Compact list view for recipes
@@ -34,6 +35,11 @@ const RecipeList = ({ recipes, onDelete, canEdit }) => {
                   <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 truncate">
                     {recipe.title}
                   </h3>
+                  {recipe.status && recipe.status !== 'published' && (
+                    <div className="mb-1">
+                      <StatusBadge status={recipe.status} />
+                    </div>
+                  )}
 
                   {/* Dietary Tags */}
                   {recipe.dietary_tags && recipe.dietary_tags.length > 0 && (

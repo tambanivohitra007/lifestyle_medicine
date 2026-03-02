@@ -20,6 +20,8 @@ import { toast, confirmDelete } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AuditInfo from '../../components/shared/AuditInfo';
 import { useAuth } from '../../contexts/AuthContext';
+import StatusBadge from '../../components/shared/StatusBadge';
+import PublishActions from '../../components/shared/PublishActions';
 import ProtocolEditor from './components/ProtocolEditor';
 
 const QUALITY_RATING = {
@@ -42,10 +44,12 @@ const InterventionDetail = () => {
   const { t } = useTranslation(['interventions', 'evidence', 'conditions', 'common']);
   const { id } = useParams();
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
   const [intervention, setIntervention] = useState(null);
   const [evidence, setEvidence] = useState([]);
   const [conditions, setConditions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statusLoading, setStatusLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
 
   useEffect(() => {
@@ -84,6 +88,29 @@ const InterventionDetail = () => {
     } catch (error) {
       console.error('Error deleting intervention:', error);
       toast.error(t('interventions:toast.deleteError'));
+    }
+  };
+
+  const handleStatusAction = async (actionKey) => {
+    const endpointMap = {
+      'publish': apiEndpoints.publishIntervention,
+      'submit-for-review': apiEndpoints.submitInterventionForReview,
+      'archive': apiEndpoints.archiveIntervention,
+      'return-to-draft': apiEndpoints.returnInterventionToDraft,
+    };
+    const endpoint = endpointMap[actionKey];
+    if (!endpoint) return;
+
+    try {
+      setStatusLoading(true);
+      const response = await api.post(endpoint(id));
+      setIntervention((prev) => ({ ...prev, status: response.data.data.status }));
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error(t('common:messages.error.general'));
+    } finally {
+      setStatusLoading(false);
     }
   };
 
@@ -168,6 +195,20 @@ const InterventionDetail = () => {
           </button>
         </div>
       </div>
+
+      {/* Status & Publishing Actions */}
+      {intervention.status && (
+        <div className="flex flex-wrap items-center gap-3">
+          <StatusBadge status={intervention.status} size="md" />
+          {canEdit && (
+            <PublishActions
+              status={intervention.status}
+              onAction={handleStatusAction}
+              loading={statusLoading}
+            />
+          )}
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="border-b border-gray-200 -mx-4 sm:mx-0 px-4 sm:px-0">

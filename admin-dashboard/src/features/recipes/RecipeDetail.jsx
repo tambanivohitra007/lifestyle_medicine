@@ -15,6 +15,8 @@ import { toast, confirmDelete } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AuditInfo from '../../components/shared/AuditInfo';
 import { useAuth } from '../../contexts/AuthContext';
+import StatusBadge from '../../components/shared/StatusBadge';
+import PublishActions from '../../components/shared/PublishActions';
 
 const RecipeDetail = () => {
   const { t } = useTranslation(['recipes', 'common']);
@@ -23,6 +25,7 @@ const RecipeDetail = () => {
   const { canEdit } = useAuth();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [statusLoading, setStatusLoading] = useState(false);
 
   useEffect(() => {
     fetchRecipe();
@@ -53,6 +56,29 @@ const RecipeDetail = () => {
     } catch (error) {
       console.error('Error deleting recipe:', error);
       toast.error(t('recipes:toast.deleteError'));
+    }
+  };
+
+  const handleStatusAction = async (actionKey) => {
+    const endpointMap = {
+      'publish': apiEndpoints.publishRecipe,
+      'submit-for-review': apiEndpoints.submitRecipeForReview,
+      'archive': apiEndpoints.archiveRecipe,
+      'return-to-draft': apiEndpoints.returnRecipeToDraft,
+    };
+    const endpoint = endpointMap[actionKey];
+    if (!endpoint) return;
+
+    try {
+      setStatusLoading(true);
+      const response = await api.post(endpoint(id));
+      setRecipe((prev) => ({ ...prev, status: response.data.data.status }));
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error(t('common:messages.error.general'));
+    } finally {
+      setStatusLoading(false);
     }
   };
 
@@ -139,6 +165,20 @@ const RecipeDetail = () => {
           )}
         </div>
       </div>
+
+      {/* Status & Publishing Actions */}
+      {recipe.status && (
+        <div className="flex flex-wrap items-center gap-3">
+          <StatusBadge status={recipe.status} size="md" />
+          {canEdit && (
+            <PublishActions
+              status={recipe.status}
+              onAction={handleStatusAction}
+              loading={statusLoading}
+            />
+          )}
+        </div>
+      )}
 
       {/* Quick Info */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
