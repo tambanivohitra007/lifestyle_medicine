@@ -141,10 +141,10 @@ const Header = ({ isCollapsed, onToggleCollapse }) => {
               <>
                 <button
                   onClick={handleBack}
-                  className="p-2 -ml-1 rounded-lg hover:bg-white/10 active:bg-white/20 transition-colors touch-manipulation"
+                  className="p-2 -ml-1 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors touch-manipulation"
                   aria-label={t('navigation:header.goBack')}
                 >
-                  <ChevronLeft className="w-6 h-6 text-white" />
+                  <ChevronLeft className="w-7 h-7 text-white" strokeWidth={2.5} />
                 </button>
                 <div className="min-w-0 flex-1">
                   <h1 className="text-base font-bold text-white leading-tight truncate">
