@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LogOut, User, Shield, ChevronDown } from 'lucide-react';
+import { LogOut, Power, User, Shield, ChevronDown } from 'lucide-react';
 import {
   LayoutDashboard,
   HeartPulse,
@@ -266,12 +266,12 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         </div>
 
         {/* Bottom Actions */}
-        <div className="border-t border-secondary-700 px-4 py-3 safe-area-bottom">
+        <div className="border-t border-secondary-700 px-4 py-3 safe-area-bottom mb-3">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-400 bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 font-medium text-sm transition-colors duration-150 touch-manipulation"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 font-medium text-sm transition-colors duration-150 touch-manipulation"
           >
-            <LogOut className="w-4 h-4" />
+            <Power className="w-4 h-4" />
             {t('navigation:user.signOut')}
           </button>
         </div>
