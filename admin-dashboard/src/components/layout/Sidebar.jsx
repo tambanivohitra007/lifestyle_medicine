@@ -215,7 +215,7 @@ const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
         </div>
 
         {/* Scrollable Menu - Clean List Layout */}
-        <div className="overflow-y-auto overscroll-contain px-4 pb-2" style={{ maxHeight: 'calc(85vh - 180px)' }}>
+        <div className="overflow-y-auto overscroll-contain px-4 pb-2 scrollbar-hide" style={{ maxHeight: 'calc(85vh - 180px)' }}>
           {filteredMobileSections.map((section, sectionIndex) => (
             <div key={section.titleKey} className={sectionIndex > 0 ? 'mt-4' : ''}>
               {/* Section Title */}
