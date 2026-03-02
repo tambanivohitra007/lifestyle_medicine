@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Search, Stethoscope, Edit, Trash2, Eye, Layers, Tag, Save, Loader2, Image } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
@@ -17,6 +17,7 @@ import MediaUploader from '../../components/shared/MediaUploader';
 const Interventions = () => {
   const { t } = useTranslation(['interventions', 'common', 'careDomains', 'tags']);
   const { canEdit } = useAuth();
+  const navigate = useNavigate();
   const [interventions, setInterventions] = useState([]);
   const [careDomains, setCareDomains] = useState([]);
   const [contentTags, setContentTags] = useState([]);
@@ -309,39 +310,31 @@ const Interventions = () => {
               {interventions.map((intervention) => (
                 <div
                   key={intervention.id}
-                  className="card hover:shadow-lg transition-shadow duration-200"
+                  className="card hover:shadow-lg active:bg-gray-50 transition-all duration-200 cursor-pointer touch-manipulation"
+                  onClick={() => navigate(`/interventions/${intervention.id}`)}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-2 rounded-lg bg-green-100">
                       <Stethoscope className="w-5 sm:w-6 h-5 sm:h-6 text-green-600" />
                     </div>
-                    <div className="flex gap-1">
-                      <Link
-                        to={`/interventions/${intervention.id}`}
-                        className="action-btn"
-                        title={t('common:buttons.viewDetails')}
-                      >
-                        <Eye className="w-4 h-4 text-gray-600" />
-                      </Link>
-                      {canEdit && (
-                        <>
-                          <button
-                            onClick={() => openEditModal(intervention.id)}
-                            className="action-btn"
-                            title={t('common:buttons.edit')}
-                          >
-                            <Edit className="w-4 h-4 text-gray-600" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(intervention.id, intervention.name)}
-                            className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title={t('common:buttons.delete')}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    {canEdit && (
+                      <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => openEditModal(intervention.id)}
+                          className="action-btn"
+                          title={t('common:buttons.edit')}
+                        >
+                          <Edit className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(intervention.id, intervention.name)}
+                          className="action-btn hover:bg-red-50 active:bg-red-100"
+                          title={t('common:buttons.delete')}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
@@ -381,12 +374,9 @@ const Interventions = () => {
                   />
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <Link
-                      to={`/interventions/${intervention.id}`}
-                      className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
-                    >
+                    <span className="text-sm font-medium text-primary-600">
                       {t('common:buttons.viewDetails')} →
-                    </Link>
+                    </span>
                   </div>
                 </div>
               ))}

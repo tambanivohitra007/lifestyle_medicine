@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Search, ChefHat, Edit, Trash2, Eye, Clock, Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
@@ -15,6 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const Recipes = () => {
   const { t } = useTranslation(['recipes', 'common', 'tags']);
   const { canEdit } = useAuth();
+  const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
   const [contentTags, setContentTags] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -200,39 +201,31 @@ const Recipes = () => {
               {recipes.map((recipe) => (
                 <div
                   key={recipe.id}
-                  className="card hover:shadow-lg transition-shadow duration-200"
+                  className="card hover:shadow-lg active:bg-gray-50 transition-all duration-200 cursor-pointer touch-manipulation"
+                  onClick={() => navigate(`/recipes/${recipe.id}`)}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-2 rounded-lg bg-orange-100">
                       <ChefHat className="w-5 sm:w-6 h-5 sm:h-6 text-orange-600" />
                     </div>
-                    <div className="flex gap-1">
-                      <Link
-                        to={`/recipes/${recipe.id}`}
-                        className="action-btn"
-                        title={t('common:buttons.view')}
-                      >
-                        <Eye className="w-4 h-4 text-gray-600" />
-                      </Link>
-                      {canEdit && (
-                        <>
-                          <Link
-                            to={`/recipes/${recipe.id}/edit`}
-                            className="action-btn"
-                            title={t('common:buttons.edit')}
-                          >
-                            <Edit className="w-4 h-4 text-gray-600" />
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(recipe.id, recipe.title)}
-                            className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title={t('common:buttons.delete')}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    {canEdit && (
+                      <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                        <Link
+                          to={`/recipes/${recipe.id}/edit`}
+                          className="action-btn"
+                          title={t('common:buttons.edit')}
+                        >
+                          <Edit className="w-4 h-4 text-gray-600" />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(recipe.id, recipe.title)}
+                          className="action-btn hover:bg-red-50 active:bg-red-100"
+                          title={t('common:buttons.delete')}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
@@ -292,12 +285,9 @@ const Recipes = () => {
                   />
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <Link
-                      to={`/recipes/${recipe.id}`}
-                      className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
-                    >
+                    <span className="text-sm font-medium text-primary-600">
                       {t('recipes:detail.viewRecipe')} →
-                    </Link>
+                    </span>
                   </div>
                 </div>
               ))}

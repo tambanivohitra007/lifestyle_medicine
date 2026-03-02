@@ -382,39 +382,31 @@ const Conditions = () => {
               {conditions.map((condition) => (
                 <div
                   key={condition.id}
-                  className="card hover:shadow-lg transition-shadow duration-200"
+                  className="card hover:shadow-lg active:bg-gray-50 transition-all duration-200 cursor-pointer touch-manipulation"
+                  onClick={() => openDetailSlideOver(condition.id)}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-2 rounded-lg bg-primary-100">
                       <ShieldAlert className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600" />
                     </div>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => openDetailSlideOver(condition.id)}
-                        className="action-btn"
-                        title={t('common:buttons.viewDetails')}
-                      >
-                        <Eye className="w-4 h-4 text-gray-600" />
-                      </button>
-                      {canEdit && (
-                        <>
-                          <button
-                            onClick={() => openEditModal(condition.id)}
-                            className="action-btn"
-                            title={t('common:buttons.edit')}
-                          >
-                            <Edit className="w-4 h-4 text-gray-600" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(condition.id, condition.name)}
-                            className="action-btn hover:bg-red-50 active:bg-red-100"
-                            title={t('common:buttons.delete')}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    {canEdit && (
+                      <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => openEditModal(condition.id)}
+                          className="action-btn"
+                          title={t('common:buttons.edit')}
+                        >
+                          <Edit className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(condition.id, condition.name)}
+                          className="action-btn hover:bg-red-50 active:bg-red-100"
+                          title={t('common:buttons.delete')}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2">
@@ -434,12 +426,9 @@ const Conditions = () => {
                   />
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <button
-                      onClick={() => openDetailSlideOver(condition.id)}
-                      className="text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800"
-                    >
+                    <span className="text-sm font-medium text-primary-600">
                       {t('common:buttons.viewDetails')} →
-                    </button>
+                    </span>
                   </div>
                 </div>
               ))}
