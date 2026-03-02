@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ConditionController;
 use App\Http\Controllers\Api\ConditionMediaController;
 use App\Http\Controllers\Api\ConditionMindmapController;
 use App\Http\Controllers\Api\ConditionSectionController;
+use App\Http\Controllers\Api\ContentRevisionController;
 use App\Http\Controllers\Api\ContentTagController;
 use App\Http\Controllers\Api\EgwReferenceController;
 use App\Http\Controllers\Api\EvidenceEntryController;
@@ -268,6 +269,14 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin,editor'])->gr
     Route::post('conditions/{condition}/complications', [ConditionMindmapController::class, 'storeComplication']);
     Route::put('conditions/{condition}/complications/{complication}', [ConditionMindmapController::class, 'updateComplication']);
     Route::delete('conditions/{condition}/complications/{complication}', [ConditionMindmapController::class, 'destroyComplication']);
+
+    // Content Revisions (version history)
+    Route::prefix('revisions')->group(function () {
+        Route::get('{type}/{id}', [ContentRevisionController::class, 'index']);
+        Route::get('detail/{revision}', [ContentRevisionController::class, 'show']);
+        Route::post('{type}/{id}/restore/{revision}', [ContentRevisionController::class, 'restore']);
+        Route::get('compare/{revisionA}/{revisionB}', [ContentRevisionController::class, 'compare']);
+    });
 
     // AI Suggestions (for content editors) - rate limited to 10 requests/minute
     Route::middleware('throttle:ai')->group(function () {
