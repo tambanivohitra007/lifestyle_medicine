@@ -74,6 +74,13 @@ fi
 
 cd "$REPO_DIR"
 
+# Abort if there are uncommitted changes (prevents merge conflicts mid-deploy)
+if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+    print_error "Uncommitted changes detected in $REPO_DIR"
+    print_error "Stash or commit them first: git stash"
+    exit 1
+fi
+
 # Pull latest code
 print_info "Pulling latest code from git..."
 git pull origin main
@@ -161,14 +168,17 @@ deploy_api() {
     # Sync Laravel files to app directory
     print_info "Syncing files to $API_APP..."
     rsync -av --delete \
+        --exclude='.env' \
+        --exclude='storage/' \
+        --exclude='bootstrap/cache/' \
         --exclude='admin-dashboard/node_modules' \
         --exclude='admin-dashboard/dist' \
         --exclude='.git' \
         "$REPO_DIR/" "$API_APP/"
 
-    # Update public_html with Laravel's public folder
+    # Update public_html with Laravel's public folder (preserve storage symlink)
     print_info "Updating public_html..."
-    rsync -av --delete "$API_APP/public/" "$API_PUBLIC/"
+    rsync -av --delete --exclude='storage' "$API_APP/public/" "$API_PUBLIC/"
 
     # Fix index.php paths for HestiaCP structure
     print_info "Fixing index.php paths..."
@@ -203,9 +213,13 @@ INDEXPHP
     mkdir -p "$API_APP/storage/framework/cache"
     mkdir -p "$API_APP/storage/framework/sessions"
     mkdir -p "$API_APP/storage/framework/views"
+    mkdir -p "$API_APP/storage/app/public"
     mkdir -p "$API_APP/bootstrap/cache"
 
     cd "$API_APP"
+
+    # Recreate storage symlink (public/storage -> storage/app/public)
+    php artisan storage:link --force 2>/dev/null || true
 
     # Run migrations
     print_info "Running database migrations..."
@@ -220,12 +234,19 @@ INDEXPHP
     php artisan event:cache
     print_success "Laravel optimized"
 
+    # Restart queue workers so they pick up new code
+    print_info "Restarting queue workers..."
+    php artisan queue:restart
+    print_success "Queue workers signaled to restart"
+
     # Fix permissions
     print_info "Setting permissions..."
     chown -R $WEB_USER:$WEB_GROUP "$API_DIR"
     chmod -R 755 "$API_DIR"
     chmod -R 775 "$API_APP/storage"
     chmod -R 775 "$API_APP/bootstrap/cache"
+    # Restrict .env — contains DB passwords, API keys, secrets
+    chmod 640 "$API_APP/.env" 2>/dev/null || true
 
     # Ensure server timeout configs for AI requests
     ensure_timeout_configs
