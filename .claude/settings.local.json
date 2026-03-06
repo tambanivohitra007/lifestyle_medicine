@@ -70,7 +70,9 @@
       "Bash(git -C /c/Users/rindra/Projects/lifestyle_medicine status --short)",
       "Bash(vendor\\\\bin\\\\pint:*)",
       "Bash(npx vite build:*)",
-      "Bash(git update-index:*)"
+      "Bash(git update-index:*)",
+      "Bash(npx knip:*)",
+      "Bash(rm:*)"
     ]
   }
 }
