@@ -15,6 +15,17 @@ class ScriptureController extends Controller
 {
     use HasSorting;
 
+    public function themes(): JsonResponse
+    {
+        $themes = Scripture::whereNotNull('theme')
+            ->where('theme', '!=', '')
+            ->distinct()
+            ->orderBy('theme')
+            ->pluck('theme');
+
+        return response()->json(['data' => $themes]);
+    }
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Scripture::with('tags');

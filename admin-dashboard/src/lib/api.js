@@ -153,6 +153,7 @@ export const apiEndpoints = {
 
   // Scriptures
   scriptures: '/scriptures',
+  scriptureThemes: '/scriptures/themes',
   scripturesAdmin: '/admin/scriptures',
 
   // EGW References

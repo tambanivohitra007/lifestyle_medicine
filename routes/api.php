@@ -115,6 +115,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('conditions/{condition}/interventions/{intervention}/evidence-summary', [EvidenceSummaryController::class, 'forPair']);
 
     // Scriptures & Recipes
+    Route::get('scriptures/themes', [ScriptureController::class, 'themes']);
     Route::apiResource('scriptures', ScriptureController::class)->only(['index', 'show']);
     Route::apiResource('recipes', RecipeController::class)->only(['index', 'show']);
 
