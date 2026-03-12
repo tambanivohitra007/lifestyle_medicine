@@ -15,6 +15,9 @@ import {
     Download,
     Expand,
     Shrink,
+    Filter,
+    Eye,
+    EyeOff,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../../lib/api';
@@ -69,6 +72,9 @@ const FullGraphPage = () => {
     const [error, setError] = useState(null);
     const [stats, setStats] = useState(null);
     const [treeData, setTreeData] = useState(null);
+    const [rawTreeData, setRawTreeData] = useState(null);
+    const [hiddenTypes, setHiddenTypes] = useState([]);
+    const [showFilterPanel, setShowFilterPanel] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [expandLevel, setExpandLevel] = useState(2);
     const [, setIsFullscreen] = useState(false);
@@ -80,6 +86,7 @@ const FullGraphPage = () => {
         setError(null);
         try {
             const response = await api.get(`/knowledge-graph/tree?lang=${i18n.language}`);
+            setRawTreeData(response.data.tree);
             setTreeData(response.data.tree);
             setStats(response.data.stats);
         } catch (err) {
@@ -95,6 +102,41 @@ const FullGraphPage = () => {
     useEffect(() => {
         fetchTreeData();
     }, [fetchTreeData]);
+
+    // Apply type filter to tree
+    useEffect(() => {
+        if (!rawTreeData || hiddenTypes.length === 0) {
+            setTreeData(rawTreeData);
+            return;
+        }
+
+        const filterTree = (node) => {
+            if (!node) return null;
+            // If this node has a payload type and it's hidden, remove it
+            if (node.payload?.type && hiddenTypes.includes(node.payload.type)) {
+                return null;
+            }
+            if (!node.children) return { ...node };
+            // Filter children recursively
+            const filteredChildren = node.children
+                .map(filterTree)
+                .filter(Boolean);
+            // If a branch node has no children after filtering, skip it
+            // (but keep leaf nodes and nodes with payload types)
+            if (filteredChildren.length === 0 && !node.payload?.type) {
+                return null;
+            }
+            return { ...node, children: filteredChildren };
+        };
+
+        setTreeData(filterTree(rawTreeData));
+    }, [rawTreeData, hiddenTypes]);
+
+    const toggleType = useCallback((type) => {
+        setHiddenTypes((prev) =>
+            prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
+        );
+    }, []);
 
     // Initialize markmap
     useEffect(() => {
@@ -431,6 +473,85 @@ const FullGraphPage = () => {
 
                 {/* Controls */}
                 <div className="flex items-center gap-1">
+                    {/* Filter toggle */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowFilterPanel(!showFilterPanel)}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                                hiddenTypes.length > 0
+                                    ? 'text-primary-600 bg-primary-50'
+                                    : 'text-gray-500 hover:bg-gray-100'
+                            }`}
+                            title={t('knowledgeGraph:controls.filter')}
+                        >
+                            <Filter className="w-4 h-4" />
+                        </button>
+                        {showFilterPanel && (
+                            <div className="absolute top-full right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 p-2 z-50 min-w-[180px]">
+                                <div className="text-xs font-medium text-gray-700 mb-1.5 px-1">
+                                    {t('knowledgeGraph:filters.title')}
+                                </div>
+                                {[
+                                    'condition',
+                                    'intervention',
+                                    'careDomain',
+                                    'scripture',
+                                    'egwReference',
+                                    'recipe',
+                                ].map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() => toggleType(type)}
+                                        className="w-full flex items-center gap-2 px-1 py-1 text-xs rounded hover:bg-gray-50 transition-colors"
+                                    >
+                                        <div
+                                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                                            style={{
+                                                backgroundColor: NODE_COLORS[type],
+                                                opacity: hiddenTypes.includes(type)
+                                                    ? 0.3
+                                                    : 1,
+                                            }}
+                                        />
+                                        <span
+                                            className={`flex-1 text-left ${hiddenTypes.includes(type) ? 'text-gray-400 line-through' : 'text-gray-700'}`}
+                                        >
+                                            {t(`knowledgeGraph:nodes.${type}`)}
+                                        </span>
+                                        {hiddenTypes.includes(type) ? (
+                                            <EyeOff className="w-3 h-3 text-gray-400" />
+                                        ) : (
+                                            <Eye className="w-3 h-3 text-gray-500" />
+                                        )}
+                                    </button>
+                                ))}
+                                <div className="flex gap-1 mt-1.5 pt-1.5 border-t border-gray-100">
+                                    <button
+                                        onClick={() => setHiddenTypes([])}
+                                        className="flex-1 text-[10px] text-primary-600 hover:bg-primary-50 rounded px-1 py-0.5"
+                                    >
+                                        {t('knowledgeGraph:filters.showAll')}
+                                    </button>
+                                    <button
+                                        onClick={() =>
+                                            setHiddenTypes([
+                                                'condition',
+                                                'intervention',
+                                                'careDomain',
+                                                'scripture',
+                                                'egwReference',
+                                                'recipe',
+                                            ])
+                                        }
+                                        className="flex-1 text-[10px] text-gray-500 hover:bg-gray-50 rounded px-1 py-0.5"
+                                    >
+                                        {t('knowledgeGraph:filters.hideAll')}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div className="h-5 w-px bg-gray-300 mx-1" />
                     <button
                         onClick={handleExpandLess}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
