@@ -47,7 +47,7 @@ const MARKMAP_OPTIONS = {
  * and EGW references into a navigable tree.
  */
 const FullGraphPage = () => {
-    const { t } = useTranslation(['knowledgeGraph']);
+    const { t, i18n } = useTranslation(['knowledgeGraph']);
     const svgRef = useRef(null);
     const markmapRef = useRef(null);
     const [loading, setLoading] = useState(true);
@@ -64,7 +64,7 @@ const FullGraphPage = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await api.get('/knowledge-graph/tree');
+            const response = await api.get(`/knowledge-graph/tree?lang=${i18n.language}`);
             setTreeData(response.data.tree);
             setStats(response.data.stats);
         } catch (err) {
@@ -75,7 +75,7 @@ const FullGraphPage = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [i18n.language]);
 
     useEffect(() => {
         fetchTreeData();
@@ -334,7 +334,7 @@ const FullGraphPage = () => {
                     <button
                         onClick={handleExpandLess}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Collapse more"
+                        title={t('knowledgeGraph:controls.collapseMore')}
                     >
                         <Shrink className="w-4 h-4" />
                     </button>
@@ -344,7 +344,7 @@ const FullGraphPage = () => {
                     <button
                         onClick={handleExpandMore}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Expand more"
+                        title={t('knowledgeGraph:controls.expandMore')}
                     >
                         <Expand className="w-4 h-4" />
                     </button>
@@ -352,21 +352,21 @@ const FullGraphPage = () => {
                     <button
                         onClick={handleZoomOut}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Zoom out"
+                        title={t('knowledgeGraph:controls.zoomOut')}
                     >
                         <ZoomOut className="w-4 h-4" />
                     </button>
                     <button
                         onClick={handleZoomIn}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Zoom in"
+                        title={t('knowledgeGraph:controls.zoomIn')}
                     >
                         <ZoomIn className="w-4 h-4" />
                     </button>
                     <button
                         onClick={handleFitView}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Fit to view"
+                        title={t('knowledgeGraph:controls.fitView')}
                     >
                         <Maximize className="w-4 h-4" />
                     </button>
@@ -374,14 +374,14 @@ const FullGraphPage = () => {
                     <button
                         onClick={handleExportSvg}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Export SVG"
+                        title={t('knowledgeGraph:controls.exportSvg')}
                     >
                         <Download className="w-4 h-4" />
                     </button>
                     <button
                         onClick={toggleFullscreen}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Toggle fullscreen"
+                        title={t('knowledgeGraph:controls.toggleFullscreen')}
                     >
                         <Maximize className="w-4 h-4" />
                     </button>
@@ -402,7 +402,7 @@ const FullGraphPage = () => {
                         <div className="flex items-center gap-2 mb-2">
                             <BarChart3 className="w-3.5 h-3.5 text-gray-500" />
                             <span className="font-medium text-gray-700">
-                                {totalEntities} entities
+                                {t('knowledgeGraph:stats.totalEntities', { count: totalEntities })}
                             </span>
                         </div>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-500">
@@ -428,13 +428,7 @@ const FullGraphPage = () => {
                                                 }}
                                             />
                                             <span>
-                                                {type
-                                                    .replace(
-                                                        /([A-Z])/g,
-                                                        ' $1',
-                                                    )
-                                                    .trim()}
-                                                : {count}
+                                                {t(`knowledgeGraph:stats.${type}`, { defaultValue: type })}: {count}
                                             </span>
                                         </div>
                                     ),
@@ -446,10 +440,10 @@ const FullGraphPage = () => {
                 {/* Legend */}
                 <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg shadow-md border border-gray-200 p-2.5 text-[10px]">
                     <div className="text-gray-500 font-medium mb-1">
-                        Click nodes to expand/collapse
+                        {t('knowledgeGraph:tree.clickToExpand')}
                     </div>
                     <div className="text-gray-400">
-                        Scroll to zoom, drag to pan
+                        {t('knowledgeGraph:tree.scrollToZoom')}
                     </div>
                 </div>
             </div>

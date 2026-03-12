@@ -8,15 +8,22 @@
     "resetView": "Reset View",
     "fullscreen": "Fullscreen",
     "exitFullscreen": "Exit Fullscreen",
+    "toggleFullscreen": "Toggle Fullscreen",
     "layout": "Layout",
     "filter": "Filter",
     "backTo": "Back to {{name}}",
+    "backToDashboard": "Dashboard",
     "showUI": "Show UI",
     "hideUI": "Hide UI",
     "hideUITooltip": "Hide UI (show only graph)",
     "depth": "Depth",
     "resetLayout": "Reset Layout",
-    "resetLayoutTooltip": "Reset to default layout"
+    "resetLayoutTooltip": "Reset to default layout",
+    "collapseMore": "Collapse more",
+    "expandMore": "Expand more",
+    "exportSvg": "Export SVG",
+    "exportPng": "Export PNG",
+    "loadMore": "Load More"
   },
   "layout": {
     "hierarchical": "Hierarchical",
@@ -97,10 +104,19 @@
   },
   "statsLabel": "Statistics",
   "stats": {
+    "title": "Statistics",
     "totalNodes": "Total Nodes",
     "totalEdges": "Total Connections",
+    "totalEntities": "{{count}} entities",
+    "visibleNodes": "Visible Nodes",
+    "visibleEdges": "Visible Edges",
+    "totalInDb": "Total in DB",
     "conditions": "Conditions",
     "interventions": "Interventions",
+    "careDomains": "Care Domains",
+    "scriptures": "Scriptures",
+    "recipes": "Recipes",
+    "egwReferences": "EGW References",
     "nodes": "Nodes",
     "edges": "Edges"
   },
@@ -164,7 +180,25 @@
     "expertOpinion": "Expert"
   },
   "evidence": {
-    "grade": "Grade {{grade}}"
+    "grade": "Grade {{grade}}",
+    "filterByStrength": "Filter by Evidence Strength",
+    "allStrengths": "All Strengths",
+    "highOnly": "High Only",
+    "moderateUp": "Moderate+"
+  },
+  "tree": {
+    "rootTitle": "Lifestyle Medicine Knowledge Graph",
+    "conditions": "Conditions",
+    "careDomains": "Care Domains",
+    "unlinkedResources": "Unlinked Resources",
+    "interventions": "Interventions",
+    "scriptures": "Scriptures",
+    "recipes": "Recipes",
+    "egwReferences": "EGW References",
+    "interventionCount": "{{count}} interventions",
+    "clickToExpand": "Click nodes to expand/collapse",
+    "scrollToZoom": "Scroll to zoom, drag to pan",
+    "printView": "Print View"
   },
   "empty": {
     "title": "No data to display",
@@ -172,6 +206,7 @@
   },
   "loading": {
     "title": "Loading knowledge graph...",
+    "full": "Loading full knowledge graph...",
     "processing": "Processing relationships..."
   },
   "error": {

@@ -8,15 +8,22 @@
     "resetView": "Réinitialiser la vue",
     "fullscreen": "Plein écran",
     "exitFullscreen": "Quitter le plein écran",
+    "toggleFullscreen": "Basculer plein écran",
     "layout": "Disposition",
     "filter": "Filtrer",
     "backTo": "Retour à {{name}}",
+    "backToDashboard": "Tableau de bord",
     "showUI": "Afficher l'interface",
     "hideUI": "Masquer l'interface",
     "hideUITooltip": "Masquer l'interface (afficher uniquement le graphe)",
     "depth": "Profondeur",
     "resetLayout": "Réinitialiser la disposition",
-    "resetLayoutTooltip": "Réinitialiser à la disposition par défaut"
+    "resetLayoutTooltip": "Réinitialiser à la disposition par défaut",
+    "collapseMore": "Réduire plus",
+    "expandMore": "Développer plus",
+    "exportSvg": "Exporter en SVG",
+    "exportPng": "Exporter en PNG",
+    "loadMore": "Charger plus"
   },
   "layout": {
     "hierarchical": "Hiérarchique",
@@ -97,10 +104,19 @@
   },
   "statsLabel": "Statistiques",
   "stats": {
+    "title": "Statistiques",
     "totalNodes": "Total des nœuds",
     "totalEdges": "Total des connexions",
+    "totalEntities": "{{count}} entités",
+    "visibleNodes": "Nœuds visibles",
+    "visibleEdges": "Connexions visibles",
+    "totalInDb": "Total en base",
     "conditions": "Conditions",
     "interventions": "Interventions",
+    "careDomains": "Domaines de soins",
+    "scriptures": "Écritures",
+    "recipes": "Recettes",
+    "egwReferences": "Références EGW",
     "nodes": "Nœuds",
     "edges": "Connexions"
   },
@@ -164,7 +180,25 @@
     "expertOpinion": "Expert"
   },
   "evidence": {
-    "grade": "Grade {{grade}}"
+    "grade": "Grade {{grade}}",
+    "filterByStrength": "Filtrer par force de preuve",
+    "allStrengths": "Toutes les forces",
+    "highOnly": "Élevée uniquement",
+    "moderateUp": "Modérée+"
+  },
+  "tree": {
+    "rootTitle": "Graphe de connaissances en médecine du style de vie",
+    "conditions": "Conditions",
+    "careDomains": "Domaines de soins",
+    "unlinkedResources": "Ressources non liées",
+    "interventions": "Interventions",
+    "scriptures": "Écritures",
+    "recipes": "Recettes",
+    "egwReferences": "Références EGW",
+    "interventionCount": "{{count}} interventions",
+    "clickToExpand": "Cliquez sur les nœuds pour développer/réduire",
+    "scrollToZoom": "Défilez pour zoomer, glissez pour déplacer",
+    "printView": "Vue impression"
   },
   "empty": {
     "title": "Aucune donnée à afficher",
@@ -172,6 +206,7 @@
   },
   "loading": {
     "title": "Chargement du graphe de connaissances...",
+    "full": "Chargement du graphe complet...",
     "processing": "Traitement des relations..."
   },
   "error": {

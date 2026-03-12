@@ -422,8 +422,10 @@ class KnowledgeGraphController extends Controller
      * @param  Request  $request  Query params: limit (max 100), page, edges (bool), types (comma-separated)
      * @return JsonResponse Nodes, edges, and pagination metadata
      */
-    public function treeGraph(): JsonResponse
+    public function treeGraph(Request $request): JsonResponse
     {
+        $labels = $this->getTreeLabels($request->get('lang', 'en'));
+
         $conditions = Condition::with([
             'interventions.careDomain',
             'scriptures',
@@ -465,7 +467,7 @@ class KnowledgeGraphController extends Controller
                     ];
                 }
                 $condNode['children'][] = [
-                    'content' => '<strong>Interventions</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->interventions->count().')</span>',
+                    'content' => '<strong>'.$labels['interventions'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->interventions->count().')</span>',
                     'children' => $intChildren,
                 ];
             }
@@ -481,7 +483,7 @@ class KnowledgeGraphController extends Controller
                     ];
                 }
                 $condNode['children'][] = [
-                    'content' => '<strong>Scriptures</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->scriptures->count().')</span>',
+                    'content' => '<strong>'.$labels['scriptures'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->scriptures->count().')</span>',
                     'children' => $scrChildren,
                 ];
             }
@@ -497,7 +499,7 @@ class KnowledgeGraphController extends Controller
                     ];
                 }
                 $condNode['children'][] = [
-                    'content' => '<strong>Recipes</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->recipes->count().')</span>',
+                    'content' => '<strong>'.$labels['recipes'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->recipes->count().')</span>',
                     'children' => $recChildren,
                 ];
             }
@@ -513,7 +515,7 @@ class KnowledgeGraphController extends Controller
                     ];
                 }
                 $condNode['children'][] = [
-                    'content' => '<strong>EGW References</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->egwReferences->count().')</span>',
+                    'content' => '<strong>'.$labels['egwReferences'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->egwReferences->count().')</span>',
                     'children' => $egwChildren,
                 ];
             }
@@ -530,7 +532,7 @@ class KnowledgeGraphController extends Controller
         $domainChildren = [];
         foreach ($careDomains as $domain) {
             $domainChildren[] = [
-                'content' => '<span style="color:'.self::NODE_COLORS['careDomain'].'">'.e($domain->name).'</span> <span style="color:#6b7280;font-size:0.85em">('.$domain->interventions_count.' interventions)</span>',
+                'content' => '<span style="color:'.self::NODE_COLORS['careDomain'].'">'.e($domain->name).'</span> <span style="color:#6b7280;font-size:0.85em">('.$domain->interventions_count.' '.$labels['interventionsLower'].')</span>',
                 'payload' => ['type' => 'careDomain', 'entityId' => $domain->id],
             ];
         }
@@ -549,7 +551,7 @@ class KnowledgeGraphController extends Controller
                 ];
             }
             $unlinkedChildren[] = [
-                'content' => '<strong>Scriptures</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedScriptures->count().')</span>',
+                'content' => '<strong>'.$labels['scriptures'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedScriptures->count().')</span>',
                 'children' => $scrNodes,
                 'payload' => ['fold' => 1],
             ];
@@ -566,7 +568,7 @@ class KnowledgeGraphController extends Controller
                 ];
             }
             $unlinkedChildren[] = [
-                'content' => '<strong>Recipes</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedRecipes->count().')</span>',
+                'content' => '<strong>'.$labels['recipes'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedRecipes->count().')</span>',
                 'children' => $recNodes,
                 'payload' => ['fold' => 1],
             ];
@@ -583,7 +585,7 @@ class KnowledgeGraphController extends Controller
                 ];
             }
             $unlinkedChildren[] = [
-                'content' => '<strong>EGW References</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedEgw->count().')</span>',
+                'content' => '<strong>'.$labels['egwReferences'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedEgw->count().')</span>',
                 'children' => $egwNodes,
                 'payload' => ['fold' => 1],
             ];
@@ -591,27 +593,27 @@ class KnowledgeGraphController extends Controller
 
         // Assemble root tree
         $tree = [
-            'content' => '<strong style="font-size:1.2em">Lifestyle Medicine Knowledge Graph</strong>',
+            'content' => '<strong style="font-size:1.2em">'.$labels['rootTitle'].'</strong>',
             'children' => [],
         ];
 
         if (! empty($conditionChildren)) {
             $tree['children'][] = [
-                'content' => '<strong style="color:'.self::NODE_COLORS['condition'].'">Conditions</strong> <span style="color:#6b7280;font-size:0.85em">('.count($conditionChildren).')</span>',
+                'content' => '<strong style="color:'.self::NODE_COLORS['condition'].'">'.$labels['conditions'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.count($conditionChildren).')</span>',
                 'children' => $conditionChildren,
             ];
         }
 
         if (! empty($domainChildren)) {
             $tree['children'][] = [
-                'content' => '<strong style="color:'.self::NODE_COLORS['careDomain'].'">Care Domains</strong> <span style="color:#6b7280;font-size:0.85em">('.count($domainChildren).')</span>',
+                'content' => '<strong style="color:'.self::NODE_COLORS['careDomain'].'">'.$labels['careDomains'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.count($domainChildren).')</span>',
                 'children' => $domainChildren,
             ];
         }
 
         if (! empty($unlinkedChildren)) {
             $tree['children'][] = [
-                'content' => '<strong style="color:#94a3b8">Unlinked Resources</strong>',
+                'content' => '<strong style="color:#94a3b8">'.$labels['unlinkedResources'].'</strong>',
                 'children' => $unlinkedChildren,
                 'payload' => ['fold' => 1],
             ];
@@ -642,6 +644,39 @@ class KnowledgeGraphController extends Controller
             'insufficient' => '#94a3b8',
             default => '#6b7280',
         };
+    }
+
+    /**
+     * Get translated labels for the tree graph based on locale.
+     */
+    protected function getTreeLabels(string $lang): array
+    {
+        $translations = [
+            'en' => [
+                'rootTitle' => 'Lifestyle Medicine Knowledge Graph',
+                'conditions' => 'Conditions',
+                'careDomains' => 'Care Domains',
+                'unlinkedResources' => 'Unlinked Resources',
+                'interventions' => 'Interventions',
+                'interventionsLower' => 'interventions',
+                'scriptures' => 'Scriptures',
+                'recipes' => 'Recipes',
+                'egwReferences' => 'EGW References',
+            ],
+            'fr' => [
+                'rootTitle' => 'Graphe de connaissances en médecine du style de vie',
+                'conditions' => 'Conditions',
+                'careDomains' => 'Domaines de soins',
+                'unlinkedResources' => 'Ressources non liées',
+                'interventions' => 'Interventions',
+                'interventionsLower' => 'interventions',
+                'scriptures' => 'Écritures',
+                'recipes' => 'Recettes',
+                'egwReferences' => 'Références EGW',
+            ],
+        ];
+
+        return $translations[$lang] ?? $translations['en'];
     }
 
     /**
