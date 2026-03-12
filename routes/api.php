@@ -126,6 +126,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
     // Knowledge Graph
     Route::get('knowledge-graph/full', [KnowledgeGraphController::class, 'fullGraph']);
+    Route::get('knowledge-graph/tree', [KnowledgeGraphController::class, 'treeGraph']);
     Route::get('knowledge-graph/condition/{condition}', [KnowledgeGraphController::class, 'conditionGraph']);
     Route::get('knowledge-graph/intervention/{intervention}', [KnowledgeGraphController::class, 'interventionGraph']);
     Route::get('egw-references-abbreviations', [EgwReferenceController::class, 'abbreviations']);

@@ -422,6 +422,234 @@ class KnowledgeGraphController extends Controller
      * @param  Request  $request  Query params: limit (max 100), page, edges (bool), types (comma-separated)
      * @return JsonResponse Nodes, edges, and pagination metadata
      */
+    public function treeGraph(): JsonResponse
+    {
+        $conditions = Condition::with([
+            'interventions.careDomain',
+            'scriptures',
+            'recipes',
+            'egwReferences',
+        ])->orderBy('name')->get();
+
+        $careDomains = \App\Models\CareDomain::withCount('interventions')
+            ->orderBy('name')
+            ->get();
+
+        // Track which entities are linked to conditions
+        $linkedInterventionIds = collect();
+        $linkedScriptureIds = collect();
+        $linkedRecipeIds = collect();
+        $linkedEgwIds = collect();
+
+        // Build condition branches
+        $conditionChildren = [];
+        foreach ($conditions as $condition) {
+            $condNode = [
+                'content' => '<span style="color:'.self::NODE_COLORS['condition'].';font-weight:600">'.e($condition->name).'</span>',
+                'children' => [],
+                'payload' => ['type' => 'condition', 'entityId' => $condition->id],
+            ];
+
+            // Interventions
+            if ($condition->interventions->isNotEmpty()) {
+                $intChildren = [];
+                foreach ($condition->interventions as $intervention) {
+                    $linkedInterventionIds->push($intervention->id);
+                    $domain = $intervention->careDomain?->name;
+                    $domainTag = $domain ? ' <em style="color:#6b7280;font-size:0.85em">('.$domain.')</em>' : '';
+                    $strength = $intervention->pivot?->strength_of_evidence;
+                    $badge = $strength ? ' <span style="background:'.($this->evidenceBadgeColor($strength)).';color:#fff;padding:1px 6px;border-radius:8px;font-size:0.75em">'.$strength.'</span>' : '';
+                    $intChildren[] = [
+                        'content' => '<span style="color:'.self::NODE_COLORS['intervention'].'">'.e($intervention->name).'</span>'.$domainTag.$badge,
+                        'payload' => ['type' => 'intervention', 'entityId' => $intervention->id],
+                    ];
+                }
+                $condNode['children'][] = [
+                    'content' => '<strong>Interventions</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->interventions->count().')</span>',
+                    'children' => $intChildren,
+                ];
+            }
+
+            // Scriptures
+            if ($condition->scriptures->isNotEmpty()) {
+                $scrChildren = [];
+                foreach ($condition->scriptures as $scripture) {
+                    $linkedScriptureIds->push($scripture->id);
+                    $scrChildren[] = [
+                        'content' => '<span style="color:'.self::NODE_COLORS['scripture'].'">'.e($scripture->reference).'</span>',
+                        'payload' => ['type' => 'scripture', 'entityId' => $scripture->id],
+                    ];
+                }
+                $condNode['children'][] = [
+                    'content' => '<strong>Scriptures</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->scriptures->count().')</span>',
+                    'children' => $scrChildren,
+                ];
+            }
+
+            // Recipes
+            if ($condition->recipes->isNotEmpty()) {
+                $recChildren = [];
+                foreach ($condition->recipes as $recipe) {
+                    $linkedRecipeIds->push($recipe->id);
+                    $recChildren[] = [
+                        'content' => '<span style="color:'.self::NODE_COLORS['recipe'].'">'.e($recipe->title).'</span>',
+                        'payload' => ['type' => 'recipe', 'entityId' => $recipe->id],
+                    ];
+                }
+                $condNode['children'][] = [
+                    'content' => '<strong>Recipes</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->recipes->count().')</span>',
+                    'children' => $recChildren,
+                ];
+            }
+
+            // EGW References
+            if ($condition->egwReferences->isNotEmpty()) {
+                $egwChildren = [];
+                foreach ($condition->egwReferences as $egwRef) {
+                    $linkedEgwIds->push($egwRef->id);
+                    $egwChildren[] = [
+                        'content' => '<span style="color:'.self::NODE_COLORS['egwReference'].'">'.e($egwRef->citation).'</span>',
+                        'payload' => ['type' => 'egwReference', 'entityId' => $egwRef->id],
+                    ];
+                }
+                $condNode['children'][] = [
+                    'content' => '<strong>EGW References</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->egwReferences->count().')</span>',
+                    'children' => $egwChildren,
+                ];
+            }
+
+            if (! empty($condNode['children'])) {
+                $conditionChildren[] = $condNode;
+            } else {
+                // Conditions with no relations still appear
+                $conditionChildren[] = $condNode;
+            }
+        }
+
+        // Build care domains branch
+        $domainChildren = [];
+        foreach ($careDomains as $domain) {
+            $domainChildren[] = [
+                'content' => '<span style="color:'.self::NODE_COLORS['careDomain'].'">'.e($domain->name).'</span> <span style="color:#6b7280;font-size:0.85em">('.$domain->interventions_count.' interventions)</span>',
+                'payload' => ['type' => 'careDomain', 'entityId' => $domain->id],
+            ];
+        }
+
+        // Unlinked resources
+        $unlinkedChildren = [];
+
+        $unlinkedScriptures = \App\Models\Scripture::whereNotIn('id', $linkedScriptureIds->unique())
+            ->orderBy('reference')->get();
+        if ($unlinkedScriptures->isNotEmpty()) {
+            $scrNodes = [];
+            foreach ($unlinkedScriptures as $s) {
+                $scrNodes[] = [
+                    'content' => '<span style="color:'.self::NODE_COLORS['scripture'].'">'.e($s->reference).'</span>',
+                    'payload' => ['type' => 'scripture', 'entityId' => $s->id],
+                ];
+            }
+            $unlinkedChildren[] = [
+                'content' => '<strong>Scriptures</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedScriptures->count().')</span>',
+                'children' => $scrNodes,
+                'payload' => ['fold' => 1],
+            ];
+        }
+
+        $unlinkedRecipes = \App\Models\Recipe::whereNotIn('id', $linkedRecipeIds->unique())
+            ->orderBy('title')->get();
+        if ($unlinkedRecipes->isNotEmpty()) {
+            $recNodes = [];
+            foreach ($unlinkedRecipes as $r) {
+                $recNodes[] = [
+                    'content' => '<span style="color:'.self::NODE_COLORS['recipe'].'">'.e($r->title).'</span>',
+                    'payload' => ['type' => 'recipe', 'entityId' => $r->id],
+                ];
+            }
+            $unlinkedChildren[] = [
+                'content' => '<strong>Recipes</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedRecipes->count().')</span>',
+                'children' => $recNodes,
+                'payload' => ['fold' => 1],
+            ];
+        }
+
+        $unlinkedEgw = \App\Models\EgwReference::whereNotIn('id', $linkedEgwIds->unique())
+            ->orderBy('book')->orderBy('page_start')->get();
+        if ($unlinkedEgw->isNotEmpty()) {
+            $egwNodes = [];
+            foreach ($unlinkedEgw as $e) {
+                $egwNodes[] = [
+                    'content' => '<span style="color:'.self::NODE_COLORS['egwReference'].'">'.e($e->citation).'</span>',
+                    'payload' => ['type' => 'egwReference', 'entityId' => $e->id],
+                ];
+            }
+            $unlinkedChildren[] = [
+                'content' => '<strong>EGW References</strong> <span style="color:#6b7280;font-size:0.85em">('.$unlinkedEgw->count().')</span>',
+                'children' => $egwNodes,
+                'payload' => ['fold' => 1],
+            ];
+        }
+
+        // Assemble root tree
+        $tree = [
+            'content' => '<strong style="font-size:1.2em">Lifestyle Medicine Knowledge Graph</strong>',
+            'children' => [],
+        ];
+
+        if (! empty($conditionChildren)) {
+            $tree['children'][] = [
+                'content' => '<strong style="color:'.self::NODE_COLORS['condition'].'">Conditions</strong> <span style="color:#6b7280;font-size:0.85em">('.count($conditionChildren).')</span>',
+                'children' => $conditionChildren,
+            ];
+        }
+
+        if (! empty($domainChildren)) {
+            $tree['children'][] = [
+                'content' => '<strong style="color:'.self::NODE_COLORS['careDomain'].'">Care Domains</strong> <span style="color:#6b7280;font-size:0.85em">('.count($domainChildren).')</span>',
+                'children' => $domainChildren,
+            ];
+        }
+
+        if (! empty($unlinkedChildren)) {
+            $tree['children'][] = [
+                'content' => '<strong style="color:#94a3b8">Unlinked Resources</strong>',
+                'children' => $unlinkedChildren,
+                'payload' => ['fold' => 1],
+            ];
+        }
+
+        return response()->json([
+            'tree' => $tree,
+            'stats' => [
+                'conditions' => $conditions->count(),
+                'interventions' => Intervention::count(),
+                'careDomains' => $careDomains->count(),
+                'scriptures' => \App\Models\Scripture::count(),
+                'recipes' => \App\Models\Recipe::count(),
+                'egwReferences' => \App\Models\EgwReference::count(),
+            ],
+        ]);
+    }
+
+    /**
+     * Get the evidence badge color for a given strength level.
+     */
+    protected function evidenceBadgeColor(string $strength): string
+    {
+        return match ($strength) {
+            'high' => '#059669',
+            'moderate' => '#ca8a04',
+            'emerging' => '#0ea5e9',
+            'insufficient' => '#94a3b8',
+            default => '#6b7280',
+        };
+    }
+
+    /**
+     * GET /api/v1/knowledge-graph/full
+     *
+     * @param  Request  $request  Query params: limit (max 100), page, edges (bool), types (comma-separated)
+     * @return JsonResponse Nodes, edges, and pagination metadata
+     */
     public function fullGraph(Request $request): JsonResponse
     {
         $limit = min((int) $request->get('limit', 50), 100);
@@ -736,7 +964,7 @@ class KnowledgeGraphController extends Controller
      * Create a React Flow node for a condition entity.
      *
      * @param  Condition  $condition  The condition model instance
-     * @param  bool       $isCenter   Whether this is the center/focus node
+     * @param  bool  $isCenter  Whether this is the center/focus node
      * @return array React Flow node data structure
      */
     protected function createConditionNode($condition, bool $isCenter = false): array
@@ -768,7 +996,7 @@ class KnowledgeGraphController extends Controller
      * Create a React Flow node for an intervention entity.
      *
      * @param  Intervention  $intervention  The intervention model instance
-     * @param  bool          $isCenter      Whether this is the center/focus node
+     * @param  bool  $isCenter  Whether this is the center/focus node
      * @return array React Flow node data structure
      */
     protected function createInterventionNode($intervention, bool $isCenter = false): array
@@ -934,8 +1162,8 @@ class KnowledgeGraphController extends Controller
      * Edge styling is based on evidence strength and effectiveness rating.
      * High evidence or very high effectiveness triggers edge animation.
      *
-     * @param  Condition                       $condition      The condition model instance
-     * @param  Intervention                    $intervention   The intervention model (with pivot)
+     * @param  Condition  $condition  The condition model instance
+     * @param  Intervention  $intervention  The intervention model (with pivot)
      * @param  InterventionEffectiveness|null  $effectiveness  Optional effectiveness rating
      * @return array React Flow edge data structure
      */

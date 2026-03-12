@@ -1,667 +1,460 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
-import ReactFlow, {
-  Background,
-  Controls,
-  MiniMap,
-  useNodesState,
-  useEdgesState,
-  useReactFlow,
-  ReactFlowProvider,
-  Panel,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, Layout, ChevronLeft, ChevronRight, BarChart3, Eye, EyeOff, RotateCcw } from 'lucide-react';
+import { Markmap, deriveOptions } from 'markmap-view';
+import {
+    Loader2,
+    ChevronLeft,
+    BarChart3,
+    Search,
+    X,
+    ZoomIn,
+    ZoomOut,
+    Maximize,
+    Download,
+    Expand,
+    Shrink,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { nodeTypes } from './nodes';
-import { edgeTypes } from './edges';
-import { applyLayout, layoutOptions } from './utils/layoutEngine';
-import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp, NodeDetailsPanel, NodeContextMenu, InteractiveLegend } from './controls';
-import { useKeyboardShortcuts, useLayoutPersistence } from './hooks';
 import api from '../../lib/api';
 
-/**
- * Inner component for the full knowledge graph view that displays all entities
- * in the system with paginated lazy loading. Shares most interaction patterns
- * with KnowledgeGraphInner (filtering, search, layout switching, hover highlighting,
- * context menu, details panel) but without a center entity focus.
- *
- * Supports pagination via a "Load More" button that appends additional nodes
- * from the API. Uses useMemo for display node/edge computation for performance
- * with large datasets.
- */
-const FullGraphInner = () => {
-  const { t } = useTranslation(['knowledgeGraph']);
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [allNodes, setAllNodes] = useState([]);
-  const [allEdges, setAllEdges] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [layoutType, setLayoutType] = useState('medical');
-  const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState(null);
-  const [hiddenTypes, setHiddenTypes] = useState([]);
-  const [highlightedNodeId, setHighlightedNodeId] = useState(null);
-  const [showUI, setShowUI] = useState(true);
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [hoveredNodeId, setHoveredNodeId] = useState(null);
-  const [contextMenu, setContextMenu] = useState(null);
-  const [draggingNodeParent, setDraggingNodeParent] = useState(null); // Track parent of dragging node
-  const { fitView, setCenter } = useReactFlow();
+const NODE_COLORS = {
+    condition: '#ef4444',
+    intervention: '#f43f5e',
+    careDomain: '#3b82f6',
+    scripture: '#6366f1',
+    egwReference: '#8b5cf6',
+    recipe: '#f59e0b',
+    evidenceEntry: '#10b981',
+    reference: '#64748b',
+};
 
-  // Layout persistence
-  const { restorePositions, clearSavedPositions } = useLayoutPersistence(
-    'full-graph',
-    nodes,
-    setNodes,
-    true
-  );
-
-  const limit = 50;
-
-  // Fetch graph data
-  const fetchGraphData = useCallback(async (pageNum = 1) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await api.get(`/knowledge-graph/full?page=${pageNum}&limit=${limit}`);
-      const { nodes: apiNodes, edges: apiEdges, meta: apiMeta } = response.data;
-
-      // Ensure all edges use step path by setting type
-      const processedEdges = apiEdges.map(edge => ({
-        ...edge,
-        type: edge.type || 'smoothstep',
-      }));
-
-      // Apply layout
-      const layoutedNodes = applyLayout(apiNodes, processedEdges, layoutType);
-
-      // Restore saved positions if available (only for first page)
-      const restoredNodes = pageNum === 1 ? restorePositions(layoutedNodes) : layoutedNodes;
-
-      if (pageNum === 1) {
-        setAllNodes(restoredNodes);
-        setAllEdges(processedEdges);
-      } else {
-        // Append for lazy loading
-        setAllNodes((prev) => [...prev, ...restoredNodes]);
-        setAllEdges((prev) => [...prev, ...processedEdges]);
-      }
-
-      setMeta(apiMeta);
-    } catch (err) {
-      console.error('Failed to fetch knowledge graph:', err);
-      setError(err.response?.data?.message || 'Failed to load knowledge graph');
-    } finally {
-      setLoading(false);
-    }
-  }, [layoutType, restorePositions]);
-
-  useEffect(() => {
-    fetchGraphData(1);
-  }, []);
-
-  // Apply filter to nodes and edges
-  const applyFilter = useCallback((nodeList, edgeList, hidden) => {
-    // First, filter content nodes (non-group nodes)
-    const visibleContentNodes = nodeList.filter(
-      (node) => node.type !== 'group' && !hidden.includes(node.type)
-    );
-    const visibleNodeIds = new Set(visibleContentNodes.map((node) => node.id));
-
-    // Determine which group containers should be visible based on their content
-    const visibleGroupIds = new Set();
-    nodeList.forEach((node) => {
-      if (node.type === 'group') {
-        // Check if any content nodes belong to this group
-        const groupCategory = node.id.replace('group-', '');
-        const hasVisibleContent = visibleContentNodes.some((contentNode) => {
-          // Match group to content nodes by category
-          if (groupCategory === 'condition') return contentNode.type === 'condition';
-          if (groupCategory === 'research') return contentNode.type === 'evidenceEntry' || contentNode.type === 'reference';
-          if (groupCategory === 'culinary') return contentNode.type === 'recipe' || (contentNode.data?.careDomain?.toLowerCase() === 'nutrition');
-          if (groupCategory === 'spiritual') return contentNode.type === 'scripture' || contentNode.type === 'egwReference' || (contentNode.data?.careDomain?.toLowerCase() === 'trust in god');
-          // For other solution categories, check careDomain
-          const careDomainMap = {
-            'physical': ['exercise', 'sunlight', 'air'],
-            'water': ['water therapy', 'hydrotherapy'],
-            'mental': ['temperance', 'rest', 'mental health'],
-            'medication': ['supplements', 'medications'],
-          };
-          const domains = careDomainMap[groupCategory] || [];
-          return domains.includes(contentNode.data?.careDomain?.toLowerCase());
-        });
-        if (hasVisibleContent) {
-          visibleGroupIds.add(node.id);
-        }
-      }
-    });
-
-    // Filter nodes: include visible content nodes and their group containers
-    // Also handle parent-child relationships - remove parentId if parent is not visible
-    const filteredNodes = nodeList
-      .filter((node) => visibleNodeIds.has(node.id) || visibleGroupIds.has(node.id))
-      .map((node) => {
-        // If this node has a parent but the parent is not visible, remove the parent relationship
-        if (node.parentId && !visibleGroupIds.has(node.parentId)) {
-          const { parentId, extent, ...nodeWithoutParent } = node;
-          return nodeWithoutParent;
-        }
-        return node;
-      });
-
-    const filteredEdges = edgeList.filter(
-      (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
-    );
-
-    setNodes(filteredNodes);
-    setEdges(filteredEdges);
-  }, [setNodes, setEdges]);
-
-  // Apply filter when allNodes/allEdges or hiddenTypes change
-  useEffect(() => {
-    if (allNodes.length > 0) {
-      applyFilter(allNodes, allEdges, hiddenTypes);
-    }
-  }, [allNodes, allEdges, hiddenTypes, applyFilter]);
-
-  // Handle filter toggle
-  const handleToggleType = useCallback((type) => {
-    setHiddenTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    );
-  }, []);
-
-  const handleShowAll = useCallback(() => {
-    setHiddenTypes([]);
-  }, []);
-
-  const handleHideAll = useCallback(() => {
-    const allTypes = ['condition', 'intervention', 'careDomain', 'scripture', 'egwReference', 'recipe', 'evidenceEntry', 'reference'];
-    setHiddenTypes(allTypes);
-  }, []);
-
-  // Handle layout change
-  const handleLayoutChange = useCallback((newLayout) => {
-    setLayoutType(newLayout);
-    if (allNodes.length > 0) {
-      const layoutedNodes = applyLayout(allNodes, allEdges, newLayout);
-      setAllNodes(layoutedNodes);
-    }
-  }, [allNodes, allEdges]);
-
-  // Keyboard shortcuts
-  useKeyboardShortcuts({
-    onLayoutChange: handleLayoutChange,
-    graphTitle: 'full-knowledge-graph',
-  });
-
-  // Handle search node selection
-  const handleSelectNode = useCallback((node) => {
-    setHighlightedNodeId(node.id);
-
-    const targetNode = nodes.find((n) => n.id === node.id);
-    if (targetNode?.position) {
-      setCenter(
-        targetNode.position.x + 90,
-        targetNode.position.y + 40,
-        { zoom: 1.2, duration: 800 }
-      );
-    }
-
-    setTimeout(() => setHighlightedNodeId(null), 3000);
-  }, [nodes, setCenter]);
-
-  const handleClearSearch = useCallback(() => {
-    setHighlightedNodeId(null);
-    fitView({ padding: 0.2, duration: 500 });
-  }, [fitView]);
-
-  // Load more nodes
-  const loadMore = useCallback(() => {
-    if (meta?.hasMore && !loading) {
-      const nextPage = page + 1;
-      setPage(nextPage);
-      fetchGraphData(nextPage);
-    }
-  }, [meta, loading, page, fetchGraphData]);
-
-  // Node color map for minimap
-  const nodeColor = useCallback((node) => node.data?.color || '#666', []);
-
-  // Handle node click - open details panel
-  const handleNodeClick = useCallback((event, node) => {
-    if (node.type === 'group') return;
-    setSelectedNode(node);
-  }, []);
-
-  // Handle node hover for edge highlighting
-  const handleNodeMouseEnter = useCallback((event, node) => {
-    if (node.type !== 'group') {
-      setHoveredNodeId(node.id);
-    }
-  }, []);
-
-  const handleNodeMouseLeave = useCallback(() => {
-    setHoveredNodeId(null);
-  }, []);
-
-  // Handle node drag start - track parent group for visual feedback
-  const handleNodeDragStart = useCallback((event, node) => {
-    if (node.parentId) {
-      setDraggingNodeParent(node.parentId);
-    }
-  }, []);
-
-  // Handle node drag stop - recalculate parent group bounds to shrink/fit
-  const handleNodeDragStop = useCallback((event, node) => {
-    setDraggingNodeParent(null);
-
-    // If the dragged node has a parent, recalculate the parent's bounds
-    if (node.parentId) {
-      const padding = 30;
-      const headerSpace = 20; // Space for the header label
-
-      setNodes((currentNodes) => {
-        // Find all children of this parent
-        const children = currentNodes.filter(n => n.parentId === node.parentId && n.type !== 'group');
-        if (children.length === 0) return currentNodes;
-
-        // Calculate bounding box of all children
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        children.forEach(child => {
-          const childWidth = 200; // Approximate node width
-          const childHeight = 80; // Approximate node height
-          minX = Math.min(minX, child.position.x);
-          minY = Math.min(minY, child.position.y);
-          maxX = Math.max(maxX, child.position.x + childWidth);
-          maxY = Math.max(maxY, child.position.y + childHeight);
-        });
-
-        // Calculate required group size
-        const requiredWidth = maxX + padding;
-        const requiredHeight = maxY + padding + headerSpace;
-
-        // Update the parent group's dimensions
-        return currentNodes.map(n => {
-          if (n.id === node.parentId) {
-            return {
-              ...n,
-              style: {
-                ...n.style,
-                width: Math.max(requiredWidth, 200),
-                height: Math.max(requiredHeight, 100),
-              },
-            };
-          }
-          return n;
-        });
-      });
-    }
-  }, [setNodes]);
-
-  // Close details panel
-  const handleCloseDetails = useCallback(() => {
-    setSelectedNode(null);
-  }, []);
-
-  // Navigate to entity detail page
-  const handleNavigateToEntity = useCallback((type, entityId) => {
-    const routes = {
-      condition: `/conditions/${entityId}`,
-      intervention: `/interventions/${entityId}`,
-      recipe: `/recipes/${entityId}`,
-      scripture: `/scriptures/${entityId}`,
-      egwReference: `/egw-references/${entityId}`,
-    };
-    if (routes[type]) {
-      window.location.href = routes[type];
-    }
-  }, []);
-
-  // Handle double-click on group nodes to zoom to fit
-  const handleNodeDoubleClick = useCallback((event, node) => {
-    if (node.type === 'group') {
-      const groupX = node.position.x;
-      const groupY = node.position.y;
-      const groupWidth = parseFloat(node.style?.width) || node.width || 250;
-      const groupHeight = parseFloat(node.style?.height) || node.height || 200;
-      const centerX = groupX + groupWidth / 2;
-      const centerY = groupY + groupHeight / 2;
-      setCenter(centerX, centerY, { zoom: 1.5, duration: 500 });
-    }
-  }, [setCenter]);
-
-  // Handle right-click context menu
-  const handleNodeContextMenu = useCallback((event, node) => {
-    event.preventDefault();
-    setContextMenu({
-      node,
-      position: { x: event.clientX, y: event.clientY },
-    });
-  }, []);
-
-  const handleCloseContextMenu = useCallback(() => {
-    setContextMenu(null);
-  }, []);
-
-  const handleFocusNode = useCallback((node) => {
-    if (node.type === 'group') {
-      const groupWidth = parseFloat(node.style?.width) || node.width || 250;
-      const groupHeight = parseFloat(node.style?.height) || node.height || 200;
-      const centerX = node.position.x + groupWidth / 2;
-      const centerY = node.position.y + groupHeight / 2;
-      setCenter(centerX, centerY, { zoom: 1.5, duration: 500 });
-    } else {
-      setCenter(
-        node.position.x + 100,
-        node.position.y + 40,
-        { zoom: 1.5, duration: 500 }
-      );
-    }
-  }, [setCenter]);
-
-  // Determine connected edges for highlighting
-  const connectedEdgeIds = useMemo(() => {
-    const ids = new Set();
-    if (hoveredNodeId) {
-      edges.forEach((edge) => {
-        if (edge.source === hoveredNodeId || edge.target === hoveredNodeId) {
-          ids.add(edge.id);
-        }
-      });
-    }
-    return ids;
-  }, [edges, hoveredNodeId]);
-
-  // Add highlight state to nodes with edge highlighting
-  const displayNodes = useMemo(() =>
-    nodes.map((node) => ({
-      ...node,
-      data: {
-        ...node.data,
-        isHighlighted: node.id === highlightedNodeId,
-        // For group nodes: indicate if a child is being dragged
-        hasChildDragging: node.type === 'group' && draggingNodeParent === node.id,
-      },
-      style: {
-        ...node.style,
-        opacity: hoveredNodeId && node.id !== hoveredNodeId && !edges.some(e =>
-          (e.source === hoveredNodeId && e.target === node.id) ||
-          (e.target === hoveredNodeId && e.source === node.id)
-        ) ? 0.3 : 1,
-        transition: 'opacity 0.2s ease',
-      },
-    })),
-    [nodes, highlightedNodeId, hoveredNodeId, edges, draggingNodeParent]
-  );
-
-  // Highlight connected edges
-  const displayEdges = useMemo(() =>
-    edges.map((edge) => ({
-      ...edge,
-      style: {
-        ...edge.style,
-        opacity: hoveredNodeId ? (connectedEdgeIds.has(edge.id) ? 1 : 0.1) : (edge.style?.opacity || 1),
-        strokeWidth: connectedEdgeIds.has(edge.id) ? (edge.style?.strokeWidth || 2) + 1 : edge.style?.strokeWidth,
-        transition: 'opacity 0.2s ease, stroke-width 0.2s ease',
-      },
-    })),
-    [edges, hoveredNodeId, connectedEdgeIds]
-  );
-
-  if (loading && allNodes.length === 0) {
-    return (
-      <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">{t('knowledgeGraph:loading.full')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
-        <div className="text-center text-red-600">
-          <p className="font-medium">{t('knowledgeGraph:error.title')}</p>
-          <p className="text-sm">{error}</p>
-          <button
-            onClick={() => fetchGraphData(1)}
-            className="mt-2 px-3 py-1 text-sm bg-red-100 hover:bg-red-200 rounded-md transition-colors"
-          >
-            {t('knowledgeGraph:error.retry')}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="h-screen overflow-hidden bg-gray-50">
-      <div className="h-full w-full">
-        <ReactFlow
-          nodes={displayNodes}
-          edges={displayEdges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onNodeClick={handleNodeClick}
-          onNodeDoubleClick={handleNodeDoubleClick}
-          onNodeContextMenu={handleNodeContextMenu}
-          onNodeMouseEnter={handleNodeMouseEnter}
-          onNodeMouseLeave={handleNodeMouseLeave}
-          onNodeDragStart={handleNodeDragStart}
-          onNodeDragStop={handleNodeDragStop}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          snapToGrid={true}
-          snapGrid={[20, 20]}
-          fitView
-          fitViewOptions={{ padding: 0.1 }}
-          minZoom={0.05}
-          maxZoom={2}
-          attributionPosition="bottom-left"
-          defaultEdgeOptions={{
-            type: 'smoothstep',
-            animated: false,
-          }}
-        >
-          <Background color="#e5e7eb" gap={16} />
-          <Controls showInteractive={false} />
-          {showUI && (
-            <MiniMap
-              nodeColor={nodeColor}
-              nodeStrokeWidth={3}
-              zoomable
-              pannable
-              className="!bg-white !border !border-gray-200 !rounded-lg !shadow-md"
-            />
-          )}
-
-          {/* Back Button and UI Toggle - Always visible */}
-          <Panel position="top-left" className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('knowledgeGraph:controls.backToDashboard')}</span>
-              </Link>
-              <button
-                onClick={() => setShowUI(!showUI)}
-                className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-md border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                title={showUI ? t('knowledgeGraph:controls.hideUITooltip') : t('knowledgeGraph:controls.showUI')}
-              >
-                {showUI ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                <span className="hidden sm:inline">{showUI ? t('knowledgeGraph:controls.hideUI') : t('knowledgeGraph:controls.showUI')}</span>
-              </button>
-            </div>
-
-            {/* Search and Filter Panel - Conditional */}
-            {showUI && (
-              <>
-                <SearchBar
-                  nodes={allNodes}
-                  onSelectNode={handleSelectNode}
-                  onClearSearch={handleClearSearch}
-                />
-                <FilterPanel
-                  hiddenTypes={hiddenTypes}
-                  onToggleType={handleToggleType}
-                  onShowAll={handleShowAll}
-                  onHideAll={handleHideAll}
-                />
-              </>
-            )}
-          </Panel>
-
-          {/* Control Panel - Conditional */}
-          {showUI && (
-            <Panel position="top-right" className="flex flex-col gap-2">
-              {/* Layout Selector */}
-              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-2">
-                <div className="flex items-center gap-2 mb-2">
-                  <Layout className="w-4 h-4 text-gray-500" />
-                  <span className="text-xs font-medium text-gray-700">{t('knowledgeGraph:controls.layout')}</span>
-                </div>
-                <select
-                  value={layoutType}
-                  onChange={(e) => handleLayoutChange(e.target.value)}
-                  className="text-xs w-full px-2 py-1 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
-                >
-                  {layoutOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Reset Layout Button */}
-              <button
-                onClick={() => {
-                  clearSavedPositions();
-                  fetchGraphData(1);
-                }}
-                className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2"
-                title={t('knowledgeGraph:controls.resetLayoutTooltip')}
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>{t('knowledgeGraph:controls.resetLayout')}</span>
-              </button>
-
-              {/* Stats */}
-              {meta && (
-                <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <BarChart3 className="w-4 h-4 text-gray-500" />
-                    <span className="text-xs font-medium text-gray-700">{t('knowledgeGraph:stats.title')}</span>
-                  </div>
-                  <div className="space-y-1 text-xs text-gray-600">
-                    <div className="flex justify-between">
-                      <span>{t('knowledgeGraph:stats.visibleNodes')}:</span>
-                      <span className="font-medium">{nodes.length}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{t('knowledgeGraph:stats.visibleEdges')}:</span>
-                      <span className="font-medium">{edges.length}</span>
-                    </div>
-                    <div className="border-t border-gray-100 pt-1 mt-1">
-                      <div className="flex justify-between text-gray-400">
-                        <span>{t('knowledgeGraph:stats.totalInDb')}:</span>
-                        <span>{meta.totalNodes}</span>
-                      </div>
-                    </div>
-                  </div>
-                  {meta.stats && (
-                    <div className="mt-2 pt-2 border-t border-gray-100 space-y-0.5 text-[10px]">
-                      {Object.entries(meta.stats).map(([type, count]) => (
-                        count > 0 && (
-                          <div key={type} className="flex justify-between text-gray-500">
-                            <span className="capitalize">{type.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                            <span>{count}</span>
-                          </div>
-                        )
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Export */}
-              <ExportPanel graphTitle="full-knowledge-graph" />
-
-              {/* Keyboard Shortcuts */}
-              <KeyboardShortcutsHelp />
-
-              {/* Pagination */}
-              {meta?.hasMore && (
-                <button
-                  onClick={loadMore}
-                  disabled={loading}
-                  className="bg-white rounded-lg shadow-md border border-gray-200 p-2 text-xs font-medium text-primary-600 hover:bg-primary-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      <span>{t('knowledgeGraph:controls.loadMore')}</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              )}
-            </Panel>
-          )}
-
-          {/* Interactive Legend - Conditional */}
-          {showUI && (
-            <Panel position="bottom-right" className="!mb-4">
-              <InteractiveLegend
-                hiddenTypes={hiddenTypes}
-                onToggleType={handleToggleType}
-              />
-            </Panel>
-          )}
-        </ReactFlow>
-
-        {/* Node Details Panel */}
-        {selectedNode && (
-          <NodeDetailsPanel
-            node={selectedNode}
-            onClose={handleCloseDetails}
-            onNavigate={handleNavigateToEntity}
-          />
-        )}
-
-        {/* Context Menu */}
-        {contextMenu && (
-          <NodeContextMenu
-            node={contextMenu.node}
-            position={contextMenu.position}
-            onClose={handleCloseContextMenu}
-            onViewDetails={(node) => setSelectedNode(node)}
-            onNavigate={handleNavigateToEntity}
-            onFocus={handleFocusNode}
-          />
-        )}
-      </div>
-    </div>
-  );
+const MARKMAP_OPTIONS = {
+    colorFreezeLevel: 2,
+    duration: 400,
+    maxWidth: 350,
+    initialExpandLevel: 2,
+    spacingHorizontal: 100,
+    spacingVertical: 6,
+    zoom: true,
+    pan: true,
+    fitRatio: 0.92,
+    paddingX: 12,
 };
 
 /**
- * Full graph page with ReactFlowProvider wrapper.
- * Renders the complete knowledge graph visualization at /knowledge-graph/full.
+ * Full knowledge graph visualization using markmap — a hierarchical mindmap
+ * that organizes conditions, interventions, care domains, scriptures, recipes,
+ * and EGW references into a navigable tree.
  */
-const FullGraphPage = () => (
-  <ReactFlowProvider>
-    <FullGraphInner />
-  </ReactFlowProvider>
-);
+const FullGraphPage = () => {
+    const { t } = useTranslation(['knowledgeGraph']);
+    const svgRef = useRef(null);
+    const markmapRef = useRef(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [stats, setStats] = useState(null);
+    const [treeData, setTreeData] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [expandLevel, setExpandLevel] = useState(2);
+    const [, setIsFullscreen] = useState(false);
+    const containerRef = useRef(null);
+
+    // Fetch tree data from backend
+    const fetchTreeData = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await api.get('/knowledge-graph/tree');
+            setTreeData(response.data.tree);
+            setStats(response.data.stats);
+        } catch (err) {
+            console.error('Failed to fetch knowledge graph tree:', err);
+            setError(
+                err.response?.data?.message || 'Failed to load knowledge graph',
+            );
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchTreeData();
+    }, [fetchTreeData]);
+
+    // Initialize markmap
+    useEffect(() => {
+        if (!svgRef.current || !treeData) return;
+
+        if (!markmapRef.current) {
+            const options = deriveOptions(MARKMAP_OPTIONS);
+            markmapRef.current = Markmap.create(svgRef.current, options);
+        }
+
+        markmapRef.current.setData(treeData);
+        markmapRef.current.fit();
+
+        return () => {
+            // Cleanup on unmount only
+        };
+    }, [treeData]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            markmapRef.current?.destroy();
+            markmapRef.current = null;
+        };
+    }, []);
+
+    // Flatten tree nodes for search
+    const flatNodes = useMemo(() => {
+        if (!treeData) return [];
+        const nodes = [];
+        const walk = (node, path = []) => {
+            // Strip HTML to get plain text
+            const text = node.content?.replace(/<[^>]*>/g, '') || '';
+            nodes.push({ text, node, path: [...path, text] });
+            if (node.children) {
+                node.children.forEach((child) => walk(child, [...path, text]));
+            }
+        };
+        walk(treeData);
+        return nodes;
+    }, [treeData]);
+
+    // Search results
+    const searchResults = useMemo(() => {
+        if (searchQuery.length < 2) return [];
+        const q = searchQuery.toLowerCase();
+        return flatNodes
+            .filter((n) => n.text.toLowerCase().includes(q))
+            .slice(0, 15);
+    }, [flatNodes, searchQuery]);
+
+    // Handle zoom controls
+    const handleZoomIn = useCallback(() => {
+        markmapRef.current?.rescale(1.3);
+    }, []);
+
+    const handleZoomOut = useCallback(() => {
+        markmapRef.current?.rescale(0.7);
+    }, []);
+
+    const handleFitView = useCallback(() => {
+        markmapRef.current?.fit();
+    }, []);
+
+    // Handle expand level change
+    const handleExpandMore = useCallback(() => {
+        const newLevel = Math.min(expandLevel + 1, 6);
+        setExpandLevel(newLevel);
+        if (markmapRef.current) {
+            const options = deriveOptions({
+                ...MARKMAP_OPTIONS,
+                initialExpandLevel: newLevel,
+            });
+            markmapRef.current.setOptions(options);
+            markmapRef.current.setData(treeData);
+            markmapRef.current.fit();
+        }
+    }, [expandLevel, treeData]);
+
+    const handleExpandLess = useCallback(() => {
+        const newLevel = Math.max(expandLevel - 1, 1);
+        setExpandLevel(newLevel);
+        if (markmapRef.current) {
+            const options = deriveOptions({
+                ...MARKMAP_OPTIONS,
+                initialExpandLevel: newLevel,
+            });
+            markmapRef.current.setOptions(options);
+            markmapRef.current.setData(treeData);
+            markmapRef.current.fit();
+        }
+    }, [expandLevel, treeData]);
+
+    // Export as SVG
+    const handleExportSvg = useCallback(() => {
+        if (!svgRef.current) return;
+        const svgEl = svgRef.current;
+        const serializer = new XMLSerializer();
+        const svgStr = serializer.serializeToString(svgEl);
+        const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'knowledge-graph.svg';
+        a.click();
+        URL.revokeObjectURL(url);
+    }, []);
+
+    // Toggle fullscreen
+    const toggleFullscreen = useCallback(() => {
+        if (!containerRef.current) return;
+        if (!document.fullscreenElement) {
+            containerRef.current.requestFullscreen();
+            setIsFullscreen(true);
+        } else {
+            document.exitFullscreen();
+            setIsFullscreen(false);
+        }
+    }, []);
+
+    // Listen for fullscreen change
+    useEffect(() => {
+        const handler = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+            // Refit after fullscreen change
+            setTimeout(() => markmapRef.current?.fit(), 300);
+        };
+        document.addEventListener('fullscreenchange', handler);
+        return () => document.removeEventListener('fullscreenchange', handler);
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-2" />
+                    <p className="text-sm text-gray-600">
+                        {t('knowledgeGraph:loading.title')}
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
+                <div className="text-center text-red-600">
+                    <p className="font-medium">
+                        {t('knowledgeGraph:error.title')}
+                    </p>
+                    <p className="text-sm">{error}</p>
+                    <button
+                        onClick={fetchTreeData}
+                        className="mt-2 px-3 py-1 text-sm bg-red-100 hover:bg-red-200 rounded-md transition-colors"
+                    >
+                        {t('knowledgeGraph:error.retry')}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    const totalEntities = stats
+        ? Object.values(stats).reduce((a, b) => a + b, 0)
+        : 0;
+
+    return (
+        <div
+            ref={containerRef}
+            className="h-screen overflow-hidden bg-gray-50 flex flex-col"
+        >
+            {/* Top Bar */}
+            <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 shadow-sm z-10">
+                <div className="flex items-center gap-3">
+                    <Link
+                        to="/"
+                        className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                        <span className="hidden sm:inline">
+                            {t('knowledgeGraph:controls.backToDashboard', {
+                                defaultValue: 'Dashboard',
+                            })}
+                        </span>
+                    </Link>
+                    <div className="hidden sm:block h-5 w-px bg-gray-300" />
+                    <h1 className="hidden sm:block text-sm font-semibold text-gray-800">
+                        {t('knowledgeGraph:title')}
+                    </h1>
+                </div>
+
+                {/* Search */}
+                <div className="relative flex-1 max-w-xs mx-4">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder={t('knowledgeGraph:search.placeholder')}
+                        className="w-full pl-8 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-gray-100 rounded"
+                        >
+                            <X className="w-3.5 h-3.5 text-gray-400" />
+                        </button>
+                    )}
+
+                    {/* Search Results Dropdown */}
+                    {searchResults.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+                            <ul className="max-h-64 overflow-y-auto">
+                                {searchResults.map((result, i) => (
+                                    <li key={i}>
+                                        <button
+                                            onClick={() => {
+                                                setSearchQuery('');
+                                                // Highlight by scrolling — markmap doesn't have native search,
+                                                // but we can try to find and center on the node
+                                                if (markmapRef.current) {
+                                                    markmapRef.current.fit();
+                                                }
+                                            }}
+                                            className="w-full flex flex-col px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors"
+                                        >
+                                            <span className="font-medium text-gray-800 truncate">
+                                                {result.text}
+                                            </span>
+                                            <span className="text-[10px] text-gray-400 truncate">
+                                                {result.path.slice(0, -1).join(' > ')}
+                                            </span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {searchQuery.length >= 2 && searchResults.length === 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 p-3 z-50">
+                            <p className="text-xs text-gray-500 text-center">
+                                {t('knowledgeGraph:search.noResults')}
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Controls */}
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={handleExpandLess}
+                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Collapse more"
+                    >
+                        <Shrink className="w-4 h-4" />
+                    </button>
+                    <span className="text-xs text-gray-500 min-w-[3ch] text-center">
+                        L{expandLevel}
+                    </span>
+                    <button
+                        onClick={handleExpandMore}
+                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Expand more"
+                    >
+                        <Expand className="w-4 h-4" />
+                    </button>
+                    <div className="h-5 w-px bg-gray-300 mx-1" />
+                    <button
+                        onClick={handleZoomOut}
+                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Zoom out"
+                    >
+                        <ZoomOut className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={handleZoomIn}
+                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Zoom in"
+                    >
+                        <ZoomIn className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={handleFitView}
+                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Fit to view"
+                    >
+                        <Maximize className="w-4 h-4" />
+                    </button>
+                    <div className="h-5 w-px bg-gray-300 mx-1" />
+                    <button
+                        onClick={handleExportSvg}
+                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Export SVG"
+                    >
+                        <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={toggleFullscreen}
+                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Toggle fullscreen"
+                    >
+                        <Maximize className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Markmap SVG */}
+            <div className="flex-1 relative">
+                <svg
+                    ref={svgRef}
+                    className="w-full h-full"
+                    style={{ background: '#fafafa' }}
+                />
+
+                {/* Stats Overlay */}
+                {stats && (
+                    <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-lg shadow-md border border-gray-200 p-3 text-xs">
+                        <div className="flex items-center gap-2 mb-2">
+                            <BarChart3 className="w-3.5 h-3.5 text-gray-500" />
+                            <span className="font-medium text-gray-700">
+                                {totalEntities} entities
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-500">
+                            {Object.entries(stats).map(
+                                ([type, count]) =>
+                                    count > 0 && (
+                                        <div
+                                            key={type}
+                                            className="flex items-center gap-1.5"
+                                        >
+                                            <div
+                                                className="w-2 h-2 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        NODE_COLORS[
+                                                            type.replace(
+                                                                /s$/,
+                                                                '',
+                                                            )
+                                                        ] ||
+                                                        NODE_COLORS[type] ||
+                                                        '#6b7280',
+                                                }}
+                                            />
+                                            <span>
+                                                {type
+                                                    .replace(
+                                                        /([A-Z])/g,
+                                                        ' $1',
+                                                    )
+                                                    .trim()}
+                                                : {count}
+                                            </span>
+                                        </div>
+                                    ),
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Legend */}
+                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg shadow-md border border-gray-200 p-2.5 text-[10px]">
+                    <div className="text-gray-500 font-medium mb-1">
+                        Click nodes to expand/collapse
+                    </div>
+                    <div className="text-gray-400">
+                        Scroll to zoom, drag to pan
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export default FullGraphPage;

@@ -75,7 +75,12 @@
       "Bash(rm:*)",
       "Bash(start \"\" \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\\\\presentation.html\")",
       "WebFetch(domain:markmap.js.org)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:stackblitz.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:app.unpkg.com)"
     ]
   }
 }
