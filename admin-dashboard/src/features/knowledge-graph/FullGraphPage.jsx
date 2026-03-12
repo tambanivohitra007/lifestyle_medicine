@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Markmap, deriveOptions } from 'markmap-view';
 import {
     Loader2,
@@ -48,6 +48,7 @@ const MARKMAP_OPTIONS = {
  */
 const FullGraphPage = () => {
     const { t, i18n } = useTranslation(['knowledgeGraph']);
+    const navigate = useNavigate();
     const svgRef = useRef(null);
     const markmapRef = useRef(null);
     const [loading, setLoading] = useState(true);
@@ -97,6 +98,60 @@ const FullGraphPage = () => {
             // Cleanup on unmount only
         };
     }, [treeData]);
+
+    // Click-to-navigate: double-click a leaf node to open its detail page
+    useEffect(() => {
+        const svg = svgRef.current;
+        if (!svg) return;
+
+        const ENTITY_ROUTES = {
+            condition: (id) => `/conditions/${id}`,
+            intervention: (id) => `/interventions/${id}`,
+            recipe: (id) => `/recipes/${id}`,
+            scripture: (id) => `/scriptures/${id}`,
+            egwReference: (id) => `/egw-references/${id}`,
+            careDomain: (id) => `/care-domains/${id}`,
+        };
+
+        const findNodeData = (node, target) => {
+            // Walk tree to find the node whose content matches the clicked element
+            if (!node) return null;
+            const textContent = target.textContent?.trim();
+            const nodeText = node.content?.replace(/<[^>]*>/g, '')?.trim();
+            if (
+                node.payload?.type &&
+                node.payload?.entityId &&
+                nodeText &&
+                textContent?.includes(nodeText)
+            ) {
+                return node.payload;
+            }
+            if (node.children) {
+                for (const child of node.children) {
+                    const found = findNodeData(child, target);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        const handleDblClick = (e) => {
+            // Find the closest markmap node group
+            const nodeEl = e.target.closest('.markmap-node');
+            if (!nodeEl || !treeData) return;
+
+            const payload = findNodeData(treeData, nodeEl);
+            if (payload?.type && payload?.entityId) {
+                const routeFn = ENTITY_ROUTES[payload.type];
+                if (routeFn) {
+                    navigate(routeFn(payload.entityId));
+                }
+            }
+        };
+
+        svg.addEventListener('dblclick', handleDblClick);
+        return () => svg.removeEventListener('dblclick', handleDblClick);
+    }, [treeData, navigate]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -441,6 +496,9 @@ const FullGraphPage = () => {
                 <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg shadow-md border border-gray-200 p-2.5 text-[10px]">
                     <div className="text-gray-500 font-medium mb-1">
                         {t('knowledgeGraph:tree.clickToExpand')}
+                    </div>
+                    <div className="text-gray-400 mb-0.5">
+                        {t('knowledgeGraph:tree.dblClickToOpen')}
                     </div>
                     <div className="text-gray-400">
                         {t('knowledgeGraph:tree.scrollToZoom')}

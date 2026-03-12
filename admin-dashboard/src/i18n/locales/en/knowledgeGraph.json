@@ -197,6 +197,7 @@
     "egwReferences": "EGW References",
     "interventionCount": "{{count}} interventions",
     "clickToExpand": "Click nodes to expand/collapse",
+    "dblClickToOpen": "Double-click to open details",
     "scrollToZoom": "Scroll to zoom, drag to pan",
     "printView": "Print View"
   },

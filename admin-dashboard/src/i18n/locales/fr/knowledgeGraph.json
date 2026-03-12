@@ -197,6 +197,7 @@
     "egwReferences": "Références EGW",
     "interventionCount": "{{count}} interventions",
     "clickToExpand": "Cliquez sur les nœuds pour développer/réduire",
+    "dblClickToOpen": "Double-cliquez pour ouvrir les détails",
     "scrollToZoom": "Défilez pour zoomer, glissez pour déplacer",
     "printView": "Vue impression"
   },
