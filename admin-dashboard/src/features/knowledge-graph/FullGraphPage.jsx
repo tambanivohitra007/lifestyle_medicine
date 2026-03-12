@@ -447,6 +447,46 @@ const FullGraphPage = () => {
         return () => document.removeEventListener('fullscreenchange', handler);
     }, []);
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Ignore when typing in inputs
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            switch (e.key) {
+                case '+':
+                case '=':
+                    e.preventDefault();
+                    handleExpandMore();
+                    break;
+                case '-':
+                case '_':
+                    e.preventDefault();
+                    handleExpandLess();
+                    break;
+                case 'f':
+                    e.preventDefault();
+                    handleFitView();
+                    break;
+                case 's':
+                case '/':
+                    e.preventDefault();
+                    document.querySelector('[data-search-input]')?.focus();
+                    break;
+                case 'd':
+                    e.preventDefault();
+                    setDarkMode((prev) => !prev);
+                    break;
+                case 'Escape':
+                    setSearchQuery('');
+                    setShowFilterPanel(false);
+                    break;
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [handleExpandMore, handleExpandLess, handleFitView]);
+
     if (loading) {
         return (
             <div className="h-screen overflow-hidden bg-gray-50 flex items-center justify-center">
@@ -536,6 +576,7 @@ const FullGraphPage = () => {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        data-search-input
                         placeholder={t('knowledgeGraph:search.placeholder')}
                         className="w-full pl-8 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
@@ -808,11 +849,14 @@ const FullGraphPage = () => {
                     <div className={`font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         {t('knowledgeGraph:tree.clickToExpand')}
                     </div>
-                    <div className="text-gray-400 mb-0.5">
+                    <div className={`mb-0.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                         {t('knowledgeGraph:tree.dblClickToOpen')}
                     </div>
-                    <div className="text-gray-400">
+                    <div className={`mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                         {t('knowledgeGraph:tree.scrollToZoom')}
+                    </div>
+                    <div className={`pt-1 border-t ${darkMode ? 'border-gray-700 text-gray-500' : 'border-gray-200 text-gray-400'}`}>
+                        <span className="font-mono">+/-</span> expand &middot; <span className="font-mono">f</span> fit &middot; <span className="font-mono">s</span> search &middot; <span className="font-mono">d</span> dark
                     </div>
                 </div>
             </div>
