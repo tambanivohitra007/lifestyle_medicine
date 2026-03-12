@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Markmap, deriveOptions } from 'markmap-view';
 import { Toolbar } from 'markmap-toolbar';
 import 'markmap-toolbar/dist/style.css';
@@ -68,6 +68,7 @@ const MARKMAP_OPTIONS = {
 const FullGraphPage = () => {
     const { t, i18n } = useTranslation(['knowledgeGraph']);
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const svgRef = useRef(null);
     const markmapRef = useRef(null);
     const toolbarRef = useRef(null);
@@ -79,10 +80,12 @@ const FullGraphPage = () => {
     const [hiddenTypes, setHiddenTypes] = useState([]);
     const [evidenceFilter, setEvidenceFilter] = useState('all'); // 'all' | 'high' | 'moderate'
     const [showFilterPanel, setShowFilterPanel] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [expandLevel, setExpandLevel] = useState(2);
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+    const [expandLevel, setExpandLevel] = useState(
+        Number(searchParams.get('expand')) || 2,
+    );
     const [, setIsFullscreen] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode, setDarkMode] = useState(searchParams.get('dark') === '1');
     const containerRef = useRef(null);
 
     // Fetch tree data from backend
@@ -446,6 +449,15 @@ const FullGraphPage = () => {
         document.addEventListener('fullscreenchange', handler);
         return () => document.removeEventListener('fullscreenchange', handler);
     }, []);
+
+    // Sync state to URL params for shareable deep links
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (expandLevel !== 2) params.set('expand', expandLevel);
+        if (darkMode) params.set('dark', '1');
+        if (evidenceFilter !== 'all') params.set('evidence', evidenceFilter);
+        setSearchParams(params, { replace: true });
+    }, [expandLevel, darkMode, evidenceFilter, setSearchParams]);
 
     // Keyboard shortcuts
     useEffect(() => {
