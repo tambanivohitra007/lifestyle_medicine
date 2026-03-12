@@ -253,6 +253,72 @@ const FullGraphPage = () => {
             .slice(0, 15);
     }, [flatNodes, searchQuery]);
 
+    // Highlight a search result node in the markmap
+    const highlightSearchResult = useCallback((resultNode) => {
+        if (!markmapRef.current) return;
+        const mm = markmapRef.current;
+
+        // Walk markmap's internal state to find the matching node
+        const findINode = (inode, targetNode) => {
+            if (inode.content === targetNode.content) return inode;
+            if (inode.children) {
+                for (const child of inode.children) {
+                    const found = findINode(child, targetNode);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        const root = mm.state?.data;
+        if (!root) return;
+
+        const found = findINode(root, resultNode);
+        if (found) {
+            // Expand ancestors by unfold
+            const expandPath = (inode, target) => {
+                if (inode === target) return true;
+                if (inode.children) {
+                    for (const child of inode.children) {
+                        if (expandPath(child, target)) {
+                            if (inode.payload) inode.payload.fold = 0;
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
+            expandPath(root, found);
+            mm.setData(root);
+
+            // Use CSS highlight via a temporary class
+            setTimeout(() => {
+                const svgEl = svgRef.current;
+                if (!svgEl) return;
+                // Find all markmap node foreignObjects and match by content
+                const fos = svgEl.querySelectorAll('.markmap-foreign');
+                fos.forEach((fo) => {
+                    fo.style.transition = 'outline 0.3s ease';
+                    fo.style.outline = 'none';
+                });
+                const targetText = resultNode.content?.replace(/<[^>]*>/g, '')?.trim();
+                fos.forEach((fo) => {
+                    const text = fo.textContent?.trim();
+                    if (text && targetText && text.includes(targetText)) {
+                        fo.style.outline = '3px solid #3b82f6';
+                        fo.style.outlineOffset = '2px';
+                        fo.style.borderRadius = '4px';
+                        // Scroll into view
+                        fo.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => {
+                            fo.style.outline = 'none';
+                        }, 3000);
+                    }
+                });
+            }, 500);
+        }
+    }, []);
+
     // Handle zoom controls
     const handleZoomIn = useCallback(() => {
         markmapRef.current?.rescale(1.3);
@@ -475,11 +541,7 @@ const FullGraphPage = () => {
                                         <button
                                             onClick={() => {
                                                 setSearchQuery('');
-                                                // Highlight by scrolling — markmap doesn't have native search,
-                                                // but we can try to find and center on the node
-                                                if (markmapRef.current) {
-                                                    markmapRef.current.fit();
-                                                }
+                                                highlightSearchResult(result.node);
                                             }}
                                             className="w-full flex flex-col px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors"
                                         >
