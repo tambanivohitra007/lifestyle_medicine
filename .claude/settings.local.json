@@ -80,7 +80,11 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:gist.github.com)",
       "WebFetch(domain:unpkg.com)",
-      "WebFetch(domain:app.unpkg.com)"
+      "WebFetch(domain:app.unpkg.com)",
+      "WebFetch(domain:lifestyle.rindra.org)",
+      "Bash(find \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\" -type f \\\\\\( -name \"*.png\" -o -name \"*.jpg\" -o -name \"*.jpeg\" -o -name \"*.gif\" -o -name \"*.webp\" -o -name \"*.svg\" \\\\\\) -not -path \"*/vendor/*\" -not -path \"*/node_modules/*\" -not -path \"*/.git/*\" 2>/dev/null | head -50)",
+      "Bash(cd \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\" && rm -f .tmp_overview_b64.txt .tmp_solutions_b64.txt .tmp_qr.svg inject_slides.py && start \"\" presentation.html)",
+      "Bash(cd C:/Users/rindra/Projects/lifestyle_medicine/admin-dashboard && npm ls markmap-toolbar 2>&1)"
     ]
   }
 }
