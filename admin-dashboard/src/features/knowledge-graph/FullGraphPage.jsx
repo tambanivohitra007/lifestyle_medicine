@@ -18,6 +18,7 @@ import {
     Filter,
     Eye,
     EyeOff,
+    ImageDown,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../../lib/api';
@@ -309,6 +310,38 @@ const FullGraphPage = () => {
         URL.revokeObjectURL(url);
     }, []);
 
+    // Export as PNG
+    const handleExportPng = useCallback(() => {
+        if (!svgRef.current) return;
+        const svgEl = svgRef.current;
+        const serializer = new XMLSerializer();
+        const svgStr = serializer.serializeToString(svgEl);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        img.onload = () => {
+            const scale = 2; // High-DPI
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            ctx.scale(scale, scale);
+            ctx.fillStyle = '#fafafa';
+            ctx.fillRect(0, 0, img.width, img.height);
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob((blob) => {
+                const pngUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = pngUrl;
+                a.download = 'knowledge-graph.png';
+                a.click();
+                URL.revokeObjectURL(pngUrl);
+            }, 'image/png');
+            URL.revokeObjectURL(url);
+        };
+        img.src = url;
+    }, []);
+
     // Toggle fullscreen
     const toggleFullscreen = useCallback(() => {
         if (!containerRef.current) return;
@@ -598,6 +631,13 @@ const FullGraphPage = () => {
                         title={t('knowledgeGraph:controls.exportSvg')}
                     >
                         <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={handleExportPng}
+                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title={t('knowledgeGraph:controls.exportPng')}
+                    >
+                        <ImageDown className="w-4 h-4" />
                     </button>
                     <button
                         onClick={toggleFullscreen}
