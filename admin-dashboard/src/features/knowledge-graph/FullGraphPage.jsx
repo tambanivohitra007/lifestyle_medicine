@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Markmap, deriveOptions } from 'markmap-view';
+import { Toolbar } from 'markmap-toolbar';
+import 'markmap-toolbar/dist/style.css';
 import {
     Loader2,
     ChevronLeft,
@@ -62,6 +64,7 @@ const FullGraphPage = () => {
     const navigate = useNavigate();
     const svgRef = useRef(null);
     const markmapRef = useRef(null);
+    const toolbarRef = useRef(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [stats, setStats] = useState(null);
@@ -104,6 +107,16 @@ const FullGraphPage = () => {
 
         markmapRef.current.setData(treeData);
         markmapRef.current.fit();
+
+        // Attach toolbar
+        if (!toolbarRef.current && svgRef.current) {
+            const toolbar = Toolbar.create(markmapRef.current);
+            toolbarRef.current = toolbar.el;
+            toolbarRef.current.style.position = 'absolute';
+            toolbarRef.current.style.bottom = '60px';
+            toolbarRef.current.style.right = '16px';
+            svgRef.current.parentElement.appendChild(toolbarRef.current);
+        }
 
         return () => {
             // Cleanup on unmount only
