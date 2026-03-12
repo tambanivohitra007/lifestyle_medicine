@@ -19,6 +19,8 @@ import {
     Eye,
     EyeOff,
     ImageDown,
+    Moon,
+    Sun,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../../lib/api';
@@ -80,6 +82,7 @@ const FullGraphPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [expandLevel, setExpandLevel] = useState(2);
     const [, setIsFullscreen] = useState(false);
+    const [darkMode, setDarkMode] = useState(false);
     const containerRef = useRef(null);
 
     // Fetch tree data from backend
@@ -423,6 +426,16 @@ const FullGraphPage = () => {
         }
     }, []);
 
+    // Dark mode: adjust markmap text colors
+    useEffect(() => {
+        const svg = svgRef.current;
+        if (!svg) return;
+        const fos = svg.querySelectorAll('.markmap-foreign');
+        fos.forEach((fo) => {
+            fo.style.color = darkMode ? '#e5e7eb' : '';
+        });
+    }, [darkMode, treeData]);
+
     // Listen for fullscreen change
     useEffect(() => {
         const handler = () => {
@@ -473,10 +486,10 @@ const FullGraphPage = () => {
     return (
         <div
             ref={containerRef}
-            className="h-screen overflow-hidden bg-gray-50 flex flex-col"
+            className={`h-screen overflow-hidden flex flex-col ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}
         >
             {/* Top Bar */}
-            <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 shadow-sm z-10">
+            <div className={`flex items-center justify-between px-4 py-2 border-b shadow-sm z-10 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div className="flex items-center gap-3">
                     <Link
                         to="/"
@@ -725,10 +738,18 @@ const FullGraphPage = () => {
                     </button>
                     <button
                         onClick={toggleFullscreen}
-                        className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        className={`p-1.5 rounded-lg transition-colors ${darkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`}
                         title={t('knowledgeGraph:controls.toggleFullscreen')}
                     >
                         <Maximize className="w-4 h-4" />
+                    </button>
+                    <div className="h-5 w-px bg-gray-300 mx-1" />
+                    <button
+                        onClick={() => setDarkMode(!darkMode)}
+                        className={`p-1.5 rounded-lg transition-colors ${darkMode ? 'text-yellow-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                        title={darkMode ? 'Light mode' : 'Dark mode'}
+                    >
+                        {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                     </button>
                 </div>
             </div>
@@ -738,12 +759,12 @@ const FullGraphPage = () => {
                 <svg
                     ref={svgRef}
                     className="w-full h-full"
-                    style={{ background: '#fafafa' }}
+                    style={{ background: darkMode ? '#111827' : '#fafafa' }}
                 />
 
                 {/* Stats Overlay */}
                 {stats && (
-                    <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-lg shadow-md border border-gray-200 p-3 text-xs">
+                    <div className={`absolute bottom-4 right-4 backdrop-blur rounded-lg shadow-md border p-3 text-xs ${darkMode ? 'bg-gray-800/90 border-gray-700' : 'bg-white/90 border-gray-200'}`}>
                         <div className="flex items-center gap-2 mb-2">
                             <BarChart3 className="w-3.5 h-3.5 text-gray-500" />
                             <span className="font-medium text-gray-700">
@@ -783,8 +804,8 @@ const FullGraphPage = () => {
                 )}
 
                 {/* Legend */}
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg shadow-md border border-gray-200 p-2.5 text-[10px]">
-                    <div className="text-gray-500 font-medium mb-1">
+                <div className={`absolute bottom-4 left-4 backdrop-blur rounded-lg shadow-md border p-2.5 text-[10px] ${darkMode ? 'bg-gray-800/90 border-gray-700' : 'bg-white/90 border-gray-200'}`}>
+                    <div className={`font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         {t('knowledgeGraph:tree.clickToExpand')}
                     </div>
                     <div className="text-gray-400 mb-0.5">
