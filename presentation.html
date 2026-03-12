@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifestyle Medicine Platform — Feature Overview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           =========================================== */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+        :root {
+            --title-size: clamp(1.5rem, 5vw, 3.75rem);
+            --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+            --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+            --body-size: clamp(0.75rem, 1.5vw, 1.05rem);
+            --small-size: clamp(0.65rem, 1vw, 0.85rem);
+            --slide-padding: clamp(1rem, 4vw, 4rem);
+            --content-gap: clamp(0.5rem, 2vw, 2rem);
+            --element-gap: clamp(0.25rem, 1vw, 1rem);
+
+            /* =========================================
+               APP BRAND COLORS
+               Primary: Crimson Red (#e63950)
+               Secondary: Blue-Slate (#486581)
+               ========================================= */
+            --primary-50: #fef2f3;
+            --primary-100: #fde6e7;
+            --primary-200: #fbd0d5;
+            --primary-300: #f7aab2;
+            --primary-400: #f27a8a;
+            --primary-500: #e63950;
+            --primary-600: #d31e3a;
+            --primary-700: #b71530;
+            --primary-800: #9b142d;
+            --primary-900: #85152b;
+
+            --secondary-50: #f0f4f8;
+            --secondary-100: #d9e2ec;
+            --secondary-200: #bcccdc;
+            --secondary-300: #9fb3c8;
+            --secondary-400: #829ab1;
+            --secondary-500: #627d98;
+            --secondary-600: #486581;
+            --secondary-700: #334e68;
+            --secondary-800: #243b53;
+            --secondary-900: #102a43;
+
+            --bg-white: #ffffff;
+            --bg-gray: #f9fafb;
+            --bg-warm: #fef2f3;
+            --text-dark: #111827;
+            --text-body: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+        }
+        .card, .container, .content-box {
+            max-width: min(90vw, 1100px);
+            max-height: min(80vh, 700px);
+        }
+        .feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+        .feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1rem, 3vw, 1.75rem);
+            }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+            .grid { grid-template-columns: 1fr 1fr; }
+            .grid-3col { grid-template-columns: 1fr 1fr !important; }
+            .grid-4col { grid-template-columns: 1fr 1fr !important; }
+            .grid-5col { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           THEME STYLES — LIGHT, CLEAN, BRANDED
+           =========================================== */
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background: var(--bg-white);
+            color: var(--text-dark);
+        }
+        h1, h2, h3 {
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+        }
+        h1 { font-size: var(--title-size); }
+        h2 { font-size: var(--h2-size); }
+        h3 { font-size: var(--h3-size); }
+        p, li { font-size: var(--body-size); line-height: 1.55; color: var(--text-body); }
+
+        /* Slide backgrounds */
+        .slide { background: var(--bg-white); }
+        .slide-dark {
+            background: var(--secondary-900);
+            color: #ffffff;
+        }
+        .slide-dark p, .slide-dark li { color: var(--secondary-200); }
+        .slide-dark h1, .slide-dark h2, .slide-dark h3 { color: #ffffff; }
+        .slide-warm { background: var(--primary-50); }
+
+        /* Decorative corner accent */
+        .slide::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: clamp(80px, 15vw, 200px);
+            height: clamp(80px, 15vw, 200px);
+            background: radial-gradient(circle at 100% 0%, var(--primary-100) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .slide-dark::after {
+            background: radial-gradient(circle at 100% 0%, rgba(230,57,80,0.08) 0%, transparent 70%);
+        }
+
+        /* Section number */
+        .section-num {
+            font-size: clamp(4rem, 10vw, 10rem);
+            font-weight: 800;
+            position: absolute;
+            top: clamp(0.25rem, 1vw, 1rem);
+            right: clamp(1rem, 4vw, 3rem);
+            line-height: 1;
+            pointer-events: none;
+            color: var(--primary-500);
+            opacity: 0.05;
+        }
+        .slide-dark .section-num { color: #ffffff; opacity: 0.04; }
+
+        /* Tags / badges */
+        .tag {
+            display: inline-block;
+            padding: clamp(0.15rem, 0.4vw, 0.25rem) clamp(0.4rem, 1vw, 0.7rem);
+            border-radius: 6px;
+            font-size: var(--small-size);
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .tag-primary { background: var(--primary-100); color: var(--primary-700); }
+        .tag-secondary { background: var(--secondary-100); color: var(--secondary-700); }
+        .tag-dark { background: var(--secondary-800); color: var(--secondary-100); }
+        .tag-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-muted); }
+        .tag-white { background: rgba(255,255,255,0.15); color: #ffffff; }
+
+        /* Feature card */
+        .fcard {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: clamp(8px, 1vw, 12px);
+            padding: clamp(0.6rem, 1.5vw, 1.25rem);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .fcard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+        .slide-dark .fcard {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.08);
+        }
+        .slide-dark .fcard:hover {
+            border-color: rgba(230,57,80,0.25);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .slide-warm .fcard { background: var(--bg-white); }
+        .fcard-icon {
+            font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+            margin-bottom: clamp(0.2rem, 0.4vw, 0.35rem);
+        }
+        .fcard h3 {
+            font-size: clamp(0.8rem, 1.3vw, 1rem);
+            font-weight: 700;
+            margin: 0 0 clamp(0.1rem, 0.3vw, 0.2rem);
+            color: var(--text-dark);
+        }
+        .slide-dark .fcard h3 { color: #ffffff; }
+        .fcard p {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+        .slide-dark .fcard p { color: var(--secondary-300); }
+
+        /* Accent bar on card */
+        .fcard-accent {
+            border-top: 3px solid var(--primary-500);
+        }
+        .fcard-accent-secondary {
+            border-top: 3px solid var(--secondary-500);
+        }
+
+        /* Divider */
+        .divider {
+            width: clamp(2rem, 5vw, 3.5rem);
+            height: 3px;
+            background: var(--primary-500);
+            border: none;
+            border-radius: 2px;
+            margin: clamp(0.4rem, 1vw, 1rem) 0;
+        }
+        .divider-secondary { background: var(--secondary-500); }
+        .slide-dark .divider { background: var(--primary-400); }
+
+        /* Pipeline / flow */
+        .pipeline {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.2rem, 0.6vw, 0.5rem);
+            flex-wrap: wrap;
+        }
+        .pipeline-step {
+            background: var(--bg-white);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: clamp(0.35rem, 0.7vw, 0.6rem) clamp(0.5rem, 1vw, 0.85rem);
+            font-size: var(--small-size);
+            font-weight: 600;
+            white-space: nowrap;
+            color: var(--text-dark);
+        }
+        .pipeline-step-active {
+            border-color: var(--primary-500);
+            background: var(--primary-50);
+            color: var(--primary-700);
+        }
+        .pipeline-arrow {
+            color: var(--primary-400);
+            font-size: var(--body-size);
+            font-weight: 700;
+        }
+
+        /* Stats */
+        .stat-block { text-align: center; }
+        .stat-num {
+            font-size: clamp(1.75rem, 4.5vw, 3.5rem);
+            font-weight: 800;
+            color: var(--primary-500);
+            line-height: 1.1;
+        }
+        .slide-dark .stat-num { color: var(--primary-400); }
+        .stat-label {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: clamp(0.1rem, 0.3vw, 0.25rem);
+        }
+        .slide-dark .stat-label { color: var(--secondary-300); }
+
+        /* Domain pills */
+        .domain-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(0.15rem, 0.4vw, 0.3rem);
+            background: var(--bg-white);
+            border: 1.5px solid var(--border);
+            border-radius: 100px;
+            padding: clamp(0.2rem, 0.45vw, 0.35rem) clamp(0.45rem, 0.9vw, 0.75rem);
+            font-size: var(--small-size);
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.25s ease;
+        }
+        .domain-pill:hover {
+            border-color: var(--primary-300);
+            background: var(--primary-50);
+            color: var(--primary-700);
+        }
+
+        /* Reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 { transition-delay: 0.08s; }
+        .reveal-delay-2 { transition-delay: 0.16s; }
+        .reveal-delay-3 { transition-delay: 0.24s; }
+        .reveal-delay-4 { transition-delay: 0.32s; }
+        .reveal-delay-5 { transition-delay: 0.4s; }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--primary-500);
+            z-index: 100;
+            transition: width 0.3s ease;
+        }
+
+        /* Slide counter */
+        .slide-counter {
+            position: fixed;
+            bottom: clamp(0.75rem, 2vw, 1.25rem);
+            right: clamp(0.75rem, 2vw, 1.25rem);
+            font-size: var(--small-size);
+            color: var(--text-light);
+            z-index: 100;
+            font-variant-numeric: tabular-nums;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(8px);
+            padding: 0.2em 0.6em;
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+        }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: clamp(0.75rem, 2vw, 1.25rem);
+            left: clamp(0.75rem, 2vw, 1.25rem);
+            font-size: var(--small-size);
+            color: var(--text-light);
+            z-index: 100;
+        }
+        .keyboard-hint kbd {
+            background: var(--bg-gray);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.1em 0.4em;
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+
+        /* Utility */
+        .text-primary { color: var(--primary-500); }
+        .text-primary-dark { color: var(--primary-700); }
+        .text-secondary { color: var(--secondary-600); }
+        .text-secondary-dark { color: var(--secondary-800); }
+        .text-muted { color: var(--text-muted); }
+        .text-light { color: var(--text-light); }
+        .text-center { text-align: center; }
+        .text-white { color: #ffffff; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .mb-xs { margin-bottom: clamp(0.2rem, 0.5vw, 0.3rem); }
+        .mb-sm { margin-bottom: clamp(0.3rem, 0.8vw, 0.5rem); }
+        .mb-md { margin-bottom: clamp(0.5rem, 1.5vw, 1rem); }
+        .mb-lg { margin-bottom: clamp(0.75rem, 2vw, 1.5rem); }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .gap-xs { gap: clamp(0.2rem, 0.5vw, 0.3rem); }
+        .gap-sm { gap: clamp(0.3rem, 0.8vw, 0.5rem); }
+        .gap-md { gap: clamp(0.5rem, 1.5vw, 1rem); }
+        .gap-lg { gap: clamp(0.75rem, 2vw, 1.5rem); }
+        .max-w { max-width: min(90vw, 1100px); margin-left: auto; margin-right: auto; }
+        .w-full { width: 100%; }
+
+        .rule {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: clamp(0.4rem, 0.8vw, 0.75rem) 0;
+        }
+        .slide-dark .rule { border-top-color: rgba(255,255,255,0.08); }
+
+        /* Subtle dot pattern on certain slides */
+        .dot-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+            background-size: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Quote styling */
+        .quote {
+            font-size: var(--h3-size);
+            font-weight: 500;
+            font-style: italic;
+            color: var(--secondary-800);
+            line-height: 1.4;
+        }
+        .slide-dark .quote { color: var(--primary-200); }
+
+        /* Colored left border card */
+        .lcard {
+            border-left: 3px solid var(--primary-500);
+            padding-left: clamp(0.5rem, 1vw, 1rem);
+        }
+        .lcard-secondary { border-left-color: var(--secondary-500); }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progress" style="width:0%"></div>
+    <!-- Slide counter -->
+    <div class="slide-counter" id="counter">1 / 16</div>
+    <!-- Keyboard hint -->
+    <div class="keyboard-hint decorative"><kbd>&darr;</kbd> <kbd>&uarr;</kbd> or scroll</div>
+
+    <!-- ===================================
+         SLIDE 1: TITLE (dark brand slide)
+         =================================== -->
+    <section class="slide slide-dark" id="slide-1">
+        <div class="slide-content items-center justify-center text-center">
+            <div class="reveal">
+                <span class="tag tag-white mb-md" style="display:inline-block;">Knowledge Platform</span>
+            </div>
+            <h1 class="reveal reveal-delay-1" style="max-width:min(85vw,780px);margin:0 auto;">
+                Lifestyle Medicine &amp;<br>
+                <span style="color:var(--primary-400);">Gospel Medical Evangelism</span>
+            </h1>
+            <hr class="divider mx-auto reveal reveal-delay-2">
+            <p class="reveal reveal-delay-3" style="max-width:min(70vw,520px);margin:0 auto;color:var(--secondary-300);">
+                A comprehensive web platform for evidence-based treatment protocols built on NEWSTART+ health principles with integrated spiritual guidance
+            </p>
+            <div class="flex gap-sm items-center reveal reveal-delay-4" style="margin-top:clamp(0.75rem,2vw,1.5rem);">
+                <span class="tag" style="background:rgba(230,57,80,0.2);color:var(--primary-300);">Laravel 12</span>
+                <span class="tag" style="background:rgba(98,125,152,0.25);color:var(--secondary-200);">React 19</span>
+                <span class="tag" style="background:rgba(240,198,116,0.15);color:#f0c674;">Gemini AI</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 2: MISSION
+         =================================== -->
+    <section class="slide slide-warm dot-bg" id="slide-2">
+        <span class="section-num">01</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-primary mb-md" style="display:inline-block;">Mission</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-md">Bridging Science &amp; Faith<br>for Whole-Person Healing</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <div class="grid reveal reveal-delay-3" style="grid-template-columns:1fr 1fr;gap:clamp(1rem,3vw,2.5rem);margin-top:clamp(0.5rem,1.5vw,1rem);">
+                <div class="lcard">
+                    <h3 style="font-size:var(--body-size);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary-600);" class="mb-xs">The Problem</h3>
+                    <p>Lifestyle medicine knowledge is fragmented across journals, books, and clinical experience &mdash; with no unified platform connecting evidence-based interventions to spiritual health principles.</p>
+                </div>
+                <div class="lcard lcard-secondary">
+                    <h3 style="font-size:var(--body-size);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--secondary-600);" class="mb-xs">The Solution</h3>
+                    <p>A structured, AI-powered knowledge platform that organizes conditions, interventions, evidence, recipes, and Scripture into actionable treatment guides for practitioners.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 3: NEWSTART+ CARE DOMAINS
+         =================================== -->
+    <section class="slide" id="slide-3">
+        <span class="section-num">02</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-primary mb-md" style="display:inline-block;">Foundation</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">11 NEWSTART+ Care Domains</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <p class="text-muted reveal reveal-delay-2 mb-lg" style="max-width:min(80vw,550px);">
+                Every intervention is organized under a structured lifestyle medicine taxonomy
+            </p>
+            <div class="flex reveal reveal-delay-3" style="flex-wrap:wrap;gap:clamp(0.3rem,0.7vw,0.5rem);">
+                <span class="domain-pill">&#x1F957; Nutrition</span>
+                <span class="domain-pill">&#x1F3CB; Exercise</span>
+                <span class="domain-pill">&#x1F4A7; Water Therapy</span>
+                <span class="domain-pill">&#x2600;&#xFE0F; Sunlight</span>
+                <span class="domain-pill">&#x2696;&#xFE0F; Temperance</span>
+                <span class="domain-pill">&#x1F343; Air</span>
+                <span class="domain-pill">&#x1F319; Rest</span>
+                <span class="domain-pill">&#x1F64F; Trust in God</span>
+                <span class="domain-pill">&#x1F9E0; Mental Health</span>
+                <span class="domain-pill">&#x1F48A; Supplements</span>
+                <span class="domain-pill">&#x1FA7A; Medications</span>
+            </div>
+            <p class="text-muted reveal reveal-delay-4" style="margin-top:clamp(0.75rem,1.5vw,1.25rem);font-size:var(--small-size);">
+                Pre-seeded in the database &mdash; conditions link to interventions across multiple domains for holistic care plans
+            </p>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 4: CONDITIONS
+         =================================== -->
+    <section class="slide" id="slide-4">
+        <span class="section-num">03</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-secondary mb-md" style="display:inline-block;">Core Content</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">Condition Management</h2>
+            <hr class="divider divider-secondary reveal reveal-delay-2">
+            <div class="grid reveal reveal-delay-3" style="grid-template-columns:1fr 1fr;gap:clamp(0.5rem,1.5vw,1rem);">
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x1F3E5;</div>
+                    <h3>Structured Sections</h3>
+                    <p>Overview, pathophysiology, risk factors, complications, and lifestyle solutions</p>
+                </div>
+                <div class="fcard fcard-accent-secondary">
+                    <div class="fcard-icon">&#x1F3F7;&#xFE0F;</div>
+                    <h3>Medical Taxonomy</h3>
+                    <p>Body systems, categories, SNOMED CT and ICD-10 coding support</p>
+                </div>
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x1F4CA;</div>
+                    <h3>Completeness Tracking</h3>
+                    <p>Visual progress ring with checklists showing required sections and domain coverage</p>
+                </div>
+                <div class="fcard fcard-accent-secondary">
+                    <div class="fcard-icon">&#x1F517;</div>
+                    <h3>Rich Relationships</h3>
+                    <p>Link to interventions, scriptures, recipes, evidence, EGW references, and media</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 5: INTERVENTIONS & RECIPES
+         =================================== -->
+    <section class="slide slide-warm" id="slide-5">
+        <span class="section-num">04</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-primary mb-md" style="display:inline-block;">Core Content</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">Interventions &amp; Recipes</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <div class="grid reveal reveal-delay-3" style="grid-template-columns:1fr 1fr;gap:clamp(0.75rem,2vw,1.5rem);">
+                <div>
+                    <h3 style="font-size:var(--body-size);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary-600);" class="mb-sm">Lifestyle Interventions</h3>
+                    <div class="flex flex-col gap-sm">
+                        <div class="fcard">
+                            <h3>Step-by-Step Protocols</h3>
+                            <p>Ordered protocol steps with detailed instructions</p>
+                        </div>
+                        <div class="fcard">
+                            <h3>Effectiveness &amp; Evidence</h3>
+                            <p>Evidence strength ratings and GRADE quality scores per condition</p>
+                        </div>
+                        <div class="fcard">
+                            <h3>Safety Data</h3>
+                            <p>Contraindications, expected outcomes, and intervention relationships</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size:var(--body-size);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--secondary-600);" class="mb-sm">Therapeutic Recipes</h3>
+                    <div class="flex flex-col gap-sm">
+                        <div class="fcard">
+                            <h3>Culinary Medicine</h3>
+                            <p>Recipes with ingredients, instructions, and nutritional info</p>
+                        </div>
+                        <div class="fcard">
+                            <h3>Dietary Tags</h3>
+                            <p>Vegan, gluten-free, and other dietary classifications</p>
+                        </div>
+                        <div class="fcard">
+                            <h3>Condition Links</h3>
+                            <p>Connect recipes to conditions as part of treatment protocols</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 6: EVIDENCE
+         =================================== -->
+    <section class="slide" id="slide-6">
+        <span class="section-num">05</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-secondary mb-md" style="display:inline-block;">Evidence-Based</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">Scientific Evidence &amp; References</h2>
+            <hr class="divider divider-secondary reveal reveal-delay-2">
+            <div class="grid grid-3col reveal reveal-delay-3" style="grid-template-columns:1fr 1fr 1fr;gap:clamp(0.5rem,1.5vw,1rem);">
+                <div class="fcard fcard-accent" style="text-align:center;">
+                    <div class="fcard-icon">&#x1F1E6;</div>
+                    <h3>GRADE Quality</h3>
+                    <p>A through D evidence quality ratings following GRADE methodology</p>
+                </div>
+                <div class="fcard fcard-accent" style="text-align:center;">
+                    <div class="fcard-icon">&#x1F52C;</div>
+                    <h3>Study Types</h3>
+                    <p>RCT, meta-analysis, systematic review, observational, case series, expert opinion</p>
+                </div>
+                <div class="fcard fcard-accent" style="text-align:center;">
+                    <div class="fcard-icon">&#x1F4D1;</div>
+                    <h3>Full Citations</h3>
+                    <p>DOIs, publication details, authors, years &mdash; linked to evidence entries</p>
+                </div>
+            </div>
+            <div class="reveal reveal-delay-4" style="margin-top:clamp(0.5rem,1.2vw,1rem);">
+                <div class="fcard" style="border-left:3px solid var(--secondary-500);">
+                    <div class="flex items-center gap-sm">
+                        <span style="font-size:clamp(1rem,2vw,1.5rem);">&#x1F4CA;</span>
+                        <div>
+                            <h3 style="color:var(--secondary-700);">Evidence Summaries</h3>
+                            <p>Aggregated evidence quality distribution and completeness analysis per condition-intervention pair</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 7: SPIRITUAL INTEGRATION (dark)
+         =================================== -->
+    <section class="slide slide-dark" id="slide-7">
+        <span class="section-num">06</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag" style="background:rgba(230,57,80,0.2);color:var(--primary-300);display:inline-block;" class="mb-md">Spiritual Integration</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm" style="margin-top:clamp(0.3rem,0.8vw,0.5rem);">Scripture &amp; Ellen G. White</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <div class="grid grid-3col reveal reveal-delay-3" style="grid-template-columns:1fr 1fr 1fr;gap:clamp(0.5rem,1.5vw,1rem);">
+                <div class="fcard">
+                    <div class="fcard-icon">&#x1F4D6;</div>
+                    <h3>Scripture Management</h3>
+                    <p>Bible verses categorized by 8 health themes: healing, body temple, diet, rest, peace, trust, strength, temperance</p>
+                </div>
+                <div class="fcard">
+                    <div class="fcard-icon">&#x270D;&#xFE0F;</div>
+                    <h3>EGW References</h3>
+                    <p>Ellen G. White health writings linked to conditions and interventions with source attribution</p>
+                </div>
+                <div class="fcard">
+                    <div class="fcard-icon">&#x1F30D;</div>
+                    <h3>Bible Explorer</h3>
+                    <p>Full Bible reader with multiple translations, search, health-themed filtering, verse of the day</p>
+                </div>
+            </div>
+            <div class="reveal reveal-delay-4" style="margin-top:clamp(0.5rem,1.2vw,1rem);text-align:center;">
+                <div class="fcard" style="border-color:rgba(230,57,80,0.15);">
+                    <p class="quote" style="margin:0;">
+                        &ldquo;Beloved, I wish above all things that thou mayest prosper and be in health&rdquo;
+                    </p>
+                    <p style="font-size:var(--small-size);margin-top:0.3rem;color:var(--secondary-400);">3 John 1:2 &mdash; integrated directly into treatment guides</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 8: AI FEATURES
+         =================================== -->
+    <section class="slide" id="slide-8">
+        <span class="section-num">07</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-primary mb-md" style="display:inline-block;">Artificial Intelligence</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">AI-Powered Content Generation</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <div class="reveal reveal-delay-3 mb-md">
+                <p class="text-muted mb-sm" style="font-size:var(--small-size);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">3-Phase Gemini Workflow</p>
+                <div class="pipeline">
+                    <span class="pipeline-step pipeline-step-active">&#x1F4DD; Generate Draft<br><span style="font-size:0.8em;font-weight:400;color:var(--text-muted);">Gemini 2.0-flash</span></span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span class="pipeline-step pipeline-step-active">&#x1F9E9; Structure JSON<br><span style="font-size:0.8em;font-weight:400;color:var(--text-muted);">Gemini 2.5-flash</span></span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span class="pipeline-step pipeline-step-active">&#x1F4E5; Import to DB<br><span style="font-size:0.8em;font-weight:400;color:var(--text-muted);">Automated</span></span>
+                </div>
+            </div>
+            <div class="grid grid-3col reveal reveal-delay-4" style="grid-template-columns:1fr 1fr 1fr;gap:clamp(0.5rem,1.5vw,1rem);">
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x1F3A8;</div>
+                    <h3>AI Infographics</h3>
+                    <p>Vertex AI Imagen generates 3 infographic types per condition: overview, risk factors, lifestyle solutions</p>
+                </div>
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x1F4D6;</div>
+                    <h3>Scripture Suggestions</h3>
+                    <p>AI recommends relevant Bible verses and EGW references for each condition</p>
+                </div>
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x23F3;</div>
+                    <h3>Async Processing</h3>
+                    <p>Queue-based jobs with retries, exponential backoff, and real-time notifications</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 9: KNOWLEDGE GRAPH
+         =================================== -->
+    <section class="slide slide-warm dot-bg" id="slide-9">
+        <span class="section-num">08</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-primary mb-md" style="display:inline-block;">Visualization</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">Interactive Knowledge Graph</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <div class="grid reveal reveal-delay-3" style="grid-template-columns:1fr 1fr;gap:clamp(0.5rem,1.5vw,1.25rem);">
+                <div>
+                    <p class="text-muted mb-sm" style="font-size:var(--small-size);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">9 Custom Node Types</p>
+                    <div class="flex" style="flex-wrap:wrap;gap:clamp(0.15rem,0.4vw,0.25rem);">
+                        <span class="tag tag-primary">Condition</span>
+                        <span class="tag tag-secondary">Intervention</span>
+                        <span class="tag" style="background:var(--secondary-100);color:var(--secondary-700);">Care Domain</span>
+                        <span class="tag" style="background:#fef3c7;color:#92400e;">Scripture</span>
+                        <span class="tag" style="background:#fce7f3;color:#9d174d;">EGW Ref</span>
+                        <span class="tag tag-outline">Recipe</span>
+                        <span class="tag tag-outline">Evidence</span>
+                        <span class="tag tag-outline">Reference</span>
+                        <span class="tag tag-outline">Tag</span>
+                    </div>
+                    <hr class="rule">
+                    <p class="text-muted mb-sm" style="font-size:var(--small-size);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">Layout Algorithms</p>
+                    <div class="flex" style="flex-wrap:wrap;gap:clamp(0.15rem,0.4vw,0.25rem);">
+                        <span class="domain-pill">Hierarchical</span>
+                        <span class="domain-pill">Radial</span>
+                        <span class="domain-pill">Force-directed</span>
+                        <span class="domain-pill">Clustered</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-sm">
+                    <div class="fcard">
+                        <h3>Animated Edges</h3>
+                        <p>Color-coded by evidence strength showing condition-intervention relationships</p>
+                    </div>
+                    <div class="fcard">
+                        <h3>Search &amp; Filter</h3>
+                        <p>Autocomplete search with node highlighting, filter by type and category</p>
+                    </div>
+                    <div class="fcard">
+                        <h3>3 Views</h3>
+                        <p>Full graph explorer, condition-centric, and intervention-centric perspectives</p>
+                    </div>
+                    <div class="fcard">
+                        <h3>Export</h3>
+                        <p>PNG and SVG export with keyboard shortcuts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 10: ANALYTICS
+         =================================== -->
+    <section class="slide" id="slide-10">
+        <span class="section-num">09</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-secondary mb-md" style="display:inline-block;">Analytics</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">Dashboard &amp; Analytics</h2>
+            <hr class="divider divider-secondary reveal reveal-delay-2">
+            <div class="grid grid-3col reveal reveal-delay-3" style="grid-template-columns:repeat(3,1fr);gap:clamp(0.5rem,1.5vw,1rem);">
+                <div class="fcard fcard-accent-secondary" style="text-align:center;">
+                    <div class="fcard-icon">&#x1F4C8;</div>
+                    <h3>Overview Cards</h3>
+                    <p>Real-time stats with weekly trend sparklines</p>
+                </div>
+                <div class="fcard fcard-accent-secondary" style="text-align:center;">
+                    <div class="fcard-icon">&#x1F967;</div>
+                    <h3>Distribution Charts</h3>
+                    <p>Category pie charts and domain bar charts</p>
+                </div>
+                <div class="fcard fcard-accent-secondary" style="text-align:center;">
+                    <div class="fcard-icon">&#x1F4C5;</div>
+                    <h3>Growth Metrics</h3>
+                    <p>Content creation over time with line charts</p>
+                </div>
+                <div class="fcard fcard-accent-secondary" style="text-align:center;">
+                    <div class="fcard-icon">&#x23F0;</div>
+                    <h3>Activity Timeline</h3>
+                    <p>Recent create/update activity feed</p>
+                </div>
+                <div class="fcard fcard-accent-secondary" style="text-align:center;">
+                    <div class="fcard-icon">&#x1F50D;</div>
+                    <h3>Evidence Quality</h3>
+                    <p>Quality distribution analysis across all entries</p>
+                </div>
+                <div class="fcard fcard-accent-secondary" style="text-align:center;">
+                    <div class="fcard-icon">&#x1F4C4;</div>
+                    <h3>PDF Reports</h3>
+                    <p>Export analytics as formatted PDF documents</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 11: PUBLISHING WORKFLOW
+         =================================== -->
+    <section class="slide slide-warm" id="slide-11">
+        <span class="section-num">10</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-primary mb-md" style="display:inline-block;">Workflow</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">Publishing &amp; Content Workflow</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <div class="reveal reveal-delay-3 mb-md">
+                <p class="text-muted mb-sm" style="font-size:var(--small-size);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">Publishing Pipeline</p>
+                <div class="pipeline">
+                    <span class="pipeline-step">&#x1F4DD; Draft</span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span class="pipeline-step">&#x1F50D; Review</span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span class="pipeline-step pipeline-step-active">&#x2705; Published</span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span class="pipeline-step" style="opacity:0.5;">&#x1F4E6; Archived</span>
+                </div>
+            </div>
+            <div class="grid grid-4col reveal reveal-delay-4" style="grid-template-columns:1fr 1fr 1fr 1fr;gap:clamp(0.5rem,1.5vw,1rem);">
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x1F4DC;</div>
+                    <h3>Revisions</h3>
+                    <p>Full version history with diff viewing and restore</p>
+                </div>
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x1F50F;</div>
+                    <h3>Audit Trail</h3>
+                    <p>Tracks who created, updated, and deleted every record</p>
+                </div>
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x1F4CE;</div>
+                    <h3>Media</h3>
+                    <p>Drag-and-drop uploads with galleries and reordering</p>
+                </div>
+                <div class="fcard fcard-accent">
+                    <div class="fcard-icon">&#x1F514;</div>
+                    <h3>Notifications</h3>
+                    <p>Real-time alerts for AI completions and imports</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 12: IMPORT / EXPORT
+         =================================== -->
+    <section class="slide" id="slide-12">
+        <span class="section-num">11</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-secondary mb-md" style="display:inline-block;">Interoperability</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">Import, Export &amp; FHIR</h2>
+            <hr class="divider divider-secondary reveal reveal-delay-2">
+            <div class="grid reveal reveal-delay-3" style="grid-template-columns:1fr 1fr;gap:clamp(0.75rem,2vw,1.5rem);">
+                <div>
+                    <h3 style="font-size:var(--body-size);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary-600);" class="mb-sm">Import</h3>
+                    <div class="fcard fcard-accent">
+                        <h3>Bulk Import</h3>
+                        <p>CSV and Excel import for conditions and interventions with downloadable templates</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size:var(--body-size);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--secondary-600);" class="mb-sm">Export</h3>
+                    <div class="fcard fcard-accent-secondary">
+                        <h3>Treatment Guide PDFs</h3>
+                        <p>Individual condition guides and summary reports as formatted PDFs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal reveal-delay-4" style="margin-top:clamp(0.5rem,1vw,0.75rem);">
+                <div class="fcard" style="border:2px solid var(--secondary-200);background:var(--secondary-50);">
+                    <div class="flex items-center gap-md">
+                        <span style="font-size:clamp(1.5rem,3vw,2.5rem);">&#x1F3E5;</span>
+                        <div>
+                            <h3 style="color:var(--secondary-800);">FHIR R4 Healthcare Interoperability</h3>
+                            <p>Export conditions as <strong>PlanDefinition</strong>, interventions as <strong>ActivityDefinition</strong>, with full <strong>CapabilityStatement</strong> &mdash; ready for EHR integration</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 13: USER MANAGEMENT
+         =================================== -->
+    <section class="slide" id="slide-13">
+        <span class="section-num">12</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-primary mb-md" style="display:inline-block;">Access &amp; Discovery</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">User Management &amp; Search</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <div class="grid reveal reveal-delay-3" style="grid-template-columns:1fr 1fr;gap:clamp(0.75rem,2vw,1.5rem);">
+                <div>
+                    <h3 style="font-size:var(--body-size);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary-600);" class="mb-sm">Role-Based Access</h3>
+                    <div class="flex flex-col gap-sm">
+                        <div class="fcard">
+                            <div class="flex items-center gap-sm">
+                                <span class="tag tag-primary" style="font-size:0.7em;">Admin</span>
+                                <p style="margin:0;">Full access: AI, imports, user management, publishing</p>
+                            </div>
+                        </div>
+                        <div class="fcard">
+                            <div class="flex items-center gap-sm">
+                                <span class="tag" style="background:#fef3c7;color:#92400e;font-size:0.7em;">Editor</span>
+                                <p style="margin:0;">Content creation, editing, and submit for review</p>
+                            </div>
+                        </div>
+                        <div class="fcard">
+                            <div class="flex items-center gap-sm">
+                                <span class="tag tag-secondary" style="font-size:0.7em;">Viewer</span>
+                                <p style="margin:0;">Read-only access to published content</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size:var(--body-size);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--secondary-600);" class="mb-sm">Security &amp; Discovery</h3>
+                    <div class="flex flex-col gap-sm">
+                        <div class="fcard">
+                            <h3>Sanctum Auth + 2FA</h3>
+                            <p>Token-based API authentication with optional two-factor verification</p>
+                        </div>
+                        <div class="fcard">
+                            <h3>Global Search</h3>
+                            <p>Cross-type search across conditions, interventions, scriptures, recipes, and evidence</p>
+                        </div>
+                        <div class="fcard">
+                            <h3>Content Tagging</h3>
+                            <p>Polymorphic tags on any content type for flexible organization</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 14: TECH STACK (dark)
+         =================================== -->
+    <section class="slide slide-dark" id="slide-14">
+        <span class="section-num">13</span>
+        <div class="slide-content max-w">
+            <div class="reveal">
+                <span class="tag tag-white mb-md" style="display:inline-block;">Technology</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-sm">Tech Stack</h2>
+            <hr class="divider reveal reveal-delay-2">
+            <div class="grid grid-3col reveal reveal-delay-3" style="grid-template-columns:1fr 1fr 1fr;gap:clamp(0.5rem,1.5vw,1rem);">
+                <div class="fcard">
+                    <p style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;color:var(--primary-400);font-weight:600;">Backend</p>
+                    <h3>Laravel 12</h3>
+                    <p>PHP 8.2+, MySQL, Sanctum, Fortify, database queue</p>
+                </div>
+                <div class="fcard">
+                    <p style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;color:var(--primary-400);font-weight:600;">Frontend</p>
+                    <h3>React 19</h3>
+                    <p>Vite 7, Tailwind CSS, React Router 7, React Flow, Recharts</p>
+                </div>
+                <div class="fcard">
+                    <p style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;color:var(--primary-400);font-weight:600;">AI</p>
+                    <h3>Google Gemini</h3>
+                    <p>Gemini 2.5-flash for content, Vertex AI Imagen for infographics</p>
+                </div>
+                <div class="fcard">
+                    <p style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;color:var(--primary-400);font-weight:600;">Public App</p>
+                    <h3>Inertia.js SSR</h3>
+                    <p>TypeScript, React Compiler, Wayfinder routes, Tailwind CSS 4</p>
+                </div>
+                <div class="fcard">
+                    <p style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;color:var(--primary-400);font-weight:600;">Editor</p>
+                    <h3>TipTap</h3>
+                    <p>Rich text editing with markdown support and media embedding</p>
+                </div>
+                <div class="fcard">
+                    <p style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;color:var(--primary-400);font-weight:600;">CI/CD</p>
+                    <h3>GitHub Actions</h3>
+                    <p>PHP 8.4/8.5 matrix, ESLint, Prettier, Laravel Pint</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 15: PLATFORM STATS
+         =================================== -->
+    <section class="slide dot-bg" id="slide-15">
+        <span class="section-num">14</span>
+        <div class="slide-content max-w items-center justify-center text-center">
+            <div class="reveal">
+                <span class="tag tag-primary mb-md" style="display:inline-block;">By the Numbers</span>
+            </div>
+            <h2 class="reveal reveal-delay-1 mb-lg">Platform at a Glance</h2>
+            <div class="grid grid-5col reveal reveal-delay-2" style="grid-template-columns:repeat(5,1fr);gap:clamp(0.5rem,2vw,2rem);max-width:min(90vw,900px);margin:0 auto;">
+                <div class="stat-block">
+                    <div class="stat-num">22+</div>
+                    <div class="stat-label">Major Features</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num">40+</div>
+                    <div class="stat-label">Database Tables</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num">27+</div>
+                    <div class="stat-label">API Controllers</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num">19</div>
+                    <div class="stat-label">Frontend Modules</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num">3</div>
+                    <div class="stat-label">AI Integrations</div>
+                </div>
+            </div>
+            <hr class="rule reveal reveal-delay-3" style="max-width:min(80vw,700px);margin:clamp(0.75rem,2vw,1.5rem) auto;">
+            <div class="grid reveal reveal-delay-3" style="grid-template-columns:1fr 1fr;gap:clamp(0.75rem,2vw,1.5rem);max-width:min(80vw,700px);margin:0 auto;">
+                <div class="fcard fcard-accent" style="text-align:center;">
+                    <p class="text-muted" style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;font-weight:600;">API</p>
+                    <h3 style="color:var(--primary-600);">api.rindra.org</h3>
+                    <p>Laravel backend on HestiaCP VPS</p>
+                </div>
+                <div class="fcard fcard-accent-secondary" style="text-align:center;">
+                    <p class="text-muted" style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;font-weight:600;">Dashboard</p>
+                    <h3 style="color:var(--secondary-600);">lifestyle.rindra.org</h3>
+                    <p>React SPA with Capacitor mobile support</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         SLIDE 16: CLOSING (dark brand)
+         =================================== -->
+    <section class="slide slide-dark" id="slide-16">
+        <div class="slide-content items-center justify-center text-center">
+            <h2 class="reveal" style="font-size:var(--title-size);max-width:min(85vw,700px);">
+                Thank You
+            </h2>
+            <hr class="divider mx-auto reveal reveal-delay-1">
+            <p class="reveal reveal-delay-2" style="max-width:min(70vw,500px);margin:0 auto;color:var(--secondary-300);">
+                Lifestyle Medicine &amp; Gospel Medical Evangelism Knowledge Platform
+            </p>
+            <div class="flex gap-sm items-center reveal reveal-delay-3" style="margin-top:clamp(1rem,2.5vw,2rem);">
+                <span class="tag" style="background:rgba(230,57,80,0.2);color:var(--primary-300);">api.rindra.org</span>
+                <span class="tag" style="background:rgba(98,125,152,0.25);color:var(--secondary-200);">lifestyle.rindra.org</span>
+            </div>
+            <p class="reveal reveal-delay-4 quote" style="margin-top:clamp(1.5rem,3vw,2.5rem);max-width:min(75vw,550px);">
+                &ldquo;Whether therefore ye eat, or drink, or whatsoever ye do, do all to the glory of God.&rdquo;
+            </p>
+            <p class="reveal reveal-delay-5" style="font-size:var(--small-size);color:var(--secondary-400);margin-top:0.3rem;">1 Corinthians 10:31</p>
+        </div>
+    </section>
+
+    <!-- ===================================
+       JAVASCRIPT: NAVIGATION & ANIMATIONS
+       =================================== -->
+    <script>
+    (function() {
+        'use strict';
+
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressBar = document.getElementById('progress');
+        const counter = document.getElementById('counter');
+        let currentSlide = 0;
+
+        function updateUI() {
+            const idx = Math.round(window.scrollY / window.innerHeight);
+            currentSlide = Math.min(Math.max(idx, 0), totalSlides - 1);
+            const pct = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = pct + '%';
+            counter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+
+            // Adapt counter style for dark slides
+            const current = slides[currentSlide];
+            if (current.classList.contains('slide-dark')) {
+                counter.style.background = 'rgba(16,42,67,0.85)';
+                counter.style.color = 'var(--secondary-300)';
+                counter.style.borderColor = 'rgba(255,255,255,0.08)';
+            } else {
+                counter.style.background = 'rgba(255,255,255,0.85)';
+                counter.style.color = 'var(--text-light)';
+                counter.style.borderColor = 'var(--border-light)';
+            }
+        }
+
+        // Intersection Observer for reveal animations
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.querySelectorAll('.reveal').forEach(function(el) {
+                        el.classList.add('visible');
+                    });
+                }
+            });
+        }, { threshold: 0.15 });
+
+        slides.forEach(function(slide) { observer.observe(slide); });
+
+        window.addEventListener('scroll', updateUI, { passive: true });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                if (currentSlide < totalSlides - 1) {
+                    slides[currentSlide + 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                if (currentSlide > 0) {
+                    slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                slides[0].scrollIntoView({ behavior: 'smooth' });
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                slides[totalSlides - 1].scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // Touch swipe navigation
+        let touchStartY = 0;
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+        document.addEventListener('touchend', function(e) {
+            const diff = touchStartY - e.changedTouches[0].screenY;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0 && currentSlide < totalSlides - 1) {
+                    slides[currentSlide + 1].scrollIntoView({ behavior: 'smooth' });
+                } else if (diff < 0 && currentSlide > 0) {
+                    slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }, { passive: true });
+
+        // Initial state
+        updateUI();
+        slides[0].querySelectorAll('.reveal').forEach(function(el) {
+            el.classList.add('visible');
+        });
+    })();
+    </script>
+</body>
+</html>

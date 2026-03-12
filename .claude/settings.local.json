@@ -72,7 +72,10 @@
       "Bash(npx vite build:*)",
       "Bash(git update-index:*)",
       "Bash(npx knip:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(start \"\" \"C:\\\\Users\\\\rindra\\\\Projects\\\\lifestyle_medicine\\\\presentation.html\")",
+      "WebFetch(domain:markmap.js.org)",
+      "WebFetch(domain:www.npmjs.com)"
     ]
   }
 }
