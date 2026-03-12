@@ -13,6 +13,11 @@ import RichTextPreview from '../../components/shared/RichTextPreview';
 import StatusBadge from '../../components/shared/StatusBadge';
 import { useAuth } from '../../contexts/AuthContext';
 
+/**
+ * Recipes list page with grid, table, and list view modes. Supports search,
+ * filtering by dietary tag, content tag, and publish status. Includes pagination,
+ * persistent view mode preference, and delete functionality with confirmation.
+ */
 const Recipes = () => {
   const { t } = useTranslation(['recipes', 'common', 'tags']);
   const { canEdit } = useAuth();

@@ -12,6 +12,16 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * Manages media file uploads (images, documents) for interventions.
+ *
+ * Handles file upload, metadata updates, reordering, and deletion
+ * for intervention-associated media. Supports JPEG, PNG, GIF, WebP images
+ * and PDF documents with a 10MB file size limit.
+ *
+ * Routes: /api/v1/interventions/{intervention}/media (public read),
+ *         /api/v1/admin/interventions/{intervention}/media (admin CRUD)
+ */
 class MediaController extends Controller
 {
     /**

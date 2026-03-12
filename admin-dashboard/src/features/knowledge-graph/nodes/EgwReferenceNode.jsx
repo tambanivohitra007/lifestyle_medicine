@@ -2,6 +2,16 @@ import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { BookMarked } from 'lucide-react';
 
+/**
+ * Custom React Flow node representing an Ellen G. White (Spirit of Prophecy) reference.
+ * Styled with purple gradient background and BookMarked icon.
+ * Displays topic and book badges (book name truncated to 15 chars).
+ * Has top (target) and bottom (source) connection handles.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data containing label, topic, book, isHighlighted
+ * @param {boolean} props.selected - Whether the node is currently selected
+ */
 const EgwReferenceNode = memo(({ data, selected }) => {
   const isHighlighted = data.isHighlighted;
 

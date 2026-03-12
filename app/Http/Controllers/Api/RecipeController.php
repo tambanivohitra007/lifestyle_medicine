@@ -11,10 +11,29 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages therapeutic recipes linked to conditions and interventions.
+ *
+ * Provides CRUD operations for recipes with dietary tag filtering,
+ * content tag management, and publishing workflow support.
+ *
+ * Routes: /api/v1/recipes (public), /api/v1/admin/recipes (admin)
+ */
 class RecipeController extends Controller
 {
     use HasSorting;
 
+    /**
+     * List all recipes with optional filtering, search, and sorting.
+     *
+     * Admin/editor users can filter by publishing status; public users see only published.
+     * Supports dietary_tag filtering (JSON contains), tag_id filtering, and search.
+     *
+     * GET /api/v1/recipes
+     *
+     * @param  Request  $request  Query params: status, search, dietary_tag, tag_id, sort_by, sort_order
+     * @return AnonymousResourceCollection Paginated collection of RecipeResource (20 per page)
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Recipe::with('tags');
@@ -55,6 +74,14 @@ class RecipeController extends Controller
         return RecipeResource::collection($recipes);
     }
 
+    /**
+     * Display a single recipe with its related data.
+     *
+     * GET /api/v1/recipes/{recipe}
+     *
+     * @param  Recipe  $recipe  Route-model bound recipe instance
+     * @return RecipeResource
+     */
     public function show(Recipe $recipe): RecipeResource
     {
         $user = auth('sanctum')->user();
@@ -67,6 +94,14 @@ class RecipeController extends Controller
         return new RecipeResource($recipe);
     }
 
+    /**
+     * Publish a recipe.
+     *
+     * POST /api/v1/admin/recipes/{recipe}/publish (admin only)
+     *
+     * @param  Recipe  $recipe  Route-model bound recipe instance
+     * @return JsonResponse Success message
+     */
     public function publish(Recipe $recipe): JsonResponse
     {
         $recipe->publish();
@@ -74,6 +109,14 @@ class RecipeController extends Controller
         return response()->json(['message' => 'Recipe published successfully']);
     }
 
+    /**
+     * Submit a recipe for editorial review.
+     *
+     * POST /api/v1/admin/recipes/{recipe}/submit-for-review
+     *
+     * @param  Recipe  $recipe  Route-model bound recipe instance
+     * @return JsonResponse Success message
+     */
     public function submitForReview(Recipe $recipe): JsonResponse
     {
         $recipe->submitForReview();
@@ -81,6 +124,14 @@ class RecipeController extends Controller
         return response()->json(['message' => 'Recipe submitted for review']);
     }
 
+    /**
+     * Archive a recipe.
+     *
+     * POST /api/v1/admin/recipes/{recipe}/archive (admin only)
+     *
+     * @param  Recipe  $recipe  Route-model bound recipe instance
+     * @return JsonResponse Success message
+     */
     public function archive(Recipe $recipe): JsonResponse
     {
         $recipe->archive();
@@ -88,6 +139,14 @@ class RecipeController extends Controller
         return response()->json(['message' => 'Recipe archived successfully']);
     }
 
+    /**
+     * Return a recipe to draft status.
+     *
+     * POST /api/v1/admin/recipes/{recipe}/return-to-draft
+     *
+     * @param  Recipe  $recipe  Route-model bound recipe instance
+     * @return JsonResponse Success message
+     */
     public function returnToDraft(Recipe $recipe): JsonResponse
     {
         $recipe->returnToDraft();
@@ -95,6 +154,14 @@ class RecipeController extends Controller
         return response()->json(['message' => 'Recipe returned to draft']);
     }
 
+    /**
+     * Create a new recipe.
+     *
+     * POST /api/v1/admin/recipes
+     *
+     * @param  Request  $request  Validated fields: title, description, dietary_tags, ingredients, instructions, servings, prep/cook times, tag_ids
+     * @return RecipeResource The newly created recipe
+     */
     public function store(Request $request): RecipeResource
     {
         $validated = $request->validate([
@@ -122,6 +189,15 @@ class RecipeController extends Controller
         return new RecipeResource($recipe->load('tags'));
     }
 
+    /**
+     * Update an existing recipe.
+     *
+     * PUT /api/v1/admin/recipes/{recipe}
+     *
+     * @param  Request  $request  Validated fields: title, description, dietary_tags, ingredients, instructions, servings, prep/cook times, tag_ids
+     * @param  Recipe   $recipe   Route-model bound recipe instance
+     * @return RecipeResource The updated recipe
+     */
     public function update(Request $request, Recipe $recipe): RecipeResource
     {
         $validated = $request->validate([
@@ -149,6 +225,14 @@ class RecipeController extends Controller
         return new RecipeResource($recipe->load('tags'));
     }
 
+    /**
+     * Soft-delete a recipe.
+     *
+     * DELETE /api/v1/admin/recipes/{recipe}
+     *
+     * @param  Recipe  $recipe  Route-model bound recipe instance
+     * @return Response 204 No Content
+     */
     public function destroy(Recipe $recipe): Response
     {
         $recipe->delete();

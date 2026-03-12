@@ -3,6 +3,11 @@ import { Plus, Search, Tag, Edit, Trash2, Loader2, X, Check, Activity, ChefHat, 
 import api, { apiEndpoints } from '../../lib/api';
 import { toast, confirmDelete } from '../../lib/swal';
 
+/**
+ * Content tags management page with inline create, edit, and delete capabilities.
+ * Displays tags with usage counts across interventions, recipes, scriptures, and EGW references.
+ * Supports search filtering and inline editing via text input with Enter key submission.
+ */
 const ContentTags = () => {
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);

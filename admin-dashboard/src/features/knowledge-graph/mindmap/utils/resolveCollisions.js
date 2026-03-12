@@ -1,9 +1,15 @@
 /**
- * Node Collision Resolution for ReactFlow
+ * @module resolveCollisions
+ * Node Collision Resolution for ReactFlow.
  * Based on: https://reactflow.dev/examples/layout/node-collisions
  *
- * Iteratively resolves overlapping nodes by pushing them apart
- * along the axis with minimal overlap.
+ * Uses an iterative pairwise separation algorithm:
+ * 1. Convert nodes to bounding boxes (with margin padding)
+ * 2. For each pair of overlapping boxes, determine which axis has less overlap
+ * 3. Push nodes apart along the minimum-overlap axis
+ * 4. Repeat until no collisions or max iterations reached
+ *
+ * Supports fixed nodes (e.g., center node, user-moved nodes) that won't be displaced.
  */
 
 /**
@@ -165,8 +171,13 @@ export function resolveCollisions(nodes, options = {}) {
 }
 
 /**
- * Resolve collisions only for visible nodes
- * Useful when some nodes are hidden by filters
+ * Resolve collisions only for visible nodes while keeping hidden nodes unchanged.
+ * Useful when category filters hide some branches but remaining nodes may overlap.
+ *
+ * @param {Array} allNodes - Complete set of nodes (visible + hidden)
+ * @param {Set} visibleNodeIds - Set of node IDs that are currently visible
+ * @param {Object} [options] - Options passed to resolveCollisions
+ * @returns {Array} All nodes with visible ones repositioned and hidden ones unchanged
  */
 export function resolveVisibleCollisions(allNodes, visibleNodeIds, options = {}) {
   const visibleNodes = allNodes.filter((n) => visibleNodeIds.has(n.id));

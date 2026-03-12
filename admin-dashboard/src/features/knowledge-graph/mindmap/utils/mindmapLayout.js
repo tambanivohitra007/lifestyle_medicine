@@ -1,11 +1,19 @@
 /**
- * Mindmap Layout Algorithm
- * Creates a radial tree layout with the condition at the center,
- * condition sections (risk factors, physiology, complications, etc.) positioned around,
- * and solutions (interventions by care domain) radiating around the sides.
+ * @module mindmapLayout
+ * Mindmap Layout Algorithm -- creates a radial tree layout for condition visualization.
+ *
+ * Layout structure:
+ * - Center: condition node at origin (0, 0)
+ * - Inner ring: section branches (risk factors, physiology, complications, etc.)
+ *   positioned at predefined angles around the center
+ * - Section items: fanned out from their branch node at the branch's angle
+ * - Right side: solution branches (care domains) with sub-nodes for
+ *   interventions (max 5), scriptures (max 3), EGW references (max 3), and recipes (max 2)
+ *
+ * Uses polar coordinate system (angle + distance) converted to Cartesian for placement.
  */
 
-// Section position configuration
+/** @constant Predefined angular positions and distances for each section type */
 const SECTION_POSITIONS = {
   riskFactors: { angle: -90, distance: 280 },      // Top
   physiology: { angle: -135, distance: 300 },      // Top-left
@@ -47,7 +55,16 @@ function polarToCartesian(centerX, centerY, angle, distance) {
 }
 
 /**
- * Distribute items in a fan pattern around a given angle
+ * Distribute items in a fan pattern around a given angle.
+ * For N items, spaces them evenly within the spread range centered on baseAngle.
+ *
+ * @param {number} count - Number of items to distribute
+ * @param {number} centerX - X coordinate of fan origin
+ * @param {number} centerY - Y coordinate of fan origin
+ * @param {number} baseAngle - Central angle of the fan (degrees)
+ * @param {number} distance - Distance from center to each item
+ * @param {number} [spread=60] - Total angular spread of the fan (degrees)
+ * @returns {Array<{x: number, y: number}>} Computed positions
  */
 function distributeInFan(count, centerX, centerY, baseAngle, distance, spread = 60) {
   if (count === 0) return [];
@@ -68,7 +85,15 @@ function distributeInFan(count, centerX, centerY, baseAngle, distance, spread = 
 }
 
 /**
- * Build nodes and edges from mindmap data
+ * Build React Flow nodes and edges from the mindmap API response data.
+ * Creates a radial tree with condition at center, section branches (left side),
+ * and solution branches with interventions/scriptures/EGW references (right side).
+ *
+ * @param {Object} data - Mindmap API data: { condition, sections, branches }
+ * @param {Object} [options] - Layout options
+ * @param {number} [options.centerX=0] - X coordinate of center node
+ * @param {number} [options.centerY=0] - Y coordinate of center node
+ * @returns {{ nodes: Array, edges: Array }} React Flow nodes and edges
  */
 export function buildMindmapGraph(data, options = {}) {
   const {

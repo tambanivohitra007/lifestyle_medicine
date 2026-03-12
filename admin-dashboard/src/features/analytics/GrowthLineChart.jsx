@@ -10,6 +10,16 @@ const SERIES_CONFIG = [
   { key: 'egw_references', labelKey: 'analytics:cards.egwWritings', color: '#8b5cf6' },
 ];
 
+/**
+ * Multi-series line chart showing content growth over time using Recharts.
+ * Tracks conditions, interventions, scriptures, recipes, and EGW references.
+ * Supports toggling individual series and changing the time range (6/12/24 months).
+ *
+ * @param {Object} props
+ * @param {Array|null} props.data - Array of monthly data points with counts per entity type
+ * @param {boolean} props.loading - Whether data is still being fetched
+ * @param {Function} props.onMonthsChange - Callback when the user changes the time range
+ */
 const GrowthLineChart = ({ data, loading, onMonthsChange }) => {
   const { t } = useTranslation(['analytics']);
   const SERIES = SERIES_CONFIG.map(s => ({ ...s, label: t(s.labelKey) }));

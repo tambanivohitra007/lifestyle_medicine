@@ -53,7 +53,17 @@ const nodeColor = (node) => {
 };
 
 /**
- * Inner mindmap component (requires ReactFlowProvider)
+ * Inner mindmap component that renders an expandable, interactive React Flow mindmap
+ * centered on a medical condition. Features progressive disclosure via expand/collapse,
+ * category filtering, hover highlighting, drag-and-drop with collision resolution,
+ * and high-res PNG export.
+ *
+ * Must be wrapped in a ReactFlowProvider (handled by ConditionMindmap wrapper).
+ *
+ * @param {Object} props
+ * @param {string} props.conditionId - UUID of the condition to visualize
+ * @param {Function} [props.onNodeClick] - Optional external click handler
+ * @param {string} [props.className] - Additional CSS classes
  */
 const ConditionMindmapInner = ({
   conditionId,
@@ -814,7 +824,11 @@ const ConditionMindmapInner = ({
 };
 
 /**
- * Condition Mindmap component with provider wrapper
+ * Condition Mindmap component with ReactFlowProvider wrapper.
+ * Entry point for embedding the mindmap -- provides the React Flow
+ * context required by the inner component.
+ *
+ * @param {Object} props - Forwarded to ConditionMindmapInner
  */
 const ConditionMindmap = (props) => {
   return (

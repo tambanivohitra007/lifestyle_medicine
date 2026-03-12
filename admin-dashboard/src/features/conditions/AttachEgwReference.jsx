@@ -6,6 +6,11 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Page for attaching an Ellen G. White reference to a condition.
+ * Displays a searchable list of available EGW references with topic filtering.
+ * Excludes already-linked references from the selection.
+ */
 const AttachEgwReference = () => {
   const { t } = useTranslation(['conditions', 'common', 'references']);
   const { id: conditionId } = useParams();

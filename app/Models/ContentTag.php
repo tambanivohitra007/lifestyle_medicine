@@ -8,6 +8,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Represents a tag used to categorize and cross-reference content items.
+ *
+ * Content tags can be applied to interventions, recipes, scriptures, and EGW
+ * references to enable flexible content discovery and filtering across the platform.
+ *
+ * @property int $id Auto-increment primary key
+ * @property string $tag The tag text
+ * @property int|null $created_by ID of the user who created this record
+ * @property int|null $updated_by ID of the user who last updated this record
+ * @property int|null $deleted_by ID of the user who deleted this record
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Intervention> $interventions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Recipe> $recipes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Scripture> $scriptures
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, EgwReference> $egwReferences
+ * @property-read User|null $creator
+ * @property-read User|null $updater
+ * @property-read User|null $deleter
+ */
 class ContentTag extends Model
 {
     use HasAuditFields, HasFactory, SoftDeletes;
@@ -18,6 +41,8 @@ class ContentTag extends Model
 
     /**
      * Get the interventions with this tag.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Intervention, $this>
      */
     public function interventions(): BelongsToMany
     {
@@ -28,6 +53,8 @@ class ContentTag extends Model
 
     /**
      * Get the recipes with this tag.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Recipe, $this>
      */
     public function recipes(): BelongsToMany
     {
@@ -38,6 +65,8 @@ class ContentTag extends Model
 
     /**
      * Get the scriptures with this tag.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Scripture, $this>
      */
     public function scriptures(): BelongsToMany
     {
@@ -48,6 +77,8 @@ class ContentTag extends Model
 
     /**
      * Get the EGW references with this tag.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<EgwReference, $this>
      */
     public function egwReferences(): BelongsToMany
     {

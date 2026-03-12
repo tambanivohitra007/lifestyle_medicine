@@ -9,6 +9,7 @@ import StructuredPreview from './components/StructuredPreview';
 import ImportProgress from './components/ImportProgress';
 import InfographicGenerator from './components/InfographicGenerator';
 
+/** Phase constants representing each step of the AI content generation workflow */
 const PHASES = {
   INPUT: 'input',
   DRAFT: 'draft',
@@ -18,6 +19,11 @@ const PHASES = {
   INFOGRAPHICS: 'infographics',
 };
 
+/**
+ * Multi-phase AI content generation wizard for creating complete condition entries.
+ * Guides the user through: input -> draft review -> structured preview -> import -> infographics.
+ * Communicates with the Gemini AI backend to generate, structure, and import medical content.
+ */
 const AiContentGenerator = () => {
   const { t } = useTranslation(['aiGenerator', 'common']);
   const { notifyAiGeneration } = useNotifications();

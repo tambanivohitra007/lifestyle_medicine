@@ -26,6 +26,14 @@ const typeLabelKeys = {
   egw_reference: 'analytics:types.egwReference',
 };
 
+/**
+ * Scrollable timeline of recent user activity across all content types.
+ * Shows created/updated actions with user attribution and relative timestamps.
+ *
+ * @param {Object} props
+ * @param {Array|null} props.data - Array of activity entries from the analytics API
+ * @param {boolean} props.loading - Whether data is still being fetched
+ */
 const ActivityTimeline = ({ data, loading }) => {
   const { t } = useTranslation(['analytics']);
   if (loading) {

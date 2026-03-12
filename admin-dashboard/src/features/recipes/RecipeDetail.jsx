@@ -19,6 +19,11 @@ import StatusBadge from '../../components/shared/StatusBadge';
 import PublishActions from '../../components/shared/PublishActions';
 import RevisionHistory from '../../components/shared/RevisionHistory';
 
+/**
+ * Detailed view of a single recipe showing title, description, dietary tags,
+ * ingredients list, instructions, timing info, and servings. Includes publish
+ * status management, revision history, audit info, PDF export, and delete action.
+ */
 const RecipeDetail = () => {
   const { t } = useTranslation(['recipes', 'common']);
   const { id } = useParams();

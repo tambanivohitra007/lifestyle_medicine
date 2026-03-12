@@ -12,7 +12,11 @@ import api from '../../../lib/api';
 import ConditionMindmap from './ConditionMindmap';
 
 /**
- * Page wrapper for the condition mindmap
+ * Full-page wrapper for the condition mindmap visualization.
+ * Fetches basic condition info for the header, provides navigation
+ * back to the condition detail page and a link to the full knowledge graph view.
+ *
+ * @route /conditions/:id/mindmap
  */
 const ConditionMindmapPage = () => {
   const { t } = useTranslation(['knowledgeGraph', 'conditions']);

@@ -7,7 +7,12 @@ import NotificationDropdown from './NotificationDropdown';
 import LanguageSwitcher from '../ui/LanguageSwitcher';
 import { confirmLogout } from '../../lib/swal';
 
-// Page title mapping using i18n keys
+/**
+ * Maps a URL pathname to an i18n translation key for the page title.
+ * Handles both exact route matches and dynamic route patterns.
+ * @param {string} pathname - The current URL pathname
+ * @returns {string} The i18n key for the page title (e.g., 'conditions', 'editCondition')
+ */
 const getPageTitleKey = (pathname) => {
   const routes = {
     '/': 'lifestyleMedicine',
@@ -77,6 +82,18 @@ const getPageTitleKey = (pathname) => {
   return 'lifestyleMedicine';
 };
 
+/**
+ * Application header component with dual rendering for mobile and desktop.
+ *
+ * Mobile: Fixed app bar with back button, page title, and notifications.
+ * Desktop: Sticky header with sidebar collapse toggle, app title, language switcher,
+ * notifications, and user profile dropdown with logout.
+ *
+ * @param {Object} props
+ * @param {boolean} props.isCollapsed - Whether the desktop sidebar is collapsed
+ * @param {Function} props.onToggleCollapse - Callback to toggle sidebar collapsed state
+ * @returns {React.ReactElement} The header component
+ */
 const Header = ({ isCollapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
   const location = useLocation();

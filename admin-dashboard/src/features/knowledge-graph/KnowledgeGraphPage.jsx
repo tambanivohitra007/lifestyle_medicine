@@ -5,6 +5,14 @@ import { useTranslation } from 'react-i18next';
 import KnowledgeGraph from './KnowledgeGraph';
 import api, { apiEndpoints } from '../../lib/api';
 
+/**
+ * Page wrapper for the entity-centered knowledge graph view.
+ * Extracts route params (type, id) and query params (depth),
+ * fetches the entity name for breadcrumb display, and renders
+ * the KnowledgeGraph component in a full-screen container.
+ *
+ * @route /knowledge-graph/:type/:id
+ */
 const KnowledgeGraphPage = () => {
   const { t } = useTranslation(['knowledgeGraph']);
   const { type, id } = useParams();

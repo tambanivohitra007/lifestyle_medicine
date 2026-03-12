@@ -9,6 +9,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import StatusBadge from '../../components/shared/StatusBadge';
 import SlideOver from '../../components/shared/SlideOver';
 
+/**
+ * Scriptures management page with search, theme filtering, content tag filtering,
+ * and publish status filtering. Uses a SlideOver panel for inline create/edit of
+ * scripture entries (reference, text, theme). Supports pagination and delete.
+ */
 const Scriptures = () => {
   const { t } = useTranslation(['scriptures', 'common']);
   const { canEdit } = useAuth();

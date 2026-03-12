@@ -1,6 +1,10 @@
 import { Database, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Full-screen overlay displaying an animated progress indicator during database import.
+ * Shown while AI-structured content is being saved to the database.
+ */
 const ImportProgress = () => {
   const { t } = useTranslation(['aiGenerator']);
   return (

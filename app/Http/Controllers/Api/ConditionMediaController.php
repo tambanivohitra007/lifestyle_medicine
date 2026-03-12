@@ -12,6 +12,16 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * Manages media file uploads (images, documents, infographics) for conditions.
+ *
+ * Handles file upload, metadata updates, reordering, and deletion
+ * for condition-associated media. Similar to MediaController but scoped
+ * to conditions with additional infographic type support.
+ *
+ * Routes: /api/v1/conditions/{condition}/media (public read),
+ *         /api/v1/admin/conditions/{condition}/media (admin CRUD)
+ */
 class ConditionMediaController extends Controller
 {
     /**

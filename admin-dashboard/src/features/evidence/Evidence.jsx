@@ -40,6 +40,11 @@ const QUALITY_RATINGS = [
   { value: 'D', labelKey: 'evidence:quality.D_full' },
 ];
 
+/**
+ * Evidence entries list page with search, intervention filtering, pagination,
+ * and inline create/edit via SlideOver panel. Displays study type, quality rating,
+ * and linked intervention for each evidence entry. Supports PDF export.
+ */
 const Evidence = () => {
   const { t } = useTranslation(['evidence', 'common']);
   const { canEdit } = useAuth();

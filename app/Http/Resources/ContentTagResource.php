@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming ContentTag model instances.
+ *
+ * Includes tag name and usage counts for interventions, recipes,
+ * scriptures, and EGW references (when counted).
+ */
 class ContentTagResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

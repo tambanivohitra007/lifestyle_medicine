@@ -5,6 +5,12 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming User model instances.
+ *
+ * Includes user profile data, role with label, active status,
+ * email verification status, and soft-delete timestamp.
+ */
 class UserResource extends JsonResource
 {
     /**

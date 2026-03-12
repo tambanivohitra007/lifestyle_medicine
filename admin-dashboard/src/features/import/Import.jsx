@@ -4,6 +4,12 @@ import { useTranslation } from 'react-i18next';
 import api, { apiEndpoints } from '../../lib/api';
 import { useNotifications } from '../../contexts/NotificationContext';
 
+/**
+ * CSV/Excel import page for bulk-importing conditions and interventions.
+ * Features drag-and-drop file upload, import type selection, template download,
+ * and detailed result reporting with success/error counts.
+ * Sends notifications via NotificationContext on import completion.
+ */
 const Import = () => {
   const { t } = useTranslation(['import', 'common']);
   const { notifyImport } = useNotifications();

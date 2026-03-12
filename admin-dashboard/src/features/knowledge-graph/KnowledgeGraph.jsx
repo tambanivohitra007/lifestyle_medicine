@@ -19,6 +19,24 @@ import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp, NodeDetails
 import { useKeyboardShortcuts, useLayoutPersistence } from './hooks';
 import api from '../../lib/api';
 
+/**
+ * Inner knowledge graph component that renders an interactive React Flow graph
+ * centered on a specific entity (condition or intervention). Supports filtering
+ * by node type, search with viewport centering, layout switching (medical grouped,
+ * dagre, radial, force, cluster), layout persistence to localStorage, node
+ * details panel, right-click context menu, hover highlighting, and group node
+ * drag-to-resize.
+ *
+ * Must be wrapped in a ReactFlowProvider (handled by the exported KnowledgeGraph component).
+ *
+ * @param {Object} props
+ * @param {'condition'|'intervention'} props.centerType - Type of the center entity
+ * @param {string} props.centerId - UUID of the center entity
+ * @param {number} [props.initialDepth=2] - Graph traversal depth (1-3)
+ * @param {Function} [props.onNodeClick] - Optional external click handler
+ * @param {string} [props.className] - Additional CSS classes
+ * @param {React.ReactNode} [props.backButton] - Back navigation button element
+ */
 const KnowledgeGraphInner = ({
   centerType = 'condition',
   centerId,
@@ -618,7 +636,13 @@ const KnowledgeGraphInner = ({
   );
 };
 
-// Wrap with ReactFlowProvider for useReactFlow hook
+/**
+ * Knowledge graph component with ReactFlowProvider wrapper.
+ * Provides the React Flow context required by the inner component's
+ * use of useReactFlow, fitView, and setCenter hooks.
+ *
+ * @param {Object} props - Forwarded to KnowledgeGraphInner
+ */
 const KnowledgeGraph = (props) => (
   <ReactFlowProvider>
     <KnowledgeGraphInner {...props} />

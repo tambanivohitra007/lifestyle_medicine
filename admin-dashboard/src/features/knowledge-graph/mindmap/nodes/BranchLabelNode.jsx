@@ -9,7 +9,14 @@ const ICONS = {
 };
 
 /**
- * Branch label node - marks the start of a major branch
+ * Branch label node -- a pill-shaped marker for major mindmap branches.
+ * Similar to SectionBranchNode but with a simpler icon set and different handle
+ * configuration (target on bottom, sources on top/left/right).
+ * Used for top-level categorization labels in the mindmap hierarchy.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: label, color, icon (lucide icon key), count
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const BranchLabelNode = memo(({ data, selected }) => {
   const Icon = ICONS[data.icon] || Lightbulb;

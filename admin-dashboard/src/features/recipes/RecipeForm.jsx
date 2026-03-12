@@ -6,6 +6,11 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Form for creating or editing a recipe. Manages fields for title, description,
+ * dietary tags (dynamic chip input), ingredients (dynamic list), instructions,
+ * servings, prep time, and cook time. Handles both create and edit API flows.
+ */
 const RecipeForm = () => {
   const { t } = useTranslation(['recipes', 'common']);
   const { id } = useParams();

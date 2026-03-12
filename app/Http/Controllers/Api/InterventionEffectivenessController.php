@@ -12,6 +12,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages effectiveness ratings for condition-intervention pairs.
+ *
+ * Tracks how effective each intervention is for each condition with ratings
+ * (very_high, high, moderate, low, uncertain), evidence grades (A-D),
+ * and primary intervention designation.
+ *
+ * Routes: /api/v1/effectiveness (public read),
+ *         /api/v1/admin/effectiveness (admin CRUD)
+ */
 class InterventionEffectivenessController extends Controller
 {
     /**

@@ -1,4 +1,10 @@
-// Custom edge components for React Flow knowledge graph
+/**
+ * @module edges
+ * Custom React Flow edge components for the knowledge graph.
+ * Three edge types: condition-intervention (evidence-based), intervention-relationship
+ * (synergy/conflict), and generic relationship. The `edgeTypes` export maps edge type
+ * strings (including 'default' and 'smoothstep' fallbacks) to components.
+ */
 import ConditionInterventionEdge from './ConditionInterventionEdge';
 import RelationshipEdge from './RelationshipEdge';
 import InterventionRelationshipEdge from './InterventionRelationshipEdge';

@@ -26,6 +26,21 @@ import { useAuth, ROLES } from '../../contexts/AuthContext';
 import { confirmLogout } from '../../lib/swal';
 import LanguageSwitcher from '../ui/LanguageSwitcher';
 
+/**
+ * Navigation sidebar component with separate mobile and desktop renderings.
+ *
+ * Mobile: Bottom-sheet drawer with categorized nav links, user profile, and logout.
+ * Desktop: Fixed left sidebar with collapsible mode, organized navigation sections,
+ * and a user dropdown at the bottom.
+ *
+ * Navigation items are filtered based on user roles (admin, editor, viewer).
+ *
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the mobile sidebar drawer is visible
+ * @param {boolean} props.isCollapsed - Whether the desktop sidebar is in collapsed (icon-only) mode
+ * @param {Function} props.onClose - Callback to close the mobile sidebar drawer
+ * @returns {React.ReactElement} The sidebar navigation component
+ */
 const Sidebar = ({ isOpen, isCollapsed, onClose }) => {
   const { user, logout, hasRole } = useAuth();
   const navigate = useNavigate();

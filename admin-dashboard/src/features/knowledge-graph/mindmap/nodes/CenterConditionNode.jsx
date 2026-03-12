@@ -3,8 +3,15 @@ import { Handle, Position } from 'reactflow';
 import { AlertCircle, ChevronDown, ChevronRight } from 'lucide-react';
 
 /**
- * Center condition node - the main focus of the mindmap
- * Now with expand/collapse capability
+ * Center condition node -- the root/focus of the mindmap visualization.
+ * Features a prominent red gradient design with pulsing ring animation,
+ * expand/collapse button showing child count, category badge, and
+ * summary preview. Has connection handles on all four sides to support
+ * branches radiating in all directions.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: name/label, category, summary, expanded, expandable, childCount
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const CenterConditionNode = memo(({ data, selected }) => {
   return (

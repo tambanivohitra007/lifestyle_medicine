@@ -15,6 +15,49 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Represents a lifestyle medicine intervention or treatment approach.
+ *
+ * Interventions belong to a care domain (aligned with NEWSTART+ principles) and
+ * can be linked to conditions, scriptures, recipes, EGW references, and evidence
+ * entries. Each intervention may have a protocol with steps, contraindications,
+ * expected outcomes, effectiveness ratings, and relationships with other interventions.
+ *
+ * @property string $id UUID primary key
+ * @property string|null $care_domain_id Foreign key to the care domain
+ * @property string $name The name of the intervention
+ * @property string|null $description Detailed description of the intervention
+ * @property string|null $mechanism How the intervention works mechanistically
+ * @property string|null $snomed_code SNOMED CT clinical terminology code
+ * @property string $status Publishing status (draft, in_review, published, archived)
+ * @property int|null $created_by ID of the user who created this record
+ * @property int|null $updated_by ID of the user who last updated this record
+ * @property int|null $deleted_by ID of the user who deleted this record
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read CareDomain|null $careDomain
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Condition> $conditions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, EvidenceEntry> $evidenceEntries
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentTag> $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Scripture> $scriptures
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Recipe> $recipes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, EgwReference> $egwReferences
+ * @property-read InterventionProtocol|null $protocol
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, InterventionContraindication> $contraindications
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, InterventionOutcome> $outcomes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, InterventionEffectiveness> $effectivenessRatings
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, EvidenceSummary> $evidenceSummaries
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, InterventionRelationship> $relationshipsAsA
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, InterventionRelationship> $relationshipsAsB
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Media> $media
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentRevision> $revisions
+ * @property-read User|null $creator
+ * @property-read User|null $updater
+ * @property-read User|null $deleter
+ * @property-read Media|null $featuredImage
+ */
 class Intervention extends Model
 {
     use HasAuditFields, HasFactory, HasMedia, HasPublishingStatus, HasRevisions, HasUuids, SoftDeletes;
@@ -30,6 +73,8 @@ class Intervention extends Model
 
     /**
      * Get the care domain this intervention belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<CareDomain, $this>
      */
     public function careDomain(): BelongsTo
     {
@@ -38,6 +83,8 @@ class Intervention extends Model
 
     /**
      * Get the conditions this intervention applies to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Condition, $this>
      */
     public function conditions(): BelongsToMany
     {
@@ -56,6 +103,8 @@ class Intervention extends Model
 
     /**
      * Get the evidence entries for this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<EvidenceEntry, $this>
      */
     public function evidenceEntries(): HasMany
     {
@@ -64,6 +113,8 @@ class Intervention extends Model
 
     /**
      * Get the content tags for this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<ContentTag, $this>
      */
     public function tags(): BelongsToMany
     {
@@ -74,6 +125,8 @@ class Intervention extends Model
 
     /**
      * Get the scriptures linked to this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Scripture, $this>
      */
     public function scriptures(): BelongsToMany
     {
@@ -84,6 +137,8 @@ class Intervention extends Model
 
     /**
      * Get the recipes linked to this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Recipe, $this>
      */
     public function recipes(): BelongsToMany
     {
@@ -95,6 +150,8 @@ class Intervention extends Model
 
     /**
      * Get the EGW references linked to this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<EgwReference, $this>
      */
     public function egwReferences(): BelongsToMany
     {
@@ -105,6 +162,8 @@ class Intervention extends Model
 
     /**
      * Get the protocol for this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<InterventionProtocol, $this>
      */
     public function protocol(): HasOne
     {
@@ -113,6 +172,8 @@ class Intervention extends Model
 
     /**
      * Get the contraindications for this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<InterventionContraindication, $this>
      */
     public function contraindications(): HasMany
     {
@@ -121,6 +182,8 @@ class Intervention extends Model
 
     /**
      * Get the expected outcomes for this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<InterventionOutcome, $this>
      */
     public function outcomes(): HasMany
     {
@@ -129,6 +192,8 @@ class Intervention extends Model
 
     /**
      * Get the effectiveness ratings for this intervention across conditions.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<InterventionEffectiveness, $this>
      */
     public function effectivenessRatings(): HasMany
     {
@@ -137,6 +202,8 @@ class Intervention extends Model
 
     /**
      * Get evidence summaries for this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<EvidenceSummary, $this>
      */
     public function evidenceSummaries(): HasMany
     {
@@ -145,6 +212,8 @@ class Intervention extends Model
 
     /**
      * Get relationships where this intervention is the first one.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<InterventionRelationship, $this>
      */
     public function relationshipsAsA(): HasMany
     {
@@ -153,6 +222,8 @@ class Intervention extends Model
 
     /**
      * Get relationships where this intervention is the second one.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<InterventionRelationship, $this>
      */
     public function relationshipsAsB(): HasMany
     {
@@ -161,6 +232,8 @@ class Intervention extends Model
 
     /**
      * Get all relationships involving this intervention.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, InterventionRelationship>
      */
     public function getAllRelationships()
     {
@@ -171,7 +244,9 @@ class Intervention extends Model
     }
 
     /**
-     * Get synergistic interventions.
+     * Get synergistic interventions (those with positive relationships).
+     *
+     * @return \Illuminate\Support\Collection<int, Intervention>
      */
     public function getSynergisticInterventions()
     {
@@ -181,7 +256,9 @@ class Intervention extends Model
     }
 
     /**
-     * Get conflicting interventions.
+     * Get conflicting interventions (those with negative relationships).
+     *
+     * @return \Illuminate\Support\Collection<int, Intervention>
      */
     public function getConflictingInterventions()
     {

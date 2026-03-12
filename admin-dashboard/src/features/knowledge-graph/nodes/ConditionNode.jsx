@@ -2,6 +2,16 @@ import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { AlertCircle } from 'lucide-react';
 
+/**
+ * Custom React Flow node representing a medical condition in the knowledge graph.
+ * Styled with red gradient background and AlertCircle icon.
+ * Supports center node indicator (pulsing dot), search highlight (yellow ring),
+ * and category badge display. Has top (target) and bottom (source) connection handles.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data containing label, category, isCenter, isHighlighted
+ * @param {boolean} props.selected - Whether the node is currently selected
+ */
 const ConditionNode = memo(({ data, selected }) => {
   const isCenter = data.isCenter;
   const isHighlighted = data.isHighlighted;

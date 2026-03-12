@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming EvidenceSummary model instances.
+ *
+ * Includes GRADE quality assessment, recommendation strength, review metadata,
+ * aggregate statistics (total studies/participants), and reviewer information.
+ */
 class EvidenceSummaryResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

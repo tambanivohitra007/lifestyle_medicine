@@ -9,6 +9,15 @@ use App\Services\InfographicGeneratorService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Manages AI-generated infographics for conditions using Vertex AI Imagen.
+ *
+ * Supports generating overview, risk factor, and lifestyle solution infographics
+ * per condition. Provides status checking, retry for failures, and listing
+ * of generated infographic media.
+ *
+ * Routes: /api/v1/admin/conditions/{condition}/infographics/* (admin only)
+ */
 class InfographicController extends Controller
 {
     public function __construct(

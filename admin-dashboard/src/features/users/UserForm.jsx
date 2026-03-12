@@ -6,6 +6,11 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Standalone form for creating or editing a user account. Fields include name,
+ * email, password (with confirmation), role selector (admin/editor/viewer), and
+ * active status toggle. Password fields are optional when editing an existing user.
+ */
 const UserForm = () => {
   const { t } = useTranslation(['users', 'common']);
   const { id } = useParams();

@@ -3,7 +3,15 @@ import { Handle, Position } from 'reactflow';
 import { Stethoscope, ChefHat, FileCheck } from 'lucide-react';
 
 /**
- * Intervention node for mindmap - shows name, brief description, and linked content counts
+ * Non-expandable intervention node for the mindmap. Displays intervention name,
+ * truncated description (60 chars), evidence strength badge, and counts for
+ * linked recipes and evidence entries. Used for leaf-level interventions that
+ * don't need expand/collapse behavior.
+ * Left (target) and right (source) handles for horizontal mindmap connections.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: name/label, description, color, strengthOfEvidence, recipes[], evidenceCount
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const InterventionMindmapNode = memo(({ data, selected }) => {
   const color = data.color || '#f43f5e';

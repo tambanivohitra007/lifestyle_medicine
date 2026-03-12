@@ -13,6 +13,23 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+/**
+ * Asynchronous job for generating medical infographic images via Vertex AI Imagen.
+ *
+ * Processes infographic generation requests dispatched by InfographicGeneratorService.
+ * For each request, this job:
+ * 1. Generates an image from the pre-architected prompt using ImagenService
+ * 2. Saves the base64-encoded image to public storage under infographics/{condition_id}/
+ * 3. Creates a Media record linking the image to the condition
+ * 4. Updates the InfographicGenerationRequest with completion or failure status
+ *
+ * Configured with 3 retry attempts, 2-minute timeout, and 30-second backoff.
+ *
+ * @see \App\Services\InfographicGeneratorService The orchestrator that dispatches this job
+ * @see \App\Services\ImagenService The image generation service this job calls
+ * @see \App\Models\InfographicGenerationRequest The request model tracking job status
+ * @see \App\Models\Media The polymorphic media model for storing generated images
+ */
 class GenerateInfographicJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -34,13 +51,24 @@ class GenerateInfographicJob implements ShouldQueue
 
     /**
      * Create a new job instance.
+     *
+     * @param  InfographicGenerationRequest  $request  The generation request containing the prompt and parameters
      */
     public function __construct(
         public InfographicGenerationRequest $request
     ) {}
 
     /**
-     * Execute the job.
+     * Execute the job to generate an infographic image.
+     *
+     * Calls ImagenService to generate the image, saves it to storage, creates a Media
+     * record, and updates the request status. On failure with remaining retries, the
+     * job is released back to the queue with a 30-second backoff.
+     *
+     * @param  ImagenService  $imagenService  The Imagen service (injected by the container)
+     * @return void
+     *
+     * @throws \Exception When image generation or storage fails (caught internally for retry logic)
      */
     public function handle(ImagenService $imagenService): void
     {
@@ -123,7 +151,12 @@ class GenerateInfographicJob implements ShouldQueue
     }
 
     /**
-     * Get alt text for the generated image.
+     * Get accessibility alt text for the generated infographic image.
+     *
+     * Constructs a descriptive alt text combining the infographic type label
+     * and condition name (e.g., "Overview infographic for Hypertension").
+     *
+     * @return string The alt text string
      */
     protected function getAltText(): string
     {
@@ -135,7 +168,9 @@ class GenerateInfographicJob implements ShouldQueue
     }
 
     /**
-     * Get caption for the generated image.
+     * Get a display caption for the generated infographic image.
+     *
+     * @return string The caption string (e.g., "AI-generated Overview")
      */
     protected function getCaption(): string
     {
@@ -146,7 +181,13 @@ class GenerateInfographicJob implements ShouldQueue
     }
 
     /**
-     * Handle a job failure.
+     * Handle a permanent job failure after all retry attempts are exhausted.
+     *
+     * Called by the queue worker when the job has failed on all attempts.
+     * Marks the InfographicGenerationRequest as failed with the exception message.
+     *
+     * @param  \Throwable  $exception  The exception that caused the final failure
+     * @return void
      */
     public function failed(\Throwable $exception): void
     {

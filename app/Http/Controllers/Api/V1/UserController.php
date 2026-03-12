@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * Manages user accounts for the platform (admin only).
+ *
+ * Provides CRUD operations for users with role assignment (admin, editor, viewer),
+ * active status toggling, and soft-delete with restore capability.
+ * Includes self-deletion and self-deactivation prevention.
+ *
+ * Routes: /api/v1/admin/users (admin only)
+ */
 class UserController extends Controller
 {
     /**

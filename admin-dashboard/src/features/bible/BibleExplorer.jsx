@@ -68,6 +68,12 @@ const highlightSearchTerm = (text, searchTerm) => {
   );
 };
 
+/**
+ * Interactive Bible explorer for browsing scripture by book, chapter, and verse.
+ * Features health-themed scripture collections, full chapter reading via Bible API,
+ * verse search, copy-to-clipboard, and integration to link verses to conditions.
+ * Supports URL parameters for deep-linking to specific book/chapter views.
+ */
 const BibleExplorer = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('themes');

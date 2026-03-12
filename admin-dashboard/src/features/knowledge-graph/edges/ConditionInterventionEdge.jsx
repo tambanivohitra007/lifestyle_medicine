@@ -46,6 +46,19 @@ const EFFECTIVENESS_CONFIG = {
   uncertain: { label: 'Uncertain', color: '#64748b', bg: 'bg-slate-100', icon: '?' },
 };
 
+/**
+ * Custom React Flow edge for condition-to-intervention relationships.
+ * Encodes evidence strength (high/moderate/emerging/insufficient), recommendation
+ * level (core/adjunct/optional), and effectiveness rating with color-coded styling.
+ *
+ * High-strength or very-high-effectiveness edges show animated dashed overlays.
+ * Primary interventions get a wider glow stroke and a star indicator.
+ * Hover tooltip displays full relationship details including evidence grade,
+ * recommendation level, effectiveness rating, and clinical notes.
+ *
+ * @param {Object} props - React Flow edge props
+ * @param {Object} props.data - Edge data: strengthOfEvidence, recommendationLevel, clinicalNotes, effectiveness
+ */
 const ConditionInterventionEdge = memo(({
   id,
   sourceX,

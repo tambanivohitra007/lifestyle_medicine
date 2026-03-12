@@ -45,8 +45,16 @@ const DOMAIN_ICONS = {
 };
 
 /**
- * Master Node - Level 1 expandable category node
- * Shows category name, count badge, and expand/collapse button
+ * Master Node -- Level 1 expandable category node in the expandable mindmap.
+ * Represents either a condition section (risk factors, complications, etc.) or a
+ * solution care domain. Shows category icon, label, child count badge, and
+ * an expand/collapse chevron button. When expanded, shows a ring indicator.
+ * For solution categories, also displays intervention count sub-badge.
+ * Left (target) and right (source) handles for horizontal mindmap connections.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: label, color, icon, childCount, expandable, expanded, nodeCategory, interventionCount
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const MasterNode = memo(({ data, selected }) => {
   const color = data.color || '#6b7280';

@@ -42,6 +42,11 @@ const STUDY_TYPE_KEYS = {
   expert_opinion: 'evidence:studyTypes.expertOpinion',
 };
 
+/**
+ * Detailed view of an intervention with tabbed sections for protocols, evidence,
+ * linked conditions, media, and revision history. Supports publishing workflow
+ * actions, protocol management, evidence attachment, and media uploads.
+ */
 const InterventionDetail = () => {
   const { t } = useTranslation(['interventions', 'evidence', 'conditions', 'common']);
   const { id } = useParams();

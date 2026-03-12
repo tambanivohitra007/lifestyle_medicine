@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming BodySystem model instances.
+ *
+ * Includes system metadata (name, slug, SNOMED code, icon, color),
+ * nested condition categories, and conditions count.
+ */
 class BodySystemResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

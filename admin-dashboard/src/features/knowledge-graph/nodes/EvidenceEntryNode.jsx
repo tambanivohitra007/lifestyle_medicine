@@ -19,6 +19,18 @@ const STUDY_TYPE_KEYS = {
   expert_opinion: 'knowledgeGraph:studyTypes.expertOpinion',
 };
 
+/**
+ * Custom React Flow node representing a research evidence entry.
+ * Styled with emerald gradient background and FileCheck icon.
+ * Displays translated study type label, quality rating badge (A-D with
+ * color-coded indicators), and population text. Quality grades map to
+ * green (A), blue (B), yellow (C), and red (D).
+ * Has top (target) and bottom (source) connection handles.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data containing label, studyType, qualityRating, population, isHighlighted
+ * @param {boolean} props.selected - Whether the node is currently selected
+ */
 const EvidenceEntryNode = memo(({ data, selected }) => {
   const { t } = useTranslation(['knowledgeGraph']);
   const quality = QUALITY_COLORS[data.qualityRating] || QUALITY_COLORS.C;

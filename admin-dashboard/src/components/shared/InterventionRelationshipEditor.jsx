@@ -35,6 +35,18 @@ const RELATIONSHIP_ICONS = {
   conflict: Shield,
 };
 
+/**
+ * CRUD editor for intervention-to-intervention relationships (Knowledge Graph feature).
+ * Manages synergy, complementary, neutral, caution, and conflict relationships
+ * between pairs of interventions, with optional description and clinical notes.
+ *
+ * Supports filtering by relationship type (synergies, conflicts, or all).
+ *
+ * @param {Object} props
+ * @param {string} [props.interventionId] - UUID of the context intervention (one side of the relationship)
+ * @param {Array<Object>} [props.interventions=[]] - Available interventions for dropdown selection
+ * @returns {React.ReactElement} The intervention relationship editor component
+ */
 const InterventionRelationshipEditor = ({
   interventionId,
   interventions = [],

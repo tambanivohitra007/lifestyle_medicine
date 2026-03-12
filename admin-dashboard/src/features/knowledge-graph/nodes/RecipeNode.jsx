@@ -2,6 +2,16 @@ import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { ChefHat } from 'lucide-react';
 
+/**
+ * Custom React Flow node representing a therapeutic recipe.
+ * Styled with amber gradient background and ChefHat icon.
+ * Displays up to 3 dietary tag badges with overflow count.
+ * Has top (target) and bottom (source) connection handles.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data containing label, dietaryTags[], isHighlighted
+ * @param {boolean} props.selected - Whether the node is currently selected
+ */
 const RecipeNode = memo(({ data, selected }) => {
   const tags = data.dietaryTags || [];
   const isHighlighted = data.isHighlighted;

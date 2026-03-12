@@ -10,6 +10,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
+/**
+ * Handles bulk data import from CSV/Excel files.
+ *
+ * Supports importing conditions and interventions from uploaded spreadsheets
+ * using the Maatwebsite Excel package. Also provides template downloads.
+ *
+ * Routes: /api/v1/admin/import/* (admin only)
+ */
 class ImportController extends Controller
 {
     /**

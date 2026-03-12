@@ -81,6 +81,23 @@ const RECOMMENDATION_OPTIONS = [
   { value: 'optional', label: 'Optional', color: 'bg-slate-100 text-slate-600 ring-slate-300' },
 ];
 
+/**
+ * Multi-purpose modal for searching and attaching related entities to a condition.
+ * Supports attaching interventions, scriptures, recipes, and EGW references.
+ *
+ * Features: debounced search, category/domain filtering, single-item selection,
+ * and optional intervention mapping form (evidence strength + recommendation level).
+ *
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the modal is visible
+ * @param {Function} props.onClose - Callback to close the modal
+ * @param {string} props.entityType - Type of entity to attach: 'interventions', 'scriptures', 'recipes', or 'egw-references'
+ * @param {string} props.conditionId - UUID of the condition to attach to
+ * @param {Array<string>} [props.excludeIds=[]] - UUIDs of already-attached items to exclude from results
+ * @param {Function} [props.onAttach] - Callback after successful attachment, receives (selectedItem, mappingData?)
+ * @param {boolean} [props.showMappingForm=false] - Whether to show the intervention mapping form after selection
+ * @returns {React.ReactElement|null} The attach modal or null if entity type is invalid
+ */
 const QuickAttachModal = ({
   isOpen,
   onClose,

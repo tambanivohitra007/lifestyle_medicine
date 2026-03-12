@@ -6,6 +6,11 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Page for attaching a scripture reference to a condition.
+ * Displays a filterable grid of available (unlinked) scriptures with theme filtering.
+ * Features a sticky bottom action bar on mobile for the selected scripture.
+ */
 const AttachScripture = () => {
   const { t } = useTranslation(['conditions', 'common', 'scriptures']);
   const { id: conditionId } = useParams();

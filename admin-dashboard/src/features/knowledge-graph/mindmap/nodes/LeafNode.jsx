@@ -17,8 +17,16 @@ const CATEGORY_ICONS = {
 };
 
 /**
- * Leaf Node - Non-expandable terminal node
- * Used for section items, recipes, scriptures, EGW references
+ * Leaf Node -- generic non-expandable terminal node used across the mindmap.
+ * Renders differently based on nodeCategory: section items, recipes, scriptures,
+ * or EGW references, each with their own icon and subtitle logic.
+ * Shows a truncated label (35 chars) and a small info icon indicator when
+ * the node has detailed content (body, text, quote, or description) to view.
+ * Target handle on left for incoming connections from parent nodes.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: label, color, nodeCategory, sectionLabel, dietaryTags, theme, book, body/text/quote/description
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const LeafNode = memo(({ data, selected }) => {
   const color = data.color || '#6b7280';

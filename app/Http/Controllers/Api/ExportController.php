@@ -14,6 +14,15 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * Handles data export in multiple formats: PDF, CSV, and FHIR R4.
+ *
+ * Provides condition treatment guides as PDF, recipe cards as PDF,
+ * evidence/references as CSV, and FHIR R4-compliant PlanDefinition
+ * and ActivityDefinition resources for healthcare interoperability.
+ *
+ * Routes: /api/v1/export/* (public, rate-limited to 10/min)
+ */
 class ExportController extends Controller
 {
     /**

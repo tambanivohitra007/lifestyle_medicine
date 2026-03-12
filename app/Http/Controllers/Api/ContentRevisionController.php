@@ -13,6 +13,15 @@ use App\Models\Scripture;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
+/**
+ * Manages content revision history for versioned entities.
+ *
+ * Provides version listing, detail viewing, restoration to previous versions,
+ * and diff comparison between two revisions. Supports conditions, interventions,
+ * recipes, scriptures, and EGW references.
+ *
+ * Routes: /api/v1/admin/revisions/* (admin/editor)
+ */
 class ContentRevisionController extends Controller
 {
     private array $modelMap = [
@@ -23,6 +32,15 @@ class ContentRevisionController extends Controller
         'egw-references' => EgwReference::class,
     ];
 
+    /**
+     * List all revisions for a specific entity, newest first.
+     *
+     * GET /api/v1/admin/revisions/{type}/{id}
+     *
+     * @param  string  $type  Entity type slug: conditions, interventions, recipes, scriptures, egw-references
+     * @param  string  $id    Entity UUID
+     * @return AnonymousResourceCollection Paginated collection of ContentRevisionResource
+     */
     public function index(string $type, string $id): AnonymousResourceCollection
     {
         $modelClass = $this->getModelClass($type);
@@ -36,6 +54,14 @@ class ContentRevisionController extends Controller
         return ContentRevisionResource::collection($revisions);
     }
 
+    /**
+     * Display a single revision with its full data snapshot.
+     *
+     * GET /api/v1/admin/revisions/detail/{revision}
+     *
+     * @param  ContentRevision  $revision  Route-model bound revision instance
+     * @return ContentRevisionResource
+     */
     public function show(ContentRevision $revision): ContentRevisionResource
     {
         $revision->load('creator');
@@ -43,6 +69,16 @@ class ContentRevisionController extends Controller
         return new ContentRevisionResource($revision);
     }
 
+    /**
+     * Restore an entity to a previous revision's state.
+     *
+     * POST /api/v1/admin/revisions/{type}/{id}/restore/{revision}
+     *
+     * @param  string           $type      Entity type slug
+     * @param  string           $id        Entity UUID
+     * @param  ContentRevision  $revision  The revision to restore to
+     * @return JsonResponse Success message with version number
+     */
     public function restore(string $type, string $id, ContentRevision $revision): JsonResponse
     {
         $modelClass = $this->getModelClass($type);
@@ -58,6 +94,15 @@ class ContentRevisionController extends Controller
         return response()->json(['message' => 'Restored to version '.$revision->version_number]);
     }
 
+    /**
+     * Compare two revisions of the same entity and return a field-by-field diff.
+     *
+     * GET /api/v1/admin/revisions/compare/{revisionA}/{revisionB}
+     *
+     * @param  ContentRevision  $revisionA  First revision to compare
+     * @param  ContentRevision  $revisionB  Second revision to compare
+     * @return JsonResponse Diff showing changed fields with old/new values
+     */
     public function compare(ContentRevision $revisionA, ContentRevision $revisionB): JsonResponse
     {
         // Ensure both revisions are for the same entity
@@ -85,6 +130,14 @@ class ContentRevisionController extends Controller
         ]);
     }
 
+    /**
+     * Resolve entity type slug to its Eloquent model class.
+     *
+     * @param  string  $type  Entity type slug (conditions, interventions, etc.)
+     * @return string Fully qualified model class name
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException If type is unknown
+     */
     private function getModelClass(string $type): string
     {
         if (! isset($this->modelMap[$type])) {
@@ -94,6 +147,16 @@ class ContentRevisionController extends Controller
         return $this->modelMap[$type];
     }
 
+    /**
+     * Compute a field-by-field diff between two revision data snapshots.
+     *
+     * Skips internal fields (id, timestamps, audit columns) and returns
+     * only fields where values differ.
+     *
+     * @param  array  $dataA  Data snapshot from revision A
+     * @param  array  $dataB  Data snapshot from revision B
+     * @return array Associative array of changed fields with 'old' and 'new' values
+     */
     private function computeDiff(array $dataA, array $dataB): array
     {
         $changes = [];

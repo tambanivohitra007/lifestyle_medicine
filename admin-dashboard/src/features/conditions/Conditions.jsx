@@ -14,6 +14,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 import ConditionDetailSlideOver from './components/ConditionDetailSlideOver';
 
+/**
+ * Conditions list page with search, category/status filtering, sorting, pagination,
+ * and multiple view modes (grid, list, table). Supports inline create/edit via SlideOver
+ * panel and detail viewing via ConditionDetailSlideOver. Includes PDF export.
+ */
 const Conditions = () => {
   const { t } = useTranslation(['conditions', 'common']);
   const { canEdit } = useAuth();

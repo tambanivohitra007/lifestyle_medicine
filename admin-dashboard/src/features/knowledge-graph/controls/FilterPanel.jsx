@@ -1,6 +1,7 @@
 import { Filter, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/** @constant {Array<{type: string, labelKey: string, color: string}>} Configuration for all filterable node types with their display colors */
 const NODE_TYPE_CONFIG = [
   { type: 'condition', labelKey: 'knowledgeGraph:nodeTypes.conditions', color: '#ef4444' },
   { type: 'intervention', labelKey: 'knowledgeGraph:nodeTypes.interventions', color: '#f43f5e' },
@@ -12,6 +13,17 @@ const NODE_TYPE_CONFIG = [
   { type: 'reference', labelKey: 'knowledgeGraph:nodeTypes.references', color: '#64748b' },
 ];
 
+/**
+ * Filter panel for toggling visibility of node types in the knowledge graph.
+ * Displays a list of all node types with color indicators and eye icons
+ * showing current visibility state. Includes "Show All" / "Hide All" buttons.
+ *
+ * @param {Object} props
+ * @param {string[]} props.hiddenTypes - Array of currently hidden node type strings
+ * @param {Function} props.onToggleType - Callback to toggle a single type's visibility
+ * @param {Function} props.onShowAll - Callback to show all node types
+ * @param {Function} props.onHideAll - Callback to hide all node types
+ */
 const FilterPanel = ({ hiddenTypes = [], onToggleType, onShowAll, onHideAll }) => {
   const { t } = useTranslation(['knowledgeGraph']);
   const visibleCount = NODE_TYPE_CONFIG.length - hiddenTypes.length;

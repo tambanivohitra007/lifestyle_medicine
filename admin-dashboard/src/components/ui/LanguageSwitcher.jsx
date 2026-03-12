@@ -2,6 +2,15 @@ import { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 
+/**
+ * Language selection dropdown with multiple visual variants for different placement contexts.
+ * Displays a globe icon with the current language code and a dropdown of available languages.
+ *
+ * @param {Object} props
+ * @param {string} [props.variant='default'] - Visual variant: 'default', 'header', 'sidebar', or 'mobile'
+ * @param {boolean} [props.showLabel=true] - Whether to show the language code and chevron next to the icon
+ * @returns {React.ReactElement} The language switcher dropdown
+ */
 const LanguageSwitcher = ({ variant = 'default', showLabel = true }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);

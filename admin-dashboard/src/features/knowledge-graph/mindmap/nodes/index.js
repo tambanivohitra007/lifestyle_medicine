@@ -1,4 +1,10 @@
-// Import all mindmap node components
+/**
+ * @module mindmap/nodes
+ * Custom React Flow node components for the condition mindmap visualization.
+ * Includes both mindmap-specific nodes (CenterCondition, MasterNode, LeafNode, etc.)
+ * and re-used nodes from the parent knowledge graph (Scripture, Recipe, EgwReference).
+ * The `mindmapNodeTypes` export is passed to React Flow's nodeTypes prop.
+ */
 import CenterConditionNode from './CenterConditionNode';
 import BranchLabelNode from './BranchLabelNode';
 import RiskFactorNode from './RiskFactorNode';

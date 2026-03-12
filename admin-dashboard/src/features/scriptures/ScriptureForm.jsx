@@ -6,6 +6,11 @@ import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AiSuggestions from '../../components/shared/AiSuggestions';
 
+/**
+ * Standalone form for creating or editing a scripture entry. Includes Bible reference,
+ * text, theme selection with autocomplete from existing themes, content tag management
+ * with search/create, and AI suggestion integration for discovering relevant verses.
+ */
 const ScriptureForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();

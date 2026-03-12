@@ -24,7 +24,15 @@ const DOMAIN_ICONS = {
 };
 
 /**
- * Solution category node - represents a care domain branch
+ * Solution category node -- represents a NEWSTART+ care domain branch in the mindmap.
+ * Displays domain icon (mapped from slug), name, total item count, and stats badges
+ * for interventions, scriptures, and EGW references. Uses domain-specific icons
+ * (Utensils for nutrition, Dumbbell for exercise, Droplets for hydrotherapy, etc.).
+ * Has handles on all four sides for flexible connection routing.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: name, color, interventionCount, scriptureCount, egwCount
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const SolutionCategoryNode = memo(({ data, selected }) => {
   const domainSlug = data.name?.toLowerCase().replace(/\s+/g, '-') || '';

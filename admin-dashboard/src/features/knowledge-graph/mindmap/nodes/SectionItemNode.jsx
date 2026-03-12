@@ -3,7 +3,15 @@ import { Handle, Position } from 'reactflow';
 import { FileText } from 'lucide-react';
 
 /**
- * Section item node - individual section items (e.g., specific risk factor, complication)
+ * Section item node -- a leaf node representing an individual item within a condition
+ * section (e.g., a specific risk factor, complication, or physiological detail).
+ * Displays a truncated title (40 chars) with a section label subtitle.
+ * Shows a blue dot indicator when the item has detailed body content to view.
+ * Target handle on left for connections from the section branch.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: title, color, sectionLabel, body
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const SectionItemNode = memo(({ data, selected }) => {
   const color = data.color || '#6b7280';

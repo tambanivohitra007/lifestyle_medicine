@@ -9,7 +9,15 @@ const LIKELIHOOD_LABELS = {
 };
 
 /**
- * Complication node
+ * Mindmap node representing a medical complication of the center condition.
+ * Displays complication name, likelihood label (common/occasional/rare),
+ * and metadata badges for timeframe, preventability, and linked conditions.
+ * Color-coded by likelihood severity. Target handle on top for connections
+ * from the complications branch.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: name, color, likelihood, timeframe, preventable, linkedConditionId
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const ComplicationNode = memo(({ data, selected }) => {
   const color = data.color || data.likelihoodColor || '#dc2626';

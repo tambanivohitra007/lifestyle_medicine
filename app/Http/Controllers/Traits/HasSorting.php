@@ -4,6 +4,13 @@ namespace App\Http\Controllers\Traits;
 
 use Illuminate\Http\Request;
 
+/**
+ * Provides reusable query sorting functionality for API controllers.
+ *
+ * Extracts sort_by and sort_order parameters from the request,
+ * validates them against an allowlist of permitted columns (to prevent
+ * SQL injection), and applies the ordering to the Eloquent query builder.
+ */
 trait HasSorting
 {
     /**

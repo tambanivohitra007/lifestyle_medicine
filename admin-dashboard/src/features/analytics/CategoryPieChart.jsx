@@ -3,6 +3,14 @@ import { useTranslation } from 'react-i18next';
 
 const COLORS = ['#d31e3a', '#243b53', '#10b981', '#f59e0b', '#8b5cf6', '#6b7280', '#06b6d4', '#ec4899'];
 
+/**
+ * Pie chart visualization of conditions grouped by category using Recharts.
+ * Shows percentage labels and a custom tooltip with condition counts.
+ *
+ * @param {Object} props
+ * @param {Array|null} props.data - Array of {category, count} objects
+ * @param {boolean} props.loading - Whether data is still being fetched
+ */
 const CategoryPieChart = ({ data, loading }) => {
   const { t } = useTranslation(['analytics']);
   if (loading) {

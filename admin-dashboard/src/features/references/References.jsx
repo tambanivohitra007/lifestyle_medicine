@@ -7,6 +7,11 @@ import Pagination from '../../components/ui/Pagination';
 import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 
+/**
+ * References management page with search, year filtering, and pagination.
+ * Uses a SlideOver panel for inline create/edit of reference entries (citation,
+ * DOI, PMID, URL, year). Supports CSV export and delete with confirmation.
+ */
 const References = () => {
   const { t } = useTranslation(['references', 'common']);
   const { canEdit } = useAuth();

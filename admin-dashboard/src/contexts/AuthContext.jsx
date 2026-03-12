@@ -1,18 +1,47 @@
 import { createContext, useState, useContext, useEffect, useMemo, useCallback, useRef } from 'react';
 
+/**
+ * React context for authentication state management.
+ * Provides user data, token, role helpers, and session timeout handling.
+ * @type {React.Context<AuthContextValue|undefined>}
+ */
 const AuthContext = createContext();
 
-// Role constants
+/**
+ * Enumeration of available user roles in the application.
+ * @enum {string}
+ */
 export const ROLES = {
   ADMIN: 'admin',
   EDITOR: 'editor',
   VIEWER: 'viewer',
 };
 
-// Session timeout configuration (in milliseconds)
+/** @constant {number} SESSION_TIMEOUT - Session timeout duration in milliseconds (30 minutes of inactivity). */
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes of inactivity
+
+/** @constant {string[]} ACTIVITY_EVENTS - DOM events that reset the inactivity timeout. */
 const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'scroll', 'touchstart'];
 
+/**
+ * Custom hook to access the authentication context.
+ * Must be used within an AuthProvider.
+ *
+ * @returns {AuthContextValue} The authentication context value containing:
+ *   - user {Object|null} - The authenticated user object
+ *   - token {string|null} - The bearer auth token
+ *   - login {Function} - Stores token/user and starts session
+ *   - updateUser {Function} - Updates the stored user data
+ *   - logout {Function} - Clears auth state and session
+ *   - isAuthenticated {boolean} - Whether a token exists
+ *   - loading {boolean} - Whether initial auth check is in progress
+ *   - isAdmin {boolean} - Whether the user has the admin role
+ *   - isEditor {boolean} - Whether the user has the editor role
+ *   - isViewer {boolean} - Whether the user has the viewer role
+ *   - canEdit {boolean} - Whether the user can edit (admin or editor)
+ *   - hasRole {Function} - Checks if user has one of the specified roles
+ * @throws {Error} If used outside of an AuthProvider
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -21,6 +50,17 @@ export const useAuth = () => {
   return context;
 };
 
+/**
+ * Authentication provider component that manages user sessions, token storage,
+ * and automatic session timeout after 30 minutes of inactivity.
+ *
+ * Stores auth state in localStorage and listens for user activity events
+ * to reset the inactivity timer. On timeout, redirects to login.
+ *
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Child components to wrap
+ * @returns {React.ReactElement} Provider wrapping children with auth context
+ */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('auth_token'));
@@ -121,6 +161,11 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  /**
+   * Stores authentication credentials and starts a new session.
+   * @param {string} newToken - The bearer auth token
+   * @param {Object} userData - The user profile data
+   */
   const login = (newToken, userData) => {
     localStorage.setItem('auth_token', newToken);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -129,6 +174,10 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
+  /**
+   * Updates the stored user data without changing the token.
+   * @param {Object} userData - The updated user profile data
+   */
   const updateUser = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
@@ -140,7 +189,11 @@ export const AuthProvider = ({ children }) => {
   const isViewer = useMemo(() => user?.role === ROLES.VIEWER, [user?.role]);
   const canEdit = useMemo(() => isAdmin || isEditor, [isAdmin, isEditor]);
 
-  // Check if user has one of the specified roles
+  /**
+   * Checks if the current user has one of the specified roles.
+   * @param {string|string[]} roles - A single role string or array of role strings
+   * @returns {boolean} True if user's role matches any of the specified roles
+   */
   const hasRole = (roles) => {
     if (!user?.role) return false;
     if (Array.isArray(roles)) {

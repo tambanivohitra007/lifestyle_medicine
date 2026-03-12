@@ -7,10 +7,21 @@ use App\Services\GeminiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Provides AI-powered suggestions for Scripture and EGW references.
+ *
+ * Uses Google Gemini to suggest relevant Bible verses and Ellen G. White
+ * quotes based on a given health topic and optional context.
+ *
+ * Routes: /api/v1/admin/ai/suggest-* (admin/editor, rate-limited)
+ */
 class AiSuggestionController extends Controller
 {
     protected GeminiService $geminiService;
 
+    /**
+     * @param  GeminiService  $geminiService  Injected Gemini AI service
+     */
     public function __construct(GeminiService $geminiService)
     {
         $this->geminiService = $geminiService;

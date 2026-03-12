@@ -2,6 +2,16 @@ import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { BookOpen } from 'lucide-react';
 
+/**
+ * Custom React Flow node representing a Bible scripture reference.
+ * Styled with indigo gradient background and BookOpen icon.
+ * Displays theme badge and a truncated text preview of the verse.
+ * Has top (target) and bottom (source) connection handles.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data containing label, theme, text, isHighlighted
+ * @param {boolean} props.selected - Whether the node is currently selected
+ */
 const ScriptureNode = memo(({ data, selected }) => {
   const isHighlighted = data.isHighlighted;
 

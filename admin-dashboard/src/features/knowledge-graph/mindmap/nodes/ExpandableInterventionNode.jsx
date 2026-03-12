@@ -3,7 +3,15 @@ import { Handle, Position } from 'reactflow';
 import { Stethoscope, ChevronRight, ChevronDown, ChefHat, FileCheck } from 'lucide-react';
 
 /**
- * Expandable Intervention Node - Shows intervention with expand capability for recipes
+ * Expandable intervention node for the mindmap. Shows intervention name,
+ * truncated description (50 chars), evidence strength badge, recipe count,
+ * and evidence count indicators. Features an expand/collapse button at the
+ * bottom that reveals linked recipe child nodes when expanded.
+ * Left (target) and right (source) handles for horizontal mindmap connections.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: name/label, description, color, strengthOfEvidence, childCount, evidenceCount, expandable, expanded
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const ExpandableInterventionNode = memo(({ data, selected }) => {
   const color = data.color || '#f43f5e';

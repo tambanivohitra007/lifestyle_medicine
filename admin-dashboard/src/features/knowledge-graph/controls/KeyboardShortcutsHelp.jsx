@@ -14,6 +14,11 @@ const SHORTCUTS_CONFIG = [
   { keys: ['Esc'], descriptionKey: 'knowledgeGraph:shortcuts.clearSelection' },
 ];
 
+/**
+ * Collapsible help panel displaying available keyboard shortcuts for the knowledge graph.
+ * Renders as a small keyboard icon button when collapsed, and expands to show
+ * a full list of shortcuts with their key combinations.
+ */
 const KeyboardShortcutsHelp = () => {
   const { t } = useTranslation(['knowledgeGraph']);
   const [isOpen, setIsOpen] = useState(false);

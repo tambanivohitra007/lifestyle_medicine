@@ -1,6 +1,12 @@
 import { Code2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Application footer displaying copyright information and developer attribution.
+ * Renders the current year dynamically and links to the developer website.
+ *
+ * @returns {React.ReactElement} The footer component
+ */
 const Footer = () => {
   const { t } = useTranslation('navigation');
   const currentYear = new Date().getFullYear();

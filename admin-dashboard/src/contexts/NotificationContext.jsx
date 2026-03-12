@@ -1,24 +1,58 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
+/**
+ * React context for in-app notification management.
+ * Provides state and methods for adding, reading, and clearing notifications.
+ * Notifications are persisted in localStorage (up to 20 items).
+ * @type {React.Context<NotificationContextValue|null>}
+ */
 const NotificationContext = createContext(null);
 
-// Notification types
+/**
+ * Enumeration of notification categories.
+ * @enum {string}
+ */
 export const NOTIFICATION_TYPES = {
   AI_GENERATION: 'ai_generation',
   IMPORT: 'import',
   SYSTEM: 'system',
 };
 
-// Notification status
+/**
+ * Enumeration of notification status levels.
+ * @enum {string}
+ */
 export const NOTIFICATION_STATUS = {
   SUCCESS: 'success',
   ERROR: 'error',
   INFO: 'info',
 };
 
+/** @constant {string} STORAGE_KEY - localStorage key for persisted notifications. */
 const STORAGE_KEY = 'app_notifications';
+
+/** @constant {number} MAX_NOTIFICATIONS - Maximum number of notifications kept in storage. */
 const MAX_NOTIFICATIONS = 20;
 
+/**
+ * Notification provider component that manages a list of in-app notifications.
+ * Persists notifications to localStorage and provides methods for CRUD operations.
+ *
+ * Provides via context:
+ *   - notifications {Array} - All notification objects
+ *   - unreadCount {number} - Count of unread notifications
+ *   - addNotification {Function} - Add a new notification
+ *   - markAsRead {Function} - Mark a single notification as read
+ *   - markAllAsRead {Function} - Mark all notifications as read
+ *   - removeNotification {Function} - Remove a single notification
+ *   - clearAll {Function} - Remove all notifications
+ *   - notifyAiGeneration {Function} - Helper for AI generation notifications
+ *   - notifyImport {Function} - Helper for import notifications
+ *
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Child components to wrap
+ * @returns {React.ReactElement} Provider wrapping children with notification context
+ */
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -141,6 +175,13 @@ export const NotificationProvider = ({ children }) => {
   );
 };
 
+/**
+ * Custom hook to access the notification context.
+ * Must be used within a NotificationProvider.
+ *
+ * @returns {NotificationContextValue} The notification context value
+ * @throws {Error} If used outside of a NotificationProvider
+ */
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
   if (!context) {

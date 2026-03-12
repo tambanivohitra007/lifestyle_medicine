@@ -11,10 +11,25 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages Bible scripture references linked to health conditions.
+ *
+ * Provides CRUD operations for scriptures with theme-based organization,
+ * content tag management, and publishing workflow support.
+ *
+ * Routes: /api/v1/scriptures (public), /api/v1/admin/scriptures (admin)
+ */
 class ScriptureController extends Controller
 {
     use HasSorting;
 
+    /**
+     * Get a list of unique scripture themes for filtering.
+     *
+     * GET /api/v1/scriptures/themes
+     *
+     * @return JsonResponse Array of distinct theme strings
+     */
     public function themes(): JsonResponse
     {
         $themes = Scripture::whereNotNull('theme')
@@ -26,6 +41,17 @@ class ScriptureController extends Controller
         return response()->json(['data' => $themes]);
     }
 
+    /**
+     * List all scriptures with optional filtering, search, and sorting.
+     *
+     * Admin/editor users can filter by publishing status; public users see only published.
+     * Supports theme filtering, tag_id filtering, and search by reference/text/theme.
+     *
+     * GET /api/v1/scriptures
+     *
+     * @param  Request  $request  Query params: status, theme, tag_id, search, sort_by, sort_order
+     * @return AnonymousResourceCollection Paginated collection of ScriptureResource (20 per page)
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Scripture::with('tags');
@@ -67,6 +93,14 @@ class ScriptureController extends Controller
         return ScriptureResource::collection($scriptures);
     }
 
+    /**
+     * Display a single scripture with its related data.
+     *
+     * GET /api/v1/scriptures/{scripture}
+     *
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return ScriptureResource
+     */
     public function show(Scripture $scripture): ScriptureResource
     {
         $user = auth('sanctum')->user();
@@ -79,6 +113,14 @@ class ScriptureController extends Controller
         return new ScriptureResource($scripture);
     }
 
+    /**
+     * Publish a scripture.
+     *
+     * POST /api/v1/admin/scriptures/{scripture}/publish (admin only)
+     *
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return JsonResponse Success message
+     */
     public function publish(Scripture $scripture): JsonResponse
     {
         $scripture->publish();
@@ -86,6 +128,14 @@ class ScriptureController extends Controller
         return response()->json(['message' => 'Scripture published successfully']);
     }
 
+    /**
+     * Submit a scripture for editorial review.
+     *
+     * POST /api/v1/admin/scriptures/{scripture}/submit-for-review
+     *
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return JsonResponse Success message
+     */
     public function submitForReview(Scripture $scripture): JsonResponse
     {
         $scripture->submitForReview();
@@ -93,6 +143,14 @@ class ScriptureController extends Controller
         return response()->json(['message' => 'Scripture submitted for review']);
     }
 
+    /**
+     * Archive a scripture.
+     *
+     * POST /api/v1/admin/scriptures/{scripture}/archive (admin only)
+     *
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return JsonResponse Success message
+     */
     public function archive(Scripture $scripture): JsonResponse
     {
         $scripture->archive();
@@ -100,6 +158,14 @@ class ScriptureController extends Controller
         return response()->json(['message' => 'Scripture archived successfully']);
     }
 
+    /**
+     * Return a scripture to draft status.
+     *
+     * POST /api/v1/admin/scriptures/{scripture}/return-to-draft
+     *
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return JsonResponse Success message
+     */
     public function returnToDraft(Scripture $scripture): JsonResponse
     {
         $scripture->returnToDraft();
@@ -107,6 +173,14 @@ class ScriptureController extends Controller
         return response()->json(['message' => 'Scripture returned to draft']);
     }
 
+    /**
+     * Create a new scripture.
+     *
+     * POST /api/v1/admin/scriptures
+     *
+     * @param  Request  $request  Validated fields: reference, text, theme, tag_ids
+     * @return ScriptureResource The newly created scripture
+     */
     public function store(Request $request): ScriptureResource
     {
         $validated = $request->validate([
@@ -129,6 +203,15 @@ class ScriptureController extends Controller
         return new ScriptureResource($scripture->load('tags'));
     }
 
+    /**
+     * Update an existing scripture.
+     *
+     * PUT /api/v1/admin/scriptures/{scripture}
+     *
+     * @param  Request    $request    Validated fields: reference, text, theme, tag_ids
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return ScriptureResource The updated scripture
+     */
     public function update(Request $request, Scripture $scripture): ScriptureResource
     {
         $validated = $request->validate([
@@ -151,6 +234,14 @@ class ScriptureController extends Controller
         return new ScriptureResource($scripture->load('tags'));
     }
 
+    /**
+     * Soft-delete a scripture.
+     *
+     * DELETE /api/v1/admin/scriptures/{scripture}
+     *
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return Response 204 No Content
+     */
     public function destroy(Scripture $scripture): Response
     {
         $scripture->delete();

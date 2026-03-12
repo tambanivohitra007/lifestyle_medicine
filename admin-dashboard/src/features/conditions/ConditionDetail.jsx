@@ -99,6 +99,13 @@ const parseScriptureReference = (reference) => {
   return null;
 };
 
+/**
+ * Comprehensive condition detail page with tabbed interface showing sections,
+ * interventions, scriptures, EGW references, recipes, media, infographics, and revision history.
+ * Supports attaching/detaching related entities, drag-and-drop intervention reordering,
+ * publishing workflow actions, and inline infographic generation.
+ * Fetches all related data in a single optimized API call.
+ */
 const ConditionDetail = () => {
   const { t } = useTranslation(['conditions', 'interventions', 'common', 'recipes', 'references']);
   const { id } = useParams();

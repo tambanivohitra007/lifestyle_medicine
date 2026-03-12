@@ -3,6 +3,14 @@ import { useTranslation } from 'react-i18next';
 
 const COLORS = ['#d31e3a', '#243b53', '#10b981', '#f59e0b', '#8b5cf6', '#6b7280', '#06b6d4', '#ec4899'];
 
+/**
+ * Horizontal bar chart showing intervention counts per care domain using Recharts.
+ * Color-coded bars with custom tooltips displaying domain-specific counts.
+ *
+ * @param {Object} props
+ * @param {Array|null} props.data - Array of {domain, count} objects
+ * @param {boolean} props.loading - Whether data is still being fetched
+ */
 const DomainBarChart = ({ data, loading }) => {
   const { t } = useTranslation(['analytics']);
   if (loading) {

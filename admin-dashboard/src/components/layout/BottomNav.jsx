@@ -8,6 +8,17 @@ import {
   Menu,
 } from 'lucide-react';
 
+/**
+ * Mobile-only fixed bottom navigation bar providing quick access to primary sections.
+ * Displays four nav links (Home, Conditions, Interventions, Search) and a "More" button
+ * that opens the full sidebar menu.
+ *
+ * Hidden on desktop (lg breakpoint and above).
+ *
+ * @param {Object} props
+ * @param {Function} props.onMenuClick - Callback when the "More" menu button is tapped
+ * @returns {React.ReactElement} The bottom navigation bar
+ */
 const BottomNav = ({ onMenuClick }) => {
   const { t } = useTranslation('navigation');
 

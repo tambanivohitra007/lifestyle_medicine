@@ -20,8 +20,29 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
+/**
+ * Manages health conditions (diseases/disorders) in the knowledge platform.
+ *
+ * Provides CRUD operations for conditions along with relationship management
+ * for interventions, scriptures, recipes, and EGW references. Supports
+ * publishing workflow (draft, review, published, archived) and role-based
+ * access control for status filtering.
+ *
+ * Routes: /api/v1/conditions (public), /api/v1/admin/conditions (admin)
+ */
 class ConditionController extends Controller
 {
+    /**
+     * List all conditions with optional filtering, search, and sorting.
+     *
+     * Admin/editor users can filter by publishing status; public users see only published.
+     * Supports filtering by category, search by name/summary, and sortable columns.
+     *
+     * GET /api/v1/conditions
+     *
+     * @param  Request  $request  Query params: status, category, search, sort_by, sort_order
+     * @return AnonymousResourceCollection Paginated collection of ConditionResource (20 per page)
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Condition::query();
@@ -67,6 +88,17 @@ class ConditionController extends Controller
         return ConditionResource::collection($conditions);
     }
 
+    /**
+     * Display a single condition with its related data.
+     *
+     * Non-admin/editor users cannot view unpublished conditions (returns 404).
+     * Eager-loads sections, interventions, body system, and audit fields.
+     *
+     * GET /api/v1/conditions/{condition}
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return ConditionResource
+     */
     public function show(Condition $condition): ConditionResource
     {
         $user = auth('sanctum')->user();
@@ -79,6 +111,14 @@ class ConditionController extends Controller
         return new ConditionResource($condition);
     }
 
+    /**
+     * Publish a condition, making it publicly visible.
+     *
+     * POST /api/v1/admin/conditions/{condition}/publish (admin only)
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return JsonResponse Success message
+     */
     public function publish(Condition $condition): JsonResponse
     {
         $condition->publish();
@@ -86,6 +126,14 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Condition published successfully']);
     }
 
+    /**
+     * Submit a condition for editorial review.
+     *
+     * POST /api/v1/admin/conditions/{condition}/submit-for-review
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return JsonResponse Success message
+     */
     public function submitForReview(Condition $condition): JsonResponse
     {
         $condition->submitForReview();
@@ -93,6 +141,14 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Condition submitted for review']);
     }
 
+    /**
+     * Archive a condition, hiding it from public view.
+     *
+     * POST /api/v1/admin/conditions/{condition}/archive (admin only)
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return JsonResponse Success message
+     */
     public function archive(Condition $condition): JsonResponse
     {
         $condition->archive();
@@ -100,6 +156,14 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Condition archived successfully']);
     }
 
+    /**
+     * Return a condition to draft status for further editing.
+     *
+     * POST /api/v1/admin/conditions/{condition}/return-to-draft
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return JsonResponse Success message
+     */
     public function returnToDraft(Condition $condition): JsonResponse
     {
         $condition->returnToDraft();
@@ -165,6 +229,14 @@ class ConditionController extends Controller
         ]);
     }
 
+    /**
+     * Create a new condition.
+     *
+     * POST /api/v1/admin/conditions
+     *
+     * @param  Request  $request  Validated fields: name, category, summary, snomed_code, icd10_code, body_system_id
+     * @return ConditionResource The newly created condition
+     */
     public function store(Request $request): ConditionResource
     {
         $validated = $request->validate([
@@ -186,6 +258,15 @@ class ConditionController extends Controller
         return new ConditionResource($condition->load('bodySystem'));
     }
 
+    /**
+     * Update an existing condition.
+     *
+     * PUT /api/v1/admin/conditions/{condition}
+     *
+     * @param  Request    $request    Validated fields: name, category, summary, snomed_code, icd10_code, body_system_id
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return ConditionResource The updated condition
+     */
     public function update(Request $request, Condition $condition): ConditionResource
     {
         $validated = $request->validate([
@@ -207,6 +288,14 @@ class ConditionController extends Controller
         return new ConditionResource($condition->load('bodySystem'));
     }
 
+    /**
+     * Soft-delete a condition.
+     *
+     * DELETE /api/v1/admin/conditions/{condition}
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return Response 204 No Content
+     */
     public function destroy(Condition $condition): Response
     {
         $condition->delete();
@@ -214,6 +303,14 @@ class ConditionController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * List all sections for a condition, ordered by order_index.
+     *
+     * GET /api/v1/conditions/{condition}/sections
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return AnonymousResourceCollection Collection of ConditionSectionResource
+     */
     public function sections(Condition $condition): AnonymousResourceCollection
     {
         $sections = $condition->sections()->orderBy('order_index')->get();
@@ -221,6 +318,16 @@ class ConditionController extends Controller
         return ConditionSectionResource::collection($sections);
     }
 
+    /**
+     * List all interventions linked to a condition with pivot data.
+     *
+     * Includes care domain, strength of evidence, recommendation level, and clinical notes.
+     *
+     * GET /api/v1/conditions/{condition}/interventions
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return AnonymousResourceCollection Collection of InterventionResource with pivot data
+     */
     public function interventions(Condition $condition): AnonymousResourceCollection
     {
         $interventions = $condition->interventions()
@@ -232,16 +339,42 @@ class ConditionController extends Controller
         return InterventionResource::collection($interventions);
     }
 
+    /**
+     * List all scriptures linked to a condition.
+     *
+     * GET /api/v1/conditions/{condition}/scriptures
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return AnonymousResourceCollection Collection of ScriptureResource
+     */
     public function scriptures(Condition $condition): AnonymousResourceCollection
     {
         return ScriptureResource::collection($condition->scriptures);
     }
 
+    /**
+     * List all recipes linked to a condition.
+     *
+     * GET /api/v1/conditions/{condition}/recipes
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return AnonymousResourceCollection Collection of RecipeResource
+     */
     public function recipes(Condition $condition): AnonymousResourceCollection
     {
         return RecipeResource::collection($condition->recipes);
     }
 
+    /**
+     * Attach an intervention to a condition with pivot metadata.
+     *
+     * POST /api/v1/admin/conditions/{condition}/interventions/{intervention}
+     *
+     * @param  Request       $request       Pivot fields: strength_of_evidence, recommendation_level, clinical_notes, order_index
+     * @param  Condition     $condition     Route-model bound condition instance
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return JsonResponse Success message or 422 if already attached
+     */
     public function attachIntervention(Request $request, Condition $condition, Intervention $intervention): JsonResponse
     {
         // Check if already attached
@@ -265,6 +398,15 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Intervention attached successfully']);
     }
 
+    /**
+     * Detach an intervention from a condition.
+     *
+     * DELETE /api/v1/admin/conditions/{condition}/interventions/{intervention}
+     *
+     * @param  Condition     $condition     Route-model bound condition instance
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return JsonResponse Success message
+     */
     public function detachIntervention(Condition $condition, Intervention $intervention): JsonResponse
     {
         $condition->interventions()->detach($intervention->id);
@@ -272,6 +414,16 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Intervention detached successfully']);
     }
 
+    /**
+     * Update the pivot data for a condition-intervention relationship.
+     *
+     * PUT /api/v1/admin/conditions/{condition}/interventions/{intervention}
+     *
+     * @param  Request       $request       Pivot fields: strength_of_evidence, recommendation_level, clinical_notes, order_index
+     * @param  Condition     $condition     Route-model bound condition instance
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return JsonResponse Updated pivot data
+     */
     public function updateIntervention(Request $request, Condition $condition, Intervention $intervention): JsonResponse
     {
         $validated = $request->validate([
@@ -293,6 +445,15 @@ class ConditionController extends Controller
         ]);
     }
 
+    /**
+     * Reorder interventions for a condition by updating pivot order_index values.
+     *
+     * POST /api/v1/admin/conditions/{condition}/interventions/reorder
+     *
+     * @param  Request    $request    Array of intervention UUIDs in desired order
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return JsonResponse Success message
+     */
     public function reorderInterventions(Request $request, Condition $condition): JsonResponse
     {
         $validated = $request->validate([
@@ -307,6 +468,15 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Interventions reordered successfully']);
     }
 
+    /**
+     * Attach a scripture to a condition.
+     *
+     * POST /api/v1/admin/conditions/{condition}/scriptures/{scripture}
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return JsonResponse Success message or 422 if already attached
+     */
     public function attachScripture(Condition $condition, Scripture $scripture): JsonResponse
     {
         // Check if already attached
@@ -319,6 +489,15 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Scripture attached successfully']);
     }
 
+    /**
+     * Detach a scripture from a condition.
+     *
+     * DELETE /api/v1/admin/conditions/{condition}/scriptures/{scripture}
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @param  Scripture  $scripture  Route-model bound scripture instance
+     * @return JsonResponse Success message
+     */
     public function detachScripture(Condition $condition, Scripture $scripture): JsonResponse
     {
         $condition->scriptures()->detach($scripture->id);
@@ -326,6 +505,15 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Scripture detached successfully']);
     }
 
+    /**
+     * Attach a recipe to a condition.
+     *
+     * POST /api/v1/admin/conditions/{condition}/recipes/{recipe}
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @param  Recipe     $recipe     Route-model bound recipe instance
+     * @return JsonResponse Success message or 422 if already attached
+     */
     public function attachRecipe(Condition $condition, Recipe $recipe): JsonResponse
     {
         // Check if already attached
@@ -338,6 +526,15 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Recipe attached successfully']);
     }
 
+    /**
+     * Detach a recipe from a condition.
+     *
+     * DELETE /api/v1/admin/conditions/{condition}/recipes/{recipe}
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @param  Recipe     $recipe     Route-model bound recipe instance
+     * @return JsonResponse Success message
+     */
     public function detachRecipe(Condition $condition, Recipe $recipe): JsonResponse
     {
         $condition->recipes()->detach($recipe->id);
@@ -345,11 +542,28 @@ class ConditionController extends Controller
         return response()->json(['message' => 'Recipe detached successfully']);
     }
 
+    /**
+     * List all EGW references linked to a condition.
+     *
+     * GET /api/v1/conditions/{condition}/egw-references
+     *
+     * @param  Condition  $condition  Route-model bound condition instance
+     * @return AnonymousResourceCollection Collection of EgwReferenceResource
+     */
     public function egwReferences(Condition $condition): AnonymousResourceCollection
     {
         return EgwReferenceResource::collection($condition->egwReferences);
     }
 
+    /**
+     * Attach an EGW reference to a condition.
+     *
+     * POST /api/v1/admin/conditions/{condition}/egw-references/{egwReference}
+     *
+     * @param  Condition     $condition     Route-model bound condition instance
+     * @param  EgwReference  $egwReference  Route-model bound EGW reference instance
+     * @return JsonResponse Success message or 422 if already attached
+     */
     public function attachEgwReference(Condition $condition, EgwReference $egwReference): JsonResponse
     {
         // Check if already attached
@@ -362,6 +576,15 @@ class ConditionController extends Controller
         return response()->json(['message' => 'EGW reference attached successfully']);
     }
 
+    /**
+     * Detach an EGW reference from a condition.
+     *
+     * DELETE /api/v1/admin/conditions/{condition}/egw-references/{egwReference}
+     *
+     * @param  Condition     $condition     Route-model bound condition instance
+     * @param  EgwReference  $egwReference  Route-model bound EGW reference instance
+     * @return JsonResponse Success message
+     */
     public function detachEgwReference(Condition $condition, EgwReference $egwReference): JsonResponse
     {
         $condition->egwReferences()->detach($egwReference->id);

@@ -10,10 +10,22 @@ use App\Services\AiContentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Manages AI-powered content generation using Google Gemini.
+ *
+ * Provides asynchronous draft generation and content structuring via queue jobs.
+ * The workflow is: generate draft -> user review/approval -> structure into JSON -> import.
+ * Uses polling-based status checking for async operations.
+ *
+ * Routes: /api/v1/admin/ai/* (admin only, rate-limited)
+ */
 class AiContentController extends Controller
 {
     protected AiContentService $aiService;
 
+    /**
+     * @param  AiContentService  $aiService  Injected AI content service for generation and import
+     */
     public function __construct(AiContentService $aiService)
     {
         $this->aiService = $aiService;

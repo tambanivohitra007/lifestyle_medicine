@@ -14,6 +14,14 @@ import ProtocolStepsList from './ProtocolStepsList';
 import ContraindicationsList from './ContraindicationsList';
 import OutcomesList from './OutcomesList';
 
+/**
+ * Tabbed editor for managing an intervention's treatment protocol. Orchestrates
+ * four sub-panels — overview, steps, contraindications, and expected outcomes —
+ * and fetches/refreshes the consolidated protocol data from the API.
+ *
+ * @param {Object} props
+ * @param {string} props.interventionId - UUID of the parent intervention
+ */
 const ProtocolEditor = ({ interventionId }) => {
   const { t } = useTranslation(['interventions', 'common']);
   const [activeTab, setActiveTab] = useState('overview');

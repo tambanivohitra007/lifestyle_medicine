@@ -42,8 +42,15 @@ const RELATIONSHIP_CONFIG = {
 };
 
 /**
- * Custom edge for intervention relationships (synergies, conflicts, etc.)
- * Shows relationship type with distinctive styling.
+ * Custom React Flow edge for intervention-to-intervention relationships.
+ * Visually encodes relationship type (synergy, complementary, neutral, caution, conflict)
+ * with distinctive colors and icons. Always shows the relationship label badge.
+ * Negative relationships use dashed stroke. On hover, expands to show description
+ * and clinical notes in a tooltip popup. Uses a 24px invisible hit-area for
+ * easier mouse interaction.
+ *
+ * @param {Object} props - React Flow edge props
+ * @param {Object} props.data - Edge data: relationshipType, isNegative, description, clinicalNotes
  */
 const InterventionRelationshipEdge = memo(({
   id,

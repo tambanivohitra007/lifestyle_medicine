@@ -5,6 +5,12 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming CareDomain model instances.
+ *
+ * Includes domain name, description, icon, ordering, intervention count,
+ * nested interventions (when loaded), and audit fields.
+ */
 class CareDomainResource extends JsonResource
 {
     /**

@@ -12,6 +12,14 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 
+/**
+ * Manages body systems (e.g., Cardiovascular, Respiratory) and their condition categories.
+ *
+ * Body systems form the medical ontology hierarchy: Body System -> Condition Category -> Condition.
+ * Provides CRUD for both body systems and their nested categories.
+ *
+ * Routes: /api/v1/body-systems (public read), /api/v1/admin/body-systems (admin CRUD)
+ */
 class BodySystemController extends Controller
 {
     /**

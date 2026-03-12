@@ -1,6 +1,14 @@
 import dagre from 'dagre';
 
-// Node dimensions by type (width, height)
+/**
+ * @module layoutEngine
+ * Provides multiple graph layout algorithms for the knowledge graph visualization.
+ * Supports: dagre (hierarchical), radial, force-directed, cluster, and medical grouped layouts.
+ * The medical grouped layout is the default and organizes nodes into logical medical
+ * categories with visible container boxes.
+ */
+
+/** @constant Node dimensions (width, height) by entity type for layout calculations */
 const NODE_DIMENSIONS = {
   condition: { width: 200, height: 80 },
   intervention: { width: 200, height: 80 },
@@ -13,7 +21,7 @@ const NODE_DIMENSIONS = {
   default: { width: 180, height: 70 },
 };
 
-// Node type grouping for radial layout (inner to outer rings)
+/** @constant Ring assignment for radial layout -- 0 = center, higher = further out */
 const NODE_TYPE_RINGS = {
   condition: 0,      // Center
   intervention: 1,   // First ring
@@ -34,7 +42,14 @@ function getNodeDimensions(node) {
 }
 
 /**
- * Apply Dagre layout algorithm with optimized settings.
+ * Apply Dagre layout algorithm (hierarchical/tree layout).
+ * Uses dagre's network-simplex ranker for edge crossing minimization
+ * and greedy acyclicer for cycle handling.
+ *
+ * @param {Array} nodes - React Flow nodes
+ * @param {Array} edges - React Flow edges
+ * @param {'TB'|'LR'|'BT'|'RL'} direction - Layout direction
+ * @returns {Array} Nodes with computed positions and source/target positions
  */
 export function applyDagreLayout(nodes, edges, direction = 'TB') {
   if (nodes.length === 0) return nodes;
@@ -93,7 +108,19 @@ export function applyDagreLayout(nodes, edges, direction = 'TB') {
 
 /**
  * Apply radial layout with node type grouping.
- * Nodes are arranged in concentric rings based on their type and connection depth.
+ * Nodes are arranged in concentric rings based on BFS depth from the center node.
+ *
+ * Algorithm:
+ * 1. Find center node (isCenter flag or first node)
+ * 2. BFS from center to determine each node's depth
+ * 3. Group nodes by depth into rings
+ * 4. Position nodes on their ring with even angular distribution
+ *    -- For <= 6 nodes at a depth, uses a fan spread from the top
+ *    -- For > 6 nodes, distributes evenly around full circle
+ *
+ * @param {Array} nodes - React Flow nodes
+ * @param {Array} edges - React Flow edges
+ * @returns {Array} Nodes with computed radial positions
  */
 export function applyRadialLayout(nodes, edges) {
   if (nodes.length === 0) return nodes;
@@ -186,8 +213,20 @@ export function applyRadialLayout(nodes, edges) {
 }
 
 /**
- * Apply force-directed layout simulation.
- * Uses simple physics simulation for organic node placement.
+ * Apply force-directed layout using a spring-electric simulation.
+ *
+ * Physics model:
+ * - Repulsion: All nodes repel each other (Coulomb's law, inverse-square)
+ * - Attraction: Connected nodes attract along edges (Hooke's law, linear)
+ * - Center gravity: Weak pull toward canvas center prevents drift
+ * - Cooling: Temperature decreases linearly over iterations for convergence
+ * - Damping: 0.85 velocity damping prevents oscillation
+ * - The center node is pinned in place throughout the simulation
+ *
+ * @param {Array} nodes - React Flow nodes
+ * @param {Array} edges - React Flow edges
+ * @param {number} [iterations=100] - Number of simulation steps
+ * @returns {Array} Nodes with computed force-directed positions
  */
 export function applyForceLayout(nodes, edges, iterations = 100) {
   if (nodes.length === 0) return nodes;
@@ -306,7 +345,14 @@ export function applyForceLayout(nodes, edges, iterations = 100) {
 }
 
 /**
- * Apply cluster layout - groups nodes by type with inter-cluster spacing.
+ * Apply cluster layout -- groups nodes by entity type into horizontal bands.
+ * Each type occupies a horizontal row. Within each row, nodes are arranged
+ * in a grid pattern (columns = ceil(sqrt(count * 2))). Types are ordered
+ * by medical relevance: condition -> intervention -> careDomain -> evidence -> etc.
+ *
+ * @param {Array} nodes - React Flow nodes
+ * @param {Array} edges - React Flow edges (unused but kept for API consistency)
+ * @returns {Array} Nodes with computed grid positions grouped by type
  */
 export function applyClusterLayout(nodes, edges) {
   if (nodes.length === 0) return nodes;
@@ -665,6 +711,7 @@ export function applyMedicalGroupedLayout(nodes, edges) {
   return [...groupNodes, ...positionedNodes];
 }
 
+/** @constant Available layout options for the layout selector dropdown */
 export const layoutOptions = [
   { value: 'medical', label: 'Medical Grouped', icon: '🏥' },
   { value: 'dagre-tb', label: 'Hierarchical (Top-Down)', icon: '↓' },
@@ -674,6 +721,15 @@ export const layoutOptions = [
   { value: 'cluster', label: 'Clustered', icon: '▣' },
 ];
 
+/**
+ * Main layout dispatcher. Routes to the appropriate layout algorithm
+ * based on the layoutType string. Defaults to the medical grouped layout.
+ *
+ * @param {Array} nodes - React Flow nodes
+ * @param {Array} edges - React Flow edges
+ * @param {string} [layoutType='medical'] - One of: medical, dagre-tb, dagre-lr, dagre-bt, dagre-rl, radial, force, cluster
+ * @returns {Array} Nodes with computed positions
+ */
 export function applyLayout(nodes, edges, layoutType = 'medical') {
   switch (layoutType) {
     case 'medical':

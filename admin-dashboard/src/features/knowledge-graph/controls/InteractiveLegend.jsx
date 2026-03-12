@@ -21,7 +21,13 @@ const RELATIONSHIP_LEGEND = [
 
 /**
  * Interactive legend that allows toggling visibility of node types.
- * Click on an item to toggle its visibility.
+ * Displays both node type indicators (clickable to toggle visibility) and
+ * relationship type indicators (synergy, complementary, caution, conflict).
+ * Hidden types appear with reduced opacity and strikethrough text.
+ *
+ * @param {Object} props
+ * @param {string[]} props.hiddenTypes - Array of currently hidden node type strings
+ * @param {Function} props.onToggleType - Callback to toggle a node type's visibility
  */
 const InteractiveLegend = memo(({ hiddenTypes = [], onToggleType }) => {
   const { t } = useTranslation(['knowledgeGraph']);

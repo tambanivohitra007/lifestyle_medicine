@@ -50,6 +50,12 @@ const INFOGRAPHIC_LABEL_KEYS = {
   lifestyle_solutions: 'conditions:preview.infographicLabels.lifestyleSolutions',
 };
 
+/**
+ * Full-page print-friendly preview of a condition as a treatment guide document.
+ * Renders sections in predefined order, interventions grouped by care domain,
+ * scripture references, recipes, and inline infographics. Supports printing
+ * and PDF download via the server-side export endpoint.
+ */
 const ConditionPreview = () => {
   const { t } = useTranslation(['conditions', 'interventions', 'common']);
   const { id } = useParams();

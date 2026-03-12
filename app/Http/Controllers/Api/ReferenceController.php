@@ -9,8 +9,24 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages scientific/academic references (citations, DOIs, PMIDs).
+ *
+ * Provides CRUD operations for references that support evidence entries.
+ * References can be linked to evidence entries via a many-to-many relationship.
+ *
+ * Routes: /api/v1/references (public read), /api/v1/admin/references (admin CRUD)
+ */
 class ReferenceController extends Controller
 {
+    /**
+     * List all references with optional search and year filtering.
+     *
+     * GET /api/v1/references
+     *
+     * @param  Request  $request  Query params: search (citation/doi/pmid), year
+     * @return AnonymousResourceCollection Paginated collection of ReferenceResource (20 per page)
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Reference::query();
@@ -32,6 +48,14 @@ class ReferenceController extends Controller
         return ReferenceResource::collection($references);
     }
 
+    /**
+     * Display a single reference with audit information.
+     *
+     * GET /api/v1/references/{reference}
+     *
+     * @param  Reference  $reference  Route-model bound reference instance
+     * @return ReferenceResource
+     */
     public function show(Reference $reference): ReferenceResource
     {
         $reference->load(['creator', 'updater']);
@@ -39,6 +63,14 @@ class ReferenceController extends Controller
         return new ReferenceResource($reference);
     }
 
+    /**
+     * Create a new reference.
+     *
+     * POST /api/v1/admin/references
+     *
+     * @param  Request  $request  Validated fields: citation, doi, pmid, url, year
+     * @return ReferenceResource The newly created reference
+     */
     public function store(Request $request): ReferenceResource
     {
         $validated = $request->validate([
@@ -54,6 +86,15 @@ class ReferenceController extends Controller
         return new ReferenceResource($reference);
     }
 
+    /**
+     * Update an existing reference.
+     *
+     * PUT /api/v1/admin/references/{reference}
+     *
+     * @param  Request    $request    Validated fields: citation, doi, pmid, url, year
+     * @param  Reference  $reference  Route-model bound reference instance
+     * @return ReferenceResource The updated reference
+     */
     public function update(Request $request, Reference $reference): ReferenceResource
     {
         $validated = $request->validate([
@@ -69,6 +110,14 @@ class ReferenceController extends Controller
         return new ReferenceResource($reference);
     }
 
+    /**
+     * Soft-delete a reference.
+     *
+     * DELETE /api/v1/admin/references/{reference}
+     *
+     * @param  Reference  $reference  Route-model bound reference instance
+     * @return Response 204 No Content
+     */
     public function destroy(Reference $reference): Response
     {
         $reference->delete();

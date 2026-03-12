@@ -2,6 +2,20 @@ import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Slide-over panel that animates in from the right side of the screen.
+ * Provides a header with title/subtitle, scrollable content area, and backdrop overlay.
+ * Closes on Escape key or backdrop click. Prevents body scroll while open.
+ *
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the panel is visible
+ * @param {Function} props.onClose - Callback to close the panel
+ * @param {string} props.title - Panel header title
+ * @param {string} [props.subtitle] - Optional subtitle below the title
+ * @param {React.ReactNode} props.children - Panel content
+ * @param {string} [props.size='md'] - Panel width: 'sm', 'md', 'lg', or 'xl'
+ * @returns {React.ReactElement} The slide-over panel component
+ */
 const SlideOver = ({ isOpen, onClose, title, subtitle, children, size = 'md' }) => {
   const { t } = useTranslation('common');
 

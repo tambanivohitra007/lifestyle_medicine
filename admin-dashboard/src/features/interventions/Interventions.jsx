@@ -15,6 +15,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 import MediaUploader from '../../components/shared/MediaUploader';
 
+/**
+ * Interventions list page with search, care domain/status filtering, sorting,
+ * pagination, and multiple view modes (grid, list, table). Supports inline
+ * create/edit via SlideOver panel and thumbnail display for interventions with media.
+ */
 const Interventions = () => {
   const { t } = useTranslation(['interventions', 'common', 'careDomains', 'tags']);
   const { canEdit } = useAuth();

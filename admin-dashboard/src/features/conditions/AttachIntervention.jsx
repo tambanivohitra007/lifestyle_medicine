@@ -6,6 +6,12 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Page for attaching an intervention to a condition with mapping configuration.
+ * Split layout: left panel for searching/selecting an intervention (filtered by domain),
+ * right panel for configuring evidence strength, recommendation level, clinical notes,
+ * and display order of the condition-intervention relationship.
+ */
 const AttachIntervention = () => {
   const { t } = useTranslation(['conditions', 'common', 'interventions']);
   const { id: conditionId } = useParams();

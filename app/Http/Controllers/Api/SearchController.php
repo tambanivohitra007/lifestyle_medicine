@@ -18,6 +18,15 @@ use App\Models\Scripture;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Provides global search across all platform entities.
+ *
+ * Searches conditions, interventions, scriptures, EGW references, recipes,
+ * evidence entries, references, care domains, condition sections, content tags,
+ * protocols, and body systems with optional type filtering.
+ *
+ * Routes: GET /api/v1/search (public, rate-limited)
+ */
 class SearchController extends Controller
 {
     protected const VALID_TYPES = [

@@ -9,8 +9,28 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages evidence entries (clinical studies/research) supporting interventions.
+ *
+ * Each evidence entry belongs to an intervention and can reference multiple
+ * academic references. Supports filtering by intervention, study type,
+ * and quality rating.
+ *
+ * Routes: /api/v1/evidence-entries (public read), /api/v1/admin/evidence-entries (admin CRUD)
+ */
 class EvidenceEntryController extends Controller
 {
+    /**
+     * List all evidence entries with optional filtering and search.
+     *
+     * Supports filtering by intervention_id, study_type, quality_rating,
+     * and search across summary, population, notes, and intervention name.
+     *
+     * GET /api/v1/evidence-entries
+     *
+     * @param  Request  $request  Query params: search, intervention_id, study_type, quality_rating
+     * @return AnonymousResourceCollection Paginated collection of EvidenceEntryResource (20 per page)
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = EvidenceEntry::with(['intervention', 'references']);
@@ -43,6 +63,14 @@ class EvidenceEntryController extends Controller
         return EvidenceEntryResource::collection($evidence);
     }
 
+    /**
+     * Display a single evidence entry with its intervention, references, and audit info.
+     *
+     * GET /api/v1/evidence-entries/{evidenceEntry}
+     *
+     * @param  EvidenceEntry  $evidenceEntry  Route-model bound evidence entry instance
+     * @return EvidenceEntryResource
+     */
     public function show(EvidenceEntry $evidenceEntry): EvidenceEntryResource
     {
         $evidenceEntry->load(['intervention', 'references', 'creator', 'updater']);
@@ -50,6 +78,14 @@ class EvidenceEntryController extends Controller
         return new EvidenceEntryResource($evidenceEntry);
     }
 
+    /**
+     * Create a new evidence entry with optional reference attachments.
+     *
+     * POST /api/v1/admin/evidence-entries
+     *
+     * @param  Request  $request  Validated fields: intervention_id, study_type, population, sample_size, quality_rating, recommendation_strength, summary, notes, reference_ids
+     * @return EvidenceEntryResource The newly created evidence entry
+     */
     public function store(Request $request): EvidenceEntryResource
     {
         $validated = $request->validate([
@@ -77,6 +113,15 @@ class EvidenceEntryController extends Controller
         return new EvidenceEntryResource($evidenceEntry->load('references'));
     }
 
+    /**
+     * Update an existing evidence entry.
+     *
+     * PUT /api/v1/admin/evidence-entries/{evidenceEntry}
+     *
+     * @param  Request        $request        Validated fields: intervention_id, study_type, population, sample_size, quality_rating, recommendation_strength, summary, notes, reference_ids
+     * @param  EvidenceEntry  $evidenceEntry  Route-model bound evidence entry instance
+     * @return EvidenceEntryResource The updated evidence entry
+     */
     public function update(Request $request, EvidenceEntry $evidenceEntry): EvidenceEntryResource
     {
         $validated = $request->validate([
@@ -104,6 +149,14 @@ class EvidenceEntryController extends Controller
         return new EvidenceEntryResource($evidenceEntry->load('references'));
     }
 
+    /**
+     * Soft-delete an evidence entry.
+     *
+     * DELETE /api/v1/admin/evidence-entries/{evidenceEntry}
+     *
+     * @param  EvidenceEntry  $evidenceEntry  Route-model bound evidence entry instance
+     * @return Response 204 No Content
+     */
     public function destroy(EvidenceEntry $evidenceEntry): Response
     {
         $evidenceEntry->delete();

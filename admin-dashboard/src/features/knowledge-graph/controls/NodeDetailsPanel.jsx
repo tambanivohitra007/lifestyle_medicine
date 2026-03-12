@@ -53,6 +53,17 @@ const NODE_TYPE_CONFIG = {
   },
 };
 
+/**
+ * Sliding side panel that displays detailed information about a selected graph node.
+ * Renders type-specific detail views (condition, intervention, scripture, EGW reference,
+ * recipe, evidence entry, reference, care domain) with appropriate fields, badges,
+ * and external links. Positioned as a fixed 320px-wide panel on the right side.
+ *
+ * @param {Object} props
+ * @param {Object} props.node - The selected React Flow node object
+ * @param {Function} props.onClose - Callback to close the panel
+ * @param {Function} props.onNavigate - Callback to navigate to entity detail page (type, entityId)
+ */
 const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
   const { t } = useTranslation(['knowledgeGraph']);
 
@@ -334,7 +345,12 @@ const NodeDetailsPanel = memo(({ node, onClose, onNavigate }) => {
   );
 });
 
-// Helper components
+/**
+ * Helper component for displaying a single label-value row in the details panel.
+ * @param {Object} props
+ * @param {string} props.label - Field label
+ * @param {string} props.value - Field value (rendered with capitalize)
+ */
 const DetailRow = ({ label, value }) => (
   <div className="flex items-center justify-between py-2 border-b border-gray-50">
     <span className="text-xs text-gray-500">{label}</span>
@@ -342,6 +358,13 @@ const DetailRow = ({ label, value }) => (
   </div>
 );
 
+/**
+ * Helper component for displaying a labeled text section in the details panel.
+ * @param {Object} props
+ * @param {string} props.label - Section label
+ * @param {string} props.value - Section text content
+ * @param {boolean} [props.isQuote] - If true, renders with italic style and left border
+ */
 const DetailSection = ({ label, value, isQuote }) => (
   <div className="mb-3">
     <div className="text-xs text-gray-500 mb-1">{label}</div>

@@ -13,10 +13,30 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages lifestyle medicine interventions (treatments/therapies).
+ *
+ * Provides CRUD operations for interventions with care domain categorization,
+ * tag management, evidence entries, and publishing workflow. Each intervention
+ * belongs to a NEWSTART+ care domain.
+ *
+ * Routes: /api/v1/interventions (public), /api/v1/admin/interventions (admin)
+ */
 class InterventionController extends Controller
 {
     use HasSorting;
 
+    /**
+     * List all interventions with optional filtering, search, and sorting.
+     *
+     * Admin/editor users can filter by publishing status; public users see only published.
+     * Supports filtering by care_domain_id, tag_id, and search by name/description.
+     *
+     * GET /api/v1/interventions
+     *
+     * @param  Request  $request  Query params: status, care_domain_id, tag_id, search, sort_by, sort_order
+     * @return AnonymousResourceCollection Paginated collection of InterventionResource (20 per page)
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Intervention::with(['careDomain', 'tags']);
@@ -57,6 +77,16 @@ class InterventionController extends Controller
         return InterventionResource::collection($interventions);
     }
 
+    /**
+     * Display a single intervention with its related data.
+     *
+     * Non-admin/editor users cannot view unpublished interventions (returns 404).
+     *
+     * GET /api/v1/interventions/{intervention}
+     *
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return InterventionResource
+     */
     public function show(Intervention $intervention): InterventionResource
     {
         $user = auth('sanctum')->user();
@@ -69,6 +99,14 @@ class InterventionController extends Controller
         return new InterventionResource($intervention);
     }
 
+    /**
+     * Publish an intervention.
+     *
+     * POST /api/v1/admin/interventions/{intervention}/publish (admin only)
+     *
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return JsonResponse Success message
+     */
     public function publish(Intervention $intervention): JsonResponse
     {
         $intervention->publish();
@@ -76,6 +114,14 @@ class InterventionController extends Controller
         return response()->json(['message' => 'Intervention published successfully']);
     }
 
+    /**
+     * Submit an intervention for editorial review.
+     *
+     * POST /api/v1/admin/interventions/{intervention}/submit-for-review
+     *
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return JsonResponse Success message
+     */
     public function submitForReview(Intervention $intervention): JsonResponse
     {
         $intervention->submitForReview();
@@ -83,6 +129,14 @@ class InterventionController extends Controller
         return response()->json(['message' => 'Intervention submitted for review']);
     }
 
+    /**
+     * Archive an intervention.
+     *
+     * POST /api/v1/admin/interventions/{intervention}/archive (admin only)
+     *
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return JsonResponse Success message
+     */
     public function archive(Intervention $intervention): JsonResponse
     {
         $intervention->archive();
@@ -90,6 +144,14 @@ class InterventionController extends Controller
         return response()->json(['message' => 'Intervention archived successfully']);
     }
 
+    /**
+     * Return an intervention to draft status.
+     *
+     * POST /api/v1/admin/interventions/{intervention}/return-to-draft
+     *
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return JsonResponse Success message
+     */
     public function returnToDraft(Intervention $intervention): JsonResponse
     {
         $intervention->returnToDraft();
@@ -97,6 +159,14 @@ class InterventionController extends Controller
         return response()->json(['message' => 'Intervention returned to draft']);
     }
 
+    /**
+     * Create a new intervention.
+     *
+     * POST /api/v1/admin/interventions
+     *
+     * @param  Request  $request  Validated fields: care_domain_id, name, description, mechanism, snomed_code, tag_ids
+     * @return InterventionResource The newly created intervention
+     */
     public function store(Request $request): InterventionResource
     {
         $validated = $request->validate([
@@ -121,6 +191,15 @@ class InterventionController extends Controller
         return new InterventionResource($intervention->load(['careDomain', 'tags']));
     }
 
+    /**
+     * Update an existing intervention.
+     *
+     * PUT /api/v1/admin/interventions/{intervention}
+     *
+     * @param  Request       $request       Validated fields: care_domain_id, name, description, mechanism, snomed_code, tag_ids
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return InterventionResource The updated intervention
+     */
     public function update(Request $request, Intervention $intervention): InterventionResource
     {
         $validated = $request->validate([
@@ -145,6 +224,14 @@ class InterventionController extends Controller
         return new InterventionResource($intervention->load(['careDomain', 'tags']));
     }
 
+    /**
+     * Soft-delete an intervention.
+     *
+     * DELETE /api/v1/admin/interventions/{intervention}
+     *
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return Response 204 No Content
+     */
     public function destroy(Intervention $intervention): Response
     {
         $intervention->delete();
@@ -152,6 +239,14 @@ class InterventionController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * List all evidence entries for an intervention.
+     *
+     * GET /api/v1/interventions/{intervention}/evidence
+     *
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return AnonymousResourceCollection Collection of EvidenceEntryResource
+     */
     public function evidence(Intervention $intervention): AnonymousResourceCollection
     {
         $evidence = $intervention->evidenceEntries()->with('references')->get();
@@ -159,6 +254,14 @@ class InterventionController extends Controller
         return EvidenceEntryResource::collection($evidence);
     }
 
+    /**
+     * List all conditions linked to an intervention with pivot data.
+     *
+     * GET /api/v1/interventions/{intervention}/conditions
+     *
+     * @param  Intervention  $intervention  Route-model bound intervention instance
+     * @return AnonymousResourceCollection Collection of ConditionResource with pivot data
+     */
     public function conditions(Intervention $intervention): AnonymousResourceCollection
     {
         $conditions = $intervention->conditions()

@@ -14,6 +14,19 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Preview panel for AI-structured content before database import.
+ * Displays collapsible sections for condition, sections, interventions, evidence,
+ * scriptures, EGW references, recipes, and tags with counts and details.
+ * Supports JSON download of the structured data.
+ *
+ * @param {Object} props
+ * @param {string} props.conditionName - Name of the condition
+ * @param {Object} props.structured - AI-structured JSON data with all content entities
+ * @param {Function} props.onImport - Callback to trigger database import
+ * @param {Function} props.onBack - Callback to return to draft editing
+ * @param {boolean} props.loading - Whether an import is in progress
+ */
 const StructuredPreview = ({ conditionName, structured, onImport, onBack, loading }) => {
   const { t } = useTranslation(['aiGenerator']);
   const [expandedSections, setExpandedSections] = useState({

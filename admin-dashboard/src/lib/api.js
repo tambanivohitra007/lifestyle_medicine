@@ -1,7 +1,23 @@
+/**
+ * @module api
+ * Axios-based HTTP client for the Lifestyle Medicine REST API.
+ *
+ * Configures a shared Axios instance with:
+ * - Base URL from VITE_API_BASE_URL environment variable (defaults to localhost in dev)
+ * - 30-second request timeout
+ * - Automatic Bearer token injection from localStorage
+ * - Global error response interceptor with toast notifications
+ * - Automatic 401 redirect to login page
+ */
 import axios from 'axios';
 import { toast } from './swal';
 
-// Validate required environment variables in production
+/**
+ * Validates that required environment variables are set.
+ * Throws in production if VITE_API_BASE_URL is missing.
+ * @returns {string} The resolved API base URL
+ * @throws {Error} If VITE_API_BASE_URL is missing in production
+ */
 const validateEnvVars = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -17,7 +33,11 @@ const validateEnvVars = () => {
 
 const API_BASE_URL = validateEnvVars();
 
-// Export API_BASE_URL for components that need direct URL access (e.g., file downloads)
+/**
+ * Returns the server base URL (without the /api/v1 prefix).
+ * Useful for constructing direct file download or asset URLs.
+ * @returns {string} The server root URL
+ */
 export const getApiBaseUrl = () => API_BASE_URL.replace('/api/v1', '');
 
 const api = axios.create({
@@ -109,7 +129,13 @@ api.interceptors.response.use(
 
 export default api;
 
-// API endpoints
+/**
+ * Centralized map of all API endpoint paths and path-builder functions.
+ * Organized by feature domain (auth, conditions, interventions, etc.).
+ * Static endpoints are strings; dynamic endpoints are functions that accept IDs.
+ *
+ * @type {Object.<string, string|Function>}
+ */
 export const apiEndpoints = {
   // Auth
   login: '/login',

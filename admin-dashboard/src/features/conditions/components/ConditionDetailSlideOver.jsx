@@ -35,6 +35,18 @@ import StatusBadge from '../../../components/shared/StatusBadge';
 import PublishActions from '../../../components/shared/PublishActions';
 import RevisionHistory from '../../../components/shared/RevisionHistory';
 
+/**
+ * Slide-over panel for viewing condition details without navigating away from the list.
+ * Fetches complete condition data including sections, interventions, scriptures,
+ * EGW references, and recipes. Provides quick actions for edit, delete, and navigation.
+ *
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the slide-over is visible
+ * @param {Function} props.onClose - Callback to close the slide-over
+ * @param {string|null} props.conditionId - UUID of the condition to display
+ * @param {Function} props.onEdit - Callback to open the edit modal for the condition
+ * @param {Function} props.onDelete - Callback to delete the condition
+ */
 const ConditionDetailSlideOver = ({ isOpen, onClose, conditionId, onEdit, onDelete }) => {
   const { t } = useTranslation(['conditions', 'common']);
 

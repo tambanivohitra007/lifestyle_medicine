@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming EvidenceEntry model instances.
+ *
+ * Includes study metadata (type, population, sample size, quality rating),
+ * summary, notes, linked references, and audit fields.
+ */
 class EvidenceEntryResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

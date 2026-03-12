@@ -6,13 +6,35 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Role-based access control middleware for API routes.
+ *
+ * Enforces authentication, account activation status, and role-based authorization
+ * on protected API endpoints. Designed for use with Laravel Sanctum-authenticated routes.
+ *
+ * Behavior:
+ * - Returns 401 if the user is not authenticated
+ * - Returns 403 if the user's account is deactivated (is_active = false)
+ * - If no roles are specified, allows any authenticated active user
+ * - If roles are specified, checks the user's role against the allowed list
+ * - Returns 403 with diagnostic info (required vs. actual role) if unauthorized
+ *
+ * Usage in routes:
+ *   middleware('role:admin')           — admin only
+ *   middleware('role:admin,editor')    — admin or editor
+ *   middleware('role')                 — any authenticated active user
+ *
+ * @see \App\Models\User::$role The user role column (admin, editor, viewer)
+ */
 class CheckRole
 {
     /**
-     * Handle an incoming request.
+     * Handle an incoming request by checking authentication, account status, and role.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  ...$roles  Allowed roles (comma-separated or multiple args)
+     * @param  \Illuminate\Http\Request  $request  The incoming HTTP request
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next  The next middleware/handler in the pipeline
+     * @param  string  ...$roles  Allowed roles (e.g., 'admin', 'editor'). If empty, any role is accepted.
+     * @return \Symfony\Component\HttpFoundation\Response The response (JSON error or next handler result)
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {

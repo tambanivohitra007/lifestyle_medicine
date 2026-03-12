@@ -15,6 +15,7 @@ import {
 import api, { apiEndpoints } from '../../../lib/api';
 import { toast, confirmDelete } from '../../../lib/swal';
 
+/** Visual configuration for contraindication severity levels (icon, colors, badge styling) */
 const SEVERITY_CONFIG = {
   absolute: {
     icon: AlertOctagon,
@@ -33,6 +34,16 @@ const SEVERITY_CONFIG = {
   },
 };
 
+/**
+ * CRUD list for contraindications associated with an intervention. Each entry has
+ * a severity level (absolute, relative, caution) with corresponding visual styling,
+ * plus a description and optional condition link. Supports inline add/edit forms.
+ *
+ * @param {Object} props
+ * @param {string} props.interventionId - UUID of the parent intervention
+ * @param {Array} props.contraindications - Current contraindication records
+ * @param {Function} props.onUpdate - Callback invoked after create, update, or delete
+ */
 const ContraindicationsList = ({ interventionId, contraindications, onUpdate }) => {
   const { t } = useTranslation(['interventions', 'common', 'conditions']);
   const [editingItem, setEditingItem] = useState(null);

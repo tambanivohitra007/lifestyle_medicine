@@ -2,6 +2,16 @@ import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { Stethoscope } from 'lucide-react';
 
+/**
+ * Custom React Flow node representing a therapeutic intervention in the knowledge graph.
+ * Styled with rose gradient background and Stethoscope icon.
+ * Displays care domain badge and supports center/highlight indicators.
+ * Has top (target) and bottom (source) connection handles.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data containing label, careDomain, isCenter, isHighlighted
+ * @param {boolean} props.selected - Whether the node is currently selected
+ */
 const InterventionNode = memo(({ data, selected }) => {
   const isCenter = data.isCenter;
   const isHighlighted = data.isHighlighted;

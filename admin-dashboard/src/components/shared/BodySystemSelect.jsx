@@ -3,6 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, Activity } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 
+/**
+ * Color mapping for body system slugs to Tailwind text color classes.
+ * @constant {Object.<string, string>}
+ */
 const SYSTEM_COLORS = {
   cardiovascular: 'text-red-500',
   'metabolic-endocrine': 'text-amber-500',
@@ -15,6 +19,20 @@ const SYSTEM_COLORS = {
   integumentary: 'text-orange-500',
 };
 
+/**
+ * Dropdown select component for choosing a body system.
+ * Fetches body systems from the API on mount and displays them with
+ * optional emoji icons and condition counts.
+ *
+ * @param {Object} props
+ * @param {string|null} props.value - The selected body system UUID or null
+ * @param {Function} props.onChange - Callback invoked with the selected system UUID or null
+ * @param {boolean} [props.required=false] - Whether the field is required
+ * @param {boolean} [props.disabled=false] - Whether the field is disabled
+ * @param {boolean} [props.showIcon=true] - Whether to display the system icon inline
+ * @param {string} [props.className=''] - Additional CSS classes for the wrapper
+ * @returns {React.ReactElement} The body system select component
+ */
 const BodySystemSelect = ({
   value,
   onChange,

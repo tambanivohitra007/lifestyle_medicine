@@ -10,6 +10,12 @@ import ActivityTimeline from './ActivityTimeline';
 import QualityDistribution from './QualityDistribution';
 import ContentCompleteness from './ContentCompleteness';
 
+/**
+ * Main analytics dashboard page that aggregates platform-wide statistics.
+ * Fetches and displays overview cards, category/domain charts, growth trends,
+ * activity timeline, evidence quality distribution, and content completeness.
+ * Supports data refresh and JSON report export.
+ */
 const Analytics = () => {
   const { t } = useTranslation(['analytics', 'common']);
   const [loading, setLoading] = useState({

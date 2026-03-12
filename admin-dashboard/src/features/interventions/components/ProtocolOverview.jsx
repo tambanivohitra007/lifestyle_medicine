@@ -10,6 +10,16 @@ import {
 import api, { apiEndpoints } from '../../../lib/api';
 import { toast, confirmDelete } from '../../../lib/swal';
 
+/**
+ * Displays and edits the high-level protocol metadata for an intervention,
+ * including version, duration, frequency, intensity level, overview text,
+ * prerequisites, and equipment needed. Supports create, update, and delete.
+ *
+ * @param {Object} props
+ * @param {string} props.interventionId - UUID of the parent intervention
+ * @param {Object|null} props.protocol - Existing protocol data, or null when creating
+ * @param {Function} props.onUpdate - Callback invoked after a successful save or delete
+ */
 const ProtocolOverview = ({ interventionId, protocol, onUpdate }) => {
   const { t } = useTranslation(['interventions', 'common']);
   const [editing, setEditing] = useState(!protocol);

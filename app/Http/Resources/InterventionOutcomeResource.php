@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming InterventionOutcome model instances.
+ *
+ * Includes outcome measure, expected change, direction, timeline,
+ * evidence grade, measurement method, notes, and ordering.
+ */
 class InterventionOutcomeResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

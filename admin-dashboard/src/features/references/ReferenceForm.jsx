@@ -5,6 +5,11 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Standalone form for creating or editing a literature reference. Fields include
+ * citation text, DOI, PubMed ID, URL, and publication year. Used as a dedicated
+ * page route alternative to the inline SlideOver in the References list.
+ */
 const ReferenceForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();

@@ -2,6 +2,18 @@ import { Clock, User, RotateCcw, Eye } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Vertical timeline visualization of content revisions.
+ * Each revision shows its version number, author, relative timestamp,
+ * and optional change summary. Provides view and restore action buttons.
+ *
+ * @param {Object} props
+ * @param {Array<Object>} props.revisions - Array of revision objects to display
+ * @param {Function} props.onView - Callback when "view" is clicked, receives the revision object
+ * @param {Function} props.onRestore - Callback when "restore" is clicked, receives the revision object
+ * @param {boolean} [props.canRestore=false] - Whether restore buttons should be shown
+ * @returns {React.ReactElement} The revision timeline or empty state
+ */
 const RevisionTimeline = ({ revisions, onView, onRestore, canRestore = false }) => {
   const { t } = useTranslation('common');
 

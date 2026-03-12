@@ -11,6 +11,41 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Represents a reference from Ellen G. White's writings on health and spirituality.
+ *
+ * EGW references contain quotes and citations from books such as "Ministry of Healing",
+ * "Counsels on Diet and Foods", and other health-related publications. They are linked
+ * to conditions and interventions to provide Spirit of Prophecy guidance alongside
+ * lifestyle medicine protocols.
+ *
+ * @property string $id UUID primary key
+ * @property string $book The full book title
+ * @property string|null $book_abbreviation Standard EGW book abbreviation (e.g., "MH", "CD")
+ * @property string|null $chapter The chapter name or number
+ * @property int|null $page_start Starting page number
+ * @property int|null $page_end Ending page number
+ * @property string|null $paragraph Paragraph identifier within the page
+ * @property string|null $quote The quoted text from the reference
+ * @property string|null $topic The health or spiritual topic addressed
+ * @property string|null $context Additional context for the reference
+ * @property string $status Publishing status (draft, in_review, published, archived)
+ * @property int|null $created_by ID of the user who created this record
+ * @property int|null $updated_by ID of the user who last updated this record
+ * @property int|null $deleted_by ID of the user who deleted this record
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read string $citation Formatted citation string (accessor)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Condition> $conditions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Intervention> $interventions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentTag> $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentRevision> $revisions
+ * @property-read User|null $creator
+ * @property-read User|null $updater
+ * @property-read User|null $deleter
+ */
 class EgwReference extends Model
 {
     use HasAuditFields, HasFactory, HasPublishingStatus, HasRevisions, HasUuids, SoftDeletes;
@@ -36,6 +71,8 @@ class EgwReference extends Model
     /**
      * Get the formatted citation for this reference.
      * e.g., "Ministry of Healing, p. 127" or "MH 127.2"
+     *
+     * @return string
      */
     public function getCitationAttribute(): string
     {
@@ -77,6 +114,8 @@ class EgwReference extends Model
 
     /**
      * Get the conditions linked to this EGW reference.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Condition, $this>
      */
     public function conditions(): BelongsToMany
     {
@@ -87,6 +126,8 @@ class EgwReference extends Model
 
     /**
      * Get the interventions linked to this EGW reference.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Intervention, $this>
      */
     public function interventions(): BelongsToMany
     {
@@ -97,6 +138,8 @@ class EgwReference extends Model
 
     /**
      * Get the content tags for this EGW reference.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<ContentTag, $this>
      */
     public function tags(): BelongsToMany
     {
@@ -107,6 +150,8 @@ class EgwReference extends Model
 
     /**
      * Common EGW book abbreviations for reference.
+     *
+     * @return array<string, string> Map of abbreviation to full book title
      */
     public static function getBookAbbreviations(): array
     {

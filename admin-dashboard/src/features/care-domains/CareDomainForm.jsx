@@ -5,6 +5,11 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Standalone form page for creating or editing a care domain.
+ * Supports both create and edit modes based on URL parameter presence.
+ * Navigates back to the care domains list on success.
+ */
 const CareDomainForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();

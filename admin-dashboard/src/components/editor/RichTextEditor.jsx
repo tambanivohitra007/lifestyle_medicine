@@ -29,6 +29,18 @@ import {
   Loader2,
 } from 'lucide-react';
 
+/**
+ * Toolbar button for the rich text editor menu bar.
+ * Supports active state highlighting and disabled styling.
+ *
+ * @param {Object} props
+ * @param {Function} props.onClick - Click handler
+ * @param {boolean} [props.isActive] - Whether the button represents an active formatting state
+ * @param {boolean} [props.disabled] - Whether the button is disabled
+ * @param {React.ReactNode} props.children - Button content (typically an icon)
+ * @param {string} [props.title] - Tooltip text
+ * @returns {React.ReactElement} The menu button
+ */
 const MenuButton = ({ onClick, isActive, disabled, children, title }) => (
   <button
     type="button"
@@ -49,6 +61,18 @@ const Divider = () => (
   <div className="w-px h-6 bg-gray-300 mx-0.5 sm:mx-1 hidden sm:block" />
 );
 
+/**
+ * Toolbar for the TipTap rich text editor providing formatting controls.
+ * Includes buttons for: undo/redo, headings (H1-H3), text formatting
+ * (bold, italic, underline, strikethrough, code), lists, blockquote,
+ * text alignment, links, and image insertion.
+ *
+ * @param {Object} props
+ * @param {Object} props.editor - The TipTap editor instance
+ * @param {Function|null} props.onImageUpload - Async handler for image file uploads, returns URL
+ * @param {boolean} props.isUploading - Whether an image upload is in progress
+ * @returns {React.ReactElement|null} The toolbar or null if no editor
+ */
 const MenuBar = ({ editor, onImageUpload, isUploading }) => {
   if (!editor) return null;
 
@@ -269,6 +293,18 @@ const MenuBar = ({ editor, onImageUpload, isUploading }) => {
   );
 };
 
+/**
+ * WYSIWYG rich text editor built on TipTap with a full formatting toolbar.
+ * Supports headings, bold/italic/underline/strikethrough, lists, blockquotes,
+ * text alignment, links, inline code, and image insertion (via URL or upload).
+ *
+ * @param {Object} props
+ * @param {string} props.content - Initial HTML content for the editor
+ * @param {Function} props.onChange - Callback invoked with the updated HTML string on each edit
+ * @param {string} [props.placeholder='Start writing...'] - Placeholder text when editor is empty
+ * @param {Function} [props.onImageUpload] - Async function that receives a File and returns the uploaded image URL
+ * @returns {React.ReactElement} The rich text editor component
+ */
 const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...', onImageUpload }) => {
   const [isUploading, setIsUploading] = useState(false);
 

@@ -1,6 +1,22 @@
 import { Component } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
+/**
+ * React error boundary that catches unhandled JavaScript errors in its component subtree.
+ * Displays a user-friendly error page with reload and home navigation options.
+ * In development mode, shows the error message and component stack trace.
+ *
+ * @class ErrorBoundary
+ * @extends {React.Component}
+ *
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Child components to monitor for errors
+ *
+ * @example
+ * <ErrorBoundary>
+ *   <App />
+ * </ErrorBoundary>
+ */
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);

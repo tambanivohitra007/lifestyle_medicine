@@ -1,4 +1,10 @@
-// Enhanced custom node components for React Flow knowledge graph
+/**
+ * @module nodes
+ * Custom React Flow node components for the knowledge graph.
+ * Each node type maps to a medical entity (condition, intervention, care domain, etc.)
+ * with distinctive visual styling. The `nodeTypes` export is passed to React Flow's
+ * nodeTypes prop for automatic component resolution.
+ */
 import ConditionNode from './ConditionNode';
 import InterventionNode from './InterventionNode';
 import CareDomainNode from './CareDomainNode';

@@ -4,6 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import api, { apiEndpoints } from '../../lib/api';
 
+/**
+ * User profile management page with two sections: profile information update
+ * (name, email) and password change. Validates password confirmation client-side
+ * and updates the AuthContext on successful profile changes.
+ */
 const Profile = () => {
   const { t } = useTranslation(['profile', 'common']);
   const { user, updateUser } = useAuth();

@@ -32,6 +32,21 @@ const GRADE_COLORS = {
   D: 'bg-red-100 text-red-700',
 };
 
+/**
+ * CRUD editor for intervention effectiveness ratings (Knowledge Graph feature).
+ * Manages the mapping between conditions and interventions with effectiveness levels
+ * (very_high, high, moderate, low, uncertain) and evidence grades (A-D).
+ *
+ * Supports marking an intervention as the primary treatment for a condition.
+ *
+ * @param {Object} props
+ * @param {string} [props.conditionId] - UUID of the condition (used in condition mode)
+ * @param {string} [props.interventionId] - UUID of the intervention (used in intervention mode)
+ * @param {Array<Object>} [props.conditions=[]] - Available conditions for the dropdown
+ * @param {Array<Object>} [props.interventions=[]] - Available interventions for the dropdown
+ * @param {string} [props.mode='condition'] - Editor mode: 'condition' or 'intervention'
+ * @returns {React.ReactElement} The effectiveness rating editor component
+ */
 const EffectivenessRatingEditor = ({
   conditionId,
   interventionId,

@@ -1,10 +1,17 @@
 import { memo, useState } from 'react';
 
 /**
- * Group/Container node for visually grouping related nodes.
- * Renders as a background container with a title label.
- * Draggable - when dragged, all child nodes move with it.
- * The container stretches to contain child nodes (via ReactFlow's expandParent).
+ * Group/Container node for visually grouping related nodes in the medical layout.
+ * Renders as a background container with a colored title label pill.
+ * Draggable -- when dragged, all child nodes move with it (React Flow parent behavior).
+ * The container auto-stretches to contain child nodes (via expandParent).
+ * Shows a dashed border when inactive, solid when hovered/selected/dragging.
+ * Double-click zooms to fit the group in the viewport.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: label, color, bgColor, borderColor, icon, count
+ * @param {boolean} props.selected - Whether the group is selected
+ * @param {boolean} props.dragging - Whether the group is being dragged
  */
 const GroupNode = memo(({ data, selected, dragging }) => {
   const {

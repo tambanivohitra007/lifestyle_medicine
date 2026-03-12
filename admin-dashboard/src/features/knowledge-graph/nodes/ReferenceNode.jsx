@@ -2,6 +2,17 @@ import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { ExternalLink, FileText } from 'lucide-react';
 
+/**
+ * Custom React Flow node representing an academic/medical reference.
+ * Compact design with slate gradient background. Displays year, truncated
+ * citation preview (80 chars), and link indicator badges (DOI, PMID, URL).
+ * Icon changes to ExternalLink when the reference has external links.
+ * Has top (target) and bottom (source) connection handles.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data containing year, citation, doi, pmid, url, isHighlighted
+ * @param {boolean} props.selected - Whether the node is currently selected
+ */
 const ReferenceNode = memo(({ data, selected }) => {
   const hasLink = data.doi || data.pmid || data.url;
   const isHighlighted = data.isHighlighted;

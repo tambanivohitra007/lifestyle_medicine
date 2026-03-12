@@ -6,6 +6,11 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import { Breadcrumbs, BodySystemSelect } from '../../components/shared';
 
+/**
+ * Form page for creating or editing a medical condition.
+ * Includes fields for name, category, body system, summary, and medical codes
+ * (SNOMED CT and ICD-10) with external lookup links.
+ */
 const ConditionForm = () => {
   const { t } = useTranslation(['conditions', 'common', 'knowledgeGraph']);
   const { id } = useParams();

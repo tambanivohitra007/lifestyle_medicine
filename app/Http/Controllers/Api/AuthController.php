@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Handles authentication for the admin dashboard SPA.
+ *
+ * Provides Sanctum token-based login/logout, authenticated user retrieval,
+ * and profile/password management. Used by the standalone admin React SPA.
+ *
+ * Routes: /api/v1/login, /api/v1/logout, /api/v1/user, /api/v1/profile, /api/v1/password
+ */
 class AuthController extends Controller
 {
     /**

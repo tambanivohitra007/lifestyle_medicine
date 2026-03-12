@@ -1,6 +1,15 @@
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Content completeness visualization showing progress bars for conditions,
+ * interventions, and recipes. Displays complete/partial/incomplete counts
+ * with color-coded segments and average completion scores.
+ *
+ * @param {Object} props
+ * @param {Object|null} props.data - Completeness stats per entity type with complete/partial/incomplete counts
+ * @param {boolean} props.loading - Whether data is still being fetched
+ */
 const ContentCompleteness = ({ data, loading }) => {
   const { t } = useTranslation(['analytics']);
   if (loading) {

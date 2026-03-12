@@ -7,10 +7,22 @@ use App\Services\BibleApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Provides Bible exploration and verse lookup via the Bible API.
+ *
+ * Supports verse lookup by reference, keyword search, health-themed verse
+ * browsing, daily verse retrieval, chapter reading, and translation
+ * selection. Acts as a proxy to the external Bible API service.
+ *
+ * Routes: /api/v1/bible/* (public, rate-limited)
+ */
 class BibleController extends Controller
 {
     protected BibleApiService $bibleService;
 
+    /**
+     * @param  BibleApiService  $bibleService  Injected Bible API service
+     */
     public function __construct(BibleApiService $bibleService)
     {
         $this->bibleService = $bibleService;

@@ -13,6 +13,17 @@ const NODE_TYPE_COLORS = {
   reference: '#64748b',
 };
 
+/**
+ * Search bar with autocomplete dropdown for finding nodes in the knowledge graph.
+ * Filters nodes by label text (minimum 2 characters, max 10 results).
+ * Supports keyboard navigation (Arrow keys, Enter, Escape) through results.
+ * Group container nodes are excluded from search results.
+ *
+ * @param {Object} props
+ * @param {Array} props.nodes - All graph nodes to search through
+ * @param {Function} props.onSelectNode - Callback when a node is selected from results
+ * @param {Function} props.onClearSearch - Callback when search is cleared
+ */
 const SearchBar = ({ nodes = [], onSelectNode, onClearSearch }) => {
   const { t } = useTranslation(['knowledgeGraph']);
   const [query, setQuery] = useState('');

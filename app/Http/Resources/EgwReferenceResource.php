@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming EgwReference (Ellen G. White) model instances.
+ *
+ * Includes book info, page/paragraph reference, quote text, topic,
+ * context, computed citation string, content tags, and audit fields.
+ */
 class EgwReferenceResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

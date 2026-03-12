@@ -20,6 +20,16 @@ import { FilterPanel, SearchBar, ExportPanel, KeyboardShortcutsHelp, NodeDetails
 import { useKeyboardShortcuts, useLayoutPersistence } from './hooks';
 import api from '../../lib/api';
 
+/**
+ * Inner component for the full knowledge graph view that displays all entities
+ * in the system with paginated lazy loading. Shares most interaction patterns
+ * with KnowledgeGraphInner (filtering, search, layout switching, hover highlighting,
+ * context menu, details panel) but without a center entity focus.
+ *
+ * Supports pagination via a "Load More" button that appends additional nodes
+ * from the API. Uses useMemo for display node/edge computation for performance
+ * with large datasets.
+ */
 const FullGraphInner = () => {
   const { t } = useTranslation(['knowledgeGraph']);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -644,6 +654,10 @@ const FullGraphInner = () => {
   );
 };
 
+/**
+ * Full graph page with ReactFlowProvider wrapper.
+ * Renders the complete knowledge graph visualization at /knowledge-graph/full.
+ */
 const FullGraphPage = () => (
   <ReactFlowProvider>
     <FullGraphInner />

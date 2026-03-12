@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/** @constant {Object.<string, string>} SIZES - Tailwind max-width classes for each modal size variant. */
 const SIZES = {
   sm: 'sm:max-w-md',
   md: 'sm:max-w-lg',
@@ -11,6 +12,21 @@ const SIZES = {
   full: 'sm:max-w-6xl',
 };
 
+/**
+ * Accessible modal dialog rendered via a React portal.
+ * Supports multiple size variants, Escape key dismissal, backdrop click close,
+ * and prevents body scroll while open. On mobile, renders as a bottom sheet
+ * with a drag indicator.
+ *
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the modal is visible
+ * @param {Function} props.onClose - Callback to close the modal
+ * @param {string} props.title - Modal header title
+ * @param {string} [props.size='md'] - Width variant: 'sm', 'md', 'lg', 'xl', or 'full'
+ * @param {React.ReactNode} props.children - Modal body content
+ * @param {boolean} [props.showCloseButton=true] - Whether to show the X close button
+ * @returns {React.ReactElement|null} The modal portal or null when closed
+ */
 const Modal = ({
   isOpen,
   onClose,

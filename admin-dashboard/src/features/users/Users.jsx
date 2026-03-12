@@ -6,6 +6,12 @@ import { toast, confirmDelete } from '../../lib/swal';
 import Swal from 'sweetalert2';
 import SlideOver from '../../components/shared/SlideOver';
 
+/**
+ * User management page with search, role filtering, and active/inactive status
+ * filtering. Uses a SlideOver panel for inline create/edit with fields for name,
+ * email, password, role (admin/editor/viewer), and active status. Supports
+ * password reset confirmation, account deactivation/reactivation, and delete.
+ */
 const Users = () => {
   const { t } = useTranslation(['users', 'common']);
   const [users, setUsers] = useState([]);

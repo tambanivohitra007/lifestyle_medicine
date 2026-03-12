@@ -14,6 +14,17 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
+/**
+ * Builds mindmap visualization data for conditions.
+ *
+ * Generates hierarchical data for condition mindmaps with branches for
+ * risk factors, physiology, complications, and lifestyle solutions organized
+ * by care domain. Also provides CRUD for risk factors and complications.
+ *
+ * Routes: /api/v1/conditions/{condition}/mindmap (public read),
+ *         /api/v1/admin/conditions/{condition}/risk-factors (admin CRUD),
+ *         /api/v1/admin/conditions/{condition}/complications (admin CRUD)
+ */
 class ConditionMindmapController extends Controller
 {
     /**

@@ -18,14 +18,35 @@ use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * AI content orchestration service for the draft-to-structured-import pipeline.
+ *
+ * Implements a three-phase content generation workflow:
+ * 1. **Draft Generation** (System 1 - fast model): Generates human-readable health content drafts
+ *    using Gemini 2.0-flash for quick, creative output.
+ * 2. **Content Structuring** (System 2 - thinking model): Converts approved drafts into structured
+ *    JSON using Gemini 2.5-flash for deliberate, accurate parsing.
+ * 3. **Database Import**: Imports structured content into the database with deduplication logic,
+ *    creating conditions, interventions, evidence entries, scriptures, EGW references, and recipes.
+ *
+ * Each phase includes retry logic with exponential backoff (up to 3 attempts).
+ *
+ * @see \App\Jobs\GenerateAiDraftJob Async job that calls generateDraft()
+ * @see \App\Jobs\StructureAiContentJob Async job that calls structureContent()
+ * @see \App\Services\GeminiService Lower-level Gemini API wrapper
+ */
 class AiContentService
 {
+    /** @var Client|null The Gemini API client instance, null if API key is not configured */
     protected ?Client $client = null;
 
+    /** @var string|null The Gemini API key from configuration */
     protected ?string $apiKey = null;
 
+    /** @var string The Gemini model used for fast draft generation (System 1) */
     protected string $draftModel;
 
+    /** @var string The Gemini model used for careful content structuring (System 2) */
     protected string $structureModel;
 
     /**
@@ -75,6 +96,13 @@ class AiContentService
         'guidelines' => 'expert_opinion',
     ];
 
+    /**
+     * Initialize the AI content service with Gemini API credentials and model configuration.
+     *
+     * Configures separate models for draft generation (fast) and content structuring (thinking).
+     * Sets up Guzzle HTTP client with 5-minute timeout for long AI requests. SSL verification
+     * can be disabled in non-production environments via GEMINI_VERIFY_SSL config.
+     */
     public function __construct()
     {
         $this->apiKey = config('services.gemini.api_key');
@@ -103,13 +131,27 @@ class AiContentService
         }
     }
 
+    /**
+     * Check if the Gemini API is configured with a valid API key.
+     *
+     * @return bool True if the API key is set and non-empty
+     */
     public function isConfigured(): bool
     {
         return $this->apiKey !== null && $this->apiKey !== '';
     }
 
     /**
-     * Generate a human-readable draft for a condition.
+     * Generate a human-readable draft for a health condition.
+     *
+     * Uses the fast draft model (System 1) to produce comprehensive content covering
+     * overview, risk factors, physiology, complications, lifestyle interventions,
+     * evidence, scriptures, EGW references, recipes, and tags. Retries up to 3 times
+     * with exponential backoff on failure.
+     *
+     * @param  string  $conditionName  The name of the health condition to generate content for
+     * @param  string  $context  Optional additional context or instructions from the user
+     * @return array{success?: bool, condition_name?: string, draft?: string, error?: string} Success with draft text, or error message
      */
     public function generateDraft(string $conditionName, string $context = ''): array
     {
@@ -155,7 +197,15 @@ class AiContentService
     }
 
     /**
-     * Convert approved draft into structured JSON.
+     * Convert an approved human-readable draft into structured JSON for database import.
+     *
+     * Uses the thinking model (System 2) for careful, deliberate structuring. Fetches
+     * available care domains from the database to ensure exact name matching. Retries
+     * up to 3 times with exponential backoff on failure or JSON parse errors.
+     *
+     * @param  string  $conditionName  The name of the health condition being structured
+     * @param  string  $approvedDraft  The human-reviewed and approved draft text
+     * @return array{success?: bool, structured?: array, error?: string} Success with structured data, or error message
      */
     public function structureContent(string $conditionName, string $approvedDraft): array
     {
@@ -219,7 +269,22 @@ class AiContentService
     }
 
     /**
-     * Import structured content into the database.
+     * Import structured AI-generated content into the database.
+     *
+     * Performs a transactional import of all content entities with deduplication logic:
+     * - Conditions: Created or updated by case-insensitive name match
+     * - Condition Sections: Always created new (risk_factors, physiology, complications, etc.)
+     * - Content Tags: First-or-created by lowercase tag name
+     * - Interventions: Matched by care domain + case-insensitive name, or created new
+     * - Evidence Entries: Created with normalized study types and linked references
+     * - Scriptures: Matched by case-insensitive reference, or created new
+     * - EGW References: Matched by book + page_start or quote prefix, or created new
+     * - Recipes: Matched by case-insensitive title, enforces vegetarian dietary tag
+     *
+     * All operations are wrapped in a database transaction; rolls back on any failure.
+     *
+     * @param  array  $structured  The structured content array from structureContent()
+     * @return array{success?: bool, error?: string, results: array} Import results with counts and IDs of created/reused entities
      */
     public function importContent(array $structured): array
     {
@@ -543,6 +608,15 @@ class AiContentService
 
     /**
      * Build the prompt for draft generation.
+     *
+     * Constructs a comprehensive prompt that instructs the AI to generate a human-readable
+     * draft covering all aspects of a health condition: overview, risk factors, physiology,
+     * complications, lifestyle interventions organized by NEWSTART+ care domains, evidence
+     * summary, scriptures, EGW references, vegetarian recipes, and content tags.
+     *
+     * @param  string  $conditionName  The health condition name
+     * @param  string  $context  Optional user-provided additional context
+     * @return string The fully constructed prompt string
      */
     protected function buildDraftPrompt(string $conditionName, string $context): string
     {
@@ -625,7 +699,16 @@ PROMPT;
     }
 
     /**
-     * Build the prompt for structuring approved content.
+     * Build the prompt for structuring approved content into database-ready JSON.
+     *
+     * Constructs a detailed prompt with the exact JSON schema expected for import,
+     * including rules for care domain matching, evidence types, section types,
+     * quality ratings, and vegetarian recipe requirements.
+     *
+     * @param  string  $conditionName  The health condition name
+     * @param  string  $draft  The approved draft content to be structured
+     * @param  array  $careDomains  List of available care domain names from the database
+     * @return string The fully constructed structuring prompt
      */
     protected function buildStructurePrompt(string $conditionName, string $draft, array $careDomains): string
     {
@@ -744,8 +827,17 @@ PROMPT;
     }
 
     /**
-     * Normalize a study type value to a valid enum value.
-     * Maps common variations and aliases to the correct database enum values.
+     * Normalize a study type value to a valid database enum value.
+     *
+     * Uses a three-tier matching strategy:
+     * 1. Direct match against VALID_STUDY_TYPES
+     * 2. Alias lookup in STUDY_TYPE_ALIASES map
+     * 3. Partial string matching for common patterns (e.g., "randomized" -> "rct")
+     *
+     * Falls back to 'observational' if no match is found.
+     *
+     * @param  string  $studyType  The raw study type string from AI-generated content
+     * @return string A valid study type enum value: rct, meta_analysis, systematic_review, observational, case_series, or expert_opinion
      */
     protected function normalizeStudyType(string $studyType): string
     {
@@ -797,7 +889,13 @@ PROMPT;
     }
 
     /**
-     * Parse JSON from AI response.
+     * Parse JSON from AI response, stripping markdown formatting.
+     *
+     * Removes markdown code block wrappers (```json ... ```) that Gemini may include,
+     * then decodes the JSON. Logs the first 500 characters of raw response on parse failure.
+     *
+     * @param  string  $text  The raw text response from Gemini
+     * @return array The decoded JSON array, or an array with 'error' key on parse failure
      */
     protected function parseJsonResponse(string $text): array
     {

@@ -15,6 +15,7 @@ import {
 import api, { apiEndpoints } from '../../../lib/api';
 import { toast, confirmDelete } from '../../../lib/swal';
 
+/** Color mapping for evidence grades A through D */
 const GRADE_CONFIG = {
   A: { color: 'bg-green-100 text-green-700', label: 'A' },
   B: { color: 'bg-blue-100 text-blue-700', label: 'B' },
@@ -22,6 +23,16 @@ const GRADE_CONFIG = {
   D: { color: 'bg-red-100 text-red-700', label: 'D' },
 };
 
+/**
+ * CRUD list for expected outcomes of an intervention. Each outcome includes a measure,
+ * expected change, direction (increase/decrease/stable), timeline in weeks, evidence
+ * grade (A-D), measurement method, and notes. Supports inline add/edit forms.
+ *
+ * @param {Object} props
+ * @param {string} props.interventionId - UUID of the parent intervention
+ * @param {Array} props.outcomes - Current outcome records
+ * @param {Function} props.onUpdate - Callback invoked after create, update, or delete
+ */
 const OutcomesList = ({ interventionId, outcomes, onUpdate }) => {
   const { t } = useTranslation(['interventions', 'common']);
   const [editingItem, setEditingItem] = useState(null);

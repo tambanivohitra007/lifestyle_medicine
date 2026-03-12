@@ -3,8 +3,18 @@ import { Eye, ExternalLink, Focus, Copy, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 /**
- * Context menu that appears on right-click of a node.
- * Provides quick actions like view details, navigate, focus, etc.
+ * Context menu that appears on right-click of a graph node.
+ * Provides quick actions: view details, open full page, focus/zoom,
+ * and copy node name. Closes on outside click or Escape key.
+ * Adapts available actions based on node type (group vs content nodes).
+ *
+ * @param {Object} props
+ * @param {Object} props.node - The right-clicked React Flow node
+ * @param {{x: number, y: number}} props.position - Screen coordinates for menu placement
+ * @param {Function} props.onClose - Callback to close the menu
+ * @param {Function} props.onViewDetails - Callback to open the details panel for a node
+ * @param {Function} props.onNavigate - Callback to navigate to entity page (type, entityId)
+ * @param {Function} props.onFocus - Callback to center viewport on a node
  */
 const NodeContextMenu = memo(({
   node,

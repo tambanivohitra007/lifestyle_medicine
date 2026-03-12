@@ -1,7 +1,13 @@
+/**
+ * @module swal
+ * SweetAlert2 wrapper providing pre-configured toast notifications,
+ * confirmation dialogs, and loading indicators with consistent theming.
+ * All dialog text is i18n-aware via react-i18next.
+ */
 import Swal from 'sweetalert2';
 import i18n from '../i18n';
 
-// Custom theme colors matching Tailwind config
+/** @constant {Object} theme - Color palette matching the Tailwind CSS config. */
 const theme = {
   primary: '#2563eb',
   danger: '#dc2626',
@@ -12,7 +18,15 @@ const theme = {
 // Helper to get translations
 const t = (key, options) => i18n.t(key, options);
 
-// Toast notification (auto-dismiss)
+/**
+ * Auto-dismissing toast notifications displayed at the top-right corner.
+ * Each method accepts a message string and shows a styled toast.
+ *
+ * @property {Function} success - Show a success toast (3s).
+ * @property {Function} error - Show an error toast (4s).
+ * @property {Function} warning - Show a warning toast (3.5s).
+ * @property {Function} info - Show an info toast (3s).
+ */
 export const toast = {
   success: (message) => {
     Swal.fire({
@@ -75,7 +89,11 @@ export const toast = {
   },
 };
 
-// Confirm delete dialog
+/**
+ * Displays a confirmation dialog for delete operations with a danger-themed confirm button.
+ * @param {string} [itemName='this item'] - The name of the item being deleted (shown in the message)
+ * @returns {Promise<boolean>} Resolves to true if the user confirmed, false otherwise
+ */
 export const confirmDelete = async (itemName = 'this item') => {
   const result = await Swal.fire({
     title: t('common:confirmation.deleteTitle'),
@@ -97,7 +115,11 @@ export const confirmDelete = async (itemName = 'this item') => {
   return result.isConfirmed;
 };
 
-// Confirm remove/detach dialog
+/**
+ * Displays a confirmation dialog for remove/detach operations (e.g., unlinking a relationship).
+ * @param {string} [message] - Optional custom message (defaults to i18n common remove message)
+ * @returns {Promise<boolean>} Resolves to true if the user confirmed, false otherwise
+ */
 export const confirmRemove = async (message) => {
   const result = await Swal.fire({
     title: t('common:confirmation.removeTitle'),
@@ -119,7 +141,13 @@ export const confirmRemove = async (message) => {
   return result.isConfirmed;
 };
 
-// General confirmation dialog
+/**
+ * Displays a general-purpose confirmation dialog.
+ * @param {string} title - Dialog title
+ * @param {string} message - Dialog message body
+ * @param {string} [confirmText] - Custom confirm button text (defaults to i18n "Confirm")
+ * @returns {Promise<boolean>} Resolves to true if the user confirmed, false otherwise
+ */
 export const confirm = async (title, message, confirmText) => {
   const result = await Swal.fire({
     title: title,
@@ -141,7 +169,12 @@ export const confirm = async (title, message, confirmText) => {
   return result.isConfirmed;
 };
 
-// Error alert
+/**
+ * Displays a modal error alert with an OK button.
+ * @param {string} message - Error message to display
+ * @param {string} [title] - Optional custom title (defaults to i18n status label)
+ * @returns {Promise<SweetAlertResult>} The SweetAlert2 result
+ */
 export const showError = (message, title) => {
   return Swal.fire({
     title: title || t('common:labels.status'),
@@ -156,7 +189,12 @@ export const showError = (message, title) => {
   });
 };
 
-// Success alert
+/**
+ * Displays a modal success alert that auto-dismisses after 2 seconds.
+ * @param {string} message - Success message to display
+ * @param {string} [title] - Optional custom title (defaults to i18n status label)
+ * @returns {Promise<SweetAlertResult>} The SweetAlert2 result
+ */
 export const showSuccess = (message, title) => {
   return Swal.fire({
     title: title || t('common:labels.status'),
@@ -173,7 +211,11 @@ export const showSuccess = (message, title) => {
   });
 };
 
-// Loading dialog
+/**
+ * Shows a non-dismissable loading spinner dialog.
+ * Call hideLoading() to close it.
+ * @param {string} [message] - Optional loading message (defaults to i18n "Please wait")
+ */
 export const showLoading = (message) => {
   Swal.fire({
     title: message || t('common:messages.pleaseWait'),
@@ -188,12 +230,17 @@ export const showLoading = (message) => {
   });
 };
 
-// Close loading
+/**
+ * Closes the currently open SweetAlert2 dialog (e.g., loading spinner).
+ */
 export const hideLoading = () => {
   Swal.close();
 };
 
-// Confirm logout dialog
+/**
+ * Displays a confirmation dialog specifically for logout operations.
+ * @returns {Promise<boolean>} Resolves to true if the user confirmed logout, false otherwise
+ */
 export const confirmLogout = async () => {
   const result = await Swal.fire({
     title: t('auth:logout.title'),

@@ -10,6 +10,15 @@ const QUALITY_OPTIONS_CONFIG = [
   { labelKey: 'knowledgeGraph:export.quality.print', value: 6, descriptionKey: 'knowledgeGraph:export.quality.printDesc' },
 ];
 
+/**
+ * Export panel providing multiple graph export options: PNG (with quality levels),
+ * SVG, print/PDF, and share link copy. Uses html-to-image library to capture
+ * the React Flow viewport. PNG quality options range from standard (2x) to
+ * print-quality (6x) pixel ratio.
+ *
+ * @param {Object} props
+ * @param {string} props.graphTitle - Title used for exported filenames
+ */
 const ExportPanel = ({ graphTitle }) => {
   const { t } = useTranslation(['knowledgeGraph']);
   const translatedTitle = graphTitle || t('knowledgeGraph:title');

@@ -17,6 +17,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Provides analytics and dashboard statistics for the admin panel.
+ *
+ * Generates cached overview counts, category/domain distributions,
+ * growth trends, user activity feeds, evidence quality analysis,
+ * and content completeness scores. Results are cached for 5-10 minutes.
+ *
+ * Routes: /api/v1/admin/analytics/* (admin only)
+ */
 class AnalyticsController extends Controller
 {
     /**

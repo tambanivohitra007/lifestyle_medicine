@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming InterventionRelationship model instances.
+ *
+ * Includes relationship type (synergy/conflict/etc.), polarity flags,
+ * description, clinical notes, and both intervention endpoints.
+ */
 class InterventionRelationshipResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

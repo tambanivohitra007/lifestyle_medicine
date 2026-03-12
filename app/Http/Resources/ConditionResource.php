@@ -5,6 +5,13 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming Condition model instances.
+ *
+ * Includes core condition data, publishing status, body system, related sections,
+ * interventions, scriptures, recipes, effectiveness ratings, and audit fields.
+ * Related data is conditionally included only when eager-loaded.
+ */
 class ConditionResource extends JsonResource
 {
     /**

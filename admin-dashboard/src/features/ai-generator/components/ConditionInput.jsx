@@ -1,6 +1,18 @@
 import { Sparkles, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Input form for the first phase of AI content generation.
+ * Collects the condition name and optional context before triggering draft generation.
+ *
+ * @param {Object} props
+ * @param {string} props.conditionName - Current condition name value
+ * @param {string} props.context - Optional additional context for the AI
+ * @param {Function} props.onConditionNameChange - Callback when condition name changes
+ * @param {Function} props.onContextChange - Callback when context changes
+ * @param {Function} props.onGenerate - Callback to trigger AI draft generation
+ * @param {boolean} props.loading - Whether a generation request is in progress
+ */
 const ConditionInput = ({
   conditionName,
   context,

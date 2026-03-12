@@ -1,6 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import Modal from '../ui/Modal';
 
+/**
+ * Formats a revision field value for display.
+ * Handles null, boolean, object, and string types.
+ * @param {*} value - The value to format
+ * @returns {string} Human-readable string representation
+ */
 const formatValue = (value) => {
   if (value === null || value === undefined) return '-';
   if (typeof value === 'boolean') return value ? 'true' : 'false';
@@ -8,8 +14,23 @@ const formatValue = (value) => {
   return String(value);
 };
 
+/** @constant {string[]} SKIP_FIELDS - System fields excluded from the revision data display. */
 const SKIP_FIELDS = ['id', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by', 'deleted_by'];
 
+/**
+ * Modal dialog displaying the data snapshot of a single content revision.
+ * Shows version metadata, change summary, and all non-system fields.
+ *
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the modal is visible
+ * @param {Function} props.onClose - Callback to close the modal
+ * @param {Object} [props.revision] - The revision object to display
+ * @param {number} [props.revision.version_number] - The version number
+ * @param {Object} [props.revision.data] - The stored revision data snapshot
+ * @param {string} [props.revision.change_summary] - Summary of changes in this revision
+ * @param {string} [props.title] - Optional custom modal title
+ * @returns {React.ReactElement|null} The revision diff modal or null if no revision
+ */
 const RevisionDiff = ({ isOpen, onClose, revision, title }) => {
   const { t } = useTranslation('common');
 

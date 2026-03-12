@@ -15,6 +15,17 @@ import {
 import api, { apiEndpoints } from '../../../lib/api';
 import { toast, confirmDelete } from '../../../lib/swal';
 
+/**
+ * Manages the ordered list of steps within a treatment protocol. Supports adding,
+ * editing, reordering, and deleting steps. Each step includes phase name, title,
+ * description, duration, week range, frequency, instructions, and tips.
+ *
+ * @param {Object} props
+ * @param {string} props.interventionId - UUID of the parent intervention
+ * @param {Object} props.protocol - Parent protocol object (must exist before adding steps)
+ * @param {Array} props.steps - Current list of protocol step objects
+ * @param {Function} props.onUpdate - Callback invoked after any step mutation
+ */
 const ProtocolStepsList = ({ interventionId, protocol, steps, onUpdate }) => {
   const { t } = useTranslation(['interventions', 'common']);
   const [editingStep, setEditingStep] = useState(null);

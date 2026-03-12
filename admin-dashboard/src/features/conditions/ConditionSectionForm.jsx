@@ -7,6 +7,11 @@ import { toast } from '../../lib/swal';
 import RichTextEditor from '../../components/editor/RichTextEditor';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Form for creating or editing a condition section (e.g., risk factors, physiology, solutions).
+ * Uses a rich text editor with image upload support for section body content.
+ * Supports pre-selecting section type via URL query parameter.
+ */
 const ConditionSectionForm = () => {
   const { t } = useTranslation(['conditions', 'common']);
   const { id: conditionId, sectionId } = useParams();

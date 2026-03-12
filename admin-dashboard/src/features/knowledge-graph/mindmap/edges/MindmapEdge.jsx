@@ -2,8 +2,14 @@ import { memo } from 'react';
 import { BaseEdge, getSmoothStepPath } from 'reactflow';
 
 /**
- * Mindmap edge - step/orthogonal connector with rounded corners
- * Creates clean right-angle paths between nodes
+ * Custom React Flow edge for the mindmap visualization.
+ * Renders orthogonal (step) paths with 12px rounded corners and a subtle
+ * glow/shadow effect underneath. Supports dashed stroke for secondary connections.
+ * Uses smooth-step routing with a 20px offset before the first turn.
+ *
+ * @param {Object} props - React Flow edge props
+ * @param {Object} props.data - Edge data: color (stroke color), dashed (boolean for dashed style)
+ * @param {boolean} props.selected - Whether the edge is selected (increases stroke width and adds glow)
  */
 const MindmapEdge = memo(({
   id,

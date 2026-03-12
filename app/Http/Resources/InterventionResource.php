@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming Intervention model instances.
+ *
+ * Includes core intervention data, care domain, evidence entries, tags, media,
+ * pivot data (when accessed through a condition relationship), and audit fields.
+ */
 class InterventionResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

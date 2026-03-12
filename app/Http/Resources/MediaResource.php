@@ -5,6 +5,12 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming Media model instances.
+ *
+ * Includes file metadata (filename, MIME type, size), type classification
+ * (image/document/infographic), public URL, alt text, caption, and ordering.
+ */
 class MediaResource extends JsonResource
 {
     /**

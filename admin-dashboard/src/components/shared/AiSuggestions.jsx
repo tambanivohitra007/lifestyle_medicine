@@ -2,6 +2,18 @@ import { useState } from 'react';
 import { Sparkles, Loader2, ChevronDown, ChevronUp, Plus, AlertCircle, ExternalLink } from 'lucide-react';
 import api, { apiEndpoints } from '../../lib/api';
 
+/**
+ * Collapsible panel that fetches and displays AI-powered suggestions from Google Gemini.
+ * Supports two suggestion types: Bible scripture references and Ellen G. White quotations.
+ * Users can click "Get Suggestions" to query the API and select individual results.
+ *
+ * @param {Object} props
+ * @param {string} props.type - Suggestion type: 'scripture' for Bible verses, 'egw' for EGW references
+ * @param {string} props.topic - The health topic to search for (e.g., 'healing', 'diet')
+ * @param {string} [props.context] - Additional context to refine suggestions
+ * @param {Function} props.onSelect - Callback invoked with the selected suggestion object
+ * @returns {React.ReactElement} The AI suggestions panel
+ */
 const AiSuggestions = ({ type, topic, context, onSelect }) => {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);

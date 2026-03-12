@@ -6,6 +6,12 @@ import { Link } from 'react-router-dom';
 import RichTextPreview from '../../components/shared/RichTextPreview';
 import { useAuth } from '../../contexts/AuthContext';
 
+/**
+ * Main dashboard page showing platform overview statistics, recent conditions,
+ * and quick action cards for creating new content. Fetches aggregate counts
+ * from multiple API endpoints in parallel. Quick actions are visible only to
+ * users with edit permissions.
+ */
 const Dashboard = () => {
   const { t } = useTranslation(['dashboard', 'common']);
   const { canEdit } = useAuth();

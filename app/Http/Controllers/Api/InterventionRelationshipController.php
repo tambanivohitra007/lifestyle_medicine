@@ -10,6 +10,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages relationships (synergies/conflicts) between pairs of interventions.
+ *
+ * Tracks interaction types: synergy, complementary, neutral, caution, conflict.
+ * Relationships are bidirectional and unique per intervention pair.
+ *
+ * Routes: /api/v1/intervention-relationships (public read),
+ *         /api/v1/admin/intervention-relationships (admin CRUD)
+ */
 class InterventionRelationshipController extends Controller
 {
     /**

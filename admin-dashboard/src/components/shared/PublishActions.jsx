@@ -2,6 +2,17 @@ import { CheckCircle, Eye, Archive, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 
+/**
+ * Renders publishing workflow action buttons based on the current entity status and user role.
+ * Shows appropriate transitions: draft -> review -> published -> archived, and back.
+ * Admin users see additional actions (publish, archive).
+ *
+ * @param {Object} props
+ * @param {string} props.status - Current publishing status ('draft'|'in_review'|'published'|'archived')
+ * @param {Function} props.onAction - Callback with the action key (e.g., 'publish', 'archive', 'submit-for-review', 'return-to-draft')
+ * @param {boolean} [props.loading=false] - Whether action buttons should be disabled
+ * @returns {React.ReactElement|null} Action buttons or null if no actions available
+ */
 const PublishActions = ({ status, onAction, loading = false }) => {
   const { t } = useTranslation('common');
   const { isAdmin } = useAuth();

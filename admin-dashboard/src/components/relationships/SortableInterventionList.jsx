@@ -32,6 +32,19 @@ const RECOMMENDATION_LEVEL = {
   optional: { label: 'Optional', color: 'bg-gray-100 text-gray-700' },
 };
 
+/**
+ * Individual draggable intervention card within the sortable list.
+ * Displays intervention name, evidence strength badge, recommendation level,
+ * care domain, description, and clinical notes from the pivot data.
+ *
+ * @param {Object} props
+ * @param {Object} props.intervention - The intervention object with optional pivot data
+ * @param {Function} props.onEdit - Callback when the edit button is clicked
+ * @param {Function} props.onDetach - Callback when the detach/remove button is clicked
+ * @param {boolean} props.canEdit - Whether edit and drag actions are available
+ * @param {boolean} [props.isDragging] - Whether this item is currently being dragged
+ * @returns {React.ReactElement} The sortable intervention card
+ */
 const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) => {
   const {
     attributes,
@@ -144,6 +157,19 @@ const SortableItem = ({ intervention, onEdit, onDetach, canEdit, isDragging }) =
   );
 };
 
+/**
+ * Drag-and-drop sortable list of interventions linked to a condition.
+ * Uses @dnd-kit for pointer, touch, and keyboard drag-and-drop support.
+ * When the user cannot edit, renders a static list without drag handles.
+ *
+ * @param {Object} props
+ * @param {Array<Object>} props.interventions - Array of intervention objects to display
+ * @param {Function} [props.onReorder] - Callback with the reordered array after drag-and-drop
+ * @param {Function} props.onEdit - Callback when edit is clicked on an intervention
+ * @param {Function} props.onDetach - Callback when detach/remove is clicked on an intervention
+ * @param {boolean} props.canEdit - Whether editing and reordering are enabled
+ * @returns {React.ReactElement} The sortable intervention list or empty state
+ */
 const SortableInterventionList = ({
   interventions,
   onReorder,

@@ -11,14 +11,43 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * Vertex AI Imagen API service for AI-powered image generation.
+ *
+ * Integrates with Google Cloud's Vertex AI Imagen model to generate medical infographic
+ * background images from text prompts. Supports two execution paths:
+ * - **gRPC Client**: Uses the official Google Cloud PHP client for production environments
+ * - **REST API**: Direct HTTP requests for local development with SSL verification disabled
+ *
+ * Also provides image storage functionality to save generated images to the public disk,
+ * with automatic MIME type detection and file extension mapping.
+ *
+ * @see \App\Services\InfographicGeneratorService The orchestrator that uses this service
+ * @see \App\Jobs\GenerateInfographicJob The async job that calls generateImage()
+ */
 class ImagenService
 {
+    /** @var string|null The Google Cloud project ID */
     protected ?string $projectId;
+
+    /** @var string|null The Vertex AI region/location (e.g., 'us-central1') */
     protected ?string $location;
+
+    /** @var string|null The file path to Google Cloud service account credentials JSON */
     protected ?string $credentials;
+
+    /** @var string The Imagen model identifier (e.g., 'imagen-4.0-fast-generate-001') */
     protected string $model;
+
+    /** @var bool Whether to verify SSL certificates for API requests */
     protected bool $verifySsl;
 
+    /**
+     * Initialize the Imagen service with Vertex AI configuration.
+     *
+     * Reads project ID, location, credentials path, model name, and SSL verification
+     * settings from the services.vertex_ai configuration.
+     */
     public function __construct()
     {
         $this->projectId = config('services.vertex_ai.project_id');
@@ -165,7 +194,16 @@ class ImagenService
     }
 
     /**
-     * Generate image using REST API directly (for local dev with SSL issues).
+     * Generate an image using the Vertex AI REST API directly.
+     *
+     * Used as an alternative to the gRPC client for local development environments
+     * where SSL verification is disabled. Obtains an OAuth2 access token from the
+     * service account credentials and makes a direct POST request to the Vertex AI
+     * predict endpoint.
+     *
+     * @param  string  $prompt  The text prompt for image generation
+     * @param  array  $options  Optional parameters: aspectRatio (default '3:4'), sampleCount (default 1)
+     * @return array{success: bool, image_data?: string, error?: string}
      */
     protected function generateImageViaRest(string $prompt, array $options = []): array
     {
@@ -250,7 +288,13 @@ class ImagenService
     }
 
     /**
-     * Get OAuth2 access token from service account credentials.
+     * Get an OAuth2 access token from Google Cloud service account credentials.
+     *
+     * Creates a JWT (RS256) signed with the service account's private key, then
+     * exchanges it for an access token via Google's OAuth2 token endpoint. The
+     * JWT requests the cloud-platform scope and has a 1-hour expiry.
+     *
+     * @return string|null The access token, or null on failure
      */
     protected function getAccessToken(): ?string
     {
@@ -304,7 +348,13 @@ class ImagenService
     }
 
     /**
-     * Base64 URL encode (for JWT).
+     * Base64 URL-safe encode for JWT token construction.
+     *
+     * Converts standard base64 encoding to URL-safe variant by replacing
+     * '+' with '-', '/' with '_', and stripping trailing '=' padding.
+     *
+     * @param  string  $data  The raw binary data to encode
+     * @return string The URL-safe base64 encoded string
      */
     protected function base64UrlEncode(string $data): string
     {
@@ -360,7 +410,12 @@ class ImagenService
     }
 
     /**
-     * Get file extension from MIME type.
+     * Map a MIME type to a file extension for image storage.
+     *
+     * Supports PNG, JPEG, WebP, and GIF. Defaults to 'png' for unknown types.
+     *
+     * @param  string  $mimeType  The MIME type string (e.g., 'image/png')
+     * @return string The file extension without dot (e.g., 'png', 'jpg')
      */
     protected function getExtensionFromMime(string $mimeType): string
     {
@@ -376,7 +431,9 @@ class ImagenService
     }
 
     /**
-     * Get the configured Imagen model.
+     * Get the configured Imagen model identifier.
+     *
+     * @return string The model name (e.g., 'imagen-4.0-fast-generate-001')
      */
     public function getModel(): string
     {
@@ -384,7 +441,11 @@ class ImagenService
     }
 
     /**
-     * Get configuration status details.
+     * Get diagnostic information about the Imagen service configuration.
+     *
+     * Returns a safe summary (project ID is masked) for use in admin status endpoints.
+     *
+     * @return array{configured: bool, project_id: string|null, location: string|null, model: string, credentials_exist: bool}
      */
     public function getConfigurationStatus(): array
     {

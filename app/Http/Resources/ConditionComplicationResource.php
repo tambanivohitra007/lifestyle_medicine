@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming ConditionComplication model instances.
+ *
+ * Includes complication details (name, description, likelihood, timeframe),
+ * preventability flag, linked conditions, and audit fields.
+ */
 class ConditionComplicationResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

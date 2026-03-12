@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming ConditionRiskFactor model instances.
+ *
+ * Includes risk factor details (name, description, type, severity),
+ * modifiability flag, ordering, and audit fields.
+ */
 class ConditionRiskFactorResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

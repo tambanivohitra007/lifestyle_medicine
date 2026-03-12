@@ -31,6 +31,11 @@ const RECOMMENDATION_STRENGTHS = [
   { value: 'weak', labelKey: 'weak', descKey: 'weakDescription' },
 ];
 
+/**
+ * Form for creating or editing an evidence entry linked to an intervention.
+ * Includes tiered study type selection, quality rating, sample size, summary,
+ * DOI link, and publication year. Study types are organized by evidence hierarchy tier.
+ */
 const EvidenceForm = () => {
   const { t } = useTranslation(['evidence', 'common']);
   const { id } = useParams();

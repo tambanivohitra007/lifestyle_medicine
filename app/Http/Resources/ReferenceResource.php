@@ -5,8 +5,18 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming Reference (academic citation) model instances.
+ *
+ * Includes citation text, DOI, PMID, URL, publication year, and audit fields.
+ */
 class ReferenceResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

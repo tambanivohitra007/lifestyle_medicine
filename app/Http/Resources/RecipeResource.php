@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming Recipe model instances.
+ *
+ * Includes recipe details (title, description, ingredients, instructions,
+ * timing, servings), dietary tags, content tags, and audit fields.
+ */
 class RecipeResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

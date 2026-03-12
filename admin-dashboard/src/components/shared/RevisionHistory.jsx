@@ -6,6 +6,18 @@ import { toast } from '../../lib/swal';
 import RevisionTimeline from './RevisionTimeline';
 import RevisionDiff from './RevisionDiff';
 
+/**
+ * Displays the full revision history for a content entity with pagination.
+ * Fetches revisions from the API and renders them as a timeline.
+ * Supports viewing revision details in a modal and restoring previous versions.
+ *
+ * @param {Object} props
+ * @param {string} props.entityType - The entity type identifier (e.g., 'condition', 'intervention')
+ * @param {string} props.entityId - The UUID of the entity
+ * @param {boolean} [props.canRestore=false] - Whether the user can restore previous revisions
+ * @param {Function} [props.onRestored] - Callback invoked after a revision is successfully restored
+ * @returns {React.ReactElement} The revision history panel
+ */
 const RevisionHistory = ({ entityType, entityId, canRestore = false, onRestored }) => {
   const { t } = useTranslation('common');
   const [revisions, setRevisions] = useState([]);

@@ -1,7 +1,10 @@
 import { memo, useState } from 'react';
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow';
 
-// Relationship type configurations derived from edge IDs
+/**
+ * @constant Relationship type configurations derived from edge ID substrings.
+ * Maps edge ID patterns to display labels and emoji icons for hover tooltips.
+ */
 const RELATIONSHIP_LABELS = {
   'domain-int': { label: 'belongs to', icon: '🏷️' },
   'int-ev': { label: 'supported by', icon: '📊' },
@@ -15,8 +18,12 @@ const RELATIONSHIP_LABELS = {
 };
 
 /**
- * Generic styled edge for non-intervention relationships.
- * Shows relationship type label on hover.
+ * Custom React Flow edge for generic (non-intervention) relationships.
+ * Renders a smooth-step path with an invisible wider hit-area for easier hover detection.
+ * Shows a relationship type label (derived from edge ID pattern matching) on hover or selection.
+ * Adjusts stroke width and opacity based on hover/selection state.
+ *
+ * @param {Object} props - React Flow edge props (id, sourceX/Y, targetX/Y, positions, etc.)
  */
 const RelationshipEdge = memo(({
   id,

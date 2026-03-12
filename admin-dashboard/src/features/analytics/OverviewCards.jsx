@@ -1,6 +1,17 @@
 import { HeartPulse, Activity, Book, ChefHat, BookMarked, TestTube, Users, Plus, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Individual statistic card displaying a metric with icon and optional sub-value.
+ *
+ * @param {Object} props
+ * @param {string} props.title - Label for the metric
+ * @param {number} props.value - Primary numeric value
+ * @param {React.ComponentType} props.icon - Lucide icon component
+ * @param {string} props.color - Tailwind background color class for the icon container
+ * @param {number} [props.subValue] - Optional secondary value (e.g., recent additions)
+ * @param {string} [props.subLabel] - Label for the sub-value
+ */
 const StatCard = ({ title, value, icon: Icon, color, subValue, subLabel }) => (
   <div className="bg-white rounded-lg shadow p-6">
     <div className="flex items-center justify-between">
@@ -20,6 +31,15 @@ const StatCard = ({ title, value, icon: Icon, color, subValue, subLabel }) => (
   </div>
 );
 
+/**
+ * Grid of overview statistic cards showing entity counts and recent activity.
+ * Displays conditions, interventions, scriptures, recipes, EGW references,
+ * evidence entries, users, and today's activity.
+ *
+ * @param {Object} props
+ * @param {Object|null} props.data - Overview statistics from the analytics API
+ * @param {boolean} props.loading - Whether data is still being fetched
+ */
 const OverviewCards = ({ data, loading }) => {
   const { t } = useTranslation(['analytics']);
 

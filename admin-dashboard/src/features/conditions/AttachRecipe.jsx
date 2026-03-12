@@ -6,6 +6,11 @@ import api, { apiEndpoints } from '../../lib/api';
 import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Page for attaching a recipe to a condition.
+ * Displays a filterable grid of available (unlinked) recipes with search.
+ * Features a sticky bottom action bar for confirming the selected recipe.
+ */
 const AttachRecipe = () => {
   const { t } = useTranslation(['conditions', 'common', 'recipes']);
   const { id: conditionId } = useParams();

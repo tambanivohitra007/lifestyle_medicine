@@ -17,6 +17,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages intervention protocols, steps, contraindications, and expected outcomes.
+ *
+ * Each intervention can have one protocol with ordered steps, multiple
+ * contraindications (with severity levels), and expected outcomes with
+ * evidence grades and timelines.
+ *
+ * Routes: /api/v1/interventions/{intervention}/protocol (public read),
+ *         /api/v1/admin/interventions/{intervention}/protocol (admin CRUD)
+ */
 class InterventionProtocolController extends Controller
 {
     /**

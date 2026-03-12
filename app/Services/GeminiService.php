@@ -7,12 +7,32 @@ use GeminiAPI\Resources\Parts\TextPart;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Google Gemini API integration service for AI-powered content generation.
+ *
+ * Provides methods for generating Scripture suggestions, Ellen G. White reference
+ * suggestions, and generic text content using the Gemini 2.5-flash model. Handles
+ * API client initialization with configurable SSL verification (disabled only in
+ * non-production environments).
+ *
+ * @see \App\Services\AiContentService For higher-level AI content orchestration that builds on this service
+ * @see \App\Services\InfographicGeneratorService For infographic prompt generation using generateText()
+ */
 class GeminiService
 {
+    /** @var Client|null The Gemini API client instance, null if API key is not configured */
     protected ?Client $client = null;
 
+    /** @var string|null The Gemini API key from configuration */
     protected ?string $apiKey = null;
 
+    /**
+     * Initialize the Gemini service with API credentials and HTTP client.
+     *
+     * Reads the API key from config and creates a Gemini Client. SSL verification
+     * can be disabled via the GEMINI_VERIFY_SSL environment variable, but this is
+     * blocked in production regardless of the config value.
+     */
     public function __construct()
     {
         $this->apiKey = config('services.gemini.api_key');
@@ -41,9 +61,17 @@ class GeminiService
 
     /**
      * Generate generic text content based on system instructions and a user prompt.
-     * Used for the Infographic "Architect" step.
      *
-     * @throws \RuntimeException if Gemini is not configured
+     * Combines the system instruction and user prompt into a single request to the
+     * Gemini 2.5-flash model. Strips any markdown code block formatting from the
+     * response. Used primarily by the Infographic "Architect" step.
+     *
+     * @param  string  $systemInstruction  The system-level instruction defining AI behavior and constraints
+     * @param  string  $userPrompt  The specific task or question for the AI to address
+     * @return string The cleaned text response from Gemini
+     *
+     * @throws \RuntimeException If the Gemini API is not configured (missing API key)
+     * @throws \Exception If the Gemini API call fails (re-thrown for caller handling)
      */
     public function generateText(string $systemInstruction, string $userPrompt): string
     {
@@ -78,6 +106,14 @@ class GeminiService
 
     /**
      * Suggest Scripture references for a health condition or intervention.
+     *
+     * Sends a structured prompt to Gemini requesting 5 relevant Bible scriptures
+     * with references, full text (KJV/NKJV), themes, and explanations. The response
+     * is parsed from JSON format.
+     *
+     * @param  string  $topic  The health topic or condition name to find scriptures for
+     * @param  string  $context  Optional additional context to refine suggestions
+     * @return array{suggestions?: array, error?: string} Array with 'suggestions' key containing scripture data, or 'error' on failure
      */
     public function suggestScriptures(string $topic, string $context = ''): array
     {
@@ -105,6 +141,15 @@ class GeminiService
 
     /**
      * Suggest Ellen G. White references for a health condition or intervention.
+     *
+     * Sends a structured prompt to Gemini requesting 5 relevant quotes from EGW writings,
+     * focusing on health-related books (Ministry of Healing, Counsels on Diet and Foods, etc.).
+     * Each suggestion includes book name, abbreviation, page number, exact quote, topic, and
+     * a source URL linking to egwwritings.org.
+     *
+     * @param  string  $topic  The health topic or condition name to find EGW references for
+     * @param  string  $context  Optional additional context to refine suggestions
+     * @return array{suggestions?: array, error?: string} Array with 'suggestions' key containing EGW reference data, or 'error' on failure
      */
     public function suggestEgwReferences(string $topic, string $context = ''): array
     {
@@ -132,6 +177,13 @@ class GeminiService
 
     /**
      * Build the prompt for Scripture suggestions.
+     *
+     * Constructs a detailed prompt instructing Gemini to return 5 Bible scriptures
+     * in a specific JSON format with reference, text, theme, and explanation fields.
+     *
+     * @param  string  $topic  The health topic to build the prompt for
+     * @param  string  $context  Additional context to include in the prompt
+     * @return string The fully constructed prompt string
      */
     protected function buildScripturePrompt(string $topic, string $context): string
     {
@@ -164,7 +216,15 @@ PROMPT;
     }
 
     /**
-     * Build the prompt for EGW reference suggestions.
+     * Build the prompt for Ellen G. White reference suggestions.
+     *
+     * Constructs a detailed prompt instructing Gemini to return 5 verifiable EGW quotes
+     * in a specific JSON format. Emphasizes that quotes must be real and verifiable on
+     * egwwritings.org, and focuses on health-related books.
+     *
+     * @param  string  $topic  The health topic to build the prompt for
+     * @param  string  $context  Additional context to include in the prompt
+     * @return string The fully constructed prompt string
      */
     protected function buildEgwPrompt(string $topic, string $context): string
     {
@@ -218,6 +278,12 @@ PROMPT;
 
     /**
      * Parse Scripture suggestions from Gemini response.
+     *
+     * Strips markdown code block formatting and decodes the JSON response.
+     * Returns parsed suggestions or an error if JSON parsing fails.
+     *
+     * @param  string  $text  The raw text response from Gemini
+     * @return array{suggestions?: array, error?: string} Parsed suggestions or error message
      */
     protected function parseScriptureSuggestions(string $text): array
     {
@@ -238,7 +304,13 @@ PROMPT;
     }
 
     /**
-     * Parse EGW suggestions from Gemini response.
+     * Parse Ellen G. White suggestions from Gemini response.
+     *
+     * Strips markdown code block formatting and decodes the JSON response.
+     * Returns parsed suggestions or an error if JSON parsing fails.
+     *
+     * @param  string  $text  The raw text response from Gemini
+     * @return array{suggestions?: array, error?: string} Parsed suggestions or error message
      */
     protected function parseEgwSuggestions(string $text): array
     {

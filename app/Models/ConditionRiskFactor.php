@@ -9,6 +9,33 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Represents a risk factor associated with a medical condition.
+ *
+ * Risk factors are categorized by type (modifiable, non-modifiable, environmental,
+ * behavioral) and severity (high, moderate, low). Modifiable and behavioral risk
+ * factors are particularly relevant to lifestyle medicine as they can be addressed
+ * through interventions.
+ *
+ * @property string $id UUID primary key
+ * @property string $condition_id Foreign key to the parent condition
+ * @property string $name The risk factor name
+ * @property string|null $description Description of the risk factor
+ * @property string|null $risk_type Type classification (modifiable, non_modifiable, environmental, behavioral)
+ * @property string|null $severity Severity level (high, moderate, low)
+ * @property int|null $order_index Display ordering position
+ * @property int|null $created_by ID of the user who created this record
+ * @property int|null $updated_by ID of the user who last updated this record
+ * @property int|null $deleted_by ID of the user who deleted this record
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read Condition $condition
+ * @property-read User|null $creator
+ * @property-read User|null $updater
+ * @property-read User|null $deleter
+ */
 class ConditionRiskFactor extends Model
 {
     use HasFactory, HasUuids, SoftDeletes, HasAuditFields;
@@ -39,6 +66,8 @@ class ConditionRiskFactor extends Model
 
     /**
      * Get the condition this risk factor belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Condition, $this>
      */
     public function condition(): BelongsTo
     {
@@ -47,6 +76,8 @@ class ConditionRiskFactor extends Model
 
     /**
      * Get all available risk types.
+     *
+     * @return array<string, string> Map of risk type constant to display label
      */
     public static function getRiskTypes(): array
     {
@@ -60,6 +91,8 @@ class ConditionRiskFactor extends Model
 
     /**
      * Get all available severity levels.
+     *
+     * @return array<string, string> Map of severity constant to display label
      */
     public static function getSeverityLevels(): array
     {
@@ -71,7 +104,9 @@ class ConditionRiskFactor extends Model
     }
 
     /**
-     * Check if the risk factor is modifiable.
+     * Check if the risk factor is modifiable (modifiable or behavioral type).
+     *
+     * @return bool
      */
     public function isModifiable(): bool
     {
@@ -83,6 +118,8 @@ class ConditionRiskFactor extends Model
 
     /**
      * Check if this is a high severity risk factor.
+     *
+     * @return bool
      */
     public function isHighSeverity(): bool
     {

@@ -7,6 +7,11 @@ import { toast } from '../../lib/swal';
 import MediaUploader from '../../components/shared/MediaUploader';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 
+/**
+ * Form for creating or editing an intervention with fields for name, care domain,
+ * description, mechanism of action, intensity level, duration, frequency, medical codes
+ * (SNOMED/CPT), and media uploads. Fetches care domains for the dropdown selector.
+ */
 const InterventionForm = () => {
   const { t } = useTranslation(['interventions', 'common', 'careDomains']);
   const { id } = useParams();

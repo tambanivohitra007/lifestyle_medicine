@@ -12,6 +12,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * Manages evidence summaries aggregating research for condition-intervention pairs.
+ *
+ * Evidence summaries provide GRADE-quality assessments, review tracking,
+ * and aggregate statistics for the relationship between a condition and
+ * an intervention. Supports review scheduling and marking.
+ *
+ * Routes: /api/v1/evidence-summaries (public read),
+ *         /api/v1/admin/evidence-summaries (admin CRUD)
+ */
 class EvidenceSummaryController extends Controller
 {
     /**

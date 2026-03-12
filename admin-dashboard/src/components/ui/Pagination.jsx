@@ -1,6 +1,21 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Responsive pagination component with page number buttons and item count display.
+ * Shows 3 page buttons on mobile and 5 on desktop, with ellipsis for gaps.
+ * Includes previous/next navigation and "Showing X to Y of Z results" text.
+ *
+ * Returns null when there is only one page or fewer.
+ *
+ * @param {Object} props
+ * @param {number} props.currentPage - The currently active page (1-indexed)
+ * @param {number} props.totalPages - Total number of pages
+ * @param {Function} props.onPageChange - Callback invoked with the new page number
+ * @param {number} props.totalItems - Total item count across all pages
+ * @param {number} props.itemsPerPage - Number of items displayed per page
+ * @returns {React.ReactElement|null} The pagination controls or null
+ */
 const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
   const { t } = useTranslation('common');
 

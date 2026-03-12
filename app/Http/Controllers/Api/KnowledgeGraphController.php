@@ -9,6 +9,16 @@ use App\Models\InterventionRelationship;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Builds interactive knowledge graph data for React Flow visualization.
+ *
+ * Generates nodes and edges representing relationships between conditions,
+ * interventions, care domains, scriptures, recipes, EGW references,
+ * evidence entries, and references. Supports condition-centered,
+ * intervention-centered, and full-graph views with configurable depth.
+ *
+ * Routes: /api/v1/knowledge-graph/* (public read-only)
+ */
 class KnowledgeGraphController extends Controller
 {
     /**
@@ -401,6 +411,17 @@ class KnowledgeGraphController extends Controller
      */
     protected const VALID_NODE_TYPES = ['condition', 'intervention', 'careDomain', 'scripture', 'recipe', 'egwReference'];
 
+    /**
+     * Get the full knowledge graph with cross-type pagination.
+     *
+     * Supports filtering by node types and pagination across all entity types.
+     * Edges are only fetched for currently visible nodes to optimize performance.
+     *
+     * GET /api/v1/knowledge-graph/full
+     *
+     * @param  Request  $request  Query params: limit (max 100), page, edges (bool), types (comma-separated)
+     * @return JsonResponse Nodes, edges, and pagination metadata
+     */
     public function fullGraph(Request $request): JsonResponse
     {
         $limit = min((int) $request->get('limit', 50), 100);
@@ -676,6 +697,15 @@ class KnowledgeGraphController extends Controller
     /**
      * Extract entity IDs by type from the visible nodeIds map.
      */
+    /**
+     * Extract entity IDs grouped by type from the visible node ID map.
+     *
+     * Parses composite node IDs (e.g., "condition-uuid") into a type-keyed array
+     * of raw entity UUIDs for efficient database queries.
+     *
+     * @param  array  $nodeIds  Map of composite node IDs to boolean presence flags
+     * @return array Associative array keyed by entity type with arrays of UUID strings
+     */
     protected function extractVisibleIds(array $nodeIds): array
     {
         $visibleIds = [];
@@ -702,6 +732,13 @@ class KnowledgeGraphController extends Controller
 
     // ==================== Node Creators ====================
 
+    /**
+     * Create a React Flow node for a condition entity.
+     *
+     * @param  Condition  $condition  The condition model instance
+     * @param  bool       $isCenter   Whether this is the center/focus node
+     * @return array React Flow node data structure
+     */
     protected function createConditionNode($condition, bool $isCenter = false): array
     {
         return [
@@ -727,6 +764,13 @@ class KnowledgeGraphController extends Controller
         ];
     }
 
+    /**
+     * Create a React Flow node for an intervention entity.
+     *
+     * @param  Intervention  $intervention  The intervention model instance
+     * @param  bool          $isCenter      Whether this is the center/focus node
+     * @return array React Flow node data structure
+     */
     protected function createInterventionNode($intervention, bool $isCenter = false): array
     {
         return [
@@ -744,6 +788,12 @@ class KnowledgeGraphController extends Controller
         ];
     }
 
+    /**
+     * Create a React Flow node for a care domain entity.
+     *
+     * @param  CareDomain  $careDomain  The care domain model instance
+     * @return array React Flow node data structure
+     */
     protected function createCareDomainNode($careDomain): array
     {
         return [
@@ -760,6 +810,12 @@ class KnowledgeGraphController extends Controller
         ];
     }
 
+    /**
+     * Create a React Flow node for a scripture entity.
+     *
+     * @param  Scripture  $scripture  The scripture model instance
+     * @return array React Flow node data structure
+     */
     protected function createScriptureNode($scripture): array
     {
         return [
@@ -776,6 +832,12 @@ class KnowledgeGraphController extends Controller
         ];
     }
 
+    /**
+     * Create a React Flow node for a recipe entity.
+     *
+     * @param  Recipe  $recipe  The recipe model instance
+     * @return array React Flow node data structure
+     */
     protected function createRecipeNode($recipe): array
     {
         return [
@@ -792,6 +854,12 @@ class KnowledgeGraphController extends Controller
         ];
     }
 
+    /**
+     * Create a React Flow node for an EGW reference entity.
+     *
+     * @param  EgwReference  $egwRef  The EGW reference model instance
+     * @return array React Flow node data structure
+     */
     protected function createEgwReferenceNode($egwRef): array
     {
         return [
@@ -809,6 +877,12 @@ class KnowledgeGraphController extends Controller
         ];
     }
 
+    /**
+     * Create a React Flow node for an evidence entry entity.
+     *
+     * @param  EvidenceEntry  $evidence  The evidence entry model instance
+     * @return array React Flow node data structure
+     */
     protected function createEvidenceNode($evidence): array
     {
         return [
@@ -827,6 +901,12 @@ class KnowledgeGraphController extends Controller
         ];
     }
 
+    /**
+     * Create a React Flow node for a reference (citation) entity.
+     *
+     * @param  Reference  $reference  The reference model instance
+     * @return array React Flow node data structure
+     */
     protected function createReferenceNode($reference): array
     {
         return [
@@ -848,6 +928,17 @@ class KnowledgeGraphController extends Controller
 
     // ==================== Edge Creators ====================
 
+    /**
+     * Create a React Flow edge between a condition and intervention.
+     *
+     * Edge styling is based on evidence strength and effectiveness rating.
+     * High evidence or very high effectiveness triggers edge animation.
+     *
+     * @param  Condition                       $condition      The condition model instance
+     * @param  Intervention                    $intervention   The intervention model (with pivot)
+     * @param  InterventionEffectiveness|null  $effectiveness  Optional effectiveness rating
+     * @return array React Flow edge data structure
+     */
     protected function createConditionInterventionEdge($condition, $intervention, $effectiveness = null): array
     {
         $pivot = $intervention->pivot;

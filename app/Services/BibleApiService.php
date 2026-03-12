@@ -6,13 +6,42 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Bible.com (API.Bible) integration service for Scripture lookups and health-themed verses.
+ *
+ * Provides methods for looking up Bible verses and passages, searching Scripture text,
+ * browsing Bible books and chapters, and accessing curated health-related verse themes.
+ * Uses the API.Bible v1 REST API with caching to minimize external requests.
+ *
+ * Features:
+ * - Verse and passage lookup with multiple Bible translations
+ * - Full-text search with relevance sorting
+ * - Chapter browsing with Words of Jesus highlighting
+ * - Pre-curated health themes: healing, body as temple, diet, rest, peace, trust, strength, temperance
+ * - Daily verse selection based on date seed
+ * - Human-readable reference parsing (e.g., "John 3:16" -> "JHN.3.16")
+ *
+ * @see \App\Http\Controllers\Api\BibleController The API controller that exposes this service
+ */
 class BibleApiService
 {
+    /** @var string The API.Bible v1 base URL */
     protected string $baseUrl = 'https://api.scripture.api.bible/v1';
+
+    /** @var string|null The API.Bible API key from configuration */
     protected ?string $apiKey = null;
+
+    /** @var string|null The default Bible translation ID (KJV by default) */
     protected ?string $defaultBibleId = null;
 
-    // Health-related themes with pre-selected verse IDs (API.Bible format)
+    /**
+     * Health-related themes with pre-selected verse IDs in API.Bible format.
+     *
+     * Each theme contains a display name, description, icon, color scheme,
+     * and an array of verse references mapped to API.Bible verse IDs.
+     *
+     * @var array<string, array{name: string, description: string, icon: string, color: string, verses: array}>
+     */
     protected array $healthThemes = [
         'healing' => [
             'name' => 'Healing & Restoration',
@@ -130,7 +159,13 @@ class BibleApiService
         ],
     ];
 
-    // Bible books for browsing
+    /**
+     * Bible books organized by testament for browsing functionality.
+     *
+     * Each entry contains the book name, API.Bible book ID, and total chapter count.
+     *
+     * @var array{old_testament: array, new_testament: array}
+     */
     protected array $bibleBooks = [
         'old_testament' => [
             ['name' => 'Genesis', 'id' => 'GEN', 'chapters' => 50],
@@ -204,6 +239,12 @@ class BibleApiService
         ]
     ];
 
+    /**
+     * Initialize the Bible API service with API key and default Bible translation.
+     *
+     * Reads configuration from services.bible_api config. The default Bible ID
+     * corresponds to the King James Version (KJV).
+     */
     public function __construct()
     {
         $this->apiKey = config('services.bible_api.api_key');
@@ -211,7 +252,9 @@ class BibleApiService
     }
 
     /**
-     * Check if the API is configured.
+     * Check if the Bible API is configured with a valid API key.
+     *
+     * @return bool True if the API key is set and non-empty
      */
     public function isConfigured(): bool
     {
@@ -219,7 +262,15 @@ class BibleApiService
     }
 
     /**
-     * Make an API request.
+     * Make an authenticated GET request to the API.Bible REST API.
+     *
+     * Sends the API key via the 'api-key' header. SSL verification is disabled
+     * in local environment to work around Windows SSL certificate issues.
+     * Requests time out after 15 seconds.
+     *
+     * @param  string  $endpoint  The API endpoint path (e.g., '/bibles' or '/bibles/{id}/verses/{verseId}')
+     * @param  array  $params  Optional query parameters for the request
+     * @return array The JSON-decoded response body, or an array with 'error' key on failure
      */
     protected function request(string $endpoint, array $params = []): array
     {
@@ -252,7 +303,12 @@ class BibleApiService
     }
 
     /**
-     * Get available Bible versions.
+     * Get available Bible versions, filtered to common English translations.
+     *
+     * Results are cached for 24 hours. Filters to a curated set of Bible IDs
+     * plus any King James Version variants.
+     *
+     * @return array{data?: array, error?: string} Array of Bible version data, or error
      */
     public function getBibles(): array
     {
@@ -276,7 +332,15 @@ class BibleApiService
     }
 
     /**
-     * Look up a verse or passage.
+     * Look up a specific verse or passage by its API.Bible ID.
+     *
+     * Automatically detects whether the ID is a single verse or a passage range
+     * (contains a hyphen) and calls the appropriate API endpoint. HTML tags are
+     * stripped from the response content. Results are cached for 24 hours.
+     *
+     * @param  string  $passageId  The verse/passage ID in API.Bible format (e.g., 'JHN.3.16' or 'JHN.3.16-JHN.3.17')
+     * @param  string|null  $bibleId  Optional Bible translation ID; defaults to KJV
+     * @return array{success: bool, reference?: string, text?: string, translation?: string, bibleId?: string, error?: string}
      */
     public function lookup(string $passageId, ?string $bibleId = null): array
     {
@@ -315,7 +379,15 @@ class BibleApiService
     }
 
     /**
-     * Search for verses.
+     * Search for Bible verses matching a text query.
+     *
+     * Performs a full-text search via the API.Bible search endpoint, sorted by relevance.
+     * Results are cached for 1 hour. Returns cleaned verse text with HTML tags stripped.
+     *
+     * @param  string  $query  The search query string
+     * @param  string|null  $bibleId  Optional Bible translation ID; defaults to KJV
+     * @param  int  $limit  Maximum number of results to return (default: 20)
+     * @return array{success: bool, query?: string, total?: int, results?: array, translation?: string, error?: string}
      */
     public function search(string $query, ?string $bibleId = null, int $limit = 20): array
     {
@@ -355,7 +427,15 @@ class BibleApiService
     }
 
     /**
-     * Get a chapter.
+     * Get a full Bible chapter with parsed individual verses.
+     *
+     * Fetches the chapter content and parses the HTML into individual verse objects,
+     * each with text segments and Words of Jesus highlighting. Results are cached for 24 hours.
+     *
+     * @param  string  $bookId  The API.Bible book ID (e.g., 'JHN', 'GEN')
+     * @param  int  $chapter  The chapter number
+     * @param  string|null  $bibleId  Optional Bible translation ID; defaults to KJV
+     * @return array{success: bool, reference?: string, bookId?: string, chapter?: int, verses?: array, verseCount?: int, translation?: string, bibleId?: string, next?: array|null, previous?: array|null, error?: string}
      */
     public function getChapter(string $bookId, int $chapter, ?string $bibleId = null): array
     {
@@ -392,7 +472,14 @@ class BibleApiService
     }
 
     /**
-     * Parse chapter HTML content into individual verses.
+     * Parse chapter HTML content into individual verse objects.
+     *
+     * Extracts verses using regex on API.Bible's HTML format, identifying verse numbers
+     * from data-number attributes. Each verse is split into text segments, with special
+     * handling for "Words of Jesus" (wj class) to enable red-letter rendering.
+     *
+     * @param  string  $html  The raw HTML content from the API.Bible chapter endpoint
+     * @return array<int, array{number: int, segments: array<array{text: string, type: string}>, hasWordsOfJesus: bool}>
      */
     protected function parseChapterVerses(string $html): array
     {
@@ -458,7 +545,12 @@ class BibleApiService
     }
 
     /**
-     * Get all health themes.
+     * Get all health-related Scripture themes with metadata.
+     *
+     * Returns a summary of each theme (key, name, description, icon, color, verse count)
+     * without fetching the actual verse content.
+     *
+     * @return array<int, array{key: string, name: string, description: string, icon: string, color: string, verse_count: int}>
      */
     public function getHealthThemes(): array
     {
@@ -475,7 +567,14 @@ class BibleApiService
     }
 
     /**
-     * Get verses for a specific health theme.
+     * Get full verse content for a specific health theme.
+     *
+     * Fetches each verse in the theme via the lookup method (with caching).
+     * Returns the theme metadata along with fully resolved verse text.
+     *
+     * @param  string  $themeKey  The theme key (e.g., 'healing', 'body_temple', 'rest_sabbath')
+     * @param  string|null  $bibleId  Optional Bible translation ID; defaults to KJV
+     * @return array Theme data with resolved verses, or error if theme not found
      */
     public function getThemeVerses(string $themeKey, ?string $bibleId = null): array
     {
@@ -505,7 +604,9 @@ class BibleApiService
     }
 
     /**
-     * Get list of Bible books for browsing.
+     * Get the complete list of Bible books organized by testament.
+     *
+     * @return array{old_testament: array, new_testament: array} Books with name, ID, and chapter count
      */
     public function getBooks(): array
     {
@@ -513,7 +614,12 @@ class BibleApiService
     }
 
     /**
-     * Get available translations.
+     * Get the curated list of available Bible translations.
+     *
+     * Returns a static list of popular English translations with their API.Bible IDs,
+     * abbreviations, and descriptions. Includes KJV, ASV, BSB, WEB, and others.
+     *
+     * @return array<int, array{code: string, name: string, abbreviation: string, description: string}>
      */
     public function getTranslations(): array
     {
@@ -533,7 +639,13 @@ class BibleApiService
     }
 
     /**
-     * Get translation abbreviation by Bible ID.
+     * Get the translation abbreviation for a given Bible ID.
+     *
+     * Looks up the abbreviation (e.g., 'KJV', 'ASV') from the curated translations list.
+     * Falls back to 'KJV' if the Bible ID is not found.
+     *
+     * @param  string  $bibleId  The API.Bible Bible ID
+     * @return string The translation abbreviation
      */
     protected function getTranslationAbbreviation(string $bibleId): string
     {
@@ -547,7 +659,15 @@ class BibleApiService
     }
 
     /**
-     * Search health-themed verses by keyword.
+     * Search pre-curated health-themed verses by keyword.
+     *
+     * Searches through all verses in all health themes, matching against both
+     * the verse text and the reference string (case-insensitive). This searches
+     * the local curated verse collection rather than the full Bible API.
+     *
+     * @param  string  $query  The search query (minimum 2 characters)
+     * @param  string|null  $bibleId  Optional Bible translation ID; defaults to KJV
+     * @return array{query?: string, count?: int, results?: array, error?: string}
      */
     public function searchHealthVerses(string $query, ?string $bibleId = null): array
     {
@@ -589,7 +709,13 @@ class BibleApiService
     }
 
     /**
-     * Get daily verse (random from health themes).
+     * Get the daily verse, selected deterministically from health-themed verses.
+     *
+     * Uses the day of the year as an index into the flattened list of all health theme
+     * verses, ensuring the same verse is shown throughout each day while rotating daily.
+     *
+     * @param  string|null  $bibleId  Optional Bible translation ID; defaults to KJV
+     * @return array{success: bool, reference?: string, text?: string, translation?: string, theme?: string, themeKey?: string, themeColor?: string, error?: string}
      */
     public function getDailyVerse(?string $bibleId = null): array
     {
@@ -630,7 +756,14 @@ class BibleApiService
     }
 
     /**
-     * Parse a human-readable reference to API format.
+     * Parse a human-readable Bible reference into API.Bible format.
+     *
+     * Converts references like "John 3:16" to "JHN.3.16" and "John 3:16-17"
+     * to "JHN.3.16-JHN.3.17". Supports full book names and common abbreviations
+     * for all 66 books of the Bible (case-insensitive matching).
+     *
+     * @param  string  $reference  The human-readable reference (e.g., "John 3:16", "1 Cor 13:4-7")
+     * @return string|null The API.Bible formatted reference, or null if parsing fails
      */
     public function parseReference(string $reference): ?string
     {

@@ -30,6 +30,22 @@ const STRENGTH_COLORS = {
   weak: 'bg-amber-100 text-amber-700',
 };
 
+/**
+ * CRUD editor for evidence summaries (GRADE methodology).
+ * Supports three modes: viewing summaries for a single condition, a single intervention,
+ * or a specific condition-intervention pair.
+ *
+ * Features: quality grade (A-D) and recommendation strength (strong/weak) selection,
+ * study statistics, review scheduling, and mark-as-reviewed workflow.
+ *
+ * @param {Object} props
+ * @param {string} [props.conditionId] - UUID of the condition (used in condition/pair modes)
+ * @param {string} [props.interventionId] - UUID of the intervention (used in intervention/pair modes)
+ * @param {Array<Object>} [props.conditions=[]] - Available conditions for the dropdown (intervention mode)
+ * @param {Array<Object>} [props.interventions=[]] - Available interventions for the dropdown (condition mode)
+ * @param {string} [props.mode='condition'] - Editor mode: 'condition', 'intervention', or 'pair'
+ * @returns {React.ReactElement} The evidence summary editor component
+ */
 const EvidenceSummaryEditor = ({
   conditionId,
   interventionId,

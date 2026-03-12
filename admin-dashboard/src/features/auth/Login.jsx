@@ -6,6 +6,11 @@ import { Lock, Mail, Leaf, Heart, Activity, Shield, Clock, Eye, EyeOff } from 'l
 import api, { apiEndpoints } from '../../lib/api';
 import LanguageSwitcher from '../../components/ui/LanguageSwitcher';
 
+/**
+ * Login page with split-panel layout: branding panel (left) and login form (right).
+ * Handles email/password authentication via Sanctum API, session expiry detection,
+ * and password visibility toggle. Includes language switcher and responsive mobile layout.
+ */
 const Login = () => {
   const { t } = useTranslation('auth');
   const [email, setEmail] = useState('');

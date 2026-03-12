@@ -26,6 +26,17 @@ const STATUS_CONFIG = {
   failed: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', labelKey: 'aiGenerator:infographics.status.failed' },
 };
 
+/**
+ * Infographic generation panel using Vertex AI Imagen.
+ * Allows selecting infographic types (overview, risk factors, lifestyle solutions),
+ * tracks generation status via polling, and displays completed infographics.
+ * Supports retry of failed generation requests.
+ *
+ * @param {Object} props
+ * @param {string} props.conditionId - UUID of the condition to generate infographics for
+ * @param {string} props.conditionName - Display name of the condition
+ * @param {Function} [props.onComplete] - Optional callback when all infographics are generated
+ */
 const InfographicGenerator = ({ conditionId, conditionName, onComplete }) => {
   const { t } = useTranslation(['aiGenerator']);
   const [configured, setConfigured] = useState(null);

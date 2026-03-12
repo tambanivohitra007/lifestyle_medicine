@@ -5,8 +5,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * API resource for transforming InterventionContraindication model instances.
+ *
+ * Includes contraindication title, description, severity level
+ * (absolute/relative/caution), linked condition, and alternative recommendation.
+ */
 class InterventionContraindicationResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
         return [

@@ -7,6 +7,11 @@ import { SkeletonList } from '../../components/skeleton';
 import { useAuth } from '../../contexts/AuthContext';
 import StatusBadge from '../../components/shared/StatusBadge';
 
+/**
+ * EGW (Ellen G. White) references list page with search, topic filtering, pagination,
+ * and CRUD operations. Displays citations, quotes, and topics in a card list layout.
+ * Restricted editing based on user permissions.
+ */
 const EgwReferences = () => {
   const { canEdit } = useAuth();
   const navigate = useNavigate();

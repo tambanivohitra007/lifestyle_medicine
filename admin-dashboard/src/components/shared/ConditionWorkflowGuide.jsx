@@ -62,6 +62,27 @@ const CORE_DOMAINS = [
   'Trust in God',
 ];
 
+/**
+ * Collapsible treatment workflow progress guide for a condition.
+ * Displays a circular completion score and four workflow steps:
+ * 1. Documentation (required sections like risk factors, physiology, complications)
+ * 2. Interventions (NEWSTART+ care domain coverage)
+ * 3. Spiritual Care (scripture and EGW references)
+ * 4. Recipes (optional)
+ *
+ * Each step shows completion status with links to add missing items.
+ *
+ * @param {Object} props
+ * @param {string} props.conditionId - UUID of the condition
+ * @param {Array<Object>} [props.sections=[]] - Existing condition sections
+ * @param {Array<Object>} [props.interventions=[]] - Linked interventions with care domain info
+ * @param {Array<Object>} [props.scriptures=[]] - Linked scripture references
+ * @param {Array<Object>} [props.recipes=[]] - Linked recipes
+ * @param {Array<Object>} [props.careDomains=[]] - All available care domains
+ * @param {boolean} [props.isExpanded=false] - Whether the detailed view is expanded
+ * @param {Function} props.onToggle - Callback to toggle the expanded state
+ * @returns {React.ReactElement} The workflow guide component
+ */
 const ConditionWorkflowGuide = ({
   conditionId,
   sections = [],
@@ -395,7 +416,20 @@ const ConditionWorkflowGuide = ({
   );
 };
 
-// Workflow Step Component
+/**
+ * Individual workflow step with a numbered indicator, title, progress badge, and expandable content.
+ *
+ * @param {Object} props
+ * @param {number} props.number - Step number displayed in the indicator circle
+ * @param {string} props.title - Step title text
+ * @param {string} props.subtitle - Secondary descriptive text
+ * @param {boolean} props.isComplete - Whether the step is fully complete
+ * @param {string} props.progress - Progress text shown in the badge (e.g., "3/6 core")
+ * @param {boolean} [props.progressWarning] - Whether to show the progress badge in warning color
+ * @param {boolean} [props.isOptional] - Whether the step is optional (uses muted styling)
+ * @param {React.ReactNode} props.children - Step content rendered below the header
+ * @returns {React.ReactElement} The workflow step component
+ */
 const WorkflowStep = ({ number, title, subtitle, isComplete, progress, progressWarning, isOptional, children }) => (
   <div className="relative">
     <div className="flex items-center gap-3 mb-3">

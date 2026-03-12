@@ -6,6 +6,11 @@ import { toast, confirmDelete } from '../../lib/swal';
 import { useAuth } from '../../contexts/AuthContext';
 import SlideOver from '../../components/shared/SlideOver';
 
+/**
+ * Care domains management page with grid display, search filtering, and CRUD operations.
+ * Uses a SlideOver panel for inline create/edit forms. Shows intervention counts per domain.
+ * Edit operations are restricted to users with edit permissions.
+ */
 const CareDomains = () => {
   const { t } = useTranslation(['careDomains', 'common']);
   const { canEdit } = useAuth();

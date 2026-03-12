@@ -1,6 +1,11 @@
+/**
+ * @module sanitize
+ * HTML sanitization utilities using DOMPurify to prevent XSS attacks.
+ * Provides both sanitized HTML output and plain-text stripping.
+ */
 import DOMPurify from 'dompurify';
 
-// Configure DOMPurify to allow safe HTML tags only
+/** @constant {string[]} ALLOWED_TAGS - HTML tags permitted after sanitization. */
 const ALLOWED_TAGS = [
   'p', 'br', 'b', 'i', 'u', 'strong', 'em', 'a', 'ul', 'ol', 'li',
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre', 'span',
@@ -8,6 +13,7 @@ const ALLOWED_TAGS = [
   'img' // Allow images for inline content
 ];
 
+/** @constant {string[]} ALLOWED_ATTR - HTML attributes permitted after sanitization. */
 const ALLOWED_ATTR = [
   'href', 'target', 'rel', 'class', 'id',
   'src', 'alt', 'width', 'height', 'style' // Image attributes

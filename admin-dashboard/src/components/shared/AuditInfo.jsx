@@ -1,6 +1,21 @@
 import { User, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Displays audit trail metadata (created/updated timestamps and user names).
+ * Shows creation and last update dates with associated user names when available.
+ * Formats dates according to the active locale (English or French).
+ *
+ * @param {Object} props
+ * @param {Object} props.data - Entity data containing audit fields
+ * @param {string} [props.data.created_at] - ISO creation timestamp
+ * @param {string} [props.data.updated_at] - ISO last-update timestamp
+ * @param {Object} [props.data.created_by] - User who created the entity
+ * @param {string} [props.data.created_by.name] - Creator's display name
+ * @param {Object} [props.data.updated_by] - User who last updated the entity
+ * @param {string} [props.data.updated_by.name] - Updater's display name
+ * @returns {React.ReactElement|null} Audit info display or null if no data
+ */
 const AuditInfo = ({ data }) => {
   const { t, i18n } = useTranslation('common');
 

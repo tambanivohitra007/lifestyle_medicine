@@ -6,6 +6,7 @@ import { toast } from '../../lib/swal';
 import Breadcrumbs from '../../components/shared/Breadcrumbs';
 import AiSuggestions from '../../components/shared/AiSuggestions';
 
+/** Common EGW book abbreviations for quick selection */
 const COMMON_BOOKS = [
   { abbr: 'MH', name: 'Ministry of Healing' },
   { abbr: 'CD', name: 'Counsels on Diet and Foods' },
@@ -38,6 +39,12 @@ const COMMON_TOPICS = [
   'Health Reform',
 ];
 
+/**
+ * Form for creating or editing an EGW (Ellen G. White) reference.
+ * Includes fields for source book (with common book quick-select), page range,
+ * citation, quote, topic, and context. Integrates AI suggestions for auto-filling
+ * content based on the entered quote or citation.
+ */
 const EgwReferenceForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();

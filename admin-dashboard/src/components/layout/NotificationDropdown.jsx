@@ -14,6 +14,16 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { useNotifications, NOTIFICATION_TYPES, NOTIFICATION_STATUS } from '../../contexts/NotificationContext';
 
+/**
+ * Dropdown notification bell component displaying in-app notifications.
+ * Shows an unread badge count, supports mark-as-read, remove, mark-all-read,
+ * and clear-all actions. Notification items link to relevant pages
+ * (e.g., AI Generator, Import) based on notification type.
+ *
+ * Closes when clicking outside the dropdown area.
+ *
+ * @returns {React.ReactElement} The notification dropdown component
+ */
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);

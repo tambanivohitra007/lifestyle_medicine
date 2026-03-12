@@ -44,7 +44,12 @@ const ENTITY_TYPES = [
 const RECENT_SEARCHES_KEY = 'lm_recent_searches';
 const MAX_RECENT_SEARCHES = 5;
 
-// Debounce hook
+/**
+ * Custom hook that debounces a value by the specified delay in milliseconds.
+ * @param {*} value - The value to debounce
+ * @param {number} delay - Delay in milliseconds
+ * @returns {*} The debounced value
+ */
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -59,7 +64,12 @@ const useDebounce = (value, delay) => {
   return debouncedValue;
 };
 
-// Highlight matched text
+/**
+ * Renders text with matching query portions highlighted in yellow.
+ * @param {Object} props
+ * @param {string} props.text - The full text to display
+ * @param {string} props.query - The search query to highlight within the text
+ */
 const HighlightedText = ({ text, query }) => {
   if (!query || !text) return <span>{text}</span>;
 
@@ -80,6 +90,12 @@ const HighlightedText = ({ text, query }) => {
   );
 };
 
+/**
+ * Global search page with debounced query, type filtering, keyboard navigation,
+ * and recent search history (persisted in localStorage). Searches across all entity
+ * types (conditions, interventions, scriptures, recipes, evidence, etc.) with
+ * highlighted matching text and categorized results.
+ */
 const Search = () => {
   const { t } = useTranslation(['search', 'common']);
   const navigate = useNavigate();

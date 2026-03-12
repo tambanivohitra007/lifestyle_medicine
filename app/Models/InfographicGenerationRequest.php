@@ -8,6 +8,36 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Represents a request to generate an infographic via Vertex AI Imagen.
+ *
+ * Infographic generation requests track the lifecycle of image generation for
+ * conditions, from initial prompt creation through processing to completed media
+ * attachment. Supports different infographic types (overview, risk factors,
+ * lifestyle solutions) and includes retry logic with attempt tracking.
+ *
+ * @property string $id UUID primary key
+ * @property string $condition_id Foreign key to the condition
+ * @property string $infographic_type Type of infographic (overview, risk_factors, lifestyle_solutions)
+ * @property string $status Request status (pending, processing, completed, failed)
+ * @property string|null $prompt The generation prompt sent to the AI
+ * @property array|null $generation_params Additional parameters for image generation
+ * @property string|null $media_id Foreign key to the generated media (when completed)
+ * @property string|null $error_message Error message (when failed)
+ * @property int $attempts Number of processing attempts
+ * @property int|null $created_by ID of the user who created this record
+ * @property int|null $updated_by ID of the user who last updated this record
+ * @property int|null $deleted_by ID of the user who deleted this record
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read Condition $condition
+ * @property-read Media|null $media
+ * @property-read User|null $creator
+ * @property-read User|null $updater
+ * @property-read User|null $deleter
+ */
 class InfographicGenerationRequest extends Model
 {
     use HasUuids, SoftDeletes, HasAuditFields;
@@ -39,6 +69,8 @@ class InfographicGenerationRequest extends Model
 
     /**
      * Get the condition this request belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Condition, $this>
      */
     public function condition(): BelongsTo
     {
@@ -47,6 +79,8 @@ class InfographicGenerationRequest extends Model
 
     /**
      * Get the generated media.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Media, $this>
      */
     public function media(): BelongsTo
     {
@@ -55,6 +89,8 @@ class InfographicGenerationRequest extends Model
 
     /**
      * Get all available infographic types.
+     *
+     * @return array<string, string> Map of type constant to display label
      */
     public static function getTypes(): array
     {
@@ -67,6 +103,8 @@ class InfographicGenerationRequest extends Model
 
     /**
      * Get all available statuses.
+     *
+     * @return array<string, string> Map of status constant to display label
      */
     public static function getStatuses(): array
     {
@@ -80,6 +118,8 @@ class InfographicGenerationRequest extends Model
 
     /**
      * Check if the request is pending.
+     *
+     * @return bool
      */
     public function isPending(): bool
     {
@@ -88,6 +128,8 @@ class InfographicGenerationRequest extends Model
 
     /**
      * Check if the request is processing.
+     *
+     * @return bool
      */
     public function isProcessing(): bool
     {
@@ -96,6 +138,8 @@ class InfographicGenerationRequest extends Model
 
     /**
      * Check if the request is completed.
+     *
+     * @return bool
      */
     public function isCompleted(): bool
     {
@@ -104,6 +148,8 @@ class InfographicGenerationRequest extends Model
 
     /**
      * Check if the request has failed.
+     *
+     * @return bool
      */
     public function hasFailed(): bool
     {
@@ -111,7 +157,9 @@ class InfographicGenerationRequest extends Model
     }
 
     /**
-     * Mark the request as processing.
+     * Mark the request as processing and increment the attempt counter.
+     *
+     * @return void
      */
     public function markAsProcessing(): void
     {
@@ -122,7 +170,10 @@ class InfographicGenerationRequest extends Model
     }
 
     /**
-     * Mark the request as completed.
+     * Mark the request as completed with the generated media ID.
+     *
+     * @param  string  $mediaId UUID of the generated media record
+     * @return void
      */
     public function markAsCompleted(string $mediaId): void
     {
@@ -134,7 +185,10 @@ class InfographicGenerationRequest extends Model
     }
 
     /**
-     * Mark the request as failed.
+     * Mark the request as failed with the given error message.
+     *
+     * @param  string  $errorMessage Description of the failure
+     * @return void
      */
     public function markAsFailed(string $errorMessage): void
     {
@@ -145,7 +199,9 @@ class InfographicGenerationRequest extends Model
     }
 
     /**
-     * Reset the request for retry.
+     * Reset the request for retry by setting status back to pending.
+     *
+     * @return void
      */
     public function resetForRetry(): void
     {

@@ -23,7 +23,15 @@ const ICONS = {
 };
 
 /**
- * Section branch node - marks the start of a section branch (Risk Factors, Complications, etc.)
+ * Section branch node -- a pill-shaped connector that marks the start of a
+ * condition section branch (Risk Factors, Complications, Physiology, etc.).
+ * Displays a section icon, label, and item count badge. Acts as the
+ * intermediate node between the center condition and individual section items.
+ * Has handles on left (target), top/bottom/right (sources) for flexible routing.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: label, count, color, icon (lucide icon key)
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const SectionBranchNode = memo(({ data, selected }) => {
   const Icon = ICONS[data.icon] || FileText;

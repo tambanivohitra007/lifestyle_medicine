@@ -5,6 +5,17 @@ import Header from './Header';
 import Footer from './Footer';
 import BottomNav from './BottomNav';
 
+/**
+ * Root layout component for the admin dashboard.
+ * Provides the responsive shell with a collapsible sidebar (desktop),
+ * a fixed header, a bottom navigation bar (mobile), and a footer.
+ * Child routes are rendered via React Router's Outlet.
+ *
+ * Persists sidebar collapsed state in localStorage and auto-closes
+ * the mobile sidebar on route change or Escape key.
+ *
+ * @returns {React.ReactElement} The full-page layout structure
+ */
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {

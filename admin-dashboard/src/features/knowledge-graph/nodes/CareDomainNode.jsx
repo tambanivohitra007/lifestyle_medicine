@@ -2,6 +2,16 @@ import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { Shield } from 'lucide-react';
 
+/**
+ * Custom React Flow node representing a NEWSTART+ care domain (e.g., Nutrition, Exercise).
+ * Styled with blue gradient background and Shield icon.
+ * Compact design without extra metadata badges.
+ * Has top (target) and bottom (source) connection handles.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data containing label and isHighlighted
+ * @param {boolean} props.selected - Whether the node is currently selected
+ */
 const CareDomainNode = memo(({ data, selected }) => {
   const isHighlighted = data.isHighlighted;
 

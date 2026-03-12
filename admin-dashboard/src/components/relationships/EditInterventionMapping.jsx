@@ -17,6 +17,20 @@ const RECOMMENDATION_OPTIONS = [
   { value: 'optional', label: 'Optional', description: 'Consider based on patient', color: 'bg-gray-100 text-gray-700 border-gray-200' },
 ];
 
+/**
+ * Modal dialog for editing the relationship metadata between a condition and an intervention.
+ * Allows setting the strength of evidence (high/moderate/emerging/insufficient),
+ * recommendation level (core/adjunct/optional), and clinical notes.
+ *
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the modal is visible
+ * @param {Function} props.onClose - Callback to close the modal
+ * @param {string} props.conditionId - UUID of the parent condition
+ * @param {Object} [props.intervention] - The intervention object being edited
+ * @param {Object} [props.currentMapping] - Current pivot data (strength_of_evidence, recommendation_level, clinical_notes)
+ * @param {Function} [props.onSave] - Callback invoked with updated form data after successful save
+ * @returns {React.ReactElement|null} The edit modal or null if no intervention
+ */
 const EditInterventionMapping = ({
   isOpen,
   onClose,

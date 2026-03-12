@@ -77,8 +77,21 @@ function hasCollision(x, y, occupiedPositions) {
 }
 
 /**
- * Find available position starting from preferred angle
- * Searches outward in both directions until free space is found
+ * Find an available (non-colliding) position starting from a preferred angle.
+ *
+ * Search strategy:
+ * 1. Try the preferred angle at the given distance
+ * 2. Alternate searching clockwise and counter-clockwise in CONFIG.angleSearchStep increments
+ * 3. If no space found within maxSearchAngle, try 100px further out at the preferred angle
+ * 4. Last resort: return the preferred position even if it collides
+ *
+ * @param {number} centerX - X coordinate of the parent node
+ * @param {number} centerY - Y coordinate of the parent node
+ * @param {number} preferredAngle - Ideal angle in degrees
+ * @param {number} distance - Distance from center to place the node
+ * @param {Array} occupiedPositions - Already-placed node positions for collision checking
+ * @param {number} [maxSearchAngle=180] - Maximum angle offset to search in each direction
+ * @returns {{ position: {x,y}, angle: number }} Found position and actual angle used
  */
 function findAvailablePosition(centerX, centerY, preferredAngle, distance, occupiedPositions, maxSearchAngle = 180) {
   // Try preferred position first
@@ -116,7 +129,14 @@ function findAvailablePosition(centerX, centerY, preferredAngle, distance, occup
 }
 
 /**
- * Calculate evenly distributed angles for N items within a range
+ * Calculate evenly distributed angles for N items within an angular range.
+ * Items are placed at equal intervals, offset inward from the range boundaries
+ * (i.e., not placed at the exact start or end angle).
+ *
+ * @param {number} count - Number of angles to distribute
+ * @param {number} startAngle - Start of angular range (degrees)
+ * @param {number} endAngle - End of angular range (degrees)
+ * @returns {number[]} Array of angle values in degrees
  */
 function distributeAngles(count, startAngle, endAngle) {
   if (count === 0) return [];
@@ -262,7 +282,10 @@ export function buildExpandableMindmap(data, expandedNodes = new Set(), userPosi
 }
 
 /**
- * Create section branch with collision-aware child placement
+ * Create a section branch (risk factors, complications, etc.) in the mindmap.
+ * Places the master node and, if expanded, distributes child leaf nodes in a fan
+ * pattern around the master's angle with collision avoidance.
+ * Respects user-moved positions for both the master and child nodes.
  */
 function createSectionBranch(
   branch, calculatedMasterPos, masterAngle,
@@ -377,7 +400,11 @@ function createSectionBranch(
 }
 
 /**
- * Create solution branch with collision-aware child placement
+ * Create a solution/care-domain branch in the mindmap.
+ * Places the master node and, if expanded, distributes intervention, scripture,
+ * and EGW reference child nodes with collision avoidance. Interventions may
+ * themselves be expandable to reveal linked recipe nodes at level 3.
+ * Uses a combined angle distribution for all child types to prevent overlap.
  */
 function createSolutionBranch(
   branch, calculatedMasterPos, masterAngle,
@@ -659,7 +686,11 @@ function createSolutionBranch(
 }
 
 /**
- * Get all descendant node IDs
+ * Recursively collect all descendant node IDs from the hierarchy map.
+ *
+ * @param {string} nodeId - The parent node ID
+ * @param {Object} hierarchy - Map of nodeId -> childId[]
+ * @returns {string[]} All descendant node IDs (children, grandchildren, etc.)
  */
 export function getDescendants(nodeId, hierarchy) {
   const descendants = [];
@@ -674,7 +705,14 @@ export function getDescendants(nodeId, hierarchy) {
 }
 
 /**
- * Filter visible nodes and edges based on expansion state
+ * Filter nodes and edges to only include visible elements based on expansion state.
+ * A node is visible if it's the root (level 0) or its parent is expanded.
+ * Edges are visible only if both source and target nodes are visible.
+ *
+ * @param {Array} nodes - All graph nodes
+ * @param {Array} edges - All graph edges
+ * @param {Set} expandedNodes - Set of expanded node IDs
+ * @returns {{ nodes: Array, edges: Array }} Filtered visible nodes and edges
  */
 export function filterVisibleElements(nodes, edges, expandedNodes) {
   const visibleNodeIds = new Set();

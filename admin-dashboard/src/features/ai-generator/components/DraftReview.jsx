@@ -4,6 +4,19 @@ import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import MDEditor from '@uiw/react-md-editor';
 
+/**
+ * Draft review phase of the AI content generation workflow.
+ * Displays the AI-generated markdown draft with options to edit, regenerate, or approve.
+ * Uses MDEditor for inline editing and ReactMarkdown for preview rendering.
+ *
+ * @param {Object} props
+ * @param {string} props.conditionName - Name of the condition being generated
+ * @param {string} props.draft - AI-generated markdown draft content
+ * @param {Function} props.onApprove - Callback with approved/edited draft text to proceed to structuring
+ * @param {Function} props.onBack - Callback to return to the input phase
+ * @param {Function} props.onRegenerateDraft - Callback to regenerate a new draft
+ * @param {boolean} props.loading - Whether a request is in progress
+ */
 const DraftReview = ({
   conditionName,
   draft,

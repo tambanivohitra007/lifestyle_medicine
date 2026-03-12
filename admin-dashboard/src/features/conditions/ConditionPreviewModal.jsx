@@ -42,6 +42,16 @@ const INFOGRAPHIC_LABEL_KEYS = {
   lifestyle_solutions: 'conditions:preview.infographicLabels.lifestyleSolutions',
 };
 
+/**
+ * Modal version of the condition treatment guide preview.
+ * Fetches and displays the same content as ConditionPreview but within a full-screen modal.
+ * Includes print and PDF download actions in a sticky header.
+ *
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the modal is visible
+ * @param {Function} props.onClose - Callback to close the modal
+ * @param {string} props.conditionId - UUID of the condition to preview
+ */
 const ConditionPreviewModal = ({ isOpen, onClose, conditionId }) => {
   const { t } = useTranslation(['conditions', 'interventions', 'common']);
   const [condition, setCondition] = useState(null);

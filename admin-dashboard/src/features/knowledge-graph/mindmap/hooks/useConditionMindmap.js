@@ -2,7 +2,20 @@ import { useState, useCallback, useEffect } from 'react';
 import api from '../../../../lib/api';
 
 /**
- * Hook for fetching and managing condition mindmap data
+ * Hook for fetching and managing condition mindmap data from the API.
+ * Makes a GET request to /conditions/:id/mindmap and provides loading/error states
+ * with a refetch capability.
+ *
+ * @param {string} conditionId - UUID of the condition to fetch mindmap data for
+ * @returns {{
+ *   data: Object|null,       - Raw API response data (condition, sections, branches, meta)
+ *   loading: boolean,        - Whether the request is in progress
+ *   error: string|null,      - Error message if the request failed
+ *   refetch: Function,       - Function to re-fetch the data
+ *   condition: Object|null,  - Shortcut to data.condition
+ *   branches: Object|null,   - Shortcut to data.branches
+ *   meta: Object|null        - Shortcut to data.meta (counts of interventions, recipes, etc.)
+ * }}
  */
 export function useConditionMindmap(conditionId) {
   const [data, setData] = useState(null);

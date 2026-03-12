@@ -17,7 +17,14 @@ const RISK_TYPE_LABELS = {
 };
 
 /**
- * Risk factor node
+ * Mindmap node representing a risk factor for the center condition.
+ * Displays risk factor name, type label (modifiable/non-modifiable/environmental/behavioral),
+ * severity indicator dot, and a "Modifiable" badge when applicable.
+ * Icon varies by risk type. Target handle on bottom for connections from the risk factors branch.
+ *
+ * @param {Object} props - React Flow node props
+ * @param {Object} props.data - Node data: name, riskType, severity, isModifiable, color
+ * @param {boolean} props.selected - Whether the node is selected
  */
 const RiskFactorNode = memo(({ data, selected }) => {
   const Icon = RISK_TYPE_ICONS[data.riskType] || AlertTriangle;

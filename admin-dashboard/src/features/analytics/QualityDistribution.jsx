@@ -9,6 +9,15 @@ const QUALITY_COLORS = {
   unrated: '#9ca3af',
 };
 
+/**
+ * Bar chart displaying the distribution of evidence quality ratings.
+ * Shows color-coded bars for high, moderate, low, very_low, and unrated levels
+ * with summary stats and percentage tooltips.
+ *
+ * @param {Object} props
+ * @param {Array|null} props.data - Array of {level, label, count} objects
+ * @param {boolean} props.loading - Whether data is still being fetched
+ */
 const QualityDistribution = ({ data, loading }) => {
   const { t } = useTranslation(['analytics']);
 
