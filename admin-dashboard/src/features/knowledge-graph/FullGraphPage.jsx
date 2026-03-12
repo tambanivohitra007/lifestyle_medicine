@@ -349,6 +349,27 @@ const FullGraphPage = () => {
                     <h1 className="hidden sm:block text-sm font-semibold text-gray-800">
                         {t('knowledgeGraph:title')}
                     </h1>
+                    {/* Node count badges */}
+                    {stats && (
+                        <div className="hidden lg:flex items-center gap-1.5">
+                            {Object.entries(stats).map(([type, count]) =>
+                                count > 0 ? (
+                                    <span
+                                        key={type}
+                                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium text-white"
+                                        style={{
+                                            backgroundColor:
+                                                NODE_COLORS[type.replace(/s$/, '')] ||
+                                                NODE_COLORS[type] ||
+                                                '#6b7280',
+                                        }}
+                                    >
+                                        {count}
+                                    </span>
+                                ) : null,
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Search */}
