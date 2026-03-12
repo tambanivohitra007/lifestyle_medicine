@@ -21,6 +21,7 @@ import {
     ImageDown,
     Moon,
     Sun,
+    Printer,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../../lib/api';
@@ -327,6 +328,24 @@ const FullGraphPage = () => {
             }, 500);
         }
     }, []);
+
+    // Print-friendly view: expand all nodes and trigger print
+    const handlePrint = useCallback(() => {
+        if (!markmapRef.current || !treeData) return;
+        // Expand all nodes
+        const expandAll = (node) => {
+            if (node.payload) node.payload.fold = 0;
+            if (node.children) node.children.forEach(expandAll);
+        };
+        const root = markmapRef.current.state?.data;
+        if (root) {
+            expandAll(root);
+            markmapRef.current.setData(root);
+            markmapRef.current.fit();
+        }
+        // Trigger print after a short delay for render
+        setTimeout(() => window.print(), 500);
+    }, [treeData]);
 
     // Handle zoom controls
     const handleZoomIn = useCallback(() => {
@@ -803,6 +822,13 @@ const FullGraphPage = () => {
                         title={darkMode ? 'Light mode' : 'Dark mode'}
                     >
                         {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    </button>
+                    <button
+                        onClick={handlePrint}
+                        className={`p-1.5 rounded-lg transition-colors print:hidden ${darkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                        title={t('knowledgeGraph:tree.printView')}
+                    >
+                        <Printer className="w-4 h-4" />
                     </button>
                 </div>
             </div>

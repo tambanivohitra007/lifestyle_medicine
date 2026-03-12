@@ -252,6 +252,17 @@
     height: auto;
     box-shadow: none;
   }
+
+  /* Markmap print styles */
+  .markmap-toolbar {
+    display: none !important;
+  }
+
+  svg.w-full.h-full {
+    width: 100vw !important;
+    height: 100vh !important;
+    background: white !important;
+  }
 }
 
 /* Knowledge Graph Edge Animations */
