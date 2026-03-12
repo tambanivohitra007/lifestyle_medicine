@@ -75,6 +75,7 @@ const FullGraphPage = () => {
     const [treeData, setTreeData] = useState(null);
     const [rawTreeData, setRawTreeData] = useState(null);
     const [hiddenTypes, setHiddenTypes] = useState([]);
+    const [evidenceFilter, setEvidenceFilter] = useState('all'); // 'all' | 'high' | 'moderate'
     const [showFilterPanel, setShowFilterPanel] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [expandLevel, setExpandLevel] = useState(2);
@@ -86,7 +87,9 @@ const FullGraphPage = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await api.get(`/knowledge-graph/tree?lang=${i18n.language}`);
+            const params = new URLSearchParams({ lang: i18n.language });
+            if (evidenceFilter !== 'all') params.set('evidence', evidenceFilter);
+            const response = await api.get(`/knowledge-graph/tree?${params}`);
             setRawTreeData(response.data.tree);
             setTreeData(response.data.tree);
             setStats(response.data.stats);
@@ -98,7 +101,7 @@ const FullGraphPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [i18n.language]);
+    }, [i18n.language, evidenceFilter]);
 
     useEffect(() => {
         fetchTreeData();
@@ -642,6 +645,25 @@ const FullGraphPage = () => {
                                     >
                                         {t('knowledgeGraph:filters.hideAll')}
                                     </button>
+                                </div>
+                                {/* Evidence strength filter */}
+                                <div className="mt-1.5 pt-1.5 border-t border-gray-100">
+                                    <div className="text-[10px] font-medium text-gray-500 mb-1 px-1">
+                                        {t('knowledgeGraph:evidence.filterByStrength')}
+                                    </div>
+                                    {['all', 'moderate', 'high'].map((level) => (
+                                        <button
+                                            key={level}
+                                            onClick={() => setEvidenceFilter(level)}
+                                            className={`w-full text-left px-1 py-0.5 text-[11px] rounded ${
+                                                evidenceFilter === level
+                                                    ? 'bg-primary-50 text-primary-700 font-medium'
+                                                    : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            {t(`knowledgeGraph:evidence.${level === 'all' ? 'allStrengths' : level === 'high' ? 'highOnly' : 'moderateUp'}`)}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         )}

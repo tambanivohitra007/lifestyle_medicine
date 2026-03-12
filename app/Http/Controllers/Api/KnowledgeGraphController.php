@@ -425,6 +425,7 @@ class KnowledgeGraphController extends Controller
     public function treeGraph(Request $request): JsonResponse
     {
         $labels = $this->getTreeLabels($request->get('lang', 'en'));
+        $evidenceFilter = $request->get('evidence'); // 'high' or 'moderate'
 
         $conditions = Condition::with([
             'interventions.careDomain',
@@ -452,10 +453,17 @@ class KnowledgeGraphController extends Controller
                 'payload' => ['type' => 'condition', 'entityId' => $condition->id],
             ];
 
-            // Interventions
-            if ($condition->interventions->isNotEmpty()) {
+            // Interventions (with optional evidence strength filter)
+            $interventions = $condition->interventions;
+            if ($evidenceFilter === 'high') {
+                $interventions = $interventions->filter(fn ($i) => $i->pivot?->strength_of_evidence === 'high');
+            } elseif ($evidenceFilter === 'moderate') {
+                $interventions = $interventions->filter(fn ($i) => in_array($i->pivot?->strength_of_evidence, ['high', 'moderate']));
+            }
+
+            if ($interventions->isNotEmpty()) {
                 $intChildren = [];
-                foreach ($condition->interventions as $intervention) {
+                foreach ($interventions as $intervention) {
                     $linkedInterventionIds->push($intervention->id);
                     $domain = $intervention->careDomain?->name;
                     $domainTag = $domain ? ' <em style="color:#6b7280;font-size:0.85em">('.$domain.')</em>' : '';
@@ -467,7 +475,7 @@ class KnowledgeGraphController extends Controller
                     ];
                 }
                 $condNode['children'][] = [
-                    'content' => '<strong>'.$labels['interventions'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$condition->interventions->count().')</span>',
+                    'content' => '<strong>'.$labels['interventions'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$interventions->count().')</span>',
                     'children' => $intChildren,
                 ];
             }
