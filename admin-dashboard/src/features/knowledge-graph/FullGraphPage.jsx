@@ -28,8 +28,19 @@ const NODE_COLORS = {
     reference: '#64748b',
 };
 
+// Branch colors by depth and content type
+const BRANCH_COLORS = [
+    '#1e293b', // root: slate-800
+    '#ef4444', // conditions (red), care domains (blue) — overridden per-branch
+    '#f43f5e', // interventions (rose)
+    '#6366f1', // scriptures/spiritual (indigo)
+    '#10b981', // evidence (emerald)
+    '#64748b', // references (slate)
+];
+
 const MARKMAP_OPTIONS = {
-    colorFreezeLevel: 2,
+    colorFreezeLevel: 3,
+    color: BRANCH_COLORS,
     duration: 400,
     maxWidth: 350,
     initialExpandLevel: 2,
