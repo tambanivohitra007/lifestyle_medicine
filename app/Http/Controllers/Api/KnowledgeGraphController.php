@@ -429,6 +429,8 @@ class KnowledgeGraphController extends Controller
 
         $conditions = Condition::with([
             'interventions.careDomain',
+            'interventions.relationshipsAsA.interventionB',
+            'interventions.relationshipsAsB.interventionA',
             'scriptures',
             'recipes',
             'egwReferences',
@@ -469,10 +471,44 @@ class KnowledgeGraphController extends Controller
                     $domainTag = $domain ? ' <em style="color:#6b7280;font-size:0.85em">('.$domain.')</em>' : '';
                     $strength = $intervention->pivot?->strength_of_evidence;
                     $badge = $strength ? ' <span style="background:'.($this->evidenceBadgeColor($strength)).';color:#fff;padding:1px 6px;border-radius:8px;font-size:0.75em">'.$strength.'</span>' : '';
-                    $intChildren[] = [
+                    $intNode = [
                         'content' => '<span style="color:'.self::NODE_COLORS['intervention'].'">'.e($intervention->name).'</span>'.$domainTag.$badge,
                         'payload' => ['type' => 'intervention', 'entityId' => $intervention->id],
                     ];
+
+                    // Add relationships as sub-nodes
+                    $relChildren = [];
+                    foreach ($intervention->relationshipsAsA as $rel) {
+                        $relColor = self::RELATIONSHIP_COLORS[$rel->relationship_type] ?? '#94a3b8';
+                        $icon = match ($rel->relationship_type) {
+                            'synergy' => '&#9889;',
+                            'complementary' => '&#10003;',
+                            'caution' => '&#9888;',
+                            'conflict' => '&#10007;',
+                            default => '&#8226;',
+                        };
+                        $relChildren[] = [
+                            'content' => $icon.' <span style="color:'.$relColor.'">'.e($rel->interventionB?->name ?? '').'</span> <em style="color:#6b7280;font-size:0.8em">'.$rel->relationship_type.'</em>',
+                        ];
+                    }
+                    foreach ($intervention->relationshipsAsB as $rel) {
+                        $relColor = self::RELATIONSHIP_COLORS[$rel->relationship_type] ?? '#94a3b8';
+                        $icon = match ($rel->relationship_type) {
+                            'synergy' => '&#9889;',
+                            'complementary' => '&#10003;',
+                            'caution' => '&#9888;',
+                            'conflict' => '&#10007;',
+                            default => '&#8226;',
+                        };
+                        $relChildren[] = [
+                            'content' => $icon.' <span style="color:'.$relColor.'">'.e($rel->interventionA?->name ?? '').'</span> <em style="color:#6b7280;font-size:0.8em">'.$rel->relationship_type.'</em>',
+                        ];
+                    }
+                    if (! empty($relChildren)) {
+                        $intNode['children'] = $relChildren;
+                    }
+
+                    $intChildren[] = $intNode;
                 }
                 $condNode['children'][] = [
                     'content' => '<strong>'.$labels['interventions'].'</strong> <span style="color:#6b7280;font-size:0.85em">('.$interventions->count().')</span>',
